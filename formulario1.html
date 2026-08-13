@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="formulario1.css">
+    <link rel="stylesheet" href="estilos.css">
+    <title>LaFe Distribuidora</title>
+</head>
+<body>
+    <header>
+        <h2>LaFe Distribuidora</h2>
+    
+        <nav>
+            <ul>
+                <li><a href="index.html">Incio</a></li>
+                <li><a href="catalogo.html">Catalogo</a></li>
+                <li><a href="preguntas.html">Preguntas Frecuentes</a></li>
+                <li><a href="index.html#contacto">Contacto</a></li>
+                <li><a href="formulario1.html">¿Te intertesa?</a></li>
+            </ul>
+        </nav>
+
+    </header>
+
+    <h1>Registrate</h1>
+    <form method="post">
+
+        <label for="nombre">Nombre completo</label>
+        <input class="form1" type="text" name="nombre" required> <br>
+
+        <label for="correo">Correo electronico</label>
+        <input class="form1" type="email" name="correo" required> <br>
+
+        <label for="naci">Fecha de nacimiento</label>
+        <input class="form1" type="date" name="naci" required> <br>
+
+        <label for="civil">Estado civil</label>
+        <select class="form1" name="civil" required>
+            <option value="soltera">soltera/o</option>
+            <option value="casada">casada/o</option>
+            <option value="divorciada">divorciada/o</option>
+            <option value="viuda">viuda/o</option>
+        </select> <br>
+
+        <label for="laburo">Describa su situacion laboral</label>
+        <textarea class="form1" name="laburo"></textarea> <br>
+
+        <label for="enviar">Enviar</label>
+        <input class="form1" type="submit" name="enviar">
+
+    </form>
+    <footer>
+        Copyright 2026
+    </footer>
+</body>
+</html>
