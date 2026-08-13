@@ -1,3 +1,14 @@
-footer {
-    background: linear-gradient(#dc2525, #000);
+.nav {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navegador {
+    display: flex;
+
+}
+
+.listItemNav {
+    
 }
