@@ -2,53 +2,55 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="estilos.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
 <body>
-    <header>
+    <header class="sidebar">
         <h1>LaFe Distribuidora</h1>
-    
-        <nav>
-            <ul>
-                <li><a href="index.html">Incio</a></li>
-                <li><a href="catalogo.html">Catalogo</a></li>
-                <li><a href="preguntas.html">Preguntas Frecuentes</a></li>
-                <li><a href="index.html#contacto">Contacto</a></li>
+        <nav class="nav" aria-label="Navegación principal">
+            <ul class="ul-nav">
+                <li><a class="a-nav" href="index.html">Inicio</a></li>
+                <li><a class="a-nav" href="catalogo.html">Catálogo</a></li>
+                <li><a class="a-nav" href="preguntas.html">Preguntas Frecuentes</a></li>
+                <li><a class="a-nav" href="index.html#contacto">Contacto</a></li>
+                <li><a class="a-nav" href="formulario1.html">¿Te interesa?</a></li>
+                <li><a class="a-nav" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">Encontranos</a></li>
             </ul>
         </nav>
-
     </header>
 
-    <table>
-        <caption>Productos en venta</caption>
-        <thead>
-            <tr>
-                <th scope="col">Numero</th>
-                <th scope="col">Producto</th>
-                <th scope="col">Precio</th>
-            </tr>
-        </thead>
+    <main class="main-content">
+        <table class="table-catalogo">
+            <caption>Productos en venta</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Numero</th>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Precio</th>
+                </tr>
+            </thead>
 
-        <tbody>
-            <tr>
-                <th>1</th>
-                <td>Arroz</td>
-                <td>$1200</td>
-            </tr>
-            <tr>
-                <th>2</th>
-                <td>Fideos</td>
-                <td>$1450</td>
-            </tr>
-            <tr>
-                <th>3</th>
-                <td>Polenta</td>
-                <td>$999</td>
-            </tr>
-        </tbody>
-    </table>
-
+            <tbody>
+                <tr>
+                    <th>1</th>
+                    <td>Arroz</td>
+                    <td>$1200</td>
+                </tr>
+                <tr>
+                    <th>2</th>
+                    <td>Fideos</td>
+                    <td>$1450</td>
+                </tr>
+                <tr>
+                    <th>3</th>
+                    <td>Polenta</td>
+                    <td>$999</td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
     <footer>
         Copyright 2026
     </footer>

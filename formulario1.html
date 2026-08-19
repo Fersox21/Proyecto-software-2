@@ -8,49 +8,49 @@
     <title>LaFe Distribuidora</title>
 </head>
 <body>
-    <header>
-        <h2>LaFe Distribuidora</h2>
-    
-        <nav>
-            <ul>
-                <li><a href="index.html">Incio</a></li>
-                <li><a href="catalogo.html">Catalogo</a></li>
-                <li><a href="preguntas.html">Preguntas Frecuentes</a></li>
-                <li><a href="index.html#contacto">Contacto</a></li>
-                <li><a href="formulario1.html">¿Te intertesa?</a></li>
+    <header class="sidebar">
+        <h1>LaFe Distribuidora</h1>
+        <nav class="nav" aria-label="Navegación principal">
+            <ul class="ul-nav">
+                <li><a class="a-nav" href="index.html">Inicio</a></li>
+                <li><a class="a-nav" href="catalogo.html">Catálogo</a></li>
+                <li><a class="a-nav" href="preguntas.html">Preguntas Frecuentes</a></li>
+                <li><a class="a-nav" href="index.html#contacto">Contacto</a></li>
+                <li><a class="a-nav" href="formulario1.html">¿Te interesa?</a></li>
+                <li><a class="a-nav" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">Encontranos</a></li>
             </ul>
         </nav>
-
     </header>
+    <main class="main-content">
+        <h2>Registrate</h2>
+        <form method="post">
 
-    <h1>Registrate</h1>
-    <form method="post">
+            <label for="nombre">Nombre completo</label>
+            <input class="form1" type="text" name="nombre" required> <br>
 
-        <label for="nombre">Nombre completo</label>
-        <input class="form1" type="text" name="nombre" required> <br>
+            <label for="correo">Correo electronico</label>
+            <input class="form1" type="email" name="correo" required> <br>
 
-        <label for="correo">Correo electronico</label>
-        <input class="form1" type="email" name="correo" required> <br>
+            <label for="naci">Fecha de nacimiento</label>
+            <input class="form1" type="date" name="naci" required min="1936-01-01" max="2020-01-01"> <br>
 
-        <label for="naci">Fecha de nacimiento</label>
-        <input class="form1" type="date" name="naci" required min="1936-01-01" max="2020-01-01"> <br>
+            <label for="civil">Estado civil</label>
+            <select class="form1" name="civil" required>
+                <option value="" disabled selected>Selecciona..</option>
+                <option value="soltera">soltera/o</option>
+                <option value="casada">casada/o</option>
+                <option value="divorciada">divorciada/o</option>
+                <option value="viuda">viuda/o</option>
+            </select> <br>
 
-        <label for="civil">Estado civil</label>
-        <select class="form1" name="civil" required>
-            <option value="" disabled selected>Selecciona..</option>
-            <option value="soltera">soltera/o</option>
-            <option value="casada">casada/o</option>
-            <option value="divorciada">divorciada/o</option>
-            <option value="viuda">viuda/o</option>
-        </select> <br>
+            <label for="laburo">Describa su situacion laboral</label>
+            <textarea class="form1" name="laburo"></textarea> <br>
 
-        <label for="laburo">Describa su situacion laboral</label>
-        <textarea class="form1" name="laburo"></textarea> <br>
+            <label for="enviar">Enviar</label>
+            <input class="form1" type="submit" name="enviar">
 
-        <label for="enviar">Enviar</label>
-        <input class="form1" type="submit" name="enviar">
-
-    </form>
+        </form>
+    </main>
     <footer>
         Copyright 2026
     </footer>
