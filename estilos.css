@@ -1,3 +1,10 @@
+:root {
+    footer-color: #403f3f;
+    header-color: #858181;
+    nav-color: #000;
+    table-color: #000;
+}
+
 * {
     font-family: Helvetica, sans-serif;
     box-sizing: border-box;
@@ -28,7 +35,7 @@ footer {
     display: grid;
     justify-content: center;
     align-items: center;
-    background-color: #403f3f;
+    background-color: var(footer-color);
 
 }
 
@@ -36,7 +43,7 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    background-color: #858181;
+    background-color: var(header-color);
     padding: 10px;
     text-align: center;
 }
@@ -65,7 +72,7 @@ nav {
 
 .a-nav {
     text-decoration: none;
-    color: #000;
+    color: var(nav-color);
     font-size: 1rem;
 }
 
@@ -76,7 +83,7 @@ nav {
 }
 
 .table-catalogo  {
-    border: 2px solid #000;
+    border: 2px solid var(table-color);
 }
 
 /*
