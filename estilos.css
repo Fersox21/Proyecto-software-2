@@ -41,9 +41,11 @@ footer {
     text-align: center;
 }
 
-logo{
+.logo{
     mix-blend-mode: multiply;
     display: block;
+    width: 100%;
+    height: 80%;
 }
 
 nav {
