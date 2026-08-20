@@ -93,18 +93,27 @@ nav {
 /* Resolucion mas pequeña en desktop */
 @media screen and (max-width: 1032px) {
     h1 {
-        font-size: 1.5rem;
+        font-size: 10px;
     }
 }
 
 /* Para tablets */
 @media screen and (max-width: 1024px) {
+    h1 {
+        font-size: 2rem;
+    }
     body {
-        grid-template-columns: 160px 1fr;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        grid-template-areas: 
+        "header"
+        "main"
+        "footer";
     }
 
     .ul-nav {
         gap: 1rem;
+        flex-direction: row;
     }
 
     .a-nav {
@@ -119,9 +128,9 @@ nav {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
         grid-template-areas: 
+            "header"
             "main"
-            "footer"
-            "header";
+            "footer";
     }
 
     .sidebar {
