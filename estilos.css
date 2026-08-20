@@ -25,7 +25,11 @@ h1 {
 }
 
 footer {
+    display: grid;
+    justify-content: center;
+    align-items: center;
     background-color: #403f3f;
+
 }
 
 .sidebar {
