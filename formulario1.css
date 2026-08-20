@@ -1,10 +1,30 @@
-.form1 {
-    margin-top: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    box-sizing: border-box;
-    padding: 5px;
-    border: 2px solid #000;
-    border-radius: 5px;
+
+.contenido-principal {
+    display: flex;
+    flex-direction: column; /* lo amplia  */
+    align-items: center;    /* centra horizontalmente */
+    width: 100%;
+    padding-top: 2rem;       
 }
 
+
+.formulario-registro {
+    display: flex;
+    flex-direction: column; 
+    width: 100%;
+    max-width: 400px;       
+    margin-top: 2rem;       /* espacio entre el titulo y el form  */
+}
+
+
+.formulario-registro label {
+    margin-top: 15px;       
+    font-weight: bold;
+}
+
+.formulario-registro input, 
+.formulario-registro select, 
+.formulario-registro textarea {
+    padding: 8px;
+    margin-top: 5px;
+}
