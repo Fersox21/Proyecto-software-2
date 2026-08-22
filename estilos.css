@@ -85,9 +85,23 @@ nav {
 
 .a-nav {
     text-decoration: none;
-    color: var(nav-color);
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    position: relative;
+    color: #c5c4c2;
+    background-color: rgba(56, 56, 55, 0.63);
     font-size: 1rem;
 }
+
+
+.a-nav:hover {
+  background-color: rgba(158, 122, 3, 0.856);
+  color: #d4d3d3; 
+  transform: translate(4px, -4px); 
+}
+
 
 .main-content{
     margin-left: 2rem;
@@ -98,6 +112,111 @@ nav {
 .table-catalogo  {
     border: 2px solid var(table-color);
 }
+
+.contacto {
+  background-color: #fcf9f5; /* Fondo cálido que contrasta con el blanco */
+  padding: 5rem 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.contacto-contenedor {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 2rem;
+    align-items: center;
+}
+
+.contacto-info-general h2 {
+    font-size: 2rem;
+    color: #222222;
+    margin: 0.5rem 0 1rem;
+    line-height: 1.2;
+}
+
+.contacto-horario {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #777777;
+    font-size: 1rem;
+    background: rgba(0, 0, 0, 0.03);
+    padding: 0.4rem;
+    border-radius: 6px;
+}
+
+.contacto-canales {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.contacto-card {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    background-color: #ffffff;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    text-decoration: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.contacto-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+
+
+.card-icono {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.contacto-card.wsp .card-icono {
+  background-color: #e8f8ee;
+  color: #25d366;
+}
+
+.contacto-card.mail .card-icono {
+  background-color: #fff3e6;
+  color: #c25e00;
+}
+
+.card-detalle {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-etiqueta {
+  font-size: 0.8rem;
+  color: #888888;
+  font-weight: 500;
+}
+
+.card-valor {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222222;
+}
+
+
+.contacto-card:hover .card-flecha {
+  transform: translateX(4px);
+  color: #222222;
+}
+
 
 
 /* Resolucion mas pequeña en desktop */
@@ -143,8 +262,15 @@ nav {
             "footer";
     }
 
+.contacto-contenedor {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+  }
 
-}
+  .seccion-contacto {
+        padding: 3.5rem 1rem;
+  }
+
 
 
     .sidebar {
