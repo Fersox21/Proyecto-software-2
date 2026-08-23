@@ -1,8 +1,8 @@
 :root {
-    footer-color: #403f3f;
-    header-color: #858181;
-    nav-color: #000;
-    table-color: #000;
+    --footer-color: #403f3f;
+    --header-color: antiquewhite;
+    --nav-color: #000;
+    --table-color: #000;
 }
 
 * {
@@ -35,7 +35,7 @@ footer {
     display: grid;
     justify-content: center;
     align-items: center;
-    background-color: var(footer-color);
+    background-color: var(--footer-color);
     flex-direction: row;
     
 
@@ -45,7 +45,7 @@ footer {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    background-color: antiquewhite;
+    background-color: var(--header-color);
     padding: 10px;
     text-align: center;
 
@@ -110,7 +110,7 @@ nav {
 }
 
 .table-catalogo  {
-    border: 2px solid var(table-color);
+    border: 2px solid var(--table-color);
 }
 
 .contacto {
