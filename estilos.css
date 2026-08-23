@@ -3,7 +3,7 @@
     --header-color: #858181;
     --nav-color: #000;
     --table-color: #000;
-    --background-color
+    --background-color: #ffffff;
 }
 
 * {
@@ -36,7 +36,7 @@ footer {
     display: grid;
     justify-content: center;
     align-items: center;
-    background-color: var(footer-color);
+    background-color: var(--footer-color);
     flex-direction: row;
     
 
@@ -112,7 +112,7 @@ nav {
 }
 
 .table-catalogo  {
-    border: 2px solid var(table-color);
+    border: 2px solid var(--table-color);
 }
 
 .contacto {
