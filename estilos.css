@@ -13,6 +13,10 @@
     padding: 0;
 }
 
+#inicio {
+    text-align: left;
+}
+
 body {
     display: grid;
     grid-template-columns: 1fr 5fr;
