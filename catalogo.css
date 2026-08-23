@@ -1,0 +1,95 @@
+:root {
+    --color-input: #000; 
+}
+
+.div-buscador {
+    
+    display: flex;
+    align-items: center;
+    width: 300px;
+    border: 1px solid #7a7a7a; 
+    border-radius: 200px;
+    overflow: hidden;
+    background-color: white;
+    margin-bottom: 1rem;
+}
+
+.titulo-h2{
+    white-space: nowrap; /* para que no haga enter */
+    font-size: 1.5rem;   
+    text-align: center;
+    align-items: center;
+    margin : 0;
+    padding: 0%;
+    margin-bottom: 1rem;
+}
+
+#buscador {
+    color: var(--color-input);
+    flex-grow: 1;
+    border: none;
+    padding: 8px 10px;
+    outline: none;
+    font-family: Helvetica, sans-serif;
+    
+}
+
+.boton-buscador {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px; 
+    display: flex; 
+    align-items: center;
+    transition: background-color 0.2s ease;
+}
+
+.boton-buscador:hover {
+    background-color: #858181;  
+}
+
+
+.lupa {
+    width: 20px;  
+    height: 20px;
+    object-fit: contain; 
+    transition: filter 0.2s ease;
+    
+}
+
+.boton-buscador:hover .lupa {
+    filter: brightness(0) invert(1);
+}
+
+/*para sacar la cruz*/
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+}
+
+@media screen and (max-width: 768px){
+
+.div-buscador {
+    
+    display: flex;
+    align-items: center;
+    width: 210px;
+    border: 1px solid #7a7a7a; 
+    border-radius: 200px;
+    overflow: hidden;
+    background-color: white;
+    margin-bottom: 1rem;
+}
+
+.titulo-h2{
+    white-space: nowrap; /* para que no haga enter */
+    font-size: 1.5rem;   
+    text-align: center;
+    align-items: center;
+    margin : 0;
+    padding: 0%;
+    margin-bottom: 1rem;
+}
+}

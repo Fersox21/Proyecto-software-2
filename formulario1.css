@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column; /* lo amplia  */
     align-items: center;    /* centra horizontalmente */
-    width: 100%;
+    width: 100px;
     padding-top: 2rem;       
 }
 
@@ -11,7 +11,7 @@
 .formulario-registro {
     display: flex;
     flex-direction: column; 
-    width: 100%;
+    width: 200rem;
     max-width: 400px;       
     margin-top: 2rem;       /* espacio entre el titulo y el form  */
 }
@@ -27,4 +27,16 @@
 .formulario-registro textarea {
     padding: 8px;
     margin-top: 5px;
+}
+
+@media screen and (max-width: 768px){
+
+    .formulario-registro {
+    display: flex;
+    flex-direction: column; 
+    width: 100%;
+    max-width: 400px;       
+    margin-top: 2rem;       /* espacio entre el titulo y el form  */
+}
+
 }
