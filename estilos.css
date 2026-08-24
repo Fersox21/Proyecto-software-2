@@ -66,10 +66,12 @@ footer {
     height: 80%;
     max-width: 170px;
     justify-self: center;    
-    filter: brightness(1.5);   
+    filter: brightness(1.5) contrast(10);
+       
 }
 
 nav {
+    margin-top: 1rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -208,7 +210,58 @@ nav {
   color: #222222;
 }
 
+.inicio-content {
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
 
+.cuadrados {
+  display: grid;
+  /* Crea columnas que se adaptan al tamaño de la pantalla */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 30px;
+  max-width: 1000px;
+  margin: 0 auto; /*lo centra */
+}
+
+.cuadrado {
+  background-color: #fcf9f2; /* Color crema suave */
+  border-radius: 12px;
+  padding: 35px 25px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Sombra muy sutil */
+  border: 1px solid #eae1d0; /* Borde apenas visible */
+  transition: transform 0.2s ease; /* Transición suave al pasar el mouse */
+}
+
+.cuadrado:hover {
+  transform: translateY(-5px); /* Eleva la tarjeta un poquito */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cuadrado-icono {
+  font-size: 4em; /* Tamaño grande si usas emojis */
+  margin-bottom: 15px;
+}
+
+.cuadrado-icono img {
+  max-width: 90px;
+  height: auto;
+}
+
+.cuadrado h3 {
+  font-size: 1.5em;
+  color: #6b4c3a; /* Marrón cálido, tono panadería */
+  margin-bottom: 10px;
+  font-family: 'Georgia', serif;
+}
+
+.cuadrado p {
+  font-size: 1em;
+  color: #333333;
+  line-height: 1.5;
+  margin: 0;
+}
 /* Resolucion mas pequeña en desktop */
 @media screen and (max-width: 1032px) {
     h1 {
