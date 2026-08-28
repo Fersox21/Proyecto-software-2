@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="estilos.css">
     <link rel="stylesheet" href="catalogo.css">
-    <title>Document</title>
+    <script src="catalogo.js" defer></script>
+    <title>LaFe Distribuidora</title>
 </head>
 <body>
     <header class="sidebar">
@@ -36,36 +37,33 @@
             <div class="div-buscador">
                 <input type="search" id="buscador" placeholder="Buscar producto">
                 <button type="button" class="boton-buscador">
-                    <img src="Resources/Img/Items/search_24dp_7A7A7A_FILL0_wght400_GRAD0_opsz24.svg"
-                    class="lupa"
+                    <img src="Resources\Img\Items\search_24dp_7A7A7A_FILL0_wght400_GRAD0_opsz24.svg" 
+                    class="lupa" 
                     alt="buscador">
                 </button>
             </div>
-
-            <!-- Contenedor vacío: JavaScript inserta acá las tarjetas -->
-            <section id="grilla-productos" class="grilla-productos" aria-live="polite"></section>
-
-            <!-- Mensaje para cuando el buscador no encuentra nada -->
-            <p id="sin-resultados" class="sin-resultados" hidden>No se encontraron productos.</p>
-
-            <!--
-              Molde de una tarjeta. El contenido de <template> NO se muestra
-              ni carga imágenes hasta que JS lo clona. Es solo la "forma".
-            -->
-            <template id="tpl-producto">
-                <article class="card-producto">
+            <section id="sec-prod" class="sec-prod" aria-live="polite"></section>
+            <p id="sin-result" class="sin-result" hidden>No se encontraron productos.</p>
+            <template id="temp-card">
+                <article class="card">
+                    <h3 class="card-nom"></h3>
                     <img class="card-img" src="" alt="">
-                    <h3 class="card-nombre"></h3>
-                    <p class="card-precio"></p>
-                    <button type="button" class="card-boton">Agregar</button>
+                    <p class="card-prec"></p>
+                    <button class="card-bot"></button>
                 </article>
             </template>
+            <dialog id="modal-exito" class="modal">
+                <div class="modal-cont">
+                    <img class="modal-ico" src="Resources/Img/Icons/check.svg" alt="">
+                    <h3 class="modal-titulo">¡Producto agregado!</h3>
+                    <p class="modal-texto"></p>
+                    <button type="button" class="modal-cerrar" autofocus>Seguir comprando</button>
+                </div>
+            </dialog>
     </main>
     <footer>
         <p>LaFe se reserva todos los derechos</p>
         <p>Copyright 2026</p>
     </footer>
-
-    <script src="catalogo.js" defer></script>
 </body>
 </html>

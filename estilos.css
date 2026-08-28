@@ -3,7 +3,7 @@
     --header-color: #858181;
     --nav-color: #000;
     --table-color: #000;
-    --background-color: #ffffff;
+    --background-color: #333f;
 }
 
 * {
@@ -19,11 +19,12 @@
 
 body {
     display: grid;
-    grid-template-columns: 1fr 5fr;
-    grid-template-rows: 1fr auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto auto;
     grid-template-areas: 
-     "header main"
-     "footer footer";
+     "header"
+     "main"
+     "footer";
      min-height: 100vh;
 }
 
@@ -42,25 +43,23 @@ footer {
     align-items: center;
     background-color: var(--footer-color);
     flex-direction: row;
-    
+}
 
+.main-content {
+    margin: 3rem;
 }
 
 .sidebar {
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
+    flex-direction: row;
+    justify-content: space-between;
     background-color: var(--background-color);
-;
     padding: 10px;
     text-align: center;
-
-    background-image: url(/Resources/Img/Backgrounds/medialunas.jpg);
     background-size: 100%;
     background-position: center;
     background-size: cover;
-    
-
+    align-items: center;
 }
 
 
@@ -75,17 +74,18 @@ footer {
 
 nav {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
+    justify-content: center;
     align-items: center;
 }
 
 .ul-nav {
     list-style: none;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 2rem;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 }
 
 .a-nav {
@@ -97,7 +97,7 @@ nav {
     position: relative;
     color: #c5c4c2;
     background-color: rgba(56, 56, 55, 0.63);
-    font-size: 1rem;
+    font-size: 1.5rem;
 }
 
 
@@ -107,13 +107,6 @@ nav {
   transform: translate(4px, -4px); 
 }
 
-
-.main-content{
-    margin-left: 2rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-}
-
 .table-catalogo  {
     border: 2px solid var(--table-color);
 }
@@ -121,6 +114,7 @@ nav {
 .contacto {
   background-color: var(--background-color); 
   padding: 5rem 1.5rem;
+  border-radius: 10px;
 }
 
 .contacto-contenedor {
@@ -163,8 +157,6 @@ nav {
     border: 1px solid #eaeaea;
     border-radius: 12px;
     text-decoration: none;
-    
-    
 }
 
 .contactos:hover {
@@ -279,9 +271,5 @@ nav {
         flex-wrap: wrap;
         justify-content: center;
         gap: 0.8rem;
-    }
-
-    .main-content {
-        padding: 1rem;
     }
 }
