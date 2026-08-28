@@ -1,0 +1,20 @@
+[
+    {
+    "id": 1,
+    "nombre": "Harina",
+    "precio": 1200,
+    "imagen": "Resources/Img/Product-Images/harina.webp"
+  },
+  {
+    "id": 2,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "imagen": "Resources/Img/Product-Images/fideos.webp"
+  },
+  {
+    "id": 3,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "imagen": "Resources/Img/Product-Images/fideos.webp"
+  }
+]

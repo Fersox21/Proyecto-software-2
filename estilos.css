@@ -55,6 +55,7 @@ footer {
 .table-catalogo  {
     border: 2px solid var(--table-color);
 }
+
 #titulo-inicio {
     text-align: center;      /* Centra el texto */
     font-size: 2.5rem;       /* Un poco más grande para que tenga presencia */
@@ -65,14 +66,12 @@ footer {
 
 .imagen-banner {
     background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('Resources/Img/Backgrounds/fondo-inicio.png');
-
     width: 100%;
     height: 80vh;
-
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-
+    margin: 0;
     display: flex;
     flex-direction: column;
     justify-content: center;

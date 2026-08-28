@@ -1,0 +1,65 @@
+const formatoPrecio = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+});
+
+async function obtenerProductos(origen) {
+  const respuesta = await fetch(origen);
+  if (!respuesta.ok) throw new Error(`El servidor respondió ${respuesta.status}`);
+  const filas = await respuesta.json();
+  return filas.map((fila) => ({
+    id: fila.id ?? fila.id_producto,
+    nombre: fila.nombre ?? fila.descripcion,
+    precio: Number(fila.precio ?? 0),
+    imagen: fila.imagen ?? fila.url_imagen ?? "",
+  }));
+}
+
+// La función reutilizable. Recibe TODO lo que cambia entre páginas.
+export async function montarCatalogo({ origen, contenedor, template, onAgregar }) {
+  const grilla = document.querySelector(contenedor);
+  const molde = document.querySelector(template);
+  let todos = [];
+
+  function crearTarjeta(producto) {
+    const t = molde.content.cloneNode(true);
+    t.querySelector(".card-nom").textContent = producto.nombre;
+    t.querySelector(".card-prec").textContent = formatoPrecio.format(producto.precio);
+    const boton = t.querySelector(".card-bot");
+    boton.textContent = "Agregar";
+    const img = t.querySelector(".card-img");
+    img.src = producto.imagen || "Resources/Img/Product-Images/placeholder.webp";
+    img.alt = producto.nombre;
+    if (onAgregar) boton.addEventListener("click", () => onAgregar(producto));
+    return t;
+  }
+
+  function render(lista) {
+    if (lista.length === 0) {
+      grilla.innerHTML = `<p class="mensaje-grilla">No se encontraron productos.</p>`;
+      return;
+    }
+    grilla.innerHTML = "";
+    const frag = document.createDocumentFragment();
+    for (const p of lista) frag.append(crearTarjeta(p));
+    grilla.append(frag);
+  }
+
+  grilla.innerHTML = `<p class="mensaje-grilla">Cargando productos...</p>`;
+  try {
+    todos = await obtenerProductos(origen);
+    render(todos);
+  } catch (error) {
+    console.error(error);
+    grilla.innerHTML = `<p class="mensaje-grilla">No se pudieron cargar los productos.</p>`;
+  }
+
+  // Devuelve un "control" para que la página filtre si quiere (el buscador).
+  return {
+    filtrar(texto) {
+      const q = texto.trim().toLowerCase();
+      render(todos.filter((p) => p.nombre.toLowerCase().includes(q)));
+    },
+  };
+}

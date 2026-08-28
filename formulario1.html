@@ -10,6 +10,21 @@
 </head>
 <body>
     <header class="sidebar">
+
+        <div class="topbar">
+            <span class="topbar-item">
+            <i class="far fa-clock"></i>
+            Lun a Vie 8:00–16:00 · Sáb 9:00–13:00
+            </span>
+            <div class="topbar-contacto">
+            <a href="mailto:info@lafe.com" class="topbar-item">
+                <i class="far fa-envelope"></i> info@lafe.com
+            </a>
+            <a href="https://wa.me/5492664238128" class="topbar-item" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-whatsapp"></i> +54 9 2664 23-8128
+            </a>
+            </div>
+        </div>
         
         <a href="index.html" class="brand-logo">    
             <img 
@@ -30,7 +45,7 @@
         </nav>
     </header>
     <main class="main-content">
-        <h2>Registrate</h2>
+        <h2 class="form-tit">Registrate</h2>
         <form class="formulario-registro" method="post">
 
             <label for="nombre">Nombre completo</label>
@@ -38,6 +53,7 @@
 
             <label for="correo">Correo electronico</label>
             <input class="form1" type="email" name="correo" required> <br>
+            <p>Ejemplo: nombre@mail.com</p>
 
             <label for="naci">Fecha de nacimiento</label>
             <input class="form1" type="date" name="naci" required min="1936-01-01" max="2020-01-01"> <br>

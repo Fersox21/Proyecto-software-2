@@ -1,3 +1,5 @@
+import { montarCatalogo } from "./tarjetasProductos.js";
+
 const pista = document.getElementById('pista-marcas');
 const btnIzq = document.getElementById('btn-izq');
 const btnDer = document.getElementById('btn-der');
@@ -53,4 +55,20 @@ btnDer.addEventListener('click', () => {
     setTimeout(() => {
         enMovimiento = false;
     }, 400);
+});
+
+/* Productos destacados */
+
+const modal = document.querySelector("#modal-exito");
+const modalTexto = modal.querySelector(".modal-texto");
+modal.querySelector(".modal-cerrar").addEventListener("click", () => modal.close());
+
+montarCatalogo({
+  origen: "productosDestacados.json",
+  contenedor: "#sec-prod-dest",
+  template: "#temp-card-dest",
+  onAgregar: (producto) => {
+    modalTexto.textContent = `"${producto.nombre}" se agregó al carrito.`;
+    modal.showModal();
+  },
 });
