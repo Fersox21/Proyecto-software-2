@@ -62,21 +62,22 @@ footer {
     align-items: center;
 }
 
-
-.logo{
+.logo {
     mix-blend-mode: multiply;
     width: 100%;
-    height: 80%;
+    height: auto; /* IMPORTANTE: Cambiamos 80% por auto para no generar cajas fantasma */
     max-width: 170px;
     justify-self: center;    
-    filter: brightness(1.5);   
+   
 }
 
 nav {
+    margin-top: 0rem;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
+    margin-bottom: 0px;
 }
 
 .ul-nav {
@@ -109,6 +110,77 @@ nav {
 
 .table-catalogo  {
     border: 2px solid var(--table-color);
+}
+#titulo-inicio {
+    text-align: center;      /* Centra el texto */
+    font-size: 2.5rem;       /* Un poco más grande para que tenga presencia */
+    color: #4a3628;          /* Un marrón oscuro en lugar de negro puro combina mejor */
+    margin-bottom: 50px;     /* Empuja las tarjetas de los iconos hacia abajo */
+    font-family: 'Georgia', serif; /* Usa la misma letra clásica de los otros títulos */
+}
+
+.imagen-banner {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('Resources/Img/Backgrounds/fondo-inicio.png');
+
+    width: 100%;
+    height: 60vh;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+
+.imagen-banner-texto {
+    max-width: 800px; 
+    margin: 0 auto; 
+}
+
+
+.imagen-banner-texto h1 {
+    font-family: 'Georgia', serif; 
+    font-size: 3.5em; 
+    font-weight: bold;
+    color: #fcf9f2; 
+    line-height: 1.2; /* el renglon */
+    margin-bottom: 20px; 
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
+}
+
+/* Estilos para el Párrafo */
+.imagen-banner-texto p {
+    font-family: 'Montserrat', sans-serif; /* Letra moderna y limpia para contrastar con el título */
+    font-size: 1.3em; 
+    color: #e3d5ca; /* Un beige un poquito más oscuro que el título para no competir en importancia */
+    font-weight: 400;
+    margin: 0; 
+}
+
+.imagen-banner h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; 
+    letter-spacing: 3px; /* Separa las letras para un toque más profesional */
+    text-transform: uppercase; /* Fuerza las mayúsculas automáticamente */
+    font-size: 1.2em;
+    color: #e3d5ca; /* El beige claro que resalta sobre el fondo oscuro */
+    margin-bottom: 20px;
+}
+
+/* Ajuste para pantallas más pequeñas (celulares) */
+@media (max-width: 768px) {
+    .imagen-banner-texto h1 {
+        font-size: 2.2em; /* Achica el título en celulares */
+    }
+    
+    .imagen-banner-texto p {
+        font-size: 1.1em;
+    }
 }
 
 .contacto {
@@ -169,11 +241,9 @@ nav {
 .contacto-icono {
   width: 48px;
   height: 48px;
-  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
 }
 
 .contactos.wsp .contacto-icono {
@@ -204,7 +274,168 @@ nav {
   color: #222222;
 }
 
+.inicio-content {
+  padding: 60px 20px;
+  background-color: var(--background-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+    margin-top: -60px; 
+    
+   
+    position: relative; 
+    z-index: 10; 
+    
+   
+    border-radius: 30px 30px 0 0;
+}
 
+.cuadrados {
+    /* crea la grilla */
+  display: grid;
+    /* hace el tamaño maximo y minimo, el auto fit llena cada fila y lo repite */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    /* espacio entre los cuadros */
+  gap: 30px;
+    /* tamaño maximo */
+  max-width: 1000px;
+    /* lo centra */
+  margin: 1rem auto; 
+}
+
+.cuadrado {
+  background-color: #fcf9f2; 
+  border-radius: 12px;
+  /* espacio respecto a los bordes */
+  padding: 35px 25px;
+  /* centra todo */
+  text-align: center;
+  /* la sombra */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
+  /* Borde apenas visible */
+  border: 1px solid #eae1d0; 
+
+  transition: transform 0.2s ease; /* Transición suave al pasar el mouse */
+}
+
+.cuadrado:hover {
+  transform: translateY(-5px); /* Eleva la tarjeta un poquito */
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+
+.cuadrado-icono {
+    font-size: 4em;
+
+    width: 120px;  
+    height: 120px;
+    
+   
+    border-radius: 50%; 
+    background-color: #eae1d0;
+
+
+    padding: 15px; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 auto 20px auto;
+    box-sizing: border-box;
+}
+
+.cuadrado-icono img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cuadrado h3 {
+  font-size: 1.5em;
+  color: #6b4c3a; /* Marrón cálido, tono panadería */
+  margin-bottom: 10px;
+  font-family: 'Georgia', serif;
+}
+
+.cuadrado p {
+  font-size: 1em;
+  color: #333333;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ruleta-imagenes-titulo h2{
+    text-align: center;     
+    font-size: 2.5rem;       
+    color: #4a3628;         
+    margin-bottom: 50px;    
+    font-family: 'Georgia', serif;
+}
+
+
+.nuestras-marcas {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    
+}
+
+.nuestras-marcas-titulo h2 {
+    text-align: center;      
+    font-size: 2.5rem;       
+    color: #4a3628;         
+      
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    font-family: 'Georgia', serif;
+    margin-bottom: 20px;
+}
+
+.carrusel-contenedor {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
+}
+
+.imagenes-marcas {
+    display: flex;
+    gap: 40px;
+    align-items: center;
+    overflow-x: hidden;
+    scroll-behavior: smooth;
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto; 
+}
+
+
+.imagenes-marcas img {
+    flex: 0 0 auto; 
+    max-width: 150px;
+    height: 100px;
+    object-fit: contain;
+}
+
+
+.btn-carrusel {
+    background-color: #000000;
+    color: #fcf9f2; 
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-carrusel:hover {
+    background-color: #4a3628; /* Se oscurece al pasar el mouse */
+}
 /* Resolucion mas pequeña en desktop */
 @media screen and (max-width: 1032px) {
     h1 {
