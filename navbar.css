@@ -1,0 +1,121 @@
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--background-color);
+    padding: 0 0 1rem 0;
+    text-align: center;
+    background-size: 100%;
+    background-position: center;
+    background-size: cover;
+    align-items: center;
+}
+
+.logo {
+    mix-blend-mode: multiply;
+    width: 50%;
+    height: auto; /* IMPORTANTE: Cambiamos 80% por auto para no generar cajas fantasma */
+    max-width: 170px;
+    justify-self: center;    
+    
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  background-color: #0005;
+  color: #d9cfc0;
+  width: 100%;
+  font-size: 0.8rem;
+  padding: 0.4rem 1.5rem;
+}
+
+.topbar-contacto {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.topbar-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;                     /* separa el iconito del texto */
+  color: inherit;
+  text-decoration: none;
+}
+
+.topbar-item:hover {
+  text-decoration: underline;
+}
+
+nav {
+    margin-top: 0rem;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.ul-nav {
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.a-nav {
+    text-decoration: none;
+    display: block;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    transition: all 0.25s ease;
+    position: relative;
+    color: #c5c4c2;
+    background-color: rgba(56, 56, 55, 0.63);
+    font-size: 1.5rem;
+}
+
+
+.a-nav:hover {
+  background-color: rgba(158, 122, 3, 0.856);
+  color: #d4d3d3; 
+  transform: translate(4px, -4px); 
+}
+
+/* Para tablets */
+@media screen and (max-width: 1024px) {
+    h1 {
+        font-size: 2rem;
+    }
+
+    .ul-nav {
+        gap: 1rem;
+        flex-direction: row;
+    }
+
+    .a-nav {
+        font-size: 0.9rem;
+    }
+}
+
+/* Para celulares */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        height: auto;
+        padding: 1rem;
+        
+    }
+
+    .ul-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.8rem;
+    }
+}
