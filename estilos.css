@@ -46,7 +46,10 @@ footer {
 }
 
 .main-content {
-    margin: 3rem;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    gap: 2rem;
 }
 
 .sidebar {
@@ -64,11 +67,11 @@ footer {
 
 .logo {
     mix-blend-mode: multiply;
-    width: 100%;
+    width: 50%;
     height: auto; /* IMPORTANTE: Cambiamos 80% por auto para no generar cajas fantasma */
     max-width: 170px;
     justify-self: center;    
-   
+    
 }
 
 nav {
@@ -123,7 +126,7 @@ nav {
     background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('Resources/Img/Backgrounds/fondo-inicio.png');
 
     width: 100%;
-    height: 60vh;
+    height: 80vh;
 
     background-size: cover;
     background-position: center;
@@ -184,7 +187,7 @@ nav {
 }
 
 .contacto {
-  background-color: var(--background-color); 
+  background-color: white; 
   padding: 5rem 1.5rem;
   border-radius: 10px;
 }
@@ -225,7 +228,7 @@ nav {
     align-items: center;
     gap: 1.25rem;
     padding: 1.25rem;
-    background-color: var(--background-color);
+    background-color: white;
     border: 1px solid #eaeaea;
     border-radius: 12px;
     text-decoration: none;
@@ -276,10 +279,11 @@ nav {
 
 .inicio-content {
   padding: 60px 20px;
-  background-color: var(--background-color);
+  background-color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   
     margin-top: -60px; 
+   
     
    
     position: relative; 
@@ -295,7 +299,7 @@ nav {
     /* hace el tamaño maximo y minimo, el auto fit llena cada fila y lo repite */
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     /* espacio entre los cuadros */
-  gap: 30px;
+  gap: 6rem;
     /* tamaño maximo */
   max-width: 1000px;
     /* lo centra */
@@ -362,6 +366,14 @@ nav {
   margin: 0;
 }
 
+.ruleta-imagenes {
+    width: 100%;
+
+    margin: 0 auto;
+    padding: 40px 20px;
+  
+}
+
 .ruleta-imagenes-titulo h2{
     text-align: center;     
     font-size: 2.5rem;       
@@ -373,10 +385,10 @@ nav {
 
 .nuestras-marcas {
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
-    padding: 40px 20px;
-    
+    padding: 40px 100px;
+    background-color: white;
+    ;
 }
 
 .nuestras-marcas-titulo h2 {
