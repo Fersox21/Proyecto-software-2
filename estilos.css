@@ -4,6 +4,14 @@
     --nav-color: #000;
     --table-color: #000;
     --background-color: #333f;
+
+    --surface: #f4ede4;     
+    --accent: #b08968;         /* Marrón pastel medio */
+    --accent-hover: #7f5539;   /* Marrón tostado para hovers y contraste */
+    --text-primary: #3d2b1f;   /* Marrón muy oscuro para texto legible */
+    --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
+    --border-color: #e6ccb2;   /* Borde suave sutil */
+    --focus-highlight: #ddb892;/* Color de resalte al enfocar */
 }
 
 * {
@@ -389,6 +397,71 @@ footer {
 .btn-carrusel:hover {
     background-color: #4a3628; /* Se oscurece al pasar el mouse */
 }
+
+/* Seccion preguntas */
+
+.preguntas-content {
+    padding-left: 0.4rem;
+}
+
+.preguntas-content p {
+    text-align: left;
+    justify-content: flex-start;
+    padding: 0.5rem;
+   margin-left: 1rem;
+    border: #000;
+    background-color: var(--surface);
+    border-radius: 5px; 
+    height: fit-content;
+    
+}
+
+.preguntas-content h2{
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--text-colors, #3d2b1f);
+    padding: 1rem;
+}
+
+
+.preguntas-content ol {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+
+.preguntas-content ol li a {
+    display: block;
+    text-decoration: none;
+    color: var(--text-primary, #3d2b1f);
+    background-color: var(--surface, #f4ede4);
+    border: 1px solid var(--border-color, #e6ccb2);
+    padding: 0.85rem 1.2rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    
+}
+
+.preguntas-content ol li a:hover {
+    background-color: #ede0d4;
+    border-color: var(--accent, #b08968);
+    transform: translateX(4px);
+}
+
+
+.preguntas-content h2:target {
+    color: var(--accent-hover, #7f5539);
+    background-color: var(--focus-highlight, #ddb892);
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    display: inline-block;
+    animation: pulse 1.2s ease-out;
+}
+
+
 
 /* ---- Media Queries ---- */
 
