@@ -50,6 +50,7 @@ footer {
     flex-direction: column;
     margin: 0;
     gap: 2rem;
+    min-width: 100%;
 }
 
 .table-catalogo  {
@@ -388,11 +389,13 @@ footer {
 .btn-carrusel:hover {
     background-color: #4a3628; /* Se oscurece al pasar el mouse */
 }
+
+/* ---- Media Queries ---- */
+
 /* Resolucion mas pequeña en desktop */
 @media screen and (max-width: 1032px) {
-    h1 {
-        font-size: 10px;
-    }
+    
+    
 }
 
 /* Para tablets */

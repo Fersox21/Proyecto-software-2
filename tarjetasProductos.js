@@ -13,6 +13,7 @@ async function obtenerProductos(origen) {
     nombre: fila.nombre ?? fila.descripcion,
     precio: Number(fila.precio ?? 0),
     imagen: fila.imagen ?? fila.url_imagen ?? "",
+    categoria: fila.categoria ?? "otros",
   }));
 }
 
@@ -55,11 +56,31 @@ export async function montarCatalogo({ origen, contenedor, template, onAgregar }
     grilla.innerHTML = `<p class="mensaje-grilla">No se pudieron cargar los productos.</p>`;
   }
 
-  // Devuelve un "control" para que la página filtre si quiere (el buscador).
+    // Guardamos los criterios activos y una función que los aplica todos juntos.
+  let criterios = { texto: "", categorias: [], precioMax: Infinity };
+
+  function aplicarCriterios() {
+    const q = criterios.texto.trim().toLowerCase();
+    render(
+      todos.filter((p) => {
+        const okTexto = p.nombre.toLowerCase().includes(q);
+        const okCategoria =
+          criterios.categorias.length === 0 ||
+          criterios.categorias.includes(p.categoria);
+        const okPrecio = p.precio <= criterios.precioMax;
+        return okTexto && okCategoria && okPrecio;
+      })
+    );
+  }
+
   return {
-    filtrar(texto) {
-      const q = texto.trim().toLowerCase();
-      render(todos.filter((p) => p.nombre.toLowerCase().includes(q)));
+    buscar(texto) {
+      criterios.texto = texto;
+      aplicarCriterios();
+    },
+    filtrar(nuevos) {
+      criterios = { ...criterios, ...nuevos };
+      aplicarCriterios();
     },
   };
 }

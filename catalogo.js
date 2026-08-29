@@ -16,5 +16,59 @@ const catalogo = await montarCatalogo({
 
 // El buscador solo existe en esta página:
 document.querySelector("#buscador").addEventListener("input", (e) => {
-  catalogo.filtrar(e.target.value);
+  catalogo.buscar(e.target.value);
+});
+
+// ---------- Panel de filtros ----------
+const btnFiltros    = document.querySelector("#btn-filtros");
+const panel         = document.querySelector("#panel-filtros");
+const fondo         = document.querySelector("#fondo-filtros");
+const btnCerrar     = document.querySelector("#btn-cerrar-filtros");
+const form          = document.querySelector("#form-filtros");
+const precioMax     = document.querySelector("#precio-max");
+const precioMaxVal  = document.querySelector("#precio-max-valor");
+
+function abrirPanel() {
+  panel.classList.add("abierto");
+  fondo.hidden = false;
+  btnFiltros.setAttribute("aria-expanded", "true");
+  panel.setAttribute("aria-hidden", "false");
+}
+
+function cerrarPanel() {
+  panel.classList.remove("abierto");
+  fondo.hidden = true;
+  btnFiltros.setAttribute("aria-expanded", "false");
+  panel.setAttribute("aria-hidden", "true");
+}
+
+btnFiltros.addEventListener("click", abrirPanel);
+btnCerrar.addEventListener("click", cerrarPanel);
+fondo.addEventListener("click", cerrarPanel);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") cerrarPanel();
+});
+
+// mostrar el valor del rango mientras se mueve
+precioMax.addEventListener("input", () => {
+  precioMaxVal.textContent = `$${Number(precioMax.value).toLocaleString("es-AR")}`;
+});
+
+// aplicar filtros
+form.addEventListener("submit", (e) => {
+  e.preventDefault();                      // que no recargue la página
+  const datos = new FormData(form);
+  catalogo.filtrar({
+    categorias: datos.getAll("categoria"), // array con los checkboxes marcados
+    precioMax: Number(datos.get("precioMax")),
+  });
+  cerrarPanel();
+});
+
+// limpiar
+form.addEventListener("reset", () => {
+  setTimeout(() => {                        // esperar a que el form se vacíe
+    catalogo.filtrar({ categorias: [], precioMax: Infinity });
+    precioMaxVal.textContent = "$5.000";
+  });
 });

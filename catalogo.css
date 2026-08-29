@@ -68,6 +68,100 @@ input[type="search"]::-webkit-search-results-decoration {
   -webkit-appearance: none;
 }
 
+.barra-superior {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-filtros {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid #7a7a7a;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+.btn-filtros:hover { background: #f2ebe0; }
+
+/* --- EL PANEL --- */
+.panel-filtros {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 85vw);        /* 320px, o 85% en pantallas chicas */
+  background: #fff;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.15);
+  padding: 1.5rem;
+  z-index: 100;
+  overflow-y: auto;               /* si hay muchos filtros, scrollea */
+
+  transform: translateX(-100%);   /* ESCONDIDO fuera de pantalla */
+  transition: transform 0.28s ease;
+}
+
+.panel-filtros.abierto {
+  transform: translateX(0);       /* VISIBLE */
+}
+
+/* --- EL FONDO OSCURO --- */
+.fondo-filtros {
+  position: fixed;
+  inset: 0;                       /* top/right/bottom/left: 0 */
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 90;                    /* debajo del panel (100), encima de todo lo demás */
+}
+
+/* --- CONTENIDO DEL PANEL --- */
+.panel-filtros-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+.btn-cerrar-filtros {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.form-filtros fieldset {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+.form-filtros legend { font-weight: 600; padding: 0 0.4rem; }
+.form-filtros label { display: block; padding: 0.35rem 0; cursor: pointer; }
+
+.form-filtros-acciones { display: flex; gap: 0.75rem; margin-top: 0.5rem; }
+.btn-aplicar {
+  flex: 1;
+  background: #7a1f2b;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+.btn-limpiar {
+  flex: 1;
+  background: #eee;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem;
+  cursor: pointer;
+}
+
+/* respeta a quien pidió menos animaciones */
+@media (prefers-reduced-motion: reduce) {
+  .panel-filtros { transition: none; }
+}
+
 /* Telefono */
 @media screen and (max-width: 768px){
 
