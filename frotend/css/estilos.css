@@ -11,7 +11,7 @@
     --text-primary: #3d2b1f;   /* Marrón muy oscuro para texto legible */
     --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
     --border-color: #e6ccb2;   /* Borde suave sutil */
-    --focus-highlight: #ddb892;/* Color de resalte al enfocar */
+    --focus-highlight: #ddb8927e;/* Color de resalte al enfocar */
 }
 
 * {
@@ -413,14 +413,16 @@ footer {
     background-color: var(--surface);
     border-radius: 5px; 
     height: fit-content;
+    max-width: fit-content;
     
 }
 
 .preguntas-content h2{
     font-weight: 600;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: var(--text-colors, #3d2b1f);
-    padding: 1rem;
+    padding: 0.4rem 0.8rem;
+    margin: 1rem;
 }
 
 
@@ -432,10 +434,15 @@ footer {
     gap: 0.75rem;
 }
 
+.preguntas-content {
+    margin-bottom: 2rem;
+}
+
 
 .preguntas-content ol li a {
     display: block;
     text-decoration: none;
+    max-width: max-content;
     color: var(--text-primary, #3d2b1f);
     background-color: var(--surface, #f4ede4);
     border: 1px solid var(--border-color, #e6ccb2);
@@ -453,8 +460,8 @@ footer {
 
 
 .preguntas-content h2:target {
-    color: var(--accent-hover, #7f5539);
-    background-color: var(--focus-highlight, #ddb892);
+    color: var(--accent-hover, #dfa079);
+    background-color: var(--focus-highlight);
     padding: 0.4rem 0.8rem;
     border-radius: 6px;
     display: inline-block;
