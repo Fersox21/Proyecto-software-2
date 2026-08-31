@@ -21,16 +21,16 @@
 }
 
 .topbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem 1.5rem;
-  background-color: #0005;
-  color: #d9cfc0;
-  min-width: 100%;
-  font-size: 0.8rem;
-  padding: 0.4rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    background-color: #0005;
+    color: #d9cfc0;
+    min-width: 100%;
+    font-size: 0.8rem;
+    padding: 0.4rem 1.5rem;
 }
 
 .topbar-contacto {
@@ -78,7 +78,10 @@ nav {
     position: relative;
     color: #c5c4c2;
     background-color: rgba(56, 56, 55, 0.63);
-    font-size: 1.5rem;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 0.875rem; /* 14px */
+    font-weight: 500;    /* Medium */
+     letter-spacing: 0.01em;
 }
 
 
