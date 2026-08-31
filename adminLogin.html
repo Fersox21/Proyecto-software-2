@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/frotend/css/navbar.css">
+    <link rel="stylesheet" href="/frotend/css/panelAdmin/adminlogin.css">
+    <script type="module" src="/frotend/js/panelAdmin/adminValidate.js"></script>
+    <title>Document</title>
+</head>
+<body>
+
+    <header class="sidebar">
+
+        <div class="topbar">
+                <span class="topbar-item">
+                <i class="far fa-clock"></i>
+                Lun a Vie 8:00–16:00 · Sáb 9:00–13:00
+                </span>
+                <div class="topbar-contacto">
+                <a href="mailto:info@lafe.com" class="topbar-item">
+                    <i class="far fa-envelope"></i> info@lafe.com
+                </a>
+                <a href="https://wa.me/5492664238128" class="topbar-item" target="_blank" rel="noopener noreferrer">
+                    <i class="fab fa-whatsapp"></i> +54 9 2664 23-8128
+                </a>
+                </div>
+            </div>
+        
+        <a href="index.html" class="brand-logo">    
+            <img 
+                src="/Resources/Img/Logo/Logo-Lafe.png" 
+                class="logo"
+                alt="LaFe Distribuidora"
+            >
+            </a>
+    </header>
+
+    <main>
+        <h2>Ingreso administrador</h2>
+        <form class="formulario-registro" action="/login" method="post">
+            <label for="contraseña">Ingrese la contraseña:</label>
+            <input class="form1" type="password" id="contraseña" name="contraseña" required>
+
+            <input class="form1" type="submit" name="enviar" value="Ingresar">
+        </form>
+    </main>
+    
+</body>
+</html>
