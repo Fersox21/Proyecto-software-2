@@ -1,0 +1,42 @@
+:root {
+    --color-main: #B9C1D6;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    grid-template-rows: 1fr;
+    min-height: 100vh;
+    grid-template-areas: 
+    "sidebar-admin main-admin";
+}
+
+#sidebar-admin {grid-area: sidebar-admin;}
+#main-admin {grid-area: main-admin;}
+
+.main-admin {
+    background-color: var(--color-main);
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.5fr 6fr;
+    min-height: 100vh;
+    grid-template-areas: 
+    "Encabezado"
+    "Principal";
+}
+
+.aside-admin {
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem;
+    background-color: beige;
+}
+
+.h2-admin {
+    margin: 1rem;
+}
