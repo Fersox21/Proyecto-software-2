@@ -17,7 +17,6 @@ async function obtenerProductos(origen) {
   }));
 }
 
-// La función reutilizable. Recibe TODO lo que cambia entre páginas.
 export async function montarCatalogo({ origen, contenedor, template, onAgregar }) {
   const grilla = document.querySelector(contenedor);
   const molde = document.querySelector(template);

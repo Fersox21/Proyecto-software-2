@@ -4,48 +4,55 @@
     "nombre": "Harina",
     "precio": 1200,
     "categoria": "harinas",
-    "imagen": "Resources/Img/Product-Images/harina.webp"
+    "imagen": "Resources/Img/Product-Images/harina.webp",
+    "stock": 21
   },
   {
     "id": 2,
     "nombre": "Fideos",
     "precio": 1450,
     "categoria": "pastas",
-    "imagen": "Resources/Img/Product-Images/fideos.webp"
+    "imagen": "Resources/Img/Product-Images/fideos.webp",
+    "stock": 8
   },
   {
     "id": 3,
     "nombre": "Polenta",
     "precio": 999,
     "categoria": "harinas",
-    "imagen": "Resources/Img/Product-Images/polenta.webp"
+    "imagen": "Resources/Img/Product-Images/polenta.webp",
+    "stock": 39
   },
   {
     "id": 4,
     "nombre": "Arroz",
     "precio": 999,
     "categoria": "granos",
-    "imagen": "Resources/Img/Product-Images/arroz.webp"
+    "imagen": "Resources/Img/Product-Images/arroz.webp",
+    "stock": 16
   },
   {
     "id": 5,
     "nombre": "Huevos",
     "precio": 999,
     "categoria": "harinas",
-    "imagen": "Resources/Img/Product-Images/huevos.webp"
+    "imagen": "Resources/Img/Product-Images/huevos.webp",
+    "stock": 32
   },
   {
     "id": 6,
     "nombre": "Polenta",
     "precio": 999,
     "categoria": "harinas",
-    "imagen": "Resources/Img/Product-Images/polenta.webp"
+    "imagen": "Resources/Img/Product-Images/polenta.webp",
+    "stock": 0
   },
   {
     "id": 7,
     "nombre": "Polenta",
     "precio": 999,
     "categoria": "harinas",
-    "imagen": "Resources/Img/Product-Images/polenta.webp"
+    "imagen": "Resources/Img/Product-Images/polenta.webp",
+    "stock": 10
   }
 ]
