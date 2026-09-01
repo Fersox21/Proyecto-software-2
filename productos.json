@@ -33,7 +33,7 @@
   },
   {
     "id": 5,
-    "nombre": "Huevos",
+    "nombre": "Huevos medianos",
     "precio": 999,
     "categoria": "harinas",
     "imagen": "Resources/Img/Product-Images/huevos.webp",
@@ -89,7 +89,7 @@
   },
   {
     "id": 5,
-    "nombre": "Huevos",
+    "nombre": "Huevos medianos",
     "precio": 999,
     "categoria": "harinas",
     "imagen": "Resources/Img/Product-Images/huevos.webp",
@@ -145,7 +145,7 @@
   },
   {
     "id": 5,
-    "nombre": "Huevos",
+    "nombre": "Huevos pequeños",
     "precio": 999,
     "categoria": "harinas",
     "imagen": "Resources/Img/Product-Images/huevos.webp",
@@ -201,7 +201,7 @@
   },
   {
     "id": 5,
-    "nombre": "Huevos",
+    "nombre": "Huevos grandes",
     "precio": 999,
     "categoria": "harinas",
     "imagen": "Resources/Img/Product-Images/huevos.webp",
