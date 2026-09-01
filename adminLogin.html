@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/frotend/css/navbar.css">
     <link rel="stylesheet" href="/frotend/css/panelAdmin/adminlogin.css">
-    <script type="module" src="/frotend/js/panelAdmin/adminValidate.js"></script>
+    <script src="/frotend/js/panelAdmin/adminValidate.js"></script>
     <title>LaFe Distribuidora</title>
 </head>
 <body>
@@ -38,11 +38,11 @@
 
     <main>
         <h2>Ingreso administrador</h2>
-        <form class="formulario-registro" action="/login" method="post">
+        <form class="formulario-registro" method="post" novalidate>
             <label for="contraseña">Ingrese la contraseña:</label>
             <input class="form1" type="password" id="contraseña" name="contraseña" required>
 
-            <input class="form1" type="submit" name="enviar" value="Ingresar">
+            <input class="btn-login" type="submit" name="enviar" value="Ingresar" onclick="login(event)">
         </form>
     </main>
     
