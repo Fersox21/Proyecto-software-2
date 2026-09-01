@@ -56,7 +56,7 @@ body {
 }
 
 .agregar-prod:hover {
-    background-color: var(--color-foco-h);
+    background-color: var(--color-foco-hover);
     color: var(--color-foco);
 }
 
@@ -120,4 +120,38 @@ body {
 
 .tabla-prod-admin tbody tr:hover {
   background: #f8fafc;
+}
+
+.tabla-admin-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.control-pag { display: flex; align-items: center; gap: 4px; }
+#nums-pag { display: inline-flex; gap: 4px; }
+
+.control-pag button,
+.nums-pag {
+  min-width: 28px;
+  height: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: white;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+.nums-pag.activo {
+  background: var(--color-foco);
+  border-color: var(--color-foco);
+  color: white;
+}
+.control-pag button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
