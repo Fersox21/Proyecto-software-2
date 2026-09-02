@@ -13,18 +13,6 @@
     --color-topbar-texto:    #c9c1b3;   /* texto e iconos del topbar */
 }
 
-/* Header *//*
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background-color: var(--color-header);
-    padding: 0 0 1rem 0;
-    text-align: center;
-    align-items: center;
-    min-width: 100%;
-}
-*/
 .sidebar {
     background-color: var(--color-header);
 }
