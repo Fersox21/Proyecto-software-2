@@ -10,7 +10,7 @@
 
     /* TOPBAR */
     --color-topbar:          #262220;   /* fondo del topbar */
-    --color-topbar-texto:    #c9c1b3;   /* texto e iconos del topbar */
+    --color-topbar-texto:    white;   /* texto e iconos del topbar */
 }
 
 .sidebar {
