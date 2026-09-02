@@ -1,9 +1,9 @@
 
 .contenido-principal {
     display: flex;
-    flex-direction: column; /* lo amplia  */
-    align-items: center;    /* centra horizontalmente */
-    width: 100px;
+    flex-direction: column;
+    align-items: center;
+    width: 100vw;
     padding-top: 2rem;       
 }
 
@@ -28,9 +28,7 @@
     font-weight: bold;
 }
 
-.formulario-registro input, 
-.formulario-registro select, 
-.formulario-registro textarea {
+.formulario-registro input, .formulario-registro select, .formulario-registro textarea {
     padding: 8px;
     margin-top: 5px;
 }
@@ -42,7 +40,7 @@
     flex-direction: column; 
     width: 100%;
     max-width: 400px;       
-    margin-top: 2rem;       /* espacio entre el titulo y el form  */
+    margin-top: 2rem; 
 }
 
 }
