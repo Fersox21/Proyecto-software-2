@@ -41,6 +41,35 @@ body {
     border-bottom: 3px solid var(--color-navbar);
 }
 
+.nav-admin {
+    display: flex;
+    flex-direction: column;
+}
+
+.li-nav {
+    display: flex;
+    align-items: center; /* Centra verticalmente el ícono y el texto */
+    gap: 12px; /* Espaciado uniforme sin depender de márgenes */
+}
+
+.a-nav-admin{
+    display: flex;
+}
+
+.li-nav-h {
+    padding: 0.6rem 1rem;
+    margin: 0.25rem 0.75rem;
+    border-radius: 8px;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.li-nav-h:hover {
+    background-color: rgba(59, 76, 206, 0.08); 
+    transform: translateX(6px); 
+}
+
+
+
 .h1-admin {
     margin: 1rem;
     font-weight: bold;
