@@ -372,7 +372,7 @@ footer {
     display: flex;
     gap: 40px;
     align-items: center;
-    overflow-x: hidden;
+    overflow-x: hidden; 
     scroll-behavior: smooth;
     width: 100%;
     max-width: 850px;
@@ -402,6 +402,18 @@ footer {
 
 .btn-carrusel:hover {
     background-color: #4a3628; /* Se oscurece al pasar el mouse */
+}
+
+@media (max-width: 768px) {
+
+    #btn-izq, #btn-der {
+        display: none;
+    }
+   
+    #pista-marcas {
+        flex-wrap: wrap; 
+        justify-content: center; 
+    }
 }
 
 /* Seccion preguntas */
