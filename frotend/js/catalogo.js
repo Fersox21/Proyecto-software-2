@@ -72,3 +72,20 @@ form.addEventListener("reset", () => {
     precioMaxVal.textContent = "$5.000";
   });
 });
+
+const paramsFooter = new URLSearchParams(window.location.search);
+const categoriaFooter = paramsFooter.get('categoria');
+
+if (categoriaFooter) {
+  // 1. Filtramos el catálogo usando tu método existente
+  catalogo.filtrar({
+    categorias: [categoriaFooter], // Lo pasamos como array porque tu lógica usa datos.getAll()
+    precioMax: Infinity            // O el valor máximo que uses por defecto
+  });
+
+  // 2. Tildamos el checkbox correspondiente en el panel para que la interfaz quede sincronizada
+  const checkboxFiltro = form.querySelector(`input[name="categoria"][value="${categoriaFooter}"]`);
+  if (checkboxFiltro) {
+    checkboxFiltro.checked = true;
+  }
+}
