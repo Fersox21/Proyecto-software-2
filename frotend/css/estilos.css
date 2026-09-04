@@ -12,6 +12,7 @@
     --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
     --border-color: #e6ccb2;   /* Borde suave sutil */
     --focus-highlight: #ddb8927e;/* Color de resalte al enfocar */
+    --color-section-prodDest: #1F1C17;
 }
 
 * {
@@ -73,55 +74,12 @@ footer {
     font-family: 'Georgia', serif; /* Usa la misma letra clásica de los otros títulos */
 }
 
-.imagen-banner {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/Resources/Img/Backgrounds/fondo-inicio.png");
-    width: 100%;
-    height: 80vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 0;
+#section-prodDest {
+    min-height: 80vh;
+    background-color: var(--color-section-prodDest);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-
-.imagen-banner-texto {
-    max-width: 800px; 
-    margin: 0 auto; 
-}
-
-
-.imagen-banner-texto h1 {
-    font-family: 'Georgia', serif; 
-    font-size: 3.5em; 
-    font-weight: bold;
-    color: #fcf9f2; 
-    line-height: 1.2; /* el renglon */
-    margin-bottom: 20px; 
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
-}
-
-/* Estilos para el Párrafo */
-.imagen-banner-texto p {
-    font-family: 'Montserrat', sans-serif; /* Letra moderna y limpia para contrastar con el título */
-    font-size: 1.3em; 
-    color: #e3d5ca; /* Un beige un poquito más oscuro que el título para no competir en importancia */
-    font-weight: 400;
-    margin: 0; 
-}
-
-.imagen-banner h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700; 
-    letter-spacing: 3px; /* Separa las letras para un toque más profesional */
-    text-transform: uppercase; /* Fuerza las mayúsculas automáticamente */
-    font-size: 1.2em;
-    color: #e3d5ca; /* El beige claro que resalta sobre el fondo oscuro */
-    margin-bottom: 20px;
 }
 
 /* Ajuste para pantallas más pequeñas (celulares) */
@@ -228,18 +186,12 @@ footer {
 
 .inicio-content {
   padding: 60px 20px;
-  background-color: white;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
-    margin-top: -60px; 
-   
-    
-   
-    position: relative; 
-    z-index: 10; 
-    
-   
-    border-radius: 30px 30px 0 0;
+  margin-top: -60px;
+  position: relative; 
+  z-index: 10; 
+  border-radius: 30px 30px 0 0;
+  margin-top: 2rem;
 }
 
 .cuadrados {

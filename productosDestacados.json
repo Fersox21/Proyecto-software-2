@@ -3,18 +3,21 @@
     "id": 1,
     "nombre": "Harina",
     "precio": 1200,
+    "descripcion": "25 kg",
     "imagen": "Resources/Img/Product-Images/harina.webp"
   },
   {
     "id": 2,
     "nombre": "Fideos",
     "precio": 1450,
+    "descripcion": "25 kg",
     "imagen": "Resources/Img/Product-Images/fideos.webp"
   },
   {
     "id": 3,
     "nombre": "Fideos",
     "precio": 1450,
+    "descripcion": "25 kg",
     "imagen": "Resources/Img/Product-Images/fideos.webp"
   }
 ]

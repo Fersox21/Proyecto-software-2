@@ -55,13 +55,20 @@
   font-family: Helvetica, sans-serif;
 }
 
+.card-desc {
+  margin: 0;
+  font-size: 0.9rem;
+  font-family: Helvetica, sans-serif;
+  color: black;
+}
+
 .card-prec {
   margin: 0;
   font-weight: 700;
   color: #7a1f2b;
 }
 
-.card-bot {
+.card-butt {
   margin-top: auto;
   padding: 0.5rem 0.75rem;
   border: none;
@@ -73,7 +80,7 @@
   transition: background-color 0.2s ease;
 }
 
-.card-bot:hover {
+.card-butt:hover {
   background-color: #5c161f;
 }
 

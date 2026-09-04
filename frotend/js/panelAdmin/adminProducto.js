@@ -26,6 +26,7 @@ async function obtenerProductos(origen) {
     nombre: fila.nombre,
     categoria: fila.categoria ?? "otros",
     precio: Number(fila.precio ?? 0),
+    descripcion: fila.descripcion ?? "",
     stock: Number(fila.stock ?? 0),
   }));
 }
@@ -37,7 +38,8 @@ function crearFila(producto){
     fila.querySelector(".col-categoria").textContent = producto.categoria;
     fila.querySelector(".col-precio").textContent = formatoPrecio.format(producto.precio);
     fila.querySelector(".col-stock").textContent = producto.stock;
-    
+    fila.querySelector(".col-descripcion").textContent = producto.descripcion;
+
     const stock = producto.stock;
     const estado = fila.querySelector(".col-estado");
     let texto, clase;
