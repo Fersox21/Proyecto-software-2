@@ -10,9 +10,10 @@ async function obtenerProductos(origen) {
   const filas = await respuesta.json();
   return filas.map((fila) => ({
     id: fila.id ?? fila.id_producto,
-    nombre: fila.nombre ?? fila.descripcion,
+    nombre: fila.nombre ?? "",
     precio: Number(fila.precio ?? 0),
     imagen: fila.imagen ?? fila.url_imagen ?? "",
+    descripcion: fila.descripcion ?? "",
     categoria: fila.categoria ?? "otros",
   }));
 }
@@ -23,16 +24,17 @@ export async function montarCatalogo({ origen, contenedor, template, onAgregar }
   let todos = [];
 
   function crearTarjeta(producto) {
-    const t = molde.content.cloneNode(true);
-    t.querySelector(".card-nom").textContent = producto.nombre;
-    t.querySelector(".card-prec").textContent = formatoPrecio.format(producto.precio);
-    const boton = t.querySelector(".card-bot");
-    boton.textContent = "Agregar";
-    const img = t.querySelector(".card-img");
+    const moldecito = molde.content.cloneNode(true);
+    moldecito.querySelector(".card-nom").textContent = producto.nombre;
+    moldecito.querySelector(".card-prec").textContent = formatoPrecio.format(producto.precio);
+    const boton = moldecito.querySelector(".card-butt");
+    boton.textContent = "Agregar al carrito";
+    const img = moldecito.querySelector(".card-img");
     img.src = producto.imagen || "Resources/Img/Product-Images/placeholder.webp";
     img.alt = producto.nombre;
+    moldecito.querySelector(".card-desc").textContent = producto.descripcion;
     if (onAgregar) boton.addEventListener("click", () => onAgregar(producto));
-    return t;
+    return moldecito;
   }
 
   function render(lista) {

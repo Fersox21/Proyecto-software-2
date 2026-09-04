@@ -1,16 +1,27 @@
 :root {
     /* HEADER */
-    --color-header:          #f5e9d6;   /* fondo del header */
-    --color-titulo-header:   #221e1a;   /* texto del titulo del header */
-    --color-fe-logo:         #b07d1e;   /* "Fe" en el titulo del header */
+    --color-header-home: transparent;   /* fondo del header */
+    --color-header: #262220;   /* fondo del header */
+    --color-titulo-header: white;   /* texto del titulo del header */
+    --color-fe-logo: #b07d1e;   /* "Fe" en el titulo del header */
 
     /* NAV */
-    --color-a-nav:           #4d463c;   /* texto de los links del nav */
-    --color-a-nav-hover:     #b07d1e;   /* hover para links del nav */
+    --color-a-nav: white;   /* texto de los links del nav */
+    --color-a-nav-hover: #b07d1e;   /* hover para links del nav */
 
     /* TOPBAR */
-    --color-topbar:          #262220;   /* fondo del topbar */
-    --color-topbar-texto:    white;   /* texto e iconos del topbar */
+    --color-topbar: black;   /* fondo del topbar */
+    --color-topbar-texto: white;   /* texto e iconos del topbar */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar-home {
+    background-color: var(--color-header-home);
+    min-height: 100vh;
 }
 
 .sidebar {
@@ -36,6 +47,7 @@ nav {
     justify-content: space-between;
     gap: 1.5rem;
     padding: 1.4rem 2rem;
+    min-width: 100%;
 }
 
 /* titulo del header */
@@ -89,7 +101,6 @@ nav {
 .ul-nav {
     list-style: none;
     display: flex;
-    flex-direction: row;
     justify-content: center;
     align-items: center;
     gap: 1.75rem;
@@ -128,6 +139,70 @@ nav {
 }
 .a-nav:hover::after, .a-nav[aria-current="page"]::after {
   transform: scaleX(1);
+}
+
+.imagen-banner {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/Resources/Img/Backgrounds/fondo-inicio.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    flex: 1;
+    min-height: 100%;
+    min-width: 100%;
+    padding-bottom: 5rem;
+    gap: 5rem;
+}
+
+
+.imagen-banner-texto {
+    max-width: 800px;
+}
+
+
+.imagen-banner-texto h1 {
+    font-family: 'Georgia', serif; 
+    font-size: 3.5em; 
+    font-weight: bold;
+    color: #fcf9f2; 
+    line-height: 1.2; /* el renglon */
+    margin-bottom: 20px; 
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
+}
+
+/* Estilos para el Párrafo */
+.imagen-banner-texto p {
+    font-family: 'Montserrat', sans-serif; /* Letra moderna y limpia para contrastar con el título */
+    font-size: 1.3em; 
+    color: #e3d5ca; /* Un beige un poquito más oscuro que el título para no competir en importancia */
+    font-weight: 400;
+    margin: 0; 
+}
+
+.imagen-banner h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700; 
+    letter-spacing: 3px; /* Separa las letras para un toque más profesional */
+    text-transform: uppercase; /* Fuerza las mayúsculas automáticamente */
+    font-size: 1.2em;
+    color: #e3d5ca; /* El beige claro que resalta sobre el fondo oscuro */
+    margin-bottom: 20px;
+}
+
+#div-banner-general {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.navbar-modificado {
+    
 }
 
 /* MEDIA QUERY */

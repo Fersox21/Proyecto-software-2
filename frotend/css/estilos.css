@@ -4,6 +4,7 @@
     --nav-color: #000;
     --table-color: #000;
     --background-color: #333f;
+    --color-body: #e9e3de;
 
     --surface: #f4ede4;     
     --accent: #b08968;         /* Marrón pastel medio */
@@ -11,7 +12,11 @@
     --text-primary: #3d2b1f;   /* Marrón muy oscuro para texto legible */
     --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
     --border-color: #e6ccb2;   /* Borde suave sutil */
-    --focus-highlight: #ddb8927e;/* Color de resalte al enfocar */
+    --focus-highlight: #ddb8927e;  /* Color de resalte al enfocar */
+    --color-section-prodDestestacados: #3e3d3a; 
+    --color-marcasDestacadas: #e9e3de;
+    --color-section-contact: #e9e3de;
+    --color-informacion-contact: #efece9;
 }
 
 * {
@@ -63,6 +68,7 @@ footer {
     margin: 0;
     gap: 2rem;
     min-width: 100%;
+    background-color: var(--color-body);
 }
 
 .table-catalogo  {
@@ -79,55 +85,13 @@ footer {
     font-family: 'Georgia', serif; /* Usa la misma letra clásica de los otros títulos */
 }
 
-.imagen-banner {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("/Resources/Img/Backgrounds/fondo-inicio.png");
-    width: 100%;
-    height: 80vh;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    margin: 0;
+#section-prodDest {
+    min-height: 80vh;
+    background-color: var(--color-section-prodDestestacados);
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-
-.imagen-banner-texto {
-    max-width: 800px; 
-    margin: 0 auto; 
-}
-
-
-.imagen-banner-texto h1 {
-    font-family: 'Georgia', serif; 
-    font-size: 3.5em; 
-    font-weight: bold;
-    color: #fcf9f2; 
-    line-height: 1.2; /* el renglon */
-    margin-bottom: 20px; 
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
-}
-
-/* Estilos para el Párrafo */
-.imagen-banner-texto p {
-    font-family: 'Montserrat', sans-serif; /* Letra moderna y limpia para contrastar con el título */
-    font-size: 1.3em; 
-    color: #e3d5ca; /* Un beige un poquito más oscuro que el título para no competir en importancia */
-    font-weight: 400;
-    margin: 0; 
-}
-
-.imagen-banner h2 {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700; 
-    letter-spacing: 3px; /* Separa las letras para un toque más profesional */
-    text-transform: uppercase; /* Fuerza las mayúsculas automáticamente */
-    font-size: 1.2em;
-    color: #e3d5ca; /* El beige claro que resalta sobre el fondo oscuro */
-    margin-bottom: 20px;
+    box-shadow: 0 2px 15px black;
 }
 
 /* Ajuste para pantallas más pequeñas (celulares) */
@@ -142,17 +106,20 @@ footer {
 }
 
 .contacto {
-  background-color: white; 
+  background-color: var(--color-section-contact); 
   padding: 5rem 1.5rem;
   border-radius: 10px;
 }
 
 .contacto-contenedor {
+    padding: 2rem 4rem;
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
     gap: 2rem;
     align-items: center;
+    box-shadow: 0 1px 10px black;
+    background-color: var(--color-informacion-contact);
 }
 
 .contacto-info-general h2 {
@@ -168,6 +135,7 @@ footer {
     color: #777777;
     font-size: 1rem;
     background: rgba(0, 0, 0, 0.03);
+    background-color: var(--color-informacion-contact);
     padding: 0.4rem;
     border-radius: 6px;
 }
@@ -183,7 +151,6 @@ footer {
     align-items: center;
     gap: 1.25rem;
     padding: 1.25rem;
-    background-color: white;
     border: 1px solid #eaeaea;
     border-radius: 12px;
     text-decoration: none;
@@ -234,18 +201,12 @@ footer {
 
 .inicio-content {
   padding: 60px 20px;
-  background-color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  
-    margin-top: -60px; 
-   
-    
-   
-    position: relative; 
-    z-index: 10; 
-    
-   
-    border-radius: 30px 30px 0 0;
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+  margin-top: -60px;
+  position: relative; 
+  z-index: 10; 
+  border-radius: 30px 30px 0 0;
+  margin-top: 2rem;
 }
 
 .cuadrados {
@@ -342,8 +303,7 @@ footer {
     width: 100%;
     margin: 0 auto;
     padding: 40px 100px;
-    background-color: white;
-    ;
+    background-color: var(--color-marcasDestacas);
 }
 
 .nuestras-marcas-titulo h2 {
@@ -358,6 +318,10 @@ footer {
     
     font-family: 'Georgia', serif;
     margin-bottom: 20px;
+}
+
+.titulo-h2 {
+    color: white;
 }
 
 .carrusel-contenedor {

@@ -5,15 +5,18 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="frotend/css/estilos.css">
         <link rel="stylesheet" href="frotend/css/navbar.css">
-        <link rel="stylesheet" href="frotend/css/productos.css">
+        <link rel="stylesheet" href="frotend/css/card-producto.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
         <script type="module" src="frotend/js/inicio.js" defer></script>
         <title>LaFe Distribuidora</title>
     </head>
     <body>
-        <header class="sidebar">
 
+        <!-- Header -->
+        <header class="sidebar-home">
+
+            <!-- TopBar -->
             <div class="topbar">
                 <span class="topbar-item">
                 <i class="far fa-clock"></i>
@@ -29,69 +32,75 @@
                 </div>
             </div>
 
-            <nav aria-label="Navegación principal">
-                <a class="a-logo" href="index.html">
-                    La<span class="fe-logo">Fe</span> Distribuidora
-                </a>
-                <ul class="ul-nav">
-                    <li><a class="a-nav" href="index.html" aria-current="page">Inicio</a></li>
-                    <li><a class="a-nav" href="catalogo.html">Catálogo</a></li>
-                    <li><a class="a-nav" href="preguntas.html">Preguntas Frecuentes</a></li>
-                    <li><a class="a-nav" href="index.html#contacto">Contacto</a></li>
-                    <li><a class="a-nav" href="formulario1.html">¿Te interesa?</a></li>
-                    <li><a class="a-nav" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">Encontranos</a></li>
-                </ul>
-            </nav>
+            <!-- NavBar y Banner -->
+            <div class="imagen-banner">
+                <nav aria-label="Navegación principal">
+                    <a class="a-logo" href="index.html">
+                        La<span class="fe-logo">Fe</span> Distribuidora
+                    </a>
+                    <ul class="ul-nav">
+                        <li><a class="a-nav" href="index.html" aria-current="page">Inicio</a></li>
+                        <li><a class="a-nav" href="catalogo.html">Catálogo</a></li>
+                        <li><a class="a-nav" href="preguntas.html">Preguntas Frecuentes</a></li>
+                        <li><a class="a-nav" href="index.html#contacto">Contacto</a></li>
+                        <li><a class="a-nav" href="formulario1.html">¿Te interesa?</a></li>
+                        <li><a class="a-nav" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">Encontranos</a></li>
+                    </ul>
+                </nav>
+                <div id="div-banner-general">
+                    <h2>LAFE Distribuidora</h2>
+                        <div class="imagen-banner-texto">
+                            <h1>Insumos de calidad para tu panaderia</h1>
+                            <p>Acompañamos el cremiento de tu negocio con stock garantizado</p>
+                        </div>
+                    </div>
+                </div>
         </header>
 
-            <main class="main-content">
+        <!-- Contenido principal -->
+        <main class="main-content">
 
-                <div class="imagen-banner">
-                    <h2>LAFE Distribuidora</h2>
-                    <div class="imagen-banner-texto">
-                        <h1>Insumos de calidad para tu panaderia</h1>
-                        <p>Acompañamos el cremiento de tu negocio con stock garantizado</p>
+            <!-- Tarjetas de bienvenida -->
+            <div class="inicio-content">
+                <h2 id="titulo-inicio">Bienvenidos a LaFe Distribuidora</h2>
+                <div class="cuadrados">
+                    <div class="cuadrado">
+                        <div class="cuadrado-icono">
+                                <img src="Resources\Img\Items\nosotros.svg" alt="Quienes somos">
+                        </div>
+                        <h3>Quienes somos?</h3>
+                        <p>somos distribuidora LaFe</p>
+                    </div>
+
+                    <div class="cuadrado">
+                        <div class="cuadrado-icono">
+                                <img src="Resources\Img\Items\wheat_24dp_69645B_FILL0_wght400_GRAD0_opsz24.svg" alt="Productos">
+                        </div>
+                        <h3>Que productos ofrecemos?</h3>
+                        <p>Ofrecemos insumos de panaderia</p>
+                    </div>
+
+                    <div class="cuadrado">
+                        <div class="cuadrado-icono">
+                                <img src="Resources\Img\Items\stock.svg" alt="Stock">
+                        </div>
+                        <h3>Tu stock garantizado</h3>
+                        <p>Siempre tenemos lo que necesitas</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="inicio-content">
-                    <h2 id="titulo-inicio">Bienvenidos a LaFe Distribuidora</h2>
-                    <div class="cuadrados">
-
-                        <div class="cuadrado">
-                            <div class="cuadrado-icono">
-                                    <img src="Resources\Img\Items\nosotros.svg" alt="Quienes somos">
-                            </div>
-                            <h3>Quienes somos?</h3>
-                            <p>somos distribuidora LaFe</p>
-                        </div>
-
-                        <div class="cuadrado">
-                            <div class="cuadrado-icono">
-                                    <img src="Resources\Img\Items\wheat_24dp_69645B_FILL0_wght400_GRAD0_opsz24.svg" alt="Productos">
-                            </div>
-                            <h3>Que productos ofrecemos?</h3>
-                            <p>Ofrecemos insumos de panaderia</p>
-                        </div>
-
-                        <div class="cuadrado">
-                            <div class="cuadrado-icono">
-                                    <img src="Resources\Img\Items\stock.svg" alt="Stock">
-                            </div>
-                            <h3>Tu stock garantizado</h3>
-                            <p>Siempre tenemos lo que necesitas</p>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Productos destacados -->
+            <section id="section-prodDest">
                 <h2 class="titulo-h2">Productos Destacados</h2>
                 <section id="sec-prod-dest" class="sec-prod-dest" aria-live="polite"></section>
                 <template id="temp-card-dest">
                     <article class="card">
-                        <h3 class="card-nom"></h3>
                         <img class="card-img" src="" alt="">
+                        <h3 class="card-nom"></h3>
+                        <p class="card-desc"></p>
                         <p class="card-prec"></p>
-                        <button class="card-bot"></button>
+                        <button class="card-butt"></button>
                     </article>
                 </template>
                 <dialog id="modal-exito" class="modal">
@@ -102,29 +111,28 @@
                         <button type="button" class="modal-cerrar" autofocus>Seguir comprando</button>
                     </div>
                 </dialog>
+            </section>
 
-
-                <div class="nuestras-marcas">
-                    <div class="nuestras-marcas-titulo">
-                        <h2>Nuestras Marcas</h2>
-                            <div class="carrusel-contenedor">
+            <!-- Marcas asociadas -->
+            <section class="nuestras-marcas">
+                <div class="nuestras-marcas-titulo">
+                    <h2>Nuestras Marcas</h2>
+                        <div class="carrusel-contenedor">
                                 
-                                <button class="btn-carrusel" id="btn-izq">◄</button>
+                            <button class="btn-carrusel" id="btn-izq">◄</button>
         
-                                <div class="imagenes-marcas" id="pista-marcas">
-                                    <img src="Resources\Img\marcas\Arcor_logo.svg.webp" alt="arcor">
-                                    <img src="Resources\Img\marcas\D_NQ_NP_942777-MLA71060533526_082023-O.webp" alt="emeth">
-                                    <img src="Resources\Img\marcas\logo-mapsa-color.png" alt="mapsa">
-                                    <img src="Resources\Img\marcas\logo.png" alt="levedit">
-                                    <img src="Resources\Img\marcas\rich-products-corporation-logo-png_seeklogo-339105.png" alt="richs">
-                                    <img src="Resources\Img\marcas\leheritlogo.png" alt="lheritier">
-                                </div>
-                              
-                                <button class="btn-carrusel" id="btn-der">►</button>
-
-                            </div>
-                    </div>
+                            <div class="imagenes-marcas" id="pista-marcas">
+                                <img src="Resources\Img\marcas\Arcor_logo.svg.webp" alt="arcor">
+                                <img src="Resources\Img\marcas\D_NQ_NP_942777-MLA71060533526_082023-O.webp" alt="emeth">
+                                <img src="Resources\Img\marcas\logo-mapsa-color.png" alt="mapsa">
+                                <img src="Resources\Img\marcas\logo.png" alt="levedit">
+                                <img src="Resources\Img\marcas\rich-products-corporation-logo-png_seeklogo-339105.png" alt="richs">
+                                <img src="Resources\Img\marcas\leheritlogo.png" alt="lheritier">
+                            </div>                              
+                            <button class="btn-carrusel" id="btn-der">►</button>
+                        </div>
                 </div>
+            </section>
 
                 <!-- <h2 id="inicio">Inicio</h2>
                 <ol>
@@ -145,36 +153,35 @@
                 </ol> -->
 
                 
+            <!-- Seccion de contacto -->
+            <article class="contacto" id="contacto">
+                <div class="contacto-contenedor">
 
-                <article class="contacto" id="contacto">
-                    <div class="contacto-contenedor">
-
-                        <div class="contacto-info-general">
+                    <div class="contacto-info-general">
                             
-                            <h2>Comunicate con nosotros</h2>
+                        <h2>Comunicate con nosotros</h2>
                             
-                            <div class="contacto-horario">
-                                <i class="far fa-clock"></i>
-                                <span>Lunes a Viernes de 8:00 a 16:00 hs, Sabados de 9:00 a 13:00 hs.</span>
-                            </div>
+                        <div class="contacto-horario">
+                            <i class="far fa-clock"></i>
+                            <span>Lunes a Viernes de 8:00 a 16:00 hs, Sabados de 9:00 a 13:00 hs.</span>
                         </div>
+                    </div>
 
-                        <div class="contacto-metodos">
+                    <div class="contacto-metodos">
 
-                            <a
-                                href="https://wa.me/5492664238128?text=Hola,%20quisiera%20recibir%20m%C3%A1s%20informaci%C3%B3n"
-                                class="contactos wsp"
-                                target="_blank"
-                                rel="noopener noreferrer">
-                                <div class="contacto-icono">
-                                    <i class="fab fa-whatsapp"></i>
-                                </div>
-                                <div class="contacto-detalle">
-                                    <span class="contacto-etiqueta">WhatsApp Directo</span>
-                                    <span class="contacto-valor">+54 9 2664238128</span>
-                                </div>
-                                
-                            </a>
+                        <a
+                            href="https://wa.me/5492664238128?text=Hola,%20quisiera%20recibir%20m%C3%A1s%20informaci%C3%B3n"
+                            class="contactos wsp"
+                            target="_blank"
+                            rel="noopener noreferrer">
+                            <div class="contacto-icono">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="contacto-detalle">
+                                <span class="contacto-etiqueta">WhatsApp Directo</span>
+                                <span class="contacto-valor">+54 9 2664238128</span>
+                            </div>
+                        </a>
 
                             <!-- Correo Electrónico -->
                             <a href="mailto:info@lafe.com"
