@@ -28,7 +28,7 @@ export async function montarCatalogo({ origen, contenedor, template, onAgregar }
     moldecito.querySelector(".card-nom").textContent = producto.nombre;
     moldecito.querySelector(".card-prec").textContent = formatoPrecio.format(producto.precio);
     const boton = moldecito.querySelector(".card-butt");
-    boton.textContent = "Agregar";
+    boton.textContent = "Agregar al carrito";
     const img = moldecito.querySelector(".card-img");
     img.src = producto.imagen || "Resources/Img/Product-Images/placeholder.webp";
     img.alt = producto.nombre;

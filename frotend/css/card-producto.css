@@ -1,3 +1,10 @@
+:root {
+  --color-boton-card-letra: #956918;
+  --color-boton-card-borde: #b07d1e;
+  --color-prec-card: #black;
+  --colo-desc-card: #888;
+}
+
 .titulo-h2{
     white-space: nowrap;
     font-size: 1.5rem;   
@@ -59,29 +66,31 @@
   margin: 0;
   font-size: 0.9rem;
   font-family: Helvetica, sans-serif;
-  color: black;
+  color: var(--colo-desc-card);
 }
 
 .card-prec {
   margin: 0;
   font-weight: 700;
-  color: #7a1f2b;
+  color: var(--color-prec-card);
 }
 
 .card-butt {
   margin-top: auto;
   padding: 0.5rem 0.75rem;
-  border: none;
   border-radius: 6px;
-  background-color: #7a1f2b;
-  color: #fff;
+  background-color: white;
+  color: var(--color-boton-card-letra);
+  border: 2px solid var(--color-boton-card-borde);
   font-family: Helvetica, sans-serif;
   cursor: pointer;
   transition: background-color 0.2s ease;
+  font-weight: 600;
 }
 
 .card-butt:hover {
-  background-color: #5c161f;
+  background-color: var(--color-boton-card-borde);
+  color: white;
 }
 
 .mensaje-grilla, .sin-result {

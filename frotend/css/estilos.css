@@ -306,6 +306,10 @@ footer {
     margin-bottom: 20px;
 }
 
+.titulo-h2 {
+    color: white;
+}
+
 .carrusel-contenedor {
     display: flex;
     align-items: center;
