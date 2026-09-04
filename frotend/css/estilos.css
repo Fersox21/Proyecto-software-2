@@ -4,6 +4,7 @@
     --nav-color: #000;
     --table-color: #000;
     --background-color: #333f;
+    --color-body: #e9e3de;
 
     --surface: #f4ede4;     
     --accent: #b08968;         /* Marrón pastel medio */
@@ -11,8 +12,11 @@
     --text-primary: #3d2b1f;   /* Marrón muy oscuro para texto legible */
     --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
     --border-color: #e6ccb2;   /* Borde suave sutil */
-    --focus-highlight: #ddb8927e;/* Color de resalte al enfocar */
-    --color-section-prodDest: #1F1C17;
+    --focus-highlight: #ddb8927e;  /* Color de resalte al enfocar */
+    --color-section-prodDestestacados: #3e3d3a; 
+    --color-marcasDestacadas: #e9e3de;
+    --color-section-contact: #e9e3de;
+    --color-informacion-contact: #efece9;
 }
 
 * {
@@ -60,6 +64,7 @@ footer {
     margin: 0;
     gap: 2rem;
     min-width: 100%;
+    background-color: var(--color-body);
 }
 
 .table-catalogo  {
@@ -76,10 +81,11 @@ footer {
 
 #section-prodDest {
     min-height: 80vh;
-    background-color: var(--color-section-prodDest);
+    background-color: var(--color-section-prodDestestacados);
     display: flex;
     flex-direction: column;
     justify-content: center;
+    box-shadow: 0 2px 15px black;
 }
 
 /* Ajuste para pantallas más pequeñas (celulares) */
@@ -94,17 +100,20 @@ footer {
 }
 
 .contacto {
-  background-color: white; 
+  background-color: var(--color-section-contact); 
   padding: 5rem 1.5rem;
   border-radius: 10px;
 }
 
 .contacto-contenedor {
+    padding: 2rem 4rem;
     max-width: 1100px;
     margin: 0 auto;
     display: grid;
     gap: 2rem;
     align-items: center;
+    box-shadow: 0 1px 10px black;
+    background-color: var(--color-informacion-contact);
 }
 
 .contacto-info-general h2 {
@@ -120,6 +129,7 @@ footer {
     color: #777777;
     font-size: 1rem;
     background: rgba(0, 0, 0, 0.03);
+    background-color: var(--color-informacion-contact);
     padding: 0.4rem;
     border-radius: 6px;
 }
@@ -135,7 +145,6 @@ footer {
     align-items: center;
     gap: 1.25rem;
     padding: 1.25rem;
-    background-color: white;
     border: 1px solid #eaeaea;
     border-radius: 12px;
     text-decoration: none;
@@ -186,7 +195,7 @@ footer {
 
 .inicio-content {
   padding: 60px 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
   margin-top: -60px;
   position: relative; 
   z-index: 10; 
@@ -288,8 +297,7 @@ footer {
     width: 100%;
     margin: 0 auto;
     padding: 40px 100px;
-    background-color: white;
-    ;
+    background-color: var(--color-marcasDestacas);
 }
 
 .nuestras-marcas-titulo h2 {
