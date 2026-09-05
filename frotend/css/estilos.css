@@ -4,7 +4,7 @@
     --nav-color: #000;
     --table-color: #000;
     --background-color: #333f;
-    --color-body: #e9e3de;
+    --color-body: white;
 
     --surface: #f4ede4;     
     --accent: #b08968;         /* Marrón pastel medio */
@@ -14,9 +14,9 @@
     --border-color: #e6ccb2;   /* Borde suave sutil */
     --focus-highlight: #ddb8927e;  /* Color de resalte al enfocar */
     --color-section-prodDestestacados: #3e3d3a; 
-    --color-marcasDestacadas: #e9e3de;
-    --color-section-contact: #e9e3de;
-    --color-informacion-contact: #efece9;
+    --color-marcasDestacadas: white;
+    --color-section-contact: white;
+    --color-informacion-contact: white;
 }
 
 * {
@@ -118,7 +118,6 @@ footer {
     display: grid;
     gap: 2rem;
     align-items: center;
-    box-shadow: 0 1px 10px black;
     background-color: var(--color-informacion-contact);
 }
 
@@ -179,6 +178,11 @@ footer {
 .contactos.mail .contacto-icono {
   background-color: #fff3e6;
   color: #c25e00;
+}
+
+.contactos.ubicacion .contacto-icono {
+    background-color: #c0d0e5;
+    color: #1a73e8;
 }
 
 .contacto-detalle {
