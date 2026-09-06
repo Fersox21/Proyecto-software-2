@@ -22,6 +22,10 @@
     --color-titulo-horarios: #cbc8c5;
     --color-horarios: #cbc8c5;
     --color-horarios-extra: #aaa8a6;
+    --color-section-bienvenida: #3e3d3a;
+    --color-icono-bienvenida: white;
+    --color-titulo-bienvenida: #b08968;
+    --color-mensaje-bienvenida: #aaa8a6;
 }
 
 * {
@@ -218,6 +222,10 @@ footer {
   margin-top: 2rem;
 }
 
+.card-img {
+    border: 1px solid black;
+}
+
 .cuadrados {
     /* crea la grilla */
   display: grid;
@@ -232,7 +240,7 @@ footer {
 }
 
 .cuadrado {
-  background-color: #fcf9f2; 
+  background-color: var(--color-section-bienvenida); 
   border-radius: 12px;
   /* espacio respecto a los bordes */
   padding: 35px 25px;
@@ -242,7 +250,6 @@ footer {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
   /* Borde apenas visible */
   border: 1px solid #eae1d0; 
-
   transition: transform 0.2s ease; /* Transición suave al pasar el mouse */
 }
 
@@ -253,20 +260,14 @@ footer {
 
 .cuadrado-icono {
     font-size: 4em;
-
     width: 120px;  
     height: 120px;
-    
-   
     border-radius: 50%; 
-    background-color: #eae1d0;
-
-
+    background-color: var(--color-icono-bienvenida);
     padding: 15px; 
     display: flex;
     justify-content: center;
     align-items: center;
-
     margin: 0 auto 20px auto;
     box-sizing: border-box;
 }
@@ -279,14 +280,14 @@ footer {
 
 .cuadrado h3 {
   font-size: 1.5em;
-  color: #6b4c3a; /* Marrón cálido, tono panadería */
+  color: var(--color-titulo-bienvenida); /* Marrón cálido, tono panadería */
   margin-bottom: 10px;
   font-family: 'Georgia', serif;
 }
 
 .cuadrado p {
   font-size: 1em;
-  color: #333333;
+  color: var(--color-mensaje-bienvenida);
   line-height: 1.5;
   margin: 0;
 }
