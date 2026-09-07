@@ -5,17 +5,21 @@ const formatoPrecio = new Intl.NumberFormat("es-AR", {
 });
 
 async function obtenerProductos(origen) {
-  const respuesta = await fetch(origen);
-  if (!respuesta.ok) throw new Error(`El servidor respondió ${respuesta.status}`);
-  const filas = await respuesta.json();
-  return filas.map((fila) => ({
-    id: fila.id ?? fila.id_producto,
-    nombre: fila.nombre ?? "",
-    precio: Number(fila.precio ?? 0),
-    imagen: fila.imagen ?? fila.url_imagen ?? "",
-    descripcion: fila.descripcion ?? "",
-    categoria: fila.categoria ?? "otros",
-  }));
+  try {
+    const respuesta = await fetch(origen);
+    if (!respuesta.ok) throw new Error(`El servidor respondió ${respuesta.status}`);
+    const productos = await respuesta.json();
+    return productos.map((producto) => ({
+      id: producto.id ?? producto.id_producto,
+      nombre: producto.nombre ?? "",
+      precio: Number(producto.precio ?? 0),
+      imagen: producto.imagen ?? producto.url_imagen ?? "",
+      descripcion: producto.descripcion ?? "",
+      categoria: producto.categoria ?? "otros",
+    }));
+  } catch (error){
+    console.log("Error en fetch", error.message);
+  }
 }
 
 export async function montarCatalogo({ origen, contenedor, template, onAgregar }) {
