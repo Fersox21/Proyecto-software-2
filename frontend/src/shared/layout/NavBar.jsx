@@ -1,3 +1,5 @@
+import { link } from 'react-router'
+
 function NavBar({enlaces}){
     return (<>
         <header class="sidebar-home">
