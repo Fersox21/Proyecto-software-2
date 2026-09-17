@@ -7,7 +7,7 @@ import Marcas from "./Home/Marcas";
 function Home(){
     return (<>
         <BienvenidosHome />
-        {/*<ProductosDestacados />*/}
+        <ProductosDestacados />
         <HorariosYUbicacion />
         <Contactos />
         <Marcas />

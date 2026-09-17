@@ -1,17 +1,27 @@
+import { useState } from 'react';
+import { Outlet } from 'react-router'; 
 import Navbar from './NavBar';
 import Footer from './Footer';
-import { Outlet } from 'react-router';
 
 function LayoutPublico({ enlaces }) {
-return (
-<>
+  const [carrito, setCarrito] = useState([]);
 
-    <Navbar enlaces={enlaces} />
-    <main><Outlet /></main>
-    <Footer />
+  function manejarAgregarAlCarrito(productoSeleccionado) {
+    console.log("Agregado al carrito:", productoSeleccionado.nombre);
+    setCarrito([...carrito, productoSeleccionado]);
+  }
 
-</>
-);
+  return (
+    <>
+      <Navbar enlaces={enlaces} cantidadCarrito={carrito.length} />
+      
+      <main>
+          <Outlet context={{ carrito, manejarAgregarAlCarrito }} />
+      </main>
+      
+      <Footer />
+    </>
+  );
 }
 
 export default LayoutPublico;
