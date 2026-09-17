@@ -1,31 +1,29 @@
 import { createBrowserRouter } from 'react-router';
 import LayoutPublico from './shared/layout/LayoutPublico';
-import LayoutGestor from './shared/layout/LayoutGestor';
 import NoEncontradaPage from './shared/pages/NoEncontradaPage';
-import Spinner from './shared/components/Spinner';
-import { HomePage } from './features/home';
-import { CatalogoPage, DetalleProductoPage } from './features/catalogo';
-import { CarritoPage } from './features/carrito';
-import { ContactoPage } from './features/contacto';
-import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth';
-import { PanelInicioPage } from './features/panel';
+import Home from './features/Home';
+import Catalogo from './features/Catalogo';
+import Formulario from './features/Formulario';
+import PreguntasFrecuentes from './features/PreguntasFrecuentes';
 
+const enlaces = [
+  { id: 1, texto: 'Inicio', destino: '/' },
+  { id: 2, texto: 'Catálogo', destino: '/catalogo' },
+  { id: 3, texto: 'Preguntas frecuentes', destino: '/preguntasFrecuentes' },
+  { id: 4, texto: 'Realizar pedido', destino: '/realizarPedido' },
+];
 
 export const router = createBrowserRouter([
-
-{
-path: '/',
-
-element: <LayoutPublico />,
-errorElement: <NoEncontradaPage />,
-children: [
-{ index: true, element: <HomePage /> }, // "/" exacto
-{ path: 'catalogo', element: <CatalogoPage /> }, // "/catalogo"
-{ path: 'catalogo/:id', element: <DetalleProductoPage /> }, // ":id" es un parámetro
-{ path: 'carrito', element: <CarritoPage /> },
-{ path: 'contacto', element: <ContactoPage /> },
-
-{ path: 'login', element: <LoginPage />, loader: redirigirSiHaySesion, hydrateFallbackElement: <Spinner />,},
-{ path: '*', element: <NoEncontradaPage /> }, // cualquier otra URL
-
-],}])
+  { 
+    path: '/',
+    element: <LayoutPublico enlaces={enlaces} />, 
+    errorElement: <NoEncontradaPage />, 
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'catalogo', element: <Catalogo /> },
+      { path: 'preguntasFrecuentes', element: <PreguntasFrecuentes />},
+      { path: 'realizarPedido', element: <Formulario /> },
+      { path: '*', element: <NoEncontradaPage /> },
+    ],
+  }
+]);
