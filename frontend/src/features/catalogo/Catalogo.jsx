@@ -1,4 +1,4 @@
-import '../styles/catalogo.css'
+import '../../styles/catalogo.css'
 
 function Catalogo(){
     return (<>

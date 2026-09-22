@@ -1,4 +1,4 @@
-function PreguntasFrecuentes() {
+function PreguntasFrecuentesPage() {
     return (<>
         <h2>Preguntas Frecuentes</h2>
         
@@ -22,4 +22,4 @@ function PreguntasFrecuentes() {
     </>);
 }
 
-export default PreguntasFrecuentes;
+export default PreguntasFrecuentesPage;

@@ -1,5 +1,5 @@
-import { RouterProvider } from 'react-router';
-import { router } from './router.jsx';
+import { RouterProvider } from 'react-router/dom';
+import { router } from './router';
 import './styles/estilos.css'
 import './styles/card-producto.css'
 
