@@ -1,10 +1,12 @@
+import logo from '../../assets/Logo/Logo-Lafe.png';
+
 function Footer(){
     return(<>
         <footer>
             <div className="footer-cuadro">
                 <div className="footer-logo">
                     <a href="index.html">
-                        <img src="frontend\src\assets\Logo\Logo-Lafe.png" alt="logo"/>
+                        <img src={logo} alt="logo"/>
                     </a>
                     </div>
 
