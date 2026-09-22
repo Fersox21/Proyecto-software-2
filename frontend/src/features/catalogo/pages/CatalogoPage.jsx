@@ -1,6 +1,6 @@
-import '../../styles/catalogo.css'
+import '../../../styles/catalogo.css'
 
-function Catalogo(){
+function CatalogoPage(){
     return (<>
         <h2 className="titulo-h2">Catalogo de Productos</h2>
             <div className="barra-superior">
@@ -47,4 +47,4 @@ function Catalogo(){
     </>);
 }
 
-export default Catalogo;
+export default CatalogoPage;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import '../../styles/formulario.css';
+import '../../../styles/formulario.css';
 
-function Formulario(){
+function FormularioPage(){
     const [valores, setValores] = useState({ nombre : '', email : ''})
 
     function handleChange(e) {
@@ -43,4 +43,4 @@ function Formulario(){
     </>);
 }
 
-export default Formulario;
+export default FormularioPage;
