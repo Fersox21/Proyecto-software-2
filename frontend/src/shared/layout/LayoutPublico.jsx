@@ -15,7 +15,7 @@ function LayoutPublico({ enlaces }) {
     <>
       <Navbar enlaces={enlaces} cantidadCarrito={carrito.length} />
       
-      <main>
+      <main className="main-content">
           <Outlet context={{ carrito, manejarAgregarAlCarrito }} />
       </main>
       

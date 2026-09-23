@@ -1,6 +1,6 @@
 :root {
     /* HEADER */
-    --color-header-home: transparent;   /* fondo del header */
+    --color-header-home: white;   /* fondo del header */
     --color-header: #262220;   /* fondo del header */
     --color-titulo-header: white;   /* texto del titulo del header */
     --color-fe-logo: #b07d1e;   /* "Fe" en el titulo del header */

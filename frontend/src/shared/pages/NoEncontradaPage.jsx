@@ -1,6 +1,8 @@
+import '../../styles/no-encontrada-page.css';
+
 function NoEncontradaPage() {
     return (<>
-        <p>Pagina no encontrada</p>
+        <h1>Pagina no encontrada</h1>
     </>);
 }
 export default NoEncontradaPage;
