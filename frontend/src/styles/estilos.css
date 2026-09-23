@@ -6,13 +6,7 @@
     --background-color: #333f;
     --color-body: white;
 
-    --surface: #f4ede4;     
-    --accent: #b08968;         /* Marrón pastel medio */
-    --accent-hover: #7f5539;   /* Marrón tostado para hovers y contraste */
-    --text-primary: #3d2b1f;   /* Marrón muy oscuro para texto legible */
-    --text-muted: #6f5e53;     /* Marrón intermedio para párrafos */
-    --border-color: #e6ccb2;   /* Borde suave sutil */
-    --focus-highlight: #ddb8927e;  /* Color de resalte al enfocar */
+    --surface: #f4ede4;
     --color-section-prodDestestacados: #3e3d3a; 
     --color-marcasDestacadas: white;
     --color-section-contact: white;

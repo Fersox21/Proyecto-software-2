@@ -1,9 +1,9 @@
-import marcaArcor from '../../../assets/marcas/marcaArcor.webp';
-import marcaEmeth from '../../../assets/marcas/marcaEmeth.webp';
-import marcaLedevit from '../../../assets/marcas/marcaLedevit.png';
-import marcaLheritier from '../../../assets/marcas/marcaLheritier.png';
-import marcaMapsa from '../../../assets/marcas/marcaMapsa.png';
-import marcaRichs from '../../../assets/marcas/marcaRichs.png';
+import marcaArcor from '../../../assets/Marcas/marcaArcor.webp';
+import marcaEmeth from '../../../assets/Marcas/marcaEmeth.webp';
+import marcaLedevit from '../../../assets/Marcas/marcaLedevit.png';
+import marcaLheritier from '../../../assets/Marcas/marcaLheritier.png';
+import marcaMapsa from '../../../assets/Marcas/marcaMapsa.png';
+import marcaRichs from '../../../assets/Marcas/marcaRichs.png';
 
 function Marcas(){
     return (

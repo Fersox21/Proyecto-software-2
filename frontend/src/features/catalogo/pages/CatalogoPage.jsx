@@ -1,6 +1,13 @@
 import '../../../styles/catalogo.css'
+import '../../../styles/card-producto.css';
+import { useOutletContext } from 'react-router';
+import { useProductos } from '../../../shared/hooks/useProductos';
+import TarjetaProducto from '../../TarjetaProducto';
 
 function CatalogoPage(){
+    const { manejarAgregarAlCarrito } = useOutletContext();
+    const { productos, cargando } = useProductos('/productos.json');
+
     return (<>
         <h2 className="titulo-h2">Catalogo de Productos</h2>
             <div className="barra-superior">
@@ -44,6 +51,20 @@ function CatalogoPage(){
                     </div>
                 </form>
             </aside>
+            <div id="fondo-filtros" class="fondo-filtros" hidden></div>
+
+            <section id="sec-prod" class="sec-prod" aria-live="polite">
+                {cargando ? (<p>Cargando catálogo...</p>)
+                : productos.length === 0 ? (<p>No hay productos disponibles</p>)
+                : (productos.map((prod) => (
+                    <TarjetaProducto 
+                        key={prod.id}
+                        producto={prod}
+                        onAgregar={manejarAgregarAlCarrito}
+                    />
+                ))
+                )}
+            </section>
     </>);
 }
 

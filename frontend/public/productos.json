@@ -1,0 +1,254 @@
+[
+  {
+    "id": 1,
+    "nombre": "Harina",
+    "precio": 1200,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/harina.webp",
+    "descripcion": "25 kg",
+    "stock": 21
+  },
+  {
+    "id": 2,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "categoria": "pastas",
+    "imagen": "../src/assets/Product-Images/fideos.webp",
+    "descripcion": "25 kg",
+    "stock": 8
+  },
+  {
+    "id": 3,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 39
+  },
+  {
+    "id": 4,
+    "nombre": "Arroz",
+    "precio": 999,
+    "categoria": "granos",
+    "imagen": "../src/assets/Product-Images/arroz.webp",
+    "descripcion": "25 kg",
+    "stock": 16
+  },
+  {
+    "id": 5,
+    "nombre": "Huevos medianos",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/huevos.webp",
+    "descripcion": "Maple completo",
+    "stock": 32
+  },
+  {
+    "id": 6,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 0
+  },
+  {
+    "id": 7,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 10
+  },
+  {
+    "id": 8,
+    "nombre": "Harina",
+    "precio": 1200,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/harina.webp",
+    "descripcion": "25 kg",
+    "stock": 21
+  },
+  {
+    "id": 9,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "categoria": "pastas",
+    "imagen": "../src/assets/Product-Images/fideos.webp",
+    "descripcion": "25 kg",
+    "stock": 8
+  },
+  {
+    "id": 10,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 39
+  },
+  {
+    "id": 11,
+    "nombre": "Arroz",
+    "precio": 999,
+    "categoria": "granos",
+    "imagen": "../src/assets/Product-Images/arroz.webp",
+    "descripcion": "25 kg",
+    "stock": 16
+  },
+  {
+    "id": 12,
+    "nombre": "Huevos medianos",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/huevos.webp",
+    "descripcion": "25 kg",
+    "stock": 32
+  },
+  {
+    "id": 13,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 0
+  },
+  {
+    "id": 14,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 10
+  },
+  {
+    "id": 15,
+    "nombre": "Harina",
+    "precio": 1200,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/harina.webp",
+    "descripcion": "25 kg",
+    "stock": 21
+  },
+  {
+    "id": 16,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "categoria": "pastas",
+    "imagen": "../src/assets/Product-Images/fideos.webp",
+    "descripcion": "25 kg",
+    "stock": 8
+  },
+  {
+    "id": 17,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 39
+  },
+  {
+    "id": 18,
+    "nombre": "Arroz",
+    "precio": 999,
+    "categoria": "granos",
+    "imagen": "../src/assets/Product-Images/arroz.webp",
+    "descripcion": "25 kg",
+    "stock": 16
+  },
+  {
+    "id": 19,
+    "nombre": "Huevos pequeños",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/huevos.webp",
+    "descripcion": "25 kg",
+    "stock": 32
+  },
+  {
+    "id": 20,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 0
+  },
+  {
+    "id": 21,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 10
+  },
+  {
+    "id": 22,
+    "nombre": "Harina",
+    "precio": 1200,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/harina.webp",
+    "descripcion": "25 kg",
+    "stock": 21
+  },
+  {
+    "id": 23,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "categoria": "pastas",
+    "imagen": "../src/assets/Product-Images/fideos.webp",
+    "descripcion": "25 kg",
+    "stock": 8
+  },
+  {
+    "id": 24,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 39
+  },
+  {
+    "id": 25,
+    "nombre": "Arroz",
+    "precio": 999,
+    "categoria": "granos",
+    "imagen": "../src/assets/Product-Images/arroz.webp",
+    "descripcion": "25 kg",
+    "stock": 16
+  },
+  {
+    "id": 26,
+    "nombre": "Huevos grandes",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/huevos.webp",
+    "descripcion": "25 kg",
+    "stock": 32
+  },
+  {
+    "id": 27,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 0
+  },
+  {
+    "id": 28,
+    "nombre": "Polenta",
+    "precio": 999,
+    "categoria": "harinas",
+    "imagen": "../src/assets/Product-Images/polenta.webp",
+    "descripcion": "25 kg",
+    "stock": 10
+  }
+]

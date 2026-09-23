@@ -1,24 +1,29 @@
 import { createBrowserRouter } from 'react-router';
 import LayoutPublico from './shared/layout/LayoutPublico';
 import NoEncontradaPage from './shared/pages/NoEncontradaPage';
-import  HomePage  from './features/home/pages/HomePage';
-import  CatalogoPage  from './features/catalogo/pages/CatalogoPage';
-import  FormularioPage  from './features/formulario/pages/FormularioPage';
-import  PreguntasFrecuentesPage  from './features/preguntasFrecuentes/pages/PreguntasFrecuentesPage';
+import Home from './features/home/pages/HomePage';
+import Catalogo from './features/catalogo/pages/CatalogoPage';
+import Formulario from './features/formulario/pages/FormularioPage';
+import PreguntasFrecuentes from './features/preguntasFrecuentes/pages/PreguntasFrecuentesPage';
 
-
+const enlaces = [
+  { id: 1, texto: 'Inicio', destino: '/' },
+  { id: 2, texto: 'Catálogo', destino: '/catalogo' },
+  { id: 3, texto: 'Preguntas frecuentes', destino: '/preguntasFrecuentes' },
+  { id: 4, texto: 'Realizar pedido', destino: '/realizarPedido' },
+];
 
 export const router = createBrowserRouter([
   { 
     path: '/',
-    element: <LayoutPublico  />, 
+    element: <LayoutPublico enlaces={enlaces} />, 
     errorElement: <NoEncontradaPage />, 
     children: [
-      { index: true, element: <HomePage /> },
-      { path: 'catalogo', element: <CatalogoPage /> },
-      { path: 'preguntasFrecuentes', element: <PreguntasFrecuentesPage />},
-      { path: 'realizarPedido', element: <FormularioPage /> },
+      { index: true, element: <Home /> },
+      { path: 'catalogo', element: <Catalogo /> },
+      { path: 'preguntasFrecuentes', element: <PreguntasFrecuentes />},
+      { path: 'realizarPedido', element: <Formulario /> },
       { path: '*', element: <NoEncontradaPage /> },
     ],
-  },
+  }
 ]);

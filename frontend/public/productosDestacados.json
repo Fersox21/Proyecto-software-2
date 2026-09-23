@@ -1,0 +1,23 @@
+[
+    {
+    "id": 1,
+    "nombre": "Harina",
+    "precio": 1200,
+    "descripcion": "1 kg",
+    "imagen": "../src/assets/Product-Images/Harina.webp"
+  },
+  {
+    "id": 2,
+    "nombre": "Fideos",
+    "precio": 1450,
+    "descripcion": "200 g",
+    "imagen": "../src/assets/Product-Images/fideos.webp"
+  },
+  {
+    "id": 3,
+    "nombre": "Huevos medianos",
+    "precio": 999,
+    "imagen": "../src/assets/Product-Images/huevos.webp",
+    "descripcion": "Maple completo"
+  }
+]
