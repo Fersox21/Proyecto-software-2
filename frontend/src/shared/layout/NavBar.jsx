@@ -1,8 +1,9 @@
 import { NavLink, useLocation } from 'react-router'
-import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock } from "react-icons/fa";
-import '../../styles/navbar.css'
+import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock } from 'react-icons/fa';
+import iconoCarrito from '../../assets/Items/iconoCarrito.svg';
+import '../../styles/navbar.css';
 
-function NavBar({enlaces}){
+function NavBar({enlaces, cantidadCarrito}){
     const location = useLocation();
     const esHome = location.pathname === '/';
 
@@ -29,18 +30,23 @@ function NavBar({enlaces}){
             <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
                 <nav aria-label="Navegación principal">
 
-                    <NavLink className="a-logo" to="/">
-                    La<span className="fe-logo">Fe</span> Distribuidora
-                    </NavLink>
-
                     <ul className="ul-nav">
-                    {enlaces.map((enlace) => (
-                        <li key={enlace.id}>
-                        <NavLink className="a-nav" to={enlace.destino}>
-                            {enlace.texto}
+                        
+                        <NavLink className="a-logo" to="/">
+                            La<span className="fe-logo">Fe</span> Distribuidora
                         </NavLink>
-                        </li>
-                    ))}
+
+                        {enlaces.map((enlace) => (
+                            <li key={enlace.id}>
+                            <NavLink className="a-nav" to={enlace.destino}>
+                                {enlace.texto}
+                            </NavLink>
+                            </li>
+                        ))}
+
+                        <NavLink className="a-logo" to="/carrito">
+                            <img  src={iconoCarrito} alt='iconoCarrito'/>
+                        </NavLink>
                     </ul>
                 </nav>
 
