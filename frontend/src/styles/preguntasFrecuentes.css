@@ -59,7 +59,7 @@
 }
 
 
-.preguntas-content h2:target {
+.preguntas-content h2.activo {
     color: var(--accent-hover, #dfa079);
     background-color: var(--focus-highlight);
     padding: 0.4rem 0.8rem;
