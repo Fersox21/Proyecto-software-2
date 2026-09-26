@@ -1,5 +1,5 @@
 import { useOutletContext } from 'react-router';
-import TarjetaProducto from '../../TarjetaProducto';
+import TarjetaProducto from '../../catalogo/componentes/TarjetaProducto';
 import { useProductos } from '../../../shared/hooks/useProductos';
 import '../../../styles/card-producto.css';
 

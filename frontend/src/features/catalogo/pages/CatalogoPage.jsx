@@ -2,7 +2,7 @@ import '../../../styles/catalogo.css'
 import '../../../styles/card-producto.css';
 import { useOutletContext } from 'react-router';
 import { useProductos } from '../../../shared/hooks/useProductos';
-import TarjetaProducto from '../../TarjetaProducto';
+import TarjetaProducto from '../componentes/TarjetaProducto';
 
 function CatalogoPage(){
     const { manejarAgregarAlCarrito } = useOutletContext();

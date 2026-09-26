@@ -30,23 +30,24 @@ function NavBar({enlaces, cantidadCarrito}){
             <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
                 <nav aria-label="Navegación principal">
 
+                    <NavLink className="a-logo" to="/">
+                        La<span className="fe-logo">Fe</span> Distribuidora
+                    </NavLink>
                     <ul className="ul-nav">
-                        
-                        <NavLink className="a-logo" to="/">
-                            La<span className="fe-logo">Fe</span> Distribuidora
-                        </NavLink>
-
                         {enlaces.map((enlace) => (
                             <li key={enlace.id}>
-                            <NavLink className="a-nav" to={enlace.destino}>
+                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'}>
                                 {enlace.texto}
                             </NavLink>
                             </li>
                         ))}
 
-                        <NavLink className="a-logo" to="/carrito">
+                        <li>
+                        <NavLink className="a-nav" to="/carrito">
                             <img  src={iconoCarrito} alt='iconoCarrito'/>
+                            {cantidadCarrito}
                         </NavLink>
+                        </li>
                     </ul>
                 </nav>
 

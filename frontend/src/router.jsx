@@ -1,29 +1,23 @@
-import { createBrowserRouter } from 'react-router';
-import LayoutPublico from './shared/layout/LayoutPublico';
-import NoEncontradaPage from './shared/pages/NoEncontradaPage';
-import { HomePage } from './features/home';
-import { CatalogoPage } from './features/catalogo';
-import { FormularioPage } from './features/formulario';
-import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes';
-import Carrito from './features/Carrito';
-
-const enlaces = [
-  { id: 1, texto: 'Inicio', destino: '/' },
-  { id: 2, texto: 'Catálogo', destino: '/catalogo' },
-  { id: 3, texto: 'Preguntas frecuentes', destino: '/preguntasFrecuentesPage' },
-  { id: 4, texto: 'Realizar pedido', destino: '/realizarPedido' }
-];
+import { createBrowserRouter } from 'react-router'
+import LayoutPublico from './shared/layout/LayoutPublico'
+import NoEncontradaPage from './shared/pages/NoEncontradaPage'
+import { HomePage } from './features/home'
+import { CatalogoPage } from './features/catalogo'
+import { FormularioPage } from './features/formulario'
+import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
+import { CarritoPage } from './features/carrito'
 
 export const router = createBrowserRouter([
   { 
     path: '/',
-    element: <LayoutPublico enlaces={enlaces} />, 
+    element: <LayoutPublico />, 
     errorElement: <NoEncontradaPage />, 
     children: [
       { index: true, element: <HomePage /> },
       { path: 'catalogo', element: <CatalogoPage /> },
       { path: 'preguntasFrecuentes', element: <PreguntasFrecuentesPage />},
       { path: 'realizarPedido', element: <FormularioPage /> },
+      { path: 'carrito', element: <CarritoPage />},
       { path: '*', element: <NoEncontradaPage /> },
     ],
   }

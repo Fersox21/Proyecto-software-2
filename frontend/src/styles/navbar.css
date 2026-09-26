@@ -87,7 +87,7 @@ nav {
 .ul-nav {
     list-style: none;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     gap: 1.75rem;
 }
