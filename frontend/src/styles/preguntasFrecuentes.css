@@ -8,7 +8,7 @@
     padding: 0.5rem;
    margin-left: 1rem;
     border: #000;
-    background-color: var(--surface, white);
+    background-color: var(--surface);
     border-radius: 5px; 
     height: fit-content;
     max-width: fit-content;
@@ -59,7 +59,7 @@
 
 .preguntas-content h2:target {
     color: var(--accent-hover, #dfa079);
-    background-color: var(--focus-highlight, black);
+    background-color: var(--focus-highlight);
     padding: 0.4rem 0.8rem;
     border-radius: 6px;
     display: inline-block;
