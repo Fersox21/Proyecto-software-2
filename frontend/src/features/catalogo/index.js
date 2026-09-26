@@ -1,0 +1,1 @@
+export { default as CatalogoPage } from './pages/CatalogoPage'

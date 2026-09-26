@@ -1,26 +1,4 @@
-:root {
-    --footer-color: #403f3f;
-    --header-color: #858181;
-    --nav-color: #000;
-    --table-color: #000;
-    --background-color: #333f;
-    --color-body: white;
 
-    --surface: #f4ede4;
-    --color-section-prodDestestacados: #3e3d3a; 
-    --color-marcasDestacadas: white;
-    --color-section-contact: white;
-    --color-informacion-contact: white;
-    --color-section-horarios: white;
-    --color-horarios-mapa: #3e3d3a;
-    --color-titulo-horarios: #cbc8c5;
-    --color-horarios: #cbc8c5;
-    --color-horarios-extra: #aaa8a6;
-    --color-section-bienvenida: #3e3d3a;
-    --color-icono-bienvenida: white;
-    --color-titulo-bienvenida: #b08968;
-    --color-mensaje-bienvenida: #aaa8a6;
-}
 
 * {
     font-family: Helvetica, sans-serif;

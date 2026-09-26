@@ -1,0 +1,1 @@
+export { default as FormularioPage } from './pages/FormularioPage'

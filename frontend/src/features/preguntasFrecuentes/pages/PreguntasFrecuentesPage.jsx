@@ -1,26 +1,41 @@
+import { useState } from 'react'; 
 import '../../../styles/preguntasFrecuentes.css';
 
 function PreguntasFrecuentesPage() {
+
+
     return (<>
-        <h2>Preguntas Frecuentes</h2>
-        
-        <ol>
-            <li><a href="#zonas-envio">¿A qué zonas envían mercadería?</a></li>
-            <li><a href="#medios-pago">¿Cuáles son los medios de pago?</a></li>
-            <li><a href="#compras-mayoristas">¿Hay un mínimo para compras mayoristas?</a></li>
-        </ol>
 
-        <section className="respuestas">
-            <h2 id="zonas-envio">1. Zonas de envío</h2>
-            <p>Hacemos envíos diarios a panaderías de toda la provincia...</p>
+     <section className="preguntas-content">
+            <div className="faq-header">
+                <h2>Preguntas Frecuentes</h2>
+                <p>Resolvemos tus dudas para que puedas realizar tus pedidos de mercadería de forma rápida y sencilla.</p>
+            </div>
+            
+            <div className="faq-grid">
+                <article className="faq-card">
+                    <h3>¿A qué zonas envían mercadería?</h3>
+                    <div className="faq-answer">
+                        <p>Hacemos envíos diarios a panaderías de toda la provincia. Contamos con logística propia para asegurar que la materia prima llegue en óptimas condiciones.</p>
+                    </div>
+                </article>
 
-            <h2 id="medios-pago">2. Medios de pago</h2>
-         <p>Aceptamos transferencias y efectivo...</p>
+                <article className="faq-card">
+                    <h3>¿Cuáles son los medios de pago?</h3>
+                    <div className="faq-answer">
+                        <p>Aceptamos transferencias bancarias y pagos en efectivo al momento de la entrega. Para cuentas corrientes, por favor contactar al sector de administración.</p>
+                    </div>
+                </article>
 
-
-            <h2 id="compras-mayoristas">3. Compras Mayoristas</h2>
-            <p>El mínimo de compra por mayor es de 5 bolsas de harina de 50kg...</p>
+                <article className="faq-card">
+                    <h3>¿Hay un mínimo para compras mayoristas?</h3>
+                    <div className="faq-answer">
+                        <p>Sí, el mínimo de compra por mayor es de 5 bolsas de harina de 50kg o su equivalente en otros productos del catálogo de la distribuidora.</p>
+                    </div>
+                </article>
+            </div>
         </section>
+        
     </>);
 }
 

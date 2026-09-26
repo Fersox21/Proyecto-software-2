@@ -4,7 +4,7 @@ import HorariosYUbicacion from "../components/HorariosYUbicacion";
 import Contactos from "../components/Contactos";
 import Marcas from "../components/Marcas";
 
-function Home(){
+function HomePage(){
     return (<>
         <BienvenidosHome />
         <ProductosDestacados />
@@ -14,4 +14,4 @@ function Home(){
     </>);
 }
 
-export default Home;
+export default HomePage;
