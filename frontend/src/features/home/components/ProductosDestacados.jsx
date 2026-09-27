@@ -1,29 +1,26 @@
-import { useOutletContext } from 'react-router';
-import TarjetaProducto from '../../catalogo/componentes/TarjetaProducto';
-import { useProductos } from '../../../shared/hooks/useProductos';
-import '../../../styles/card-producto.css';
+import { Link } from 'react-router'
+import { TarjetaProducto } from '../../catalogo'
 
-function ProductosDestacados() {
-  const { manejarAgregarAlCarrito } = useOutletContext();
-  const { productos, cargando } = useProductos('/productosDestacados.json');
-
+function ProductosDestacados({ productos, onAgregar }) {
   return (
-    <section id="section-prodDest">
-      <h2 className="titulo-h2">Productos Destacados</h2>
-      
-      <section id="sec-prod-dest" className="sec-prod-dest">
-        
-        {cargando ? (<p>Cargando catálogo...</p>) 
-        : productos.length === 0 ? (<p>No hay productos disponibles por el momento.</p>) 
-        : (productos.map((prod) => (
-            <TarjetaProducto 
-              key={prod.id} 
-              producto={prod} 
-              onAgregar={manejarAgregarAlCarrito} 
-            />
-          ))
-        )}
-      </section>
+    <section aria-labelledby="titulo-destacados">
+      <div className="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <h2 id="titulo-destacados" className="h3 mb-0">
+          Destacados de la temporada
+        </h2>
+        <Link to="/catalogo" className="link-dark">
+          Ver todo el catálogo →
+        </Link>
+      </div>
+
+      {/* CLASE 3 · Renderizar listas: key con el id del dato, nunca el índice */}
+      <div className="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-4">
+        {productos.map((producto) => (
+          <div className="col" key={producto.id}>
+            <TarjetaProducto producto={producto} onAgregar={onAgregar} />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }

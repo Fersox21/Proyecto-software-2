@@ -1,7 +1,5 @@
 import { capitalizar } from '../../../shared/utils/formato'
 
-// Componente controlado: no guarda estado propio. Muestra lo que recibe
-// (seleccionada) y avisa los cambios (onSeleccionar).
 function FiltroCategorias({ categorias, seleccionada, onSeleccionar }) {
   return (
     <div className="mb-4">

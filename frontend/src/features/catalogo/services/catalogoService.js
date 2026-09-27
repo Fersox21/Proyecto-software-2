@@ -1,7 +1,4 @@
-// Ningún componente llama a fetch directamente: lo hacen los services.
-// Hoy los datos son JSON de la carpeta ../backend (servidos por Vite).
-// Cuando exista el servidor Node, solo cambia URL_BASE (y quizás las rutas).
-const URL_BASE = '/backend/data'
+const URL_BASE = '/public'
 
 export async function obtenerProductos() {
   const respuesta = await fetch(`${URL_BASE}/productos.json`)
@@ -12,8 +9,6 @@ export async function obtenerProductos() {
 }
 
 export async function obtenerProductoPorId(id) {
-  // Con un JSON estático traemos la lista y buscamos. Con un servidor sería:
-  // fetch(`${URL_BASE}/productos/${id}`)
   const productos = await obtenerProductos()
   const producto = productos.find((p) => p.id === Number(id))
   if (!producto) {

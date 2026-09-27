@@ -1,71 +1,77 @@
-import '../../../styles/catalogo.css'
-import '../../../styles/card-producto.css';
-import { useOutletContext } from 'react-router';
-import { useProductos } from '../../../shared/hooks/useProductos';
-import TarjetaProducto from '../componentes/TarjetaProducto';
+import { useOutletContext } from 'react-router'
+import GrillaProductos from '../components/GrillaProductos'
+import FiltroCategorias from '../components/FiltroCategorias'
+import { useFiltros } from '../hooks/useFiltros'
+import { obtenerProductos } from '../services/catalogoService'
+import { useFetch } from '../../../shared/hooks/useFetch'
+import Boton from '../../../shared/components/Boton'
+import Spinner from '../../../shared/components/Spinner'
+import MensajeVacio from '../../../shared/components/MensajeVacio'
 
-function CatalogoPage(){
-    const { manejarAgregarAlCarrito } = useOutletContext();
-    const { productos, cargando } = useProductos('/productos.json');
+function CatalogoPage() {
+  const { agregarProducto } = useOutletContext()
+  const { datos: productos, cargando, error } = useFetch(obtenerProductos)
+  const filtros = useFiltros(productos)
 
-    return (<>
-        <h2 className="titulo-h2">Catalogo de Productos</h2>
-            <div className="barra-superior">
-                <div className="div-buscador">
-                    <input type="search" id="buscador" placeholder="Buscar producto"/>
-                    <button type="button" className="boton-buscador">
-                        <img src="Resources\Img\Items\search_24dp_7A7A7A_FILL0_wght400_GRAD0_opsz24.svg"
-                        className="lupa" alt="buscador"/>
-                    </button>
-                </div>
+  if (cargando) return <Spinner texto="Cargando catálogo..." />
+  if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />
 
-                <button type="button" id="btn-filtros" className="btn-filtros"
-                        aria-expanded="false" aria-controls="panel-filtros">
-                    Filtrar
-                </button>
+  return (
+    <>
+      <header className="mb-4">
+        <h1 className="h2 mb-1 titulo-tag">Catálogo</h1>
+        <p className="text-body-secondary mb-0">Filtrá por categoría o nombre.</p>
+      </header>
 
-            </div>
-            <aside id="panel-filtros" className="panel-filtros" aria-hidden="true">
-                <div className="panel-filtros-head">
-                    <h3>Filtros</h3>
-                    <button type="button" id="btn-cerrar-filtros" className="btn-cerrar-filtros" aria-label="Cerrar filtros">✕</button>
-                </div>
+      <div className="row g-4">
+        <aside className="col-lg-3 filtros">
+          <label htmlFor="busqueda" className="rotulo-filtro">
+            Buscar
+          </label>
+          {/* Input controlado: su valor sale del estado y cada tecla lo actualiza */}
+          <input
+            id="busqueda"
+            type="search"
+            className="form-control campo-busqueda-tag mb-4"
+            placeholder="Ej: harina"
+            value={filtros.busqueda}
+            onChange={(e) => filtros.setBusqueda(e.target.value)}
+          />
 
-                <form id="form-filtros" className="form-filtros">
-                    <fieldset>
-                    <legend>Categoría</legend>
-                    <label id="harinac"><input type="checkbox" name="categoria" value="harinas"/> Harinas</label>
-                    <label><input type="checkbox" name="categoria" value="pastas"/> Pastas</label>
-                    <label><input type="checkbox" name="categoria" value="lacteos"/> Lácteos</label>
-                    </fieldset>
+          <FiltroCategorias
+            categorias={filtros.categorias}
+            seleccionada={filtros.categoria}
+            onSeleccionar={filtros.setCategoria}
+          />
+          
+          {filtros.hayFiltrosActivos && (
+            <Boton
+              variante="outline-secondary"
+              tamanio="sm"
+              className="btn-limpiar-tag"
+              onClick={filtros.limpiarFiltros}
+            >
+              Limpiar filtros
+            </Boton>
+          )}
+        </aside>
 
-                    <fieldset>
-                    <legend>Precio máximo</legend>
-                    <input type="range" name="precioMax" id="precio-max" min="0" max="5000" step="100" value="5000"/>
-                    <output id="precio-max-valor">$5.000</output>
-                    </fieldset>
+        <section className="col-lg-9">
+          <p className="small text-body-secondary">
+            Mostrando {filtros.productosFiltrados.length} de {productos.length} productos
+          </p>
 
-                    <div className="form-filtros-acciones">
-                    <button type="reset" className="btn-limpiar">Limpiar</button>
-                    <button type="submit" className="btn-aplicar">Aplicar</button>
-                    </div>
-                </form>
-            </aside>
-            <div id="fondo-filtros" class="fondo-filtros" hidden></div>
-
-            <section id="sec-prod" class="sec-prod" aria-live="polite">
-                {cargando ? (<p>Cargando catálogo...</p>)
-                : productos.length === 0 ? (<p>No hay productos disponibles</p>)
-                : (productos.map((prod) => (
-                    <TarjetaProducto 
-                        key={prod.id}
-                        producto={prod}
-                        onAgregar={manejarAgregarAlCarrito}
-                    />
-                ))
-                )}
-            </section>
-    </>);
+          {filtros.productosFiltrados.length > 0 ? (
+            <GrillaProductos productos={filtros.productosFiltrados} onAgregar={agregarProducto} />
+          ) : (
+            <MensajeVacio titulo="No hay productos con esos filtros" texto="Probá con otra categoría.">
+              <Boton onClick={filtros.limpiarFiltros}>Ver todo</Boton>
+            </MensajeVacio>
+          )}
+        </section>
+      </div>
+    </>
+  )
 }
 
-export default CatalogoPage;
+export default CatalogoPage

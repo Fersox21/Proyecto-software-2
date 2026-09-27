@@ -32,24 +32,14 @@ function TarjetaProducto({ producto, onAgregar }) {
             <span className="badge text-bg-secondary">Sin stock</span>
           ) : (
             onAgregar && (
-              <>
-                <p className="small text-body-secondary mb-1">Agregar talle:</p>
-                <div className="d-flex flex-wrap gap-1">
-                  {producto.talles.map((talle) => (
-                    <button
-                      key={talle}
-                      type="button"
-                      className="btn btn-sm btn-outline-dark"
-                      // Se pasa una FUNCIÓN. onClick={onAgregar(producto, talle)} la
-                      // ejecutaría al renderizar, no al hacer clic.
-                      onClick={() => onAgregar(producto, talle)}
-                      aria-label={`Agregar ${producto.nombre} talle ${talle}`}
-                    >
-                      {talle}
-                    </button>
-                  ))}
-                </div>
-              </>
+              <button
+                type="button"
+                className="btn btn-sm btn-outline-dark w-100"
+                onClick={() => onAgregar(producto)}
+                aria-label={`Agregar ${producto.nombre} al carrito`}
+              >
+                Agregar al carrito
+              </button>
             )
           )}
         </div>
