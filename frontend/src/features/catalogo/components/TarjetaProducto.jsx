@@ -1,50 +1,90 @@
 import { Link } from 'react-router'
 import { formatearPrecio } from '../../../shared/utils/formato'
+import { useState, useRef } from 'react'
 
-// CLASE 3 · Responder a eventos
-// La tarjeta NO sabe qué es un carrito: solo avisa "quieren agregar este producto
-// en este talle" llamando a onAgregar. Quién guarda el carrito lo decide el padre.
 function TarjetaProducto({ producto, onAgregar }) {
   const sinStock = producto.stock === 0
+  const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
+  // Ref permite controlar el temporizador sin que se pisen entre clics
+  const temporizador = useRef(null)
+
+  const manejarAgregar = () => {
+    onAgregar(producto)
+    setMostrarNotificacion(true)
+
+    if (temporizador.current) {
+      clearTimeout(temporizador.current)
+    }
+
+    temporizador.current = setTimeout(() => {
+      setMostrarNotificacion(false)
+    }, 2500)
+  }
 
   return (
-    <article className="card h-100 shadow-sm tarjeta-producto">
-      <span className="ojal" aria-hidden="true"></span>
-
-      <div className="imagen-envoltorio">
-        <Link to={`/catalogo/${producto.id}`}>
-          <img src={producto.imagen} className="card-img-top" alt={producto.nombre} />
-        </Link>
-        <span className="badge categoria-chip text-uppercase">{producto.categoria}</span>
-      </div>
-      <div className="perforacion"></div>
-
-      <div className="card-body d-flex flex-column">
-        <h3 className="h6 card-title">
-          <Link to={`/catalogo/${producto.id}`} className="link-dark text-decoration-none">
-            {producto.nombre}
+    <>
+      <article className="card h-100 shadow-sm">
+        <div className="position-relative p-3 pb-0 text-center">
+          
+          <span className="badge text-bg-dark position-absolute top-0 end-0 m-3 z-1 text-uppercase">
+            {producto.categoria}
+          </span>
+          
+          <Link to={`/catalogo/${producto.id}`}>
+            <img 
+              src={producto.imagen} 
+              className="card-img-top" 
+              alt={producto.nombre} 
+              style={{ height: '200px', objectFit: 'contain' }}
+            />
           </Link>
-        </h3>
-        <p className="precio-tag mb-3">{formatearPrecio(producto.precio)}</p>
-
-        <div className="mt-auto">
-          {sinStock ? (
-            <span className="badge text-bg-secondary">Sin stock</span>
-          ) : (
-            onAgregar && (
-              <button
-                type="button"
-                className="btn btn-sm btn-outline-dark w-100"
-                onClick={() => onAgregar(producto)}
-                aria-label={`Agregar ${producto.nombre} al carrito`}
-              >
-                Agregar al carrito
-              </button>
-            )
-          )}
         </div>
-      </div>
-    </article>
+
+        <div className="card-body d-flex flex-column">
+          <h3 className="h6 card-title">
+            <Link to={`/catalogo/${producto.id}`} className="link-dark text-decoration-none">
+              {producto.nombre}
+            </Link>
+          </h3>
+          
+          <p className="fs-5 fw-bold mb-3">{formatearPrecio(producto.precio)}</p>
+
+          <div className="mt-auto">
+            {sinStock ? (
+              <span className="badge text-bg-secondary w-100 py-2">Sin stock</span>
+            ) : (
+              onAgregar && (
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline-dark w-100"
+                  onClick={manejarAgregar}
+                  aria-label={`Agregar ${producto.nombre} al carrito`}
+                >
+                  Agregar al carrito
+                </button>
+              )
+            )}
+          </div>
+        </div>
+      </article>
+
+      {/* Notificación flotante de exito al agregar producto */}
+        {mostrarNotificacion && (
+          <div 
+            className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-4 shadow-lg" 
+            style={{ zIndex: 1050 }}
+            role="alert" 
+            aria-live="assertive" 
+            aria-atomic="true"
+          >
+            <div className="d-flex">
+              <div className="toast-body fs-6">
+                Agregaste <strong>{producto.nombre}</strong> al carrito
+              </div>
+            </div>
+          </div>
+        )}
+    </>
   )
 }
 
