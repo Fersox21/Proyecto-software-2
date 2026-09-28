@@ -75,16 +75,7 @@ footer {
     box-shadow: 0 2px 15px black;
 }
 
-/* Ajuste para pantallas más pequeñas (celulares) */
-@media (max-width: 768px) {
-    .imagen-banner-texto h1 {
-        font-size: 2.2em; /* Achica el título en celulares */
-    }
-    
-    .imagen-banner-texto p {
-        font-size: 1.1em;
-    }
-}
+
 
 .contacto {
   background-color: var(--color-section-contact); 
@@ -594,6 +585,14 @@ footer > a:hover {
             "header"
             "main"
             "footer";
+    }
+    
+    .imagen-banner-texto h1 {
+        font-size: 2.2em; /* Achica el título en celulares */
+    }
+    
+    .imagen-banner-texto p {
+        font-size: 1.1em;
     }
 
 .contacto-contenedor {
