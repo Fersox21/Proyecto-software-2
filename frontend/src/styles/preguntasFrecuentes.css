@@ -5,8 +5,12 @@
     font-family: Helvetica, sans-serif, -apple-system, sans-serif;
 }
 
+
 .faq-header {
+    flex-direction: column;
+    display: flex;
     text-align: center;
+    align-items: center;
     margin-bottom: 3rem;
 }
 
@@ -62,3 +66,4 @@
     margin: 0;
     font-size: 0.95rem;
 }
+
