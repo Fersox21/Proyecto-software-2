@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router'
-import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock } from 'react-icons/fa';
+import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock, FaChevronDown } from 'react-icons/fa';
 import iconoCarrito from '../../assets/Items/iconoCarrito.svg';
 import '../../styles/navbar.css';
 
@@ -52,13 +52,18 @@ function NavBar({enlaces, cantidadCarrito}){
                 </nav>
 
                 {esHome && (
-                    <div id="div-banner-general">
-                        <h2>LAFE Distribuidora</h2>
-                        <div className="imagen-banner-texto">
-                            <h1>Insumos de calidad para tu panaderia</h1>
-                            <p>Acompañamos el cremiento de tu negocio con stock garantizado</p>
+                    <>
+                        <div id="div-banner-general">
+                            <h2>LAFE Distribuidora</h2>
+                            <div className="imagen-banner-texto">
+                                <h1>Insumos de calidad para tu panaderia</h1>
+                                <p>Acompañamos el cremiento de tu negocio con stock garantizado</p>
+                            </div>
                         </div>
-                    </div>
+                        <div className="indicador-scroll">
+                            <FaChevronDown className="flecha-animada" />
+                        </div>
+                    </>
                 )}
             </div>
         </header>
