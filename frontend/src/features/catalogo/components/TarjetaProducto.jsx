@@ -68,7 +68,7 @@ function TarjetaProducto({ producto, onAgregar }) {
         </div>
       </article>
 
-      {/* Notificación flotante de exito al agregar producto */}
+      {/* Notificación flotante al agregar producto */}
         {mostrarNotificacion && (
           <div 
             className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-4 shadow-lg" 

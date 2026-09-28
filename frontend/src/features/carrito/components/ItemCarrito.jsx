@@ -4,18 +4,18 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
   return (
     <li className="list-group-item py-3">
       <div className="d-flex flex-wrap flex-sm-nowrap gap-3 align-items-center">
-        <img src={item.imagen} alt="" className="imagen-carrito rounded" />
+        <img src={item.imagen} alt={item.nombre} className="imagen-carrito rounded" />
 
         <div className="flex-grow-1">
           <h3 className="h6 mb-1">{item.nombre}</h3>
           <p className="small text-body-secondary mb-2">
-            Talle {item.talle} · {formatearPrecio(item.precio)} c/u
+            {formatearPrecio(item.precio)} c/u
           </p>
           <div className="input-group input-group-sm w-auto">
             <button
               className="btn btn-outline-secondary"
               type="button"
-              onClick={() => onCambiarCantidad(item.id, item.talle, item.cantidad - 1)}
+              onClick={() => onCambiarCantidad(item.id, item.cantidad - 1)}
               aria-label={`Restar una unidad de ${item.nombre}`}
             >
               −
@@ -25,7 +25,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
               className="btn btn-outline-secondary"
               type="button"
               disabled={item.cantidad >= item.stock}
-              onClick={() => onCambiarCantidad(item.id, item.talle, item.cantidad + 1)}
+              onClick={() => onCambiarCantidad(item.id, item.cantidad + 1)}
               aria-label={`Sumar una unidad de ${item.nombre}`}
             >
               +

@@ -6,7 +6,7 @@
     "categoria": "harinas",
     "imagen": "../src/assets/Product-Images/harina.webp",
     "descripcion": "25 kg",
-    "stock": 21,
+    "stock": 2,
     "destacado": true
   },
   {

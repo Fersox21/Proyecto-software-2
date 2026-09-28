@@ -1,8 +1,8 @@
 import Boton from '../../../shared/components/Boton'
 import { formatearPrecio } from '../../../shared/utils/formato'
 
-const ENVIO_GRATIS_DESDE = 150000
-const COSTO_ENVIO = 6500
+const ENVIO_GRATIS_DESDE = 60000
+const COSTO_ENVIO = 1800
 
 function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
   const envio = subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTO_ENVIO
