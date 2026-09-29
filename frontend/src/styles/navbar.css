@@ -26,6 +26,19 @@
     padding: 0.45rem 2rem;
 }
 
+.btn-hamburguesa {
+    display: none; 
+    background: transparent;
+    border: none;
+    color: #fcf9f2;
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.btn-cerrar-menu, .menu-overlay {
+    display: none;
+}
+
 /* nav */
 nav {
     display: flex;
@@ -35,6 +48,7 @@ nav {
     gap: 1.5rem;
     padding: 1.4rem 2rem;
     min-width: 100%;
+    position: relative;
 }
 
 /* titulo del header */
@@ -146,11 +160,9 @@ nav {
     position: relative;
 }
 
-
 .imagen-banner-texto {
     max-width: 800px;
 }
-
 
 .imagen-banner-texto h1 {
     font-family: 'Georgia', serif; 
@@ -225,20 +237,84 @@ nav {
     
 }
 
-/* MEDIA QUERY */
+/* MEDIA QUERYs */
 /* Para tablets */
 @media screen and (max-width: 1024px) {
-    h1 {
-        font-size: 2rem;
+
+    .btn-hamburguesa {
+        display: block;
+    }
+
+    .imagen-banner {
+        height: 100vh;
     }
 
     .ul-nav {
-        gap: 1rem;
-        flex-direction: row;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 55%;
+        height: 100%;
+        background-color: #1a1a1a;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 5rem 2rem 2rem 2rem;
+        transform: translateX(-100%); 
+        transition: transform 0.3s ease-in-out;
+        z-index: 1050;
+    }
+
+    .ul-nav.abierto {
+        transform: translateX(0);
+        
+        box-shadow: 5px 0 15px rgba(0, 0, 0, 0.6);
+    }
+
+    .btn-cerrar-menu {
+        display: block;
+        position: absolute;
+        top: 1.5rem;
+        right: 1.5rem;
+        background: transparent;
+        border: none;
+        color: #fcf9f2;
+        font-size: 2rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    
+    .btn-cerrar-menu:hover {
+        color: #dfa079;
+    }
+
+    .menu-overlay {
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease-in-out;
+        z-index: 1040;
+    }
+
+    .menu-overlay.activo {
+        opacity: 1;
+        visibility: visible;
+        min-width: 100vw;
+        min-height: 100vh;
+    }
+
+    .a-logo {
+        font-size: 1.5rem;
     }
 
     .a-nav {
-        font-size: 0.9rem;
+        font-size: 1.1rem;
     }
 }
 

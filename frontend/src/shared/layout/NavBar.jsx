@@ -1,11 +1,15 @@
-import { NavLink, useLocation } from 'react-router'
-import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock, FaChevronDown } from 'react-icons/fa';
+import { useState } from 'react';
+import { NavLink, useLocation } from 'react-router';
+import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
 import iconoCarrito from '../../assets/Items/iconoCarrito.svg';
 import '../../styles/navbar.css';
 
 function NavBar({enlaces, cantidadCarrito}){
     const location = useLocation();
     const esHome = location.pathname === '/';
+    const [menuAbierto, setMenuAbierto] = useState(false);
+    const toggleMenu = () => setMenuAbierto(!menuAbierto);
+    const cerrarMenu = () => setMenuAbierto(false);
 
     return (<>
         <header className={esHome ? "sidebar-home" : "sidebar"}>
@@ -30,25 +34,53 @@ function NavBar({enlaces, cantidadCarrito}){
             <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
                 <nav aria-label="Navegación principal">
 
-                    <NavLink className="a-logo" to="/">
-                        La<span className="fe-logo">Fe</span> Distribuidora
-                    </NavLink>
-                    <ul className="ul-nav">
+                    <button 
+                        className="btn-hamburguesa" 
+                        onClick={toggleMenu} 
+                        aria-label="Alternar menú"
+                    >
+                        <FaBars />
+                    </button>
+
+                    {!menuAbierto && (
+                        <NavLink className="a-logo" to="/">
+                            La<span className="fe-logo">Fe</span> Distribuidora
+                        </NavLink>
+                    )}
+
+                    <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
+
+                    <ul className={`ul-nav ${menuAbierto ? 'abierto' : ''}`}>
+                        <button className="btn-cerrar-menu" onClick={cerrarMenu} aria-label="Cerrar menú">
+                            <FaTimes />
+                        </button>
+
+                        {menuAbierto && (
+                            <li>
+                                <NavLink className="a-logo" to="/">
+                                    La<span className="fe-logo">Fe</span> Distribuidora
+                                </NavLink>
+                            </li>
+                        )}
+                        
                         {enlaces.map((enlace) => (
                             <li key={enlace.id}>
-                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'}>
+                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
                                 {enlace.texto}
                             </NavLink>
                             </li>
                         ))}
 
                         <li>
-                        <NavLink className="a-nav" to="/carrito">
+                        <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
                             <img  src={iconoCarrito} alt='iconoCarrito'/>
                             {cantidadCarrito}
                         </NavLink>
                         </li>
                     </ul>
+
+                    
+
                 </nav>
 
                 {esHome && (

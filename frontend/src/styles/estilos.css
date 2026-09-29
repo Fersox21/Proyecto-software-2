@@ -198,19 +198,15 @@ footer {
 .cuadrado {
   background-color: var(--color-section-bienvenida); 
   border-radius: 12px;
-  /* espacio respecto a los bordes */
   padding: 35px 25px;
-  /* centra todo */
   text-align: center;
-  /* la sombra */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
-  /* Borde apenas visible */
   border: 1px solid #eae1d0; 
-  transition: transform 0.2s ease; /* Transición suave al pasar el mouse */
+  transition: transform 0.2s ease;
 }
 
 .cuadrado:hover {
-  transform: translateY(-5px); /* Eleva la tarjeta un poquito */
+  transform: translateY(-5px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -536,22 +532,6 @@ footer > a:hover {
     body {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
-        grid-template-areas: 
-            "header"
-            "main"
-            "footer";
-    }
-
-    h1 {
-        font-size: 2rem;
-    }
-
-    .ul-nav {
-        gap: 1rem;
-        flex-direction: row;
-    }
-    .a-nav {
-        font-size: 0.9rem;
     }
 }
 
@@ -562,30 +542,6 @@ footer > a:hover {
         width: 100%;
     }
 
-    .sidebar {
-        height: auto;
-    }
-    .topbar {
-        justify-content: center;
-        text-align: center;
-    }
-    .topbar-contacto {
-        justify-content: center;
-    }
-    .ul-nav {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.8rem;
-    }
-
-    .imagen-banner-texto h1 {
-        font-size: 2rem; 
-        padding: 0 15px;
-    }
-    .imagen-banner-texto p {
-        font-size: 1rem;
-        padding: 0 15px;
-    }
     #titulo-inicio, 
     .nuestras-marcas-titulo h2,
     .contacto-info-general h2 {
