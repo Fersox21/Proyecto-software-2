@@ -17,10 +17,10 @@ function Footer(){
                     <div className="footer-catalogo">
 
                         <NavLink className="footer-catalogo" to='/catalogo'>
-                        <h3><a href="catalogo.html">Productos</a></h3>
-                        <a href="catalogo.html?categoria=harinas">harinas</a>
-                        <a href="catalogo.html?categoria=pastas">pastas</a>
-                        <a href="catalogo.html?categoria=lacteos">lacteos</a>
+                        <h3>Productos</h3>
+                        <a href="catalogo.html?categoria=harinas">Harinas</a>
+                        <a href="catalogo.html?categoria=pastas">Pastas</a>
+                        <a href="catalogo.html?categoria=lacteos">Lacteos</a>
                         </NavLink>
                         
                     </div>
@@ -38,7 +38,11 @@ function Footer(){
                     </div>
 
                     <div className="footer-redes">
-                        <h3>Redes sociales</h3>
+
+                        <NavLink to='#contacto'>
+                            <h3>Redes sociales</h3>
+                        </NavLink>
+                        
                         <a href="https://www.instagram.com/insumos.lafe/?hl=es-la" target="_blank" rel="noopener noreferrer">
                             <i className="fab fa-instagram"></i> Instagram
                         </a>
@@ -53,9 +57,7 @@ function Footer(){
                     <div className="footer-interesa">
 
                         <NavLink className="footer-formulario" to='/realizarPedido'>
-                            <h3>
-                            <a href="formulario1.html">Realiza tu consulta</a>
-                            </h3>
+                            <h3>Realiza tu consulta</h3>
                         </NavLink>
                         
                     </div>
