@@ -1,28 +1,40 @@
 import logo from '../../assets/Logo/Logo-Lafe.png';
 import { NavLink } from 'react-router';
+import '../../styles/footer.css'
 
 function Footer(){
     return(<>
         <footer>
             <div className="footer-cuadro">
                 <div className="footer-logo">
-                    <a href="index.html">
+
+                    <NavLink className="footer-logo" to='/'>
                         <img src={logo} alt="logo"/>
-                    </a>
+                    </NavLink>
+        
                     </div>
 
                     <div className="footer-catalogo">
+
+                        <NavLink className="footer-catalogo" to='/catalogo'>
                         <h3><a href="catalogo.html">Productos</a></h3>
                         <a href="catalogo.html?categoria=harinas">harinas</a>
                         <a href="catalogo.html?categoria=pastas">pastas</a>
                         <a href="catalogo.html?categoria=lacteos">lacteos</a>
+                        </NavLink>
+                        
                     </div>
                     
                     <div className="footer-preguntas">
-                        <h3><a href="preguntas.html">Preguntas frecuentes</a></h3>
-                        <a href="preguntas.html">Zona de envios</a>
-                        <a href="preguntas.html">Medios de pago</a>
-                        <a href="preguntas.html">Minimo de compra</a>
+
+                        <NavLink className="footer-preguntas" to='/preguntasFrecuentes'>
+                            <h3>Preguntas frecuentes</h3>
+                            <a href="preguntas.html">Zona de envios</a>
+                            <a href="preguntas.html">Medios de pago</a>
+                            <a href="preguntas.html">Minimo de compra</a>
+                        </NavLink>
+
+                        
                     </div>
 
                     <div className="footer-redes">
@@ -39,9 +51,13 @@ function Footer(){
                     </div>
 
                     <div className="footer-interesa">
-                        <h3>
+
+                        <NavLink className="footer-formulario" to='/realizarPedido'>
+                            <h3>
                             <a href="formulario1.html">Realiza tu consulta</a>
-                        </h3>
+                            </h3>
+                        </NavLink>
+                        
                     </div>
 
                     
