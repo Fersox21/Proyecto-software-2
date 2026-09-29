@@ -9,6 +9,10 @@ footer {
     align-items: center;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 
 .footer-cuadro {
     background-color: var(--footer-color);

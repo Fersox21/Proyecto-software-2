@@ -39,7 +39,7 @@ function Footer(){
 
                     <div className="footer-redes">
 
-                        <NavLink to='#contacto'>
+                        <NavLink to='/#contacto'>
                             <h3>Redes sociales</h3>
                         </NavLink>
                         
