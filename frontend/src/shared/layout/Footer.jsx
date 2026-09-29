@@ -1,4 +1,5 @@
 import logo from '../../assets/Logo/Logo-Lafe.png';
+import { NavLink } from 'react-router';
 
 function Footer(){
     return(<>
@@ -47,7 +48,9 @@ function Footer(){
                 </div>
                 <p>LaFe se reserva todos los derechos</p>
                 <p>Copyright 2026</p>
-                <a href="./adminProductos.html">Acceso administrativo</a>
+                <NavLink className="Acceso-Admin" to="/administrador">
+                        <p>Acceso Administrativo</p>    
+                </NavLink>
             </footer>
     </>);
 }
