@@ -1,6 +1,6 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = '/backend/data'
+const URL_BASE = '/Proyecto-software-2/backend/data'
 const CLAVE_SESION = 'admin:sesion'
 
   export async function iniciarSesion(password) {
@@ -14,7 +14,7 @@ const CLAVE_SESION = 'admin:sesion'
     (u) => u.password === password,
   )
   if (!usuario) {
-    throw new Error('Email o contraseña incorrectos.')
+    throw new Error('Contraseña incorrecta.')
   }
 
 
@@ -36,7 +36,7 @@ export function protegerRuta() {
   if (!sesion) {
     throw redirect('/login')
   }
-  return sesion // lo recibe LayoutGestor con useLoaderData()
+  return sesion 
 }
 
 export function cerrarSesion() {
@@ -45,7 +45,7 @@ export function cerrarSesion() {
 
 export function redirigirSiHaySesion() {
   if (obtenerSesion()) {
-    throw redirect('/gestor')
+    throw redirect('/login')
   }
   return null
 }

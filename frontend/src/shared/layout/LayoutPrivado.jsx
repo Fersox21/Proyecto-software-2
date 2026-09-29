@@ -1,5 +1,7 @@
 import Navbar from './NavBar';
 import Footer from './Footer';
+import { Outlet, ScrollRestoration } from 'react-router'; 
+
 
 const enlacesAdmin = [
   { id: 1, texto: 'Inicio', destino: '/administrador' },
@@ -12,8 +14,11 @@ function LayoutPrivado(){
         <>
         
     <Navbar enlaces={enlacesAdmin} />
-    <main></main>
+    <main className='Main-content'>
+        <Outlet />
+    </main>
     <Footer />
+      <ScrollRestoration />
 
         </>
     )

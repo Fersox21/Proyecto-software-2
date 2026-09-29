@@ -22,11 +22,7 @@ export const router = createBrowserRouter([
       { path: 'preguntasFrecuentes', element: <PreguntasFrecuentesPage />},
       { path: 'realizarPedido', element: <FormularioPage /> },
       { path: 'carrito', element: <CarritoPage />},
-      {
-        path: 'login',
-        element: <LoginPage />,
-        loader: redirigirSiHaySesion,
-      },
+      { path: 'login', element: <LoginPage />, loader: redirigirSiHaySesion,},
       { path: '*', element: <NoEncontradaPage /> },
     ],
   }, 
