@@ -56,31 +56,36 @@ function NavBar({enlaces, cantidadCarrito}){
                         </button>
 
                         {menuAbierto && (
-                            <li>
-                                <NavLink className="a-logo" to="/">
-                                    La<span className="fe-logo">Fe</span> Distribuidora
-                                </NavLink>
-                            </li>
+                            <>
+                                <li>
+                                    <NavLink className="a-logo" to="/">
+                                        La<span className="fe-logo">Fe</span> Distribuidora
+                                    </NavLink>
+                                </li>
+                                <hr className="divisor-menu" />
+                            </>
                         )}
                         
                         {enlaces.map((enlace) => (
                             <li key={enlace.id}>
-                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
-                                {enlace.texto}
-                            </NavLink>
+                                <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
+                                    {enlace.texto}
+                                </NavLink>
                             </li>
                         ))}
 
-                        <li>
-                        <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
-                            <img  src={iconoCarrito} alt='iconoCarrito'/>
-                            {cantidadCarrito}
-                        </NavLink>
+                        <li className="carrito-desktop">
+                            <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
+                                <img  src={iconoCarrito} alt='iconoCarrito'/>
+                                {cantidadCarrito}
+                            </NavLink>
                         </li>
                     </ul>
 
-                    
-
+                    <NavLink className="a-nav carrito-mobile" to="/carrito" onClick={cerrarMenu}>
+                        <img  src={iconoCarrito} alt='iconoCarrito'/>
+                        {cantidadCarrito}
+                    </NavLink>
                 </nav>
 
                 {esHome && (
