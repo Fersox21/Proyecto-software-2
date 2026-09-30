@@ -189,72 +189,98 @@ footer {
     border: 1px solid black;
 }
 
-.cuadrados {
-    /* crea la grilla */
-  display: grid;
-    /* hace el tamaño maximo y minimo, el auto fit llena cada fila y lo repite */
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    /* espacio entre los cuadros */
-  gap: 6rem;
-    /* tamaño maximo */
-  max-width: 1000px;
-    /* lo centra */
-  margin: 1rem auto; 
+/*bienvenidos home*/
+.seccion-bienvenidos {
+  max-width: 1100px;
+  margin: 6rem auto;
+  padding: 0 1.5rem;
 }
 
-.cuadrado {
-  background-color: var(--color-section-bienvenida); 
-  border-radius: 12px;
-  /* espacio respecto a los bordes */
-  padding: 35px 25px;
-  /* centra todo */
+
+.bienvenidos-header {
   text-align: center;
-  /* la sombra */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
-  /* Borde apenas visible */
-  border: 1px solid #eae1d0; 
-  transition: transform 0.2s ease; /* Transición suave al pasar el mouse */
+  max-width: 680px;
+  margin: 0 auto 3rem auto;
 }
 
-.cuadrado:hover {
-  transform: translateY(-5px); /* Eleva la tarjeta un poquito */
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+.bienvenidos-header h2 {
+
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #22201e;
+  margin-bottom: 0.8rem;
 }
 
-.cuadrado-icono {
-    font-size: 4em;
-    width: 120px;  
-    height: 120px;
-    border-radius: 50%; 
-    background-color: var(--color-icono-bienvenida);
-    padding: 15px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 20px auto;
-    box-sizing: border-box;
-}
-
-.cuadrado-icono img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.cuadrado h3 {
-  font-size: 1.5em;
-  color: var(--color-titulo-bienvenida); /* Marrón cálido, tono panadería */
-  margin-bottom: 10px;
-  font-family: 'Georgia', serif;
-}
-
-.cuadrado p {
-  font-size: 1em;
-  color: var(--color-mensaje-bienvenida);
+.bienvenidos-header p {
+  font-size: 1.05rem;
+  color: #6c665e;
   line-height: 1.5;
+}
+
+
+.grilla-fotos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.card-foto {
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ebe5dc;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-foto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+.card-img-box {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #e9e4dc;
+}
+
+.card-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+/* textos de las tarjetas */
+.card-cuerpo {
+  padding: 1.6rem 1.4rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.card-cuerpo h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  color: #262422;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+
+.card-cuerpo p {
+  font-size: 0.92rem;
+  color: #635d55;
+  line-height: 1.55;
   margin: 0;
 }
 
+/*ruleta*/
 .ruleta-imagenes {
     width: 100%;
 
@@ -303,6 +329,7 @@ footer {
     justify-content: center;
     gap: 30px;
     width: 100%;
+    margin-bottom: 130px;
 }
 
 .imagenes-marcas {
@@ -425,40 +452,44 @@ footer {
 
 /* footer */
 
-/* Contenedor principal de columnas */
-.footer-cuadro {
 
+.footer-cuadro {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 2rem;
     width: 100%;
     max-width: 1100px;
     text-align: left;
-    margin-bottom: 1.5rem;
-}
-
-
-
-.footer-catalogo,
-.footer-preguntas,
-.footer-redes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .footer-cuadro a,
 footer > a {
-    color: #e3d5ca;
-    text-decoration: none;
-    transition: color 0.2s ease;
+  color: #e3d5ca;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-catalogo > a,
+.footer-preguntas > a,
+.footer-redes > a {
+  display: block; 
+  transition: transform 0.4s ease, color 0.2s ease;
 }
 
 .footer-cuadro a:hover,
 footer > a:hover {
-    color: #ffffff;
-    text-decoration: none;
+  color: #ffffff;
+  text-decoration: none;
 }
+
+.footer-catalogo > a:hover,
+.footer-preguntas > a:hover,
+.footer-redes > a:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
 
 .footer-logo img {
     max-width: 140px;
@@ -467,6 +498,34 @@ footer > a:hover {
     mix-blend-mode: multiply
 }
 
+.derechos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+  margin: 1rem auto 0 auto;
+  
+}
+
+.derechos span,
+.derechos a {
+  font-size: 1rem;
+  color: #a0a0a0;
+  text-decoration: none;
+}
+    
+.Acceso-Admin {
+  color: #888888;
+  text-decoration: none;
+}
+
+.Acceso-Admin:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/*mapa*/
 .section-horarios-mapa {
     background-color: var(--color-section-horarios, #faf7f2);
     padding: 3rem 1.5rem;

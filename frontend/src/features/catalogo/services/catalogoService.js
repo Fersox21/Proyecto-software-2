@@ -1,7 +1,9 @@
 const URL_BASE = '/public'
 
+
+
 export async function obtenerProductos() {
-  const respuesta = await fetch(`${URL_BASE}/productos.json`)
+  const respuesta = await fetch('/productos.json')
   if (!respuesta.ok) {
     throw new Error('No se pudieron obtener los productos')
   }
