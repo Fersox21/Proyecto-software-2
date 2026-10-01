@@ -1,8 +1,8 @@
-// import '../../../styles/panelAdmin/adminProductos.css'
+
 import { obtenerProductos } from "../services/productosServices";
-import { useFetch } from '../../../shared/hooks/useFetch'
-import Spinner from '../../../shared/components/Spinner'
-import MensajeVacio from '../../../shared/components/MensajeVacio'
+import { useFetch } from '../../../shared/hooks/useFetch';
+import Spinner from '../../../shared/components/Spinner';
+import MensajeVacio from '../../../shared/components/MensajeVacio';
 
 
 function AdministradorPage() {

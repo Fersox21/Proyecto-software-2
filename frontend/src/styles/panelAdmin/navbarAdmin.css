@@ -8,11 +8,15 @@
 
 .sidebar-admin {
     background-color: var(--color-header);
-    text-align: center;
+    width: 250px;
+    min-width: 250px;
+    min-height: 100vh;
+}
+
+.nav-admin {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
+    padding: 0 1.5rem;
 }
 
 .h2-admin {
@@ -27,13 +31,11 @@
 .ul-nav-admin {
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
-    align-items: left;
-    text-align: center;
-    gap: 2rem;
-    color: white;
+    gap: 1.5rem;
     list-style: none;
-    margin: 1rem 0;
+    margin: 0 0 2rem 0;
+    padding: 0; 
+    width: 100%;
 }
 
 .p-nav {
@@ -42,10 +44,11 @@
 }
 
 #p-cuenta-nav {
-    margin-top: 4rem;
+    margin-top: 1rem;
 }
 
-.a-nav-admin {
+.a-nav-admin, .link-admin{
+    display: block;
     text-decoration: none;
     background-color: var(--color-header);
     color: white;
@@ -54,6 +57,3 @@
     font-weight: bold;
 }
 
-.li-nav {
-    text-align: left;
-}

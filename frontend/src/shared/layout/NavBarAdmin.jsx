@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-// import '../../styles/panelAdmin/navbarAdmin.css'
+import '../../styles/panelAdmin/navbarAdmin.css'
 import Boton from '../../shared/components/Boton'
 import {cerrarSesion} from '../../features/auth'
 import { useNavigate } from "react-router";
@@ -32,10 +32,10 @@ function NavBarAdmin({enlaces}){
             <ul className="ul-nav-admin">
                 <li className="li-nav">
                     <Link className="a-nav-admin" to="/administrador/configuracion">
-                            Configuración
+                        Configuración
                     </Link> 
-
-                    
+                </li>
+                <li className="li-nav">
                     <Boton className="btn-CerrarSesion" onClick={handleCerrarSesion}>
                         Cerrar Sesion
                     </Boton>
