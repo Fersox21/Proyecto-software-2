@@ -32,6 +32,8 @@ export const router = createBrowserRouter([
     element: <LayoutPrivado />,
     loader: protegerRuta, 
     errorElement: <NoEncontradaPage />,
-    children: [{ index: true, element: <AdministradorPage /> }],
+    children: [
+      { index: true, element: <AdministradorPage /> }
+    ],
   },
 ]);
