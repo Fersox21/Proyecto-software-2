@@ -42,9 +42,6 @@ return(<>
                                 <td className="col-admin col-precio">${prod.precio}</td>
                                 <td className="col-admin col-stock">{prod.stock}</td>
                                 <td className="col-admin">
-                                    <span className={`col-estado ${prod.estado}`}>
-                                        {prod.estado.replace('-', ' ')}
-                                    </span>
                                 </td>
                                 <td className="col-admin col-acciones">
                                     <button>Editar</button>

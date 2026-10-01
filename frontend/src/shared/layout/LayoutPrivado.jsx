@@ -1,4 +1,4 @@
-import Navbar from './NavBar';
+import NavbarAdmin from './NavBarAdmin';
 import Footer from './Footer';
 import { Outlet, ScrollRestoration } from 'react-router'; 
 
@@ -13,7 +13,7 @@ function LayoutPrivado(){
     return(
         <>
         
-    <Navbar enlaces={enlacesAdmin} />
+    <NavbarAdmin enlaces={enlacesAdmin}/>
     <main className='Main-content'>
         <Outlet />
     </main>
