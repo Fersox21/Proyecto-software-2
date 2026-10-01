@@ -1,4 +1,5 @@
-import { useOutletContext } from 'react-router'
+import { useOutletContext, useSearchParams } from 'react-router'
+import { useEffect } from 'react'
 import GrillaProductos from '../components/GrillaProductos'
 import FiltroCategorias from '../components/FiltroCategorias'
 import { useFiltros } from '../hooks/useFiltros'
@@ -12,6 +13,15 @@ function CatalogoPage() {
   const { agregarProducto } = useOutletContext()
   const { datos: productos, cargando, error } = useFetch(obtenerProductos)
   const filtros = useFiltros(productos)
+
+  const [searchParams] = useSearchParams()
+  const categoriaUrl = searchParams.get('categoria')
+
+useEffect(function() {
+  if (categoriaUrl !== null) {
+    filtros.setCategoria(categoriaUrl)
+  }
+}, [categoriaUrl])
 
   if (cargando) return <Spinner texto="Cargando catálogo..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />

@@ -67,3 +67,6 @@
     font-size: 0.95rem;
 }
 
+.faq-card {
+  scroll-margin-top: 120px;
+}
