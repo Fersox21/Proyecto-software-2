@@ -7,13 +7,14 @@
 
 #root {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr auto; 
     grid-template-areas: 
-     "header"
-     "main"
-     "footer";
-     min-height: 100vh;
+    "header"
+    "main"
+    "footer";
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 header { grid-area: header;}
@@ -46,7 +47,7 @@ footer {
     flex-direction: column;
     margin: 0;
     gap: 2rem;
-    min-width: 100%;
+    width: 100%;
     background-color: var(--color-body);
 }
 
@@ -81,7 +82,7 @@ footer {
 
 .contacto-contenedor {
     padding: 2rem 4rem;
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
     display: grid;
     gap: 2rem;
@@ -131,8 +132,8 @@ footer {
 
 
 .contacto-icono {
-  width: 48px;
-  height: 48px;
+  width: 4rem;
+  height: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +190,7 @@ footer {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 6rem;
-  max-width: 1000px;
+  width: 100%;
   margin: 1rem auto; 
 }
 
@@ -209,9 +210,8 @@ footer {
 }
 
 .cuadrado-icono {
-    font-size: 4em;
-    width: 120px;  
-    height: 120px;
+    width: 7.5rem;  
+    height: 7.5rem;
     border-radius: 50%; 
     background-color: var(--color-icono-bienvenida);
     padding: 15px; 
@@ -244,7 +244,6 @@ footer {
 
 .ruleta-imagenes {
     width: 100%;
-
     margin: 0 auto;
     padding: 40px 20px;
   
@@ -262,20 +261,22 @@ footer {
 .nuestras-marcas {
     width: 100%;
     margin: 0 auto;
-    padding: 40px 100px;
+    padding: 1rem 0.5rem;
     background-color: var(--color-marcasDestacas);
 }
 
-.nuestras-marcas-titulo h2 {
+#nuestras-marcas-titulo {
     text-align: center;      
     font-size: 2.5rem;       
-    color: #4a3628;         
-      
+    color: #4a3628;
+    margin-bottom: 2rem;
+    width: 100%;
+}
 
+.nuestras-marcas-div {
     display: flex;
     align-items: center;
     justify-content: center;
-    
     font-family: 'Georgia', serif;
     margin-bottom: 20px;
 }
@@ -288,21 +289,15 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px;
     width: 100%;
 }
 
 .imagenes-marcas {
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
     align-items: center;
-    overflow-x: hidden; 
-    scroll-behavior: smooth;
-    width: 100%;
-    max-width: 850px;
-    margin: 0 auto; 
+    gap: 2rem;
 }
-
 
 .imagenes-marcas img {
     flex: 0 0 auto; 
@@ -310,7 +305,6 @@ footer {
     height: 100px;
     object-fit: contain;
 }
-
 
 .btn-carrusel {
     background-color: #000000;
@@ -322,22 +316,11 @@ footer {
     font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 0 1.5rem;
 }
 
 .btn-carrusel:hover {
     background-color: #4a3628; /* Se oscurece al pasar el mouse */
-}
-
-@media (max-width: 768px) {
-
-    #btn-izq, #btn-der {
-        display: none;
-    }
-   
-    #pista-marcas {
-        flex-wrap: wrap; 
-        justify-content: center; 
-    }
 }
 
 /* Seccion preguntas */
@@ -350,7 +333,7 @@ footer {
     text-align: left;
     justify-content: flex-start;
     padding: 0.5rem;
-   margin-left: 1rem;
+    margin-left: 1rem;
     border: #000;
     background-color: var(--surface);
     border-radius: 5px; 
@@ -411,15 +394,12 @@ footer {
 }
 
 /* footer */
-
-/* Contenedor principal de columnas */
 .footer-cuadro {
 
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 2rem;
     width: 100%;
-    max-width: 1100px;
     text-align: left;
     margin-bottom: 1.5rem;
 }
@@ -460,7 +440,7 @@ footer > a:hover {
 }
 
 .horarios-mapa {
-    max-width: 1050px;
+    max-width: 100%;
     margin: 0 auto;
     background-color: var(--color-horarios-mapa);
     border-radius: 12px;
@@ -531,6 +511,19 @@ footer > a:hover {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
     }
+
+    .imagenes-marcas img {
+        max-width: 100px;
+    }
+
+    #titulo-inicio {
+        font-size: 2rem;
+    }
+
+    .cuadrado {
+        padding: 1rem;
+        
+    }
 }
 
 /* --- PARA CELULARES (768px o menos) --- */
@@ -541,17 +534,28 @@ footer > a:hover {
         max-width: 100vw;
     }
 
-    #titulo-inicio, 
-    .nuestras-marcas-titulo h2,
-    .contacto-info-general h2 {
-        font-size: 1.8rem;
-        margin-bottom: 30px;
+    .cuadrado-icono {
+        gap: 1rem;
+        padding: 6px;
+        width: 3.5rem;  
+        height: 3.5rem;
+    }
+
+    .cuadrado {
+        padding: 1rem 0;
+    }
+
+    .cuadrado h3 {
+        font-size: 1rem;
+    }
+
+    .cuadrado p {
+        font-size: 0.8rem;
     }
 
     .cuadrados {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 0 15px;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0;
     }
 
     .horarios-mapa {
@@ -559,6 +563,7 @@ footer > a:hover {
         padding: 1.2rem;
         gap: 1.5rem;
     }
+
     .contenedor-mapa {
         height: 250px;
     }
@@ -568,6 +573,7 @@ footer > a:hover {
         gap: 1.5rem;
         padding: 1.5rem;
     }
+
     .contacto {
         padding: 0 1rem 3rem 1rem;
     }
@@ -575,9 +581,11 @@ footer > a:hover {
     .nuestras-marcas {
         padding: 40px 20px;
     }
+
     #btn-izq, #btn-der {
         display: none;
     }
+
     #pista-marcas {
         flex-wrap: wrap; 
         justify-content: center; 

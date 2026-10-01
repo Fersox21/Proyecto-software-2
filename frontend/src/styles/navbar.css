@@ -6,6 +6,11 @@
 .sidebar-home {
     background-color: var(--color-header-home);
     min-height: 100vh;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .sidebar {
@@ -46,8 +51,9 @@ nav {
     flex-wrap: wrap;
     gap: 1.5rem;
     padding: 1.4rem 2rem;
-    min-width: 100%;
+    width: 100%;
     position: relative;
+    box-sizing: border-box;
 }
 
 /* titulo del header */
@@ -72,16 +78,10 @@ nav {
   gap: 0.5rem 1.5rem;
   background-color: var(--color-topbar);
   color: var(--color-topbar-texto);
-  min-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
   font-size: 0.78rem;
   padding: 0.3rem 1rem;
-}
-
-/* contacto del topbar */
-.topbar-contacto {
-  display: flex;
-  gap: 1.25rem;
-  flex-wrap: wrap;
 }
 
 /* elementos del topbar */
@@ -149,20 +149,22 @@ nav {
     margin: 0;
     display: flex;
     flex-direction: column;
+    justify-content: start;
     align-items: center;
     text-align: center;
     flex: 1;
     min-height: 100%;
-    min-width: 100%;
+    width: 100%;
     padding-bottom: 5rem;
     gap: 5rem;
     position: relative;
+    box-sizing: border-box;
     min-height: 100vh;
-    margin-bottom: 12px;
+    margin-bottom: 1rem;
 }
 
 .imagen-banner-texto {
-    max-width: 800px;
+    max-width: 100%;
 }
 
 .imagen-banner-texto h1 {
@@ -192,6 +194,10 @@ nav {
     font-size: 1.2em;
     color: #e3d5ca; /* El beige claro que resalta sobre el fondo oscuro */
     margin-bottom: 20px;
+}
+
+.div-banner {
+    
 }
 
 #div-banner-general {
@@ -247,6 +253,7 @@ nav {
 }
 
 /* MEDIA QUERYs */
+
 /* Para tablets */
 @media screen and (max-width: 1024px) {
 
@@ -334,13 +341,63 @@ nav {
     .divisor-menu {
         width: 100%;
         border: none;
-        border-top: 1px solid rgba(227, 213, 202, 0.2); 
-        margin-top: 1rem; 
-        margin-bottom: 1rem;
+        border-top: 2px solid rgba(227, 213, 202, 0.2);
     }
 }
 
 /* Para celulares */
 @media screen and (max-width: 768px) {
+    .topbar {
+        font-size: 0.7rem;
+    }
 
+    .a-logo {
+        font-size: 1.7rem;
+    }
+
+    #div-banner-general h2 {
+        font-size: 1.3rem;
+    }
+
+    .imagen-banner-texto h1 {
+        font-size: 2.5rem;
+    }
+
+    .imagen-banner-texto p {
+        font-size: 1.3rem;
+    }
+
+}
+
+@media screen and (max-width: 426px) {
+    
+    .topbar-texto {
+        display: none;
+    }
+
+    .topbar {
+        justify-content: center;
+        gap: 1.5rem;
+    }
+
+    .a-logo {
+        font-size: 1rem;
+    }
+
+    .btn-hamburguesa {
+        font-size: 1.2rem;
+    }
+
+    #div-banner-general h2 {
+        font-size: 0.8rem;
+    }
+
+    .imagen-banner-texto h1 {
+        font-size: 1.4rem;
+    }
+
+    .imagen-banner-texto p {
+        font-size: 0.7rem;
+        font-weight: 500;
+    }
 }
