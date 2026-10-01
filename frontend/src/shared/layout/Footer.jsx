@@ -1,62 +1,73 @@
-    import logo from '../../assets/Logo/Logo-Lafe.png';
-    import { NavLink } from 'react-router';
-    import { Link } from 'react-router';
+import logo from '../../assets/Logo/Logo-Lafe.png';
+import { NavLink } from 'react-router';
 
-    function Footer(){
-        return(<>
-            <footer>
-                <div className="footer-cuadro">
-                    <div className="footer-logo">
-                        <Link to="/">
-                            <img src={logo} alt="logo"/>
-                        </Link>
+function Footer(){
+    return(<>
+        <footer>
+            <div className="footer-cuadro">
+                <div className="footer-logo">
+
+                    <NavLink className="footer-logo" to='/'>
+                        <img src={logo} alt="logo"/>
+                    </NavLink>
+        
                     </div>
 
-                        <div className="footer-catalogo">
-                            <h3><Link to="/catalogo">Productos</Link></h3>
-                            <Link to="/catalogo?categoria=harinas">harinas</Link>
-                            <Link to="/catalogo?categoria=pastas">pastas</Link>
-                            <Link to="/catalogo?categoria=granos">granos</Link>
-                        </div>
+                    <div className="footer-catalogo">
+
+                        <NavLink className="footer-catalogo" to='/catalogo'>
+                        <h3><a href="catalogo.html">Productos</a></h3>
+                        <a href="catalogo.html?categoria=harinas">harinas</a>
+                        <a href="catalogo.html?categoria=pastas">pastas</a>
+                        <a href="catalogo.html?categoria=lacteos">lacteos</a>
+                        </NavLink>
                         
-                        <div className="footer-preguntas">
-                            <h3><Link to="/preguntasFrecuentes">Preguntas frecuentes</Link></h3>
-                            <Link to="/preguntasFrecuentes#zona-envios">Zona de envios</Link>
-                            <Link to="/preguntasFrecuentes#medios-pago">Medios de pago</Link>
-                            <Link to="/preguntasFrecuentes#minimo-compra">Minimo de compra</Link>
-                        </div>
+                    </div>
+                    
+                    <div className="footer-preguntas">
 
-                        <div className="footer-redes">
-                            <h3>Redes sociales</h3>
-                            <a href="https://www.instagram.com/insumos.lafe/?hl=es-la" target="_blank" rel="noopener noreferrer">
-                                <i className="fab fa-instagram"></i> Instagram
-                            </a>
-                            <a href="https://www.facebook.com/profile.php?id=100065429201528&locale=bg_BG#" target="_blank" rel="noopener noreferrer">
-                                <i className="fab fa-facebook"></i> Facebook
-                            </a>
-                            <a href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
-                            <i className="fas fa-map-marker-alt"></i> Encontranos
-                            </a>
-                        </div>
+                        <NavLink className="footer-preguntas" to='/preguntasFrecuentes'>
+                            <h3>Preguntas frecuentes</h3>
+                            <a href="preguntas.html">Zona de envios</a>
+                            <a href="preguntas.html">Medios de pago</a>
+                            <a href="preguntas.html">Minimo de compra</a>
+                        </NavLink>
 
-                        <div className="footer-interesa">
+                        
+                    </div>
+
+                    <div className="footer-redes">
+                        <h3>Redes sociales</h3>
+                        <a href="https://www.instagram.com/insumos.lafe/?hl=es-la" target="_blank" rel="noopener noreferrer">
+                            <i className="fab fa-instagram"></i> Instagram
+                        </a>
+                        <a href="https://www.facebook.com/profile.php?id=100065429201528&locale=bg_BG#" target="_blank" rel="noopener noreferrer">
+                            <i className="fab fa-facebook"></i> Facebook
+                        </a>
+                        <a href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
+                           <i className="fas fa-map-marker-alt"></i> Encontranos
+                        </a>
+                    </div>
+
+                    <div className="footer-interesa">
+
+                        <NavLink className="footer-formulario" to='/realizarPedido'>
                             <h3>
-                                <Link to="/realizarPedido">Realiza tu pedido</Link>
+                            <a href="formulario1.html">Realiza tu consulta</a>
                             </h3>
-                        </div>
-
+                        </NavLink>
                         
                     </div>
 
-                    <div className="derechos">
-                        <span>© 2026 LaFe Distribuidora. Todos los derechos reservados.</span>
-                            <Link className="Acceso-Admin" to="/administrador">
-                                Acceso Administrativo
-                            </Link>
-                    </div>
+                    
+                </div>
+                <p>LaFe se reserva todos los derechos</p>
+                <p>Copyright 2026</p>
+                <NavLink className="Acceso-Admin" to="/login">
+                        <p>Acceso Administrativo</p>    
+                </NavLink>
+            </footer>
+    </>);
+}
 
-                </footer>
-        </>);
-    }
-
-    export default Footer;
+export default Footer;

@@ -1,25 +1,26 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = '/backend/data'
+const URL_BASE = '/data'
 const CLAVE_SESION = 'admin:sesion'
 
-  export async function iniciarSesion(password) {
+  export async function iniciarSesion({password}) {
   const respuesta = await fetch(`${URL_BASE}/credenciales.json`)
+
   if (!respuesta.ok) {
     throw new Error('No se pudo verificar el usuario. Intentá más tarde.')
   }
 
   const usuarios = await respuesta.json()
-  const usuario = usuarios.find(
-    (u) => u.password === password,
-  )
+
+  const usuario = usuarios.find((u) => u.password === password)
+
   if (!usuario) {
-    throw new Error('Email o contraseña incorrectos.')
+    throw new Error('Contraseña incorrecta.')
   }
 
 
   const sesion = {}
-  sessionStorage.setItem(CLAVE_SESION, JSON.stringify(sesion))
+  sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario))
   return sesion
 }
 
@@ -36,7 +37,7 @@ export function protegerRuta() {
   if (!sesion) {
     throw redirect('/login')
   }
-  return sesion // lo recibe LayoutGestor con useLoaderData()
+  return sesion 
 }
 
 export function cerrarSesion() {
@@ -45,7 +46,7 @@ export function cerrarSesion() {
 
 export function redirigirSiHaySesion() {
   if (obtenerSesion()) {
-    throw redirect('/gestor')
+    throw redirect('/administrador')
   }
   return null
 }

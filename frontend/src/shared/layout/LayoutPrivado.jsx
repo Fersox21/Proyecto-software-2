@@ -1,5 +1,9 @@
-import Navbar from './NavBar';
-import Footer from './Footer';
+import NavbarAdmin from './NavBarAdmin'
+import Footer from './Footer'
+import '../../styles/panelAdmin/adminProductos.css'
+
+import { Outlet, ScrollRestoration } from 'react-router'; 
+
 
 const enlacesAdmin = [
   { id: 1, texto: 'Inicio', destino: '/administrador' },
@@ -8,12 +12,18 @@ const enlacesAdmin = [
 ];
 
 function LayoutPrivado(){
-    return(
-        <>
-        
-    <Navbar enlaces={enlacesAdmin} />
-    <main></main>
-    <Footer />
+    return(<>
+    <div className='layout-admin-contenedor'>
+            <NavbarAdmin enlaces={enlacesAdmin}/>
+
+    <main className='layout-admin-principal'>
+        <Outlet />
+    </main>
+
+
+      <ScrollRestoration />
+    </div>
+    
 
         </>
     )
