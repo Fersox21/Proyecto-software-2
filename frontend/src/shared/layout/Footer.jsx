@@ -1,9 +1,5 @@
 import logo from '../../assets/Logo/Logo-Lafe.png';
 import { NavLink } from 'react-router';
-<<<<<<< HEAD
-import '../../styles/footer.css'
-=======
->>>>>>> LoginAdmin
 
 function Footer(){
     return(<>

@@ -5,24 +5,25 @@
     padding: 0;
 }
 
-#inicio {
-    text-align: left;
-}
-
-body {
+#root {
     display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto 1fr auto; 
     grid-template-areas: 
-     "header"
-     "main"
-     "footer";
-     min-height: 100vh;
+    "header"
+    "main"
+    "footer";
+    min-height: 100vh;
+    overflow-x: hidden;
 }
 
 header { grid-area: header;}
 main { grid-area: main;}
 footer { grid-area: footer;}
+
+#inicio {
+    text-align: left;
+}
 
 h1 {
     text-align: center;
@@ -35,15 +36,13 @@ h1 {
     flex-direction: column;
     margin: 0;
     gap: 2rem;
-    min-width: 100%;
+    width: 100%;
     background-color: var(--color-body);
 }
 
 .table-catalogo  {
     border: 2px solid var(--table-color);
 }
-
-
 
 #titulo-inicio {
     text-align: center;      /* Centra el texto */
@@ -72,7 +71,7 @@ h1 {
 
 .contacto-contenedor {
     padding: 2rem 4rem;
-    max-width: 1100px;
+    max-width: 100%;
     margin: 0 auto;
     display: grid;
     gap: 2rem;
@@ -122,8 +121,8 @@ h1 {
 
 
 .contacto-icono {
-  width: 48px;
-  height: 48px;
+  width: 4rem;
+  height: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -163,79 +162,113 @@ h1 {
 }
 
 .inicio-content {
-  padding: 60px 20px;
-  font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
-  margin-top: -60px;
-  position: relative; 
-  z-index: 10; 
-  border-radius: 30px 30px 0 0;
-  margin-top: 2rem;
+    padding: 60px 20px;
+    font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+    position: relative; 
+    z-index: 10; 
+    border-radius: 30px 30px 0 0;
+    margin-top: -40px;
+    background-color: var(--color-body, #ffffff);
 }
 
 .card-img {
     border: 1px solid black;
 }
 
-.cuadrados {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 6rem;
-  max-width: 1000px;
-  margin: 1rem auto; 
+/*bienvenidos home*/
+.seccion-bienvenidos {
+  max-width: 1100px;
+  margin: 6rem auto;
+  padding: 0 1.5rem;
 }
 
-.cuadrado {
-  background-color: var(--color-section-bienvenida); 
-  border-radius: 12px;
-  padding: 35px 25px;
+
+.bienvenidos-header {
   text-align: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); 
-  border: 1px solid #eae1d0; 
-  transition: transform 0.2s ease;
+  max-width: 680px;
+  margin: 0 auto 3rem auto;
 }
 
-.cuadrado:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+.bienvenidos-header h2 {
+
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #22201e;
+  margin-bottom: 0.8rem;
 }
 
-.cuadrado-icono {
-    font-size: 4em;
-    width: 120px;  
-    height: 120px;
-    border-radius: 50%; 
-    background-color: var(--color-icono-bienvenida);
-    padding: 15px; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 0 auto 20px auto;
-    box-sizing: border-box;
-}
-
-.cuadrado-icono img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.cuadrado h3 {
-  font-size: 1.5em;
-  color: var(--color-titulo-bienvenida); /* Marrón cálido, tono panadería */
-  margin-bottom: 10px;
-  font-family: 'Georgia', serif;
-}
-
-.cuadrado p {
-  font-size: 1em;
-  color: var(--color-mensaje-bienvenida);
+.bienvenidos-header p {
+  font-size: 1.05rem;
+  color: #6c665e;
   line-height: 1.5;
+}
+
+
+.grilla-fotos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.card-foto {
+  background-color: #ffffff;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #ebe5dc;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-foto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+
+.card-img-box {
+  width: 100%;
+  height: 200px;
+  overflow: hidden;
+  background-color: #e9e4dc;
+}
+
+.card-img-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+/* textos de las tarjetas */
+.card-cuerpo {
+  padding: 1.6rem 1.4rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.card-cuerpo h3 {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.25rem;
+  color: #262422;
+  margin-bottom: 0.6rem;
+  font-weight: 600;
+}
+
+.card-cuerpo p {
+  font-size: 0.92rem;
+  color: #635d55;
+  line-height: 1.55;
   margin: 0;
 }
 
+/*ruleta*/
 .ruleta-imagenes {
     width: 100%;
-
     margin: 0 auto;
     padding: 40px 20px;
   
@@ -253,20 +286,22 @@ h1 {
 .nuestras-marcas {
     width: 100%;
     margin: 0 auto;
-    padding: 40px 100px;
+    padding: 1rem 0.5rem;
     background-color: var(--color-marcasDestacas);
 }
 
-.nuestras-marcas-titulo h2 {
+#nuestras-marcas-titulo {
     text-align: center;      
     font-size: 2.5rem;       
-    color: #4a3628;         
-      
+    color: #4a3628;
+    margin-bottom: 2rem;
+    width: 100%;
+}
 
+.nuestras-marcas-div {
     display: flex;
     align-items: center;
     justify-content: center;
-    
     font-family: 'Georgia', serif;
     margin-bottom: 20px;
 }
@@ -279,21 +314,16 @@ h1 {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 30px;
     width: 100%;
+    margin-bottom: 130px;
 }
 
 .imagenes-marcas {
     display: flex;
-    gap: 40px;
+    justify-content: space-between;
     align-items: center;
-    overflow-x: hidden; 
-    scroll-behavior: smooth;
-    width: 100%;
-    max-width: 850px;
-    margin: 0 auto; 
+    gap: 2rem;
 }
-
 
 .imagenes-marcas img {
     flex: 0 0 auto; 
@@ -301,7 +331,6 @@ h1 {
     height: 100px;
     object-fit: contain;
 }
-
 
 .btn-carrusel {
     background-color: #000000;
@@ -313,22 +342,11 @@ h1 {
     font-size: 1.2rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    margin: 0 1.5rem;
 }
 
 .btn-carrusel:hover {
     background-color: #4a3628; /* Se oscurece al pasar el mouse */
-}
-
-@media (max-width: 768px) {
-
-    #btn-izq, #btn-der {
-        display: none;
-    }
-   
-    #pista-marcas {
-        flex-wrap: wrap; 
-        justify-content: center; 
-    }
 }
 
 /* Seccion preguntas */
@@ -341,7 +359,7 @@ h1 {
     text-align: left;
     justify-content: flex-start;
     padding: 0.5rem;
-   margin-left: 1rem;
+    margin-left: 1rem;
     border: #000;
     background-color: var(--surface);
     border-radius: 5px; 
@@ -405,38 +423,41 @@ h1 {
 
 /* Contenedor principal de columnas */
 .footer-cuadro {
-
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 2rem;
     width: 100%;
-    max-width: 1100px;
     text-align: left;
-    margin-bottom: 1.5rem;
-}
-
-
-
-.footer-catalogo,
-.footer-preguntas,
-.footer-redes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
+    margin-bottom: 1rem;
 }
 
 .footer-cuadro a,
 footer > a {
-    color: #e3d5ca;
-    text-decoration: none;
-    transition: color 0.2s ease;
+  color: #e3d5ca;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.footer-catalogo > a,
+.footer-preguntas > a,
+.footer-redes > a {
+  display: block; 
+  transition: transform 0.4s ease, color 0.2s ease;
 }
 
 .footer-cuadro a:hover,
 footer > a:hover {
-    color: #ffffff;
-    text-decoration: none;
+  color: #ffffff;
+  text-decoration: none;
 }
+
+.footer-catalogo > a:hover,
+.footer-preguntas > a:hover,
+.footer-redes > a:hover {
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
 
 .footer-logo img {
     max-width: 140px;
@@ -445,13 +466,41 @@ footer > a:hover {
     mix-blend-mode: multiply
 }
 
+.derechos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  width: 100%;
+  margin: 1rem auto 0 auto;
+  
+}
+
+.derechos span,
+.derechos a {
+  font-size: 1rem;
+  color: #a0a0a0;
+  text-decoration: none;
+}
+    
+.Acceso-Admin {
+  color: #888888;
+  text-decoration: none;
+}
+
+.Acceso-Admin:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+/*mapa*/
 .section-horarios-mapa {
     background-color: var(--color-section-horarios, #faf7f2);
     padding: 3rem 1.5rem;
 }
 
 .horarios-mapa {
-    max-width: 1050px;
+    max-width: 100%;
     margin: 0 auto;
     background-color: var(--color-horarios-mapa);
     border-radius: 12px;
@@ -518,30 +567,55 @@ footer > a:hover {
 
 /* --- PARA TABLETS (1024px o menos) --- */
 @media screen and (max-width: 1024px) {
-    body {
+    #root {
         grid-template-columns: 1fr;
         grid-template-rows: auto 1fr auto;
+    }
+
+    .imagenes-marcas img {
+        max-width: 100px;
+    }
+
+    #titulo-inicio {
+        font-size: 2rem;
+    }
+
+    .cuadrado {
+        padding: 1rem;
+        
     }
 }
 
 /* --- PARA CELULARES (768px o menos) --- */
 @media screen and (max-width: 768px) {
-    body {
+    html, body, #root {
         overflow-x: hidden; 
         width: 100%;
+        max-width: 100vw;
     }
 
-    #titulo-inicio, 
-    .nuestras-marcas-titulo h2,
-    .contacto-info-general h2 {
-        font-size: 1.8rem;
-        margin-bottom: 30px;
+    .cuadrado-icono {
+        gap: 1rem;
+        padding: 6px;
+        width: 3.5rem;  
+        height: 3.5rem;
+    }
+
+    .cuadrado {
+        padding: 1rem 0;
+    }
+
+    .cuadrado h3 {
+        font-size: 1rem;
+    }
+
+    .cuadrado p {
+        font-size: 0.8rem;
     }
 
     .cuadrados {
-        grid-template-columns: 1fr;
-        gap: 1.5rem;
-        padding: 0 15px;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0;
     }
 
     .horarios-mapa {
@@ -549,6 +623,7 @@ footer > a:hover {
         padding: 1.2rem;
         gap: 1.5rem;
     }
+
     .contenedor-mapa {
         height: 250px;
     }
@@ -558,6 +633,7 @@ footer > a:hover {
         gap: 1.5rem;
         padding: 1.5rem;
     }
+
     .contacto {
         padding: 0 1rem 3rem 1rem;
     }
@@ -565,9 +641,11 @@ footer > a:hover {
     .nuestras-marcas {
         padding: 40px 20px;
     }
+
     #btn-izq, #btn-der {
         display: none;
     }
+
     #pista-marcas {
         flex-wrap: wrap; 
         justify-content: center; 

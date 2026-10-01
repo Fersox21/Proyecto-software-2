@@ -14,21 +14,19 @@ function NavBar({enlaces, cantidadCarrito}){
     return (<>
         <header className={esHome ? "sidebar-home" : "sidebar"}>
             <div className="topbar">
-                <span className="topbar-item">
+                <span className="topbar-item topbar-texto">
                     <FaRegClock />
-                    Lun a Vie 8:00–16:00 · Sáb 9:00–13:00
+                    <span className="topbar-texto">Lun a Vie 8:00–16:00 · Sáb 9:00–13:00</span>
                 </span>
-                <div className="topbar-contacto">
-                    <a className="topbar-item" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
-                        <FaMapMarkerAlt /> Juan Gilberto Funes 460, San Luis
-                    </a>
-                    <a href="mailto:info@lafe.com" className="topbar-item">
-                        <FaEnvelope /> info@lafe.com
-                    </a>
-                    <a href="https://wa.me/5492664238128" className="topbar-item" target="_blank" rel="noopener noreferrer">
-                        <FaWhatsapp /> +54 9 2664 23-8128
-                    </a>
-                </div>
+                <a className="topbar-item" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
+                    <FaMapMarkerAlt /> <span className="topbar-texto">Juan Gilberto Funes 460, San Luis</span>
+                </a>
+                <a href="mailto:info@lafe.com" className="topbar-item">
+                    <FaEnvelope /> <span className="topbar-texto">info@lafe.com</span>
+                </a>
+                <a href="https://wa.me/5492664238128" className="topbar-item" target="_blank" rel="noopener noreferrer">
+                    <FaWhatsapp />+54 9 2664 23-8128
+                </a>
             </div>
 
             <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
@@ -56,35 +54,40 @@ function NavBar({enlaces, cantidadCarrito}){
                         </button>
 
                         {menuAbierto && (
-                            <li>
-                                <NavLink className="a-logo" to="/">
-                                    La<span className="fe-logo">Fe</span> Distribuidora
-                                </NavLink>
-                            </li>
+                            <>
+                                <li>
+                                    <NavLink className="a-logo logo" to="/">
+                                        La<span className="fe-logo">Fe</span> Distribuidora
+                                    </NavLink>
+                                </li>
+                                <hr className="divisor-menu" />
+                            </>
                         )}
                         
                         {enlaces.map((enlace) => (
                             <li key={enlace.id}>
-                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
-                                {enlace.texto}
-                            </NavLink>
+                                <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
+                                    {enlace.texto}
+                                </NavLink>
                             </li>
                         ))}
 
-                        <li>
-                        <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
-                            <img  src={iconoCarrito} alt='iconoCarrito'/>
-                            {cantidadCarrito}
-                        </NavLink>
+                        <li className="carrito-desktop">
+                            <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
+                                <img  src={iconoCarrito} alt='iconoCarrito'/>
+                                {cantidadCarrito}
+                            </NavLink>
                         </li>
                     </ul>
 
-                    
-
+                    <NavLink className="a-nav carrito-mobile" to="/carrito" onClick={cerrarMenu}>
+                        <img src={iconoCarrito} alt='iconoCarrito'/>
+                        {cantidadCarrito}
+                    </NavLink>
                 </nav>
 
                 {esHome && (
-                    <>
+                    <div className="div-banner">
                         <div id="div-banner-general">
                             <h2>LAFE Distribuidora</h2>
                             <div className="imagen-banner-texto">
@@ -95,7 +98,7 @@ function NavBar({enlaces, cantidadCarrito}){
                         <div className="indicador-scroll">
                             <FaChevronDown className="flecha-animada" />
                         </div>
-                    </>
+                    </div>    
                 )}
             </div>
         </header>
