@@ -445,77 +445,7 @@ footer {
 
 /* footer */
 
-/* Contenedor principal de columnas */
-.footer-cuadro {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 2rem;
-    width: 100%;
-    text-align: left;
-    margin-bottom: 1rem;
-}
 
-.footer-cuadro a,
-footer > a {
-  color: #e3d5ca;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.footer-catalogo > a,
-.footer-preguntas > a,
-.footer-redes > a {
-  display: block; 
-  transition: transform 0.4s ease, color 0.2s ease;
-}
-
-.footer-cuadro a:hover,
-footer > a:hover {
-  color: #ffffff;
-  text-decoration: none;
-}
-
-.footer-catalogo > a:hover,
-.footer-preguntas > a:hover,
-.footer-redes > a:hover {
-  color: #ffffff;
-  transform: translateX(4px);
-}
-
-
-.footer-logo img {
-    max-width: 140px;
-    height: auto;
-    display: block;
-    mix-blend-mode: multiply
-}
-
-.derechos {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  width: 100%;
-  margin: 1rem auto 0 auto;
-  
-}
-
-.derechos span,
-.derechos a {
-  font-size: 1rem;
-  color: #a0a0a0;
-  text-decoration: none;
-}
-    
-.Acceso-Admin {
-  color: #888888;
-  text-decoration: none;
-}
-
-.Acceso-Admin:hover {
-  color: #ffffff;
-  text-decoration: underline;
-}
 
 /*mapa*/
 .section-horarios-mapa {
@@ -709,4 +639,3 @@ footer > a:hover {
         flex-wrap: wrap; 
         justify-content: center; 
     }
-}
