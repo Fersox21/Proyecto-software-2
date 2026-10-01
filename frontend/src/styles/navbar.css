@@ -343,10 +343,14 @@ nav {
         border: none;
         border-top: 2px solid rgba(227, 213, 202, 0.2);
     }
+
+    .logo {
+        font-size: 2rem;
+    }
 }
 
 /* Para celulares */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 769px) {
     .topbar {
         font-size: 0.7rem;
     }
@@ -365,6 +369,15 @@ nav {
 
     .imagen-banner-texto p {
         font-size: 1.3rem;
+    }
+
+    .ul-nav {
+        align-items: start;
+        font-size: 1.1rem;
+    }
+
+    .logo {
+        font-size: 2rem;
     }
 
 }
@@ -399,5 +412,13 @@ nav {
     .imagen-banner-texto p {
         font-size: 0.7rem;
         font-weight: 500;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .a-nav {
+        font-size: 1rem;
     }
 }

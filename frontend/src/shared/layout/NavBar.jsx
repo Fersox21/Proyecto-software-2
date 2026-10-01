@@ -56,7 +56,7 @@ function NavBar({enlaces, cantidadCarrito}){
                         {menuAbierto && (
                             <>
                                 <li>
-                                    <NavLink className="a-logo" to="/">
+                                    <NavLink className="a-logo logo" to="/">
                                         La<span className="fe-logo">Fe</span> Distribuidora
                                     </NavLink>
                                 </li>
