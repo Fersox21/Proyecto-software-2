@@ -38,7 +38,7 @@ function BienvenidosHome(){
     return(<>
         
            <section className="seccion-bienvenidos">
-      <div className="bienvenidos-header">
+      <div className="bienvenidos-titulo">
         <h2>Abastecimiento confiable para tu negocio</h2>
         <p>
           Acompañamos a panaderías, confiterías y fábricas gastronómicas con materia prima de calidad y entregas directas.
