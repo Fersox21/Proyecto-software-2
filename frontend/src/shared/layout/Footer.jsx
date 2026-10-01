@@ -1,6 +1,9 @@
 import logo from '../../assets/Logo/Logo-Lafe.png';
 import { NavLink } from 'react-router';
+<<<<<<< HEAD
 import '../../styles/footer.css'
+=======
+>>>>>>> LoginAdmin
 
 function Footer(){
     return(<>
@@ -64,7 +67,7 @@ function Footer(){
                 </div>
                 <p>LaFe se reserva todos los derechos</p>
                 <p>Copyright 2026</p>
-                <NavLink className="Acceso-Admin" to="/administrador">
+                <NavLink className="Acceso-Admin" to="/login">
                         <p>Acceso Administrativo</p>    
                 </NavLink>
             </footer>

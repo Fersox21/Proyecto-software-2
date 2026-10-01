@@ -1,2 +1,2 @@
 export { default as LoginPage } from './pages/LoginPage'
-export { protegerRuta, redirigirSiHaySesion } from './services/authService'
+export { protegerRuta, redirigirSiHaySesion, cerrarSesion } from './services/authService'

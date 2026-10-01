@@ -1,47 +1,32 @@
-import { useRef, useState } from 'react'
-
+import { iniciarSesion } from '../services/authService'
+import { useNavigate } from 'react-router'
+import FormLogin from '../components/FormLogin'
+import '../../../styles/login.css'
 
 function LoginPage(){
-const [valores, setValores] = useState({ email: '', password: '' })
-  const [errores, setErrores] = useState({})
-  const [errorServidor, setErrorServidor] = useState('')
-  const [enviando, setEnviando] = useState(false)
-  const [mostrarPassword, setMostrarPassword] = useState(false)
+  const navigate = useNavigate()
 
-
+  async function handleIngresar( { password }) {
+    await iniciarSesion({ password }) 
+    navigate('/administrador', { replace: true })
+  }
 
     return(<>
 
-        <div className="mb-4">
-        <label htmlFor="password" className="form-label">
-          Contraseña
-        </label>
-        <div className="input-group has-validation">
-          <input
-            id="password"
-            name="password"
-            type={mostrarPassword ? 'text' : 'password'}
-            autoComplete="current-password"
-            className={`form-control ${errores.password ? 'is-invalid' : ''}`}
-            value={valores.password}
-            disabled={enviando}
-          />
-          <button
-            type="button"
-            className="btn btn-outline-secondary"
-            onClick={() => setMostrarPassword(!mostrarPassword)}
-            aria-pressed={mostrarPassword}
-          >
-            {mostrarPassword ? 'Ocultar' : 'Mostrar'}
-          </button>
-          {errores.password && <div className="invalid-feedback">{errores.password}</div>}
+    <div class="container justify-content-center align-items-center pb-5 pt-5">
+      <div class="row justify-content-center align-items-center g-2">
+        <div class="col-sm-10 col-md-7 col-lg-5">
+          <section className='login-form'>
+            <h1 className="h3 text-center titulo-tag">Ingreso Administrativo</h1>
+            <FormLogin onIngresar={handleIngresar} />
+          </section>
+          
         </div>
+        
       </div>
-
-
-            <button type="submit" variante="dark" className="w-100" disabled={enviando}>
-                {enviando ? 'Verificando...' : 'Ingresar'}
-            </button>
+      
+    </div>
+    
 
     </>
     )

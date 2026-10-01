@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Outlet, ScrollRestoration } from 'react-router'; 
 import { useCarrito } from '../../features/carrito';
 import Navbar from './NavBar';
