@@ -443,7 +443,7 @@ footer {
     animation: pulse 1.2s ease-out;
 }
 
-/* footer */
+
 
 
 
@@ -546,9 +546,10 @@ footer {
     .seccion-bienvenidos {
     width: 90%;
     margin: 3rem auto;
-    padding: 0 0.5rem;}
+    padding: 0 0.5rem;
+}
 
-  }
+  
 
   .bienvenidos-titulo {
     margin-bottom: 2rem;
@@ -639,3 +640,4 @@ footer {
         flex-wrap: wrap; 
         justify-content: center; 
     }
+}

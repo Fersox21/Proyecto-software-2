@@ -1,6 +1,6 @@
 import logo from '../../assets/Logo/Logo-Lafe.png';
 import { NavLink } from 'react-router';
-import '../../styles/footer.css'; // <-- Ajusta los "../" según dónde esté ubicado
+import '../../styles/footer.css'; 
 
 function Footer() {
   return (
