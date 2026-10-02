@@ -40,7 +40,7 @@ function FormLogin({ onIngresar }){
 
     setEnviando(true)
     try {
-      await onIngresar(valores) // Ahora esto enviará el objeto: { password: "lo_que_escribio" }
+      await onIngresar(valores)
     } catch (error) {
       setErrorServidor(error.message)
       setEnviando(false)
@@ -56,10 +56,10 @@ function FormLogin({ onIngresar }){
       )}
 
       <div className="mb-4">
-        <label htmlFor="password" className="form-label">
+        <label htmlFor="password" className="title-pass">
           Contraseña
         </label>
-        <div className="input-group has-validation">
+        <div className="sec-input">
           <input
             id="password"
             name="password"
@@ -73,17 +73,17 @@ function FormLogin({ onIngresar }){
           
           <button
             type="button"
-            className="btn btn-outline-secondary"
+            className="btn btn-outline-secondary mostrar"
             onClick={() => setMostrarPassword(!mostrarPassword)}
             aria-pressed={mostrarPassword}
           >
-            {mostrarPassword ? 'Ocultar' : 'Mostrar'}
+            Ver contraseña
           </button>
           {errores.password && <div className="invalid-feedback">{errores.password}</div>}
         </div>
       </div>
 
-      <Boton type="submit" variante="dark" className="w-100" disabled={enviando}>
+      <Boton type="submit" className="button-login" disabled={enviando}>
         {enviando ? 'Verificando...' : 'Ingresar'}
       </Boton>
     </form>
