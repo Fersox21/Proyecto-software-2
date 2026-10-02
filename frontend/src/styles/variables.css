@@ -42,4 +42,27 @@
     --color-icono-bienvenida: white;
     --color-titulo-bienvenida: #b08968;
     --color-mensaje-bienvenida: #aaa8a6;
+
+    /* catalogo */
+    --color-input: #000;
+    --main-bgc: #fff;
+
+    /* Card productos */
+    --color-boton-card-letra: #956918;
+    --color-boton-card-borde: #b07d1e;
+    --color-prec-card: #black;
+    --colo-desc-card: #888;
+
+    /* adminProductos */
+    --color-fondo: #f8f9fa;
+    --color-texto: #212529;
+    --color-primario: #0d6efd;
+    --fuente-principal: system-ui, -apple-system, sans-serif;
+
+    /* NavBarAdmin */
+    --color-header: #2A2A2A;
+    --color-a-nav: #bbb;
+    --color-li-nav-hover: #bbbf;
+    --color-Fe-h1-admin: #3b4cce;
+    --color-p-nav: #5F5F5F;
 }

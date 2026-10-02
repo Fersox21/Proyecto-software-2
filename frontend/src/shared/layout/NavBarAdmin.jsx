@@ -3,19 +3,39 @@ import '../../styles/panelAdmin/navbarAdmin.css'
 import Boton from '../../shared/components/Boton'
 import {cerrarSesion} from '../../features/auth'
 import { useNavigate } from "react-router";
+import { useState } from "react";
+import { FaBars, FaTimes } from 'react-icons/fa';
 
 function NavBarAdmin({enlaces}){
 
+    const [menuAbierto, setMenuAbierto] = useState(false);
+    const toggleMenu = () => setMenuAbierto(!menuAbierto);
+    const cerrarMenu = () => setMenuAbierto(false);
     const navigate = useNavigate();
+    
 
     const handleCerrarSesion = () => {
         cerrarSesion(); 
         navigate('/login'); 
     };
 
-    return(
-        <header className="sidebar-admin" id="sidebar-admin">
+    return(<>
+    
+
+        <button className="btn-hamburguesa-admin" onClick={toggleMenu} aria-label="Abrir menú de administración">
+            <FaBars />
+        </button>
+    
+        <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
+        
+        
+        <header className={`sidebar-admin ${menuAbierto ? 'abierto' : ''}`} id="sidebar-admin">
         <nav className="nav-admin">
+
+            <button className="btn-cerrar-admin" onClick={cerrarMenu} >
+                        <FaTimes />
+            </button>
+
             <h2 className="h2-admin">La <span id="Fe-h2-admin">Fe</span> · admin</h2>
 
             <p className="p-nav">GENERAL</p>
@@ -43,6 +63,7 @@ function NavBarAdmin({enlaces}){
             </ul>
         </nav>
     </header>
+    </>
     )
 }
 export default NavBarAdmin;
