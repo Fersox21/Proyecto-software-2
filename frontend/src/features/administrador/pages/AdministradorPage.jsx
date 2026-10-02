@@ -9,6 +9,11 @@ function AdministradorPage() {
 
     const { datos: productos, cargando, error } = useFetch(obtenerProductos)
 
+    function calcularEstado(stock) {
+        if (stock < 10) return "Stock bajo"
+        if (stock >= 10 && stock <= 20) return "Stock suficiente"
+        return "Stock alto"
+    }
 
     if (cargando) return <Spinner texto="Cargando catálogo..." />
     if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />
@@ -41,8 +46,7 @@ return(<>
                                 <td className="col-admin col-categoria">{prod.categoria}</td>
                                 <td className="col-admin col-precio">${prod.precio}</td>
                                 <td className="col-admin col-stock">{prod.stock}</td>
-                                <td className="col-admin">
-                                </td>
+                                <td className="col-admin">{calcularEstado(prod.stock)}</td>
                                 <td className="col-admin col-acciones">
                                     <button>Editar</button>
                                 </td>
@@ -61,7 +65,6 @@ return(<>
         </section>
     </section>
 </>)
-
 }
 
 export default AdministradorPage;
