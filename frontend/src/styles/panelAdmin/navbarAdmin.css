@@ -1,16 +1,20 @@
-:root {
-    --color-header: #2A2A2A;
-    --color-a-nav: #bbb;
-    --color-li-nav-hover: #bbbf;
-    --color-Fe-h1-admin: #3b4cce;
-    --color-p-nav: #5F5F5F;
-}
+
 
 .sidebar-admin {
     background-color: var(--color-header);
     width: 250px;
     min-width: 250px;
     min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+.btn-hamburguesa-admin,
+.btn-cerrar-admin,
+.menu-overlay {
+    display: none;
 }
 
 .nav-admin {
@@ -57,3 +61,48 @@
     font-weight: bold;
 }
 
+
+/* Media Query */
+@media (max-width: 768px) {
+    .btn-hamburguesa-admin {
+        display: block;
+        position: fixed;
+        top: 15px;
+        left: 15px;
+        background: var(--color-header, #2c2c2c);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 0.5rem 0.8rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 900;
+    }
+
+    
+    .sidebar-admin {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        transition: left 0.3s ease-in-out;
+        z-index: 1000;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+    }
+
+    .sidebar-admin.abierto {
+        left: 0;
+    }
+
+    .btn-cerrar-admin {
+        display: block;
+        background: transparent;
+        color: white;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-top: 1rem;
+        align-self: flex-end; 
+    }
+
+
+}
