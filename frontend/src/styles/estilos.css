@@ -56,11 +56,11 @@ footer {
 }
 
 #titulo-inicio {
-    text-align: center;      /* Centra el texto */
-    font-size: 2.5rem;       /* Un poco más grande para que tenga presencia */
-    color: #4a3628;          /* Un marrón oscuro en lugar de negro puro combina mejor */
-    margin-bottom: 50px;     /* Empuja las tarjetas de los iconos hacia abajo */
-    font-family: 'Georgia', serif; /* Usa la misma letra clásica de los otros títulos */
+    text-align: center;     
+    font-size: 2.5rem;      
+    color: #4a3628;          
+    margin-bottom: 50px;     
+    font-family: 'Georgia', serif; 
 }
 
 #section-prodDest {
@@ -343,10 +343,18 @@ footer {
 }
 
 .imagenes-marcas {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  max-width: 800px;
+}
+
+.imagenes-marcas::-webkit-scrollbar {
+  display: none; 
+  
 }
 
 .imagenes-marcas img {
@@ -519,7 +527,7 @@ footer {
     display: block;
 }
 
-/* --- PARA TABLETS (1024px o menos) --- */
+/* para tablet 1024px o menos */
 @media screen and (max-width: 1024px) {
     #root {
         grid-template-columns: 1fr;
@@ -540,7 +548,7 @@ footer {
     }
 }
 
-/* --- PARA CELULARES (768px o menos) --- */
+/* para celulares 768px o menos  */
 @media screen and (max-width: 768px) {
 
     .seccion-bienvenidos {
