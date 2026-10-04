@@ -71,7 +71,7 @@ function TarjetaProducto({ producto, onAgregar }) {
       {/* Notificación flotante al agregar producto */}
         {mostrarNotificacion && (
           <div 
-            className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-4 shadow-lg" 
+            className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-auto shadow-lg" 
             style={{ zIndex: 1050 }}
             role="alert" 
             aria-live="assertive" 

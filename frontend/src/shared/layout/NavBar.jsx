@@ -14,19 +14,22 @@ function NavBar({enlaces, cantidadCarrito}){
     return (<>
         <header className={esHome ? "sidebar-home" : "sidebar"}>
             <div className="topbar">
-                <span className="topbar-item topbar-texto">
-                    <FaRegClock />
-                    <span className="topbar-texto">Lun a Vie 8:00–16:00 · Sáb 9:00–13:00</span>
-                </span>
-                <a className="topbar-item" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
-                    <FaMapMarkerAlt /> <span className="topbar-texto">Juan Gilberto Funes 460, San Luis</span>
-                </a>
-                <a href="mailto:info@lafe.com" className="topbar-item">
-                    <FaEnvelope /> <span className="topbar-texto">info@lafe.com</span>
-                </a>
-                <a href="https://wa.me/5492664238128" className="topbar-item" target="_blank" rel="noopener noreferrer">
-                    <FaWhatsapp />+54 9 2664 23-8128
-                </a>
+                <div className="topbar-item-cont">
+                    <span className="topbar-item topbar-texto">
+                        <FaRegClock /> <span className="topbar-texto">Lun a Vie 8:00–16:00 · Sáb 9:00–13:00</span>
+                    </span>
+                    <a className="topbar-item" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
+                        <FaMapMarkerAlt /> <span className="topbar-texto">Juan Gilberto Funes 460, San Luis</span>
+                    </a>
+                </div>
+                <div className="topbar-item-cont">
+                    <a href="mailto:info@lafe.com" className="topbar-item">
+                        <FaEnvelope /> <span className="topbar-texto">info@lafe.com</span>
+                    </a>
+                    <a href="https://wa.me/5492664238128" className="topbar-item" target="_blank" rel="noopener noreferrer">
+                        <FaWhatsapp /><span className="topbar-texto">+54 9 2664 23-8128</span>
+                    </a>
+                </div>
             </div>
 
             <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
