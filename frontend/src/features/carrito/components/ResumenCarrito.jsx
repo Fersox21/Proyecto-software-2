@@ -4,21 +4,23 @@ import { formatearPrecio } from '../../../shared/utils/formato'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
 import iconoEntregaLocal from '../../../assets/Items/iconoEntregaLocal.svg'
 import iconoEntregaDomicilio from '../../../assets/Items/iconoEntregaDomicilio.svg'
+import EscogerUbicacion from './EscogerUbicacion'
 
 const ENVIO_GRATIS_DESDE = 60000
 const COSTO_ENVIO = 1800
 
 function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
   const [entrega, setEntrega] = useState('null')
-  const esRetiro = entrega === 'retiro'
+  const esRetiro = entrega === 'retiro' || entrega === 'null'
   const envio = subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTO_ENVIO
   const total = subtotal + envio
   const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotal
 
   return (
-    <div className="card shadow-sm rounded-4 mx-4 p-3">
-      <h2 className="h5 mb-4 text-start">Resumen de compra</h2>
+    <div className="card shadow-sm rounded-4 ms-4 p-3" style={{maxWidth: '100%'}}>
+      <h4 className="mb-4 text-start">Resumen de compra</h4>
       <div className="card-entrega">
+        <h5>Método de entrega</h5>
         <ItemTarjeta
           titulo="Retiro en distribuidora"
           icono={iconoEntregaLocal}
@@ -36,6 +38,10 @@ function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
           onSelect={() => setEntrega('estandar')}
           />
       </div>
+
+      {!esRetiro && 
+        (<EscogerUbicacion />)}
+
       <div className="card-body">
         <dl className="row mb-0 text-start">
           <dt className="col-7 fw-normal">Subtotal ({cantidadTotal} productos)</dt>

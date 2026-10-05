@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link, useOutletContext } from 'react-router';
+import { MdArrowBack } from 'react-icons/md';
 import ItemCarrito from '../components/ItemCarrito'
 import ResumenCarrito from '../components/ResumenCarrito'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
@@ -36,8 +37,13 @@ function CarritoPage() {
   return (
     <div className="container my-4">
       <div className="row g-4">
-        <div className="col-12 col-lg-8">
-          <h1 className="h2 mb-4">Tu carrito</h1>
+        <div className="col-12 col-lg-7">
+          <h1 className="h2 mb-2 text-start">Tu carrito</h1>
+          <div className="d-flex justify-content-between">
+            <p>{items.length} productos · {cantidadTotal} unidades</p>
+            <a href="/catalogo" className="text-decoration-none text-black"><MdArrowBack /> Seguir comprando</a>
+          </div>
+          <hr className="mb-3 text-secondary opacity-25" style={{width: '100%'}} />
           <ul className="list-group shadow-sm">
             {items.map((prod) => (
               <ItemCarrito
@@ -49,7 +55,7 @@ function CarritoPage() {
             ))}
           </ul>
         </div>
-        <div className="col-12 col-lg-4">
+        <div className="col-12 col-lg-5" style={{maxWidth: '100%'}}>
           <ResumenCarrito
             cantidadTotal={cantidadTotal}
             subtotal={subtotal}

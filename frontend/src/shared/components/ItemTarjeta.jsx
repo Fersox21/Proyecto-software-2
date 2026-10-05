@@ -43,9 +43,9 @@ function ItemTarjeta({ titulo, icono, texto, descripcion, seleccionado, onSelect
 
             {/* Textos */}
             <div className="flex-grow-1 ms-3">
-                <h6 className="fw-semibold fs-5 mb-1">{titulo}</h6>
-                {texto && <p className="text-body-secondary mb-1">{texto}</p>}
-                {descripcion && <p className="mb-0 fw-medium text-dark">{descripcion}</p>}
+                <h6 className="mb-1">{titulo}</h6>
+                {texto && <p className="h6 text-body-secondary">{texto}</p>}
+                {descripcion && <p className="h6 mb-0 text-dark">{descripcion}</p>}
             </div>
 
             {/* Radio custom */}
