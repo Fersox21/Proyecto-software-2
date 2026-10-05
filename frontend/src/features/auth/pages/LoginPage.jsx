@@ -1,7 +1,7 @@
 import { iniciarSesion } from '../services/authService'
 import { useNavigate } from 'react-router'
 import FormLogin from '../components/FormLogin'
-import '../../../styles/login.css'
+import '../../../styles/panelAdmin/adminlogin.css'
 
 function LoginPage(){
   const navigate = useNavigate()

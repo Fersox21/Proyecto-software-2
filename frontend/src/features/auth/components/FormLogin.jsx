@@ -3,31 +3,31 @@ import Boton from '../../../shared/components/Boton'
 import { useRef, useState } from 'react'
 
 
-function validar(valor){
-    const errores = {}
-    if (!esRequerido(valor.password)) errores.password = 'Ingresá tu contraseña.'
+function validar(valor) {
+  const errores = {}
+  if (!esRequerido(valor.password)) errores.password = 'Ingresá tu contraseña.'
   return errores
 }
 
 
-function FormLogin({ onIngresar }){
+function FormLogin({ onIngresar }) {
 
-    const [valores, setValores] = useState({password: ''})
-    const [errores, setErrores] = useState({})
-    const [errorServidor, setErrorServidor] = useState('')
-    const [enviando, setEnviando] = useState(false)
-    const [mostrarPassword, setMostrarPassword] = useState(false)
-    const formularioRef = useRef(null)
+  const [valores, setValores] = useState({ password: '' })
+  const [errores, setErrores] = useState({})
+  const [errorServidor, setErrorServidor] = useState('')
+  const [enviando, setEnviando] = useState(false)
+  const [mostrarPassword, setMostrarPassword] = useState(false)
+  const formularioRef = useRef(null)
 
-    function handleChange(e) {
+  function handleChange(e) {
     const { name, value } = e.target
     setValores({ ...valores, [name]: value })
     if (errores[name]) setErrores({ ...errores, [name]: undefined })
     setErrorServidor('')
   }
 
-    async function handleSubmit(e) {
-    e.preventDefault() 
+  async function handleSubmit(e) {
+    e.preventDefault()
 
     const nuevosErrores = validar(valores)
     setErrores(nuevosErrores)
@@ -47,13 +47,32 @@ function FormLogin({ onIngresar }){
     }
   }
 
-    return (
+  return (
     <form ref={formularioRef} onSubmit={handleSubmit} noValidate>
       {errorServidor && (
         <div className="alert alert-danger py-2" role="alert">
           {errorServidor}
         </div>
       )}
+
+      <div className="mb-3">
+          <label htmlFor="email" className="title-email">
+            Email
+          </label>
+          <div className="sec-input">
+            <input 
+              id="email"
+              type="text"
+              name="email"
+              autoComplete="current-email"
+              className={`form-control ${errores.email ? 'is-invalid' : ''}`}
+              value={valores.email}
+              onChange={handleChange}
+              disabled={enviando}
+
+              />
+          </div>
+      </div>
 
       <div className="mb-4">
         <label htmlFor="password" className="title-pass">
@@ -70,7 +89,7 @@ function FormLogin({ onIngresar }){
             onChange={handleChange}
             disabled={enviando}
           />
-          
+
           <button
             type="button"
             className="btn btn-outline-secondary mostrar"
@@ -87,7 +106,7 @@ function FormLogin({ onIngresar }){
         {enviando ? 'Verificando...' : 'Ingresar'}
       </Boton>
     </form>
-    )
+  )
 }
 
 export default FormLogin
