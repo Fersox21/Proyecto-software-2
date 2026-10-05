@@ -47,19 +47,21 @@ function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
       <div className="card-body">
         <dl className="row mb-0 text-start">
           <dt className="col-7 fw-normal">Subtotal ({cantidadTotal} productos)</dt>
-          <dd className="col-5 text-end">{formatearPrecio(subtotal)}</dd>
+          <dd className="col-5 text-end fuente-titulos">{formatearPrecio(subtotal)}</dd>
           {!esRetiro && (
             <>
               <dt className="col-7 fw-normal">Envío</dt>
-              <dd className="col-5 text-end">{envio === 0 ? 'Gratis' : formatearPrecio(envio)}</dd>
+              <dd className="col-5 text-end fuente-titulos">{envio === 0 ? 'Gratis' : formatearPrecio(envio)}</dd>
             </>
           )}
-          <dt className="col-7 border-top pt-2">Total</dt>
-          <dd className="col-5 text-end border-top pt-2 fw-bold">{formatearPrecio(total)}</dd>
+          <div className="d-flex align-items-center border-top pt-2">
+            <dt className="col-7">Total</dt>
+            <dd className="col-5 text-end h2 fuente-titulos">{formatearPrecio(total)}</dd>
+          </div>
         </dl>
 
         {!esRetiro && faltaParaEnvioGratis > 0 && (
-          <p className="small text-body-secondary">
+          <p className="small text-body-secondary fuente-titulos">
             Te faltan {formatearPrecio(faltaParaEnvioGratis)} para el envío gratis.
           </p>
         )}
