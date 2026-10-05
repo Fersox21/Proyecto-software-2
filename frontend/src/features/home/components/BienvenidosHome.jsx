@@ -1,6 +1,3 @@
-import iconoNosotros from '../../../assets/Items/iconoNosotros.svg';
-import iconoTrigo from '../../../assets/Items/iconoTrigo.svg';
-import iconoStock from '../../../assets/Items/iconoStock.svg';
 import '../../../styles/estilos.css'; 
 
 

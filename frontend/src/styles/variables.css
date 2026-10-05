@@ -1,5 +1,10 @@
 :root {
 
+    /* GENERAL */
+    --fuente-base: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --fuente-titulos: Georgia, "Times New Roman", serif;
+    --bs-body-font-family: var(--fuente-base);
+
     /* HEADER */
     --color-header-home: white;   /* fondo del header */
     --color-header: #262220;   /* fondo del header */
@@ -50,7 +55,7 @@
     /* Card productos */
     --color-boton-card-letra: #956918;
     --color-boton-card-borde: #b07d1e;
-    --color-prec-card: #black;
+    --color-prec-card: black;
     --colo-desc-card: #888;
 
     /* adminProductos */
@@ -60,9 +65,9 @@
     --fuente-principal: system-ui, -apple-system, sans-serif;
 
     /* NavBarAdmin */
-    --color-header: #2A2A2A;
-    --color-a-nav: #bbb;
-    --color-li-nav-hover: #bbbf;
+    --color-header-admin: #2A2A2A;
+    --color-a-nav-admin: #bbb;
+    --color-li-nav-hover-admin: #bbbf;
     --color-Fe-h1-admin: #3b4cce;
-    --color-p-nav: #5F5F5F;
+    --color-p-nav-admin: #5F5F5F;
 }

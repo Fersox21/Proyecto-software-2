@@ -8,6 +8,7 @@ import { useFetch } from '../../../shared/hooks/useFetch'
 import Boton from '../../../shared/components/Boton'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
+import '../../../styles/catalogo-filtros.css'
 
 function CatalogoPage() {
   const { agregarProducto } = useOutletContext()

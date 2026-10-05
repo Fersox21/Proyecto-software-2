@@ -1,0 +1,71 @@
+/* ---------- Título de página con motivo de etiqueta ---------- */
+.titulo-tag {
+  font-family: var(--fuente-titulos);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* ---------- Catálogo: filtros ---------- */
+.filtros .rotulo-filtro {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #262422;
+  opacity: 0.65;
+  margin-bottom: 0.5rem;
+}
+
+.filtros .campo-busqueda-tag {
+  border: none;
+  border-bottom: 2px solid #e6ccb2;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 0.1rem;
+  padding-right: 0.1rem;
+}
+
+.filtros .campo-busqueda-tag:focus {
+  border-color: var(--accent-hover);
+  box-shadow: none;
+}
+
+.lista-categorias-tag {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.lista-categorias-tag button {
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid transparent;
+  padding: 0.4rem 0.1rem;
+  font-size: 0.95rem;
+  color: #262422;
+  opacity: 0.65;
+  cursor: pointer;
+}
+
+.lista-categorias-tag button.activa {
+  font-weight: 700;
+  opacity: 1;
+  border-bottom-color: var(--accent-hover);
+}
+
+.btn-limpiar-tag {
+  background: none !important;
+  border: none !important;
+  color: #262422 !important;
+  opacity: 0.65;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0 !important;
+}
+
+.imagen-detalle {
+  aspect-ratio: 1;
+  object-fit: cover;
+  background-color: var(--surface);
+}

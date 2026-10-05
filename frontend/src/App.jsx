@@ -1,6 +1,5 @@
 import { RouterProvider } from 'react-router';
 import { router } from './router.jsx';
-import './styles/card-producto.css'
 
 
 function App() {

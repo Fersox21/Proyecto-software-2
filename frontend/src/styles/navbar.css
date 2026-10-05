@@ -146,7 +146,6 @@ nav {
     align-items: center;
     text-align: center;
     flex: 1;
-    min-height: 100%;
     width: 100%;
     padding-bottom: 5rem;
     gap: 5rem;
@@ -161,7 +160,7 @@ nav {
 }
 
 .imagen-banner-texto h1 {
-    font-family: 'Georgia', serif; 
+    font-family: var(--fuente-titulos);
     font-size: 3.5em; 
     font-weight: bold;
     color: #fcf9f2; 

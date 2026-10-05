@@ -1,7 +1,7 @@
 
 
 .sidebar-admin {
-    background-color: var(--color-header);
+    background-color: var(--color-header-admin);
     width: 250px;
     min-width: 250px;
     min-height: 100vh;
@@ -44,7 +44,7 @@
 
 .p-nav {
     font-weight: bold;
-    color: var(--color-p-nav);
+    color: var(--color-p-nav-admin);
 }
 
 #p-cuenta-nav {
@@ -54,7 +54,7 @@
 .a-nav-admin, .link-admin{
     display: block;
     text-decoration: none;
-    background-color: var(--color-header);
+    background-color: var(--color-header-admin);
     color: white;
     font-size: 1.5rem;
     border-radius: 10px;
@@ -69,7 +69,7 @@
         position: fixed;
         top: 15px;
         left: 15px;
-        background: var(--color-header, #2c2c2c);
+        background: var(--color-header-admin, #2c2c2c);
         color: white;
         border: none;
         border-radius: 5px;
