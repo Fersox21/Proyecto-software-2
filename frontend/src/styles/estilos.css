@@ -51,7 +51,6 @@ footer {
     margin: 0;
     gap: 2rem;
     width: 100%;
-    background-color: var(--color-body);
 }
 
 .table-catalogo  {
@@ -125,6 +124,7 @@ footer {
     border: 1px solid #eaeaea;
     border-radius: 12px;
     text-decoration: none;
+    background-color: var(--color-card-contact);
 }
 
 .contactos:hover {
@@ -190,6 +190,7 @@ footer {
   width: 80%;
   margin: 3rem auto;
   padding: 0 1.5rem;
+  background-color: var(--color-section-prodDestestacados);
 }
 
 .bienvenidos-titulo {
@@ -636,10 +637,14 @@ footer {
     }
 }
 
-h1, h2, h3, h4, h5, h6,
-.card-title,
-.card-nom,
-.card-prec,
-.precio-fraunces {
+h1, h2, .fuente-titulos {
     font-family: var(--fuente-titulos);
+    font-weight: 500;
+}
+
+.etiqueta-categoria {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bs-secondary-color);
 }

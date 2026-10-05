@@ -3,6 +3,10 @@ html {
     text-rendering: optimizeLegibility;
 }
 
+main {
+    background-color: var(--color-body);
+}
+
 /* Texto copiado: */
 
 .navbar .nav-link.active {
@@ -104,6 +108,7 @@ html {
   height: 80px;
   object-fit: cover;
   background-color: var(--marca-fondo-suave);
+  background-color: red;
 }
 
 /* ---------- Contacto / Login: tarjeta con motivo de etiqueta ---------- */

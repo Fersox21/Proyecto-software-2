@@ -1,28 +1,59 @@
 import { formatearPrecio } from '../../../shared/utils/formato'
+import { BsTrash } from 'react-icons/bs'
+import '../../../styles/carrito.css'
 
 function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
   return (
-    <li className="list-group-item py-3">
-      <div className="d-flex flex-wrap flex-sm-nowrap gap-3 align-items-center">
-        <img src={item.imagen} alt={item.nombre} className="imagen-carrito rounded" />
+    <li className="list-group-item py-4 border-0 border-dark border-top bg-transparent rounded-0">
+      <div className="row align-items-center g-3">
+        <div className="col-12 col-md-5 d-flex align-items-center gap-3">
+          <img
+            src={item.imagen}
+            alt={item.nombre}
+            className="rounded-4 object-fit-cover flex-shrink-0"
+            style={{ width: '100px', height: '100px' }}
+          />
+          <div className="text-start d-flex flex-column justify-content-center">
+            {item.categoria && (
+              <span
+                className="text-uppercase text-body-secondary fw-semibold mb-1"
+                style={{ fontSize: '0.75rem', letterSpacing: '0.08em' }}
+              >
+                {item.categoria}
+              </span>
+            )}
+            <h6 className="mb-1 fs-5 text-dark lh-sm fuente-titulos">
+              {item.nombre}
+            </h6>
+            {item.descripcion && (
+              <p className="mb-1 text-body-secondary small">
+                {item.descripcion}
+              </p>
+            )}
+          </div>
+        </div>
 
-        <div className="flex-grow-1">
-          <h3 className="h6 mb-1">{item.nombre}</h3>
-          <p className="small text-body-secondary mb-2">
-            {formatearPrecio(item.precio)} c/u
-          </p>
-          <div className="input-group input-group-sm w-auto">
+        <div className="col-4 col-md-2 text-md-center">
+          <small className="text-body-secondary d-block mb-1">Precio unitario</small>
+          <span className="text-dark fs-6 fuente-titulos">
+            {formatearPrecio(item.precio)}
+          </span>
+        </div>
+
+        <div className="col-4 col-md-2 text-md-center">
+          <small className="text-body-secondary d-block mb-1">Cantidad</small>
+          <div className="input-group input-group-sm rounded-pill border border-secondary-subtle py-0 d-inline-flex align-items-center justify-content-between" style={{ maxWidth: '110px' }}>
             <button
-              className="btn btn-outline-secondary"
+              className="btn btn-sm text-dark p-0 text-decoration-none border-0 rounded-circle btn-cantidad"
               type="button"
               onClick={() => onCambiarCantidad(item.id, item.cantidad - 1)}
               aria-label={`Restar una unidad de ${item.nombre}`}
             >
               −
             </button>
-            <span className="input-group-text bg-white px-3">{item.cantidad}</span>
+            <span className="px-2 fuente-titulos">{item.cantidad}</span>
             <button
-              className="btn btn-outline-secondary"
+              className="btn btn-sm text-dark p-0 text-decoration-none border-0 rounded-circle btn-cantidad"
               type="button"
               disabled={item.cantidad >= item.stock}
               onClick={() => onCambiarCantidad(item.id, item.cantidad + 1)}
@@ -33,10 +64,22 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
           </div>
         </div>
 
-        <div className="text-sm-end ms-auto">
-          <p className="fw-bold mb-1">{formatearPrecio(item.precio * item.cantidad)}</p>
-          <button type="button" className="btn btn-sm btn-link link-danger p-0" onClick={() => onQuitar(item.id, item.talle)}>
-            Quitar
+        <div className="col-3 col-md-2 text-end text-md-center">
+          <small className="text-body-secondary d-block mb-1">Total</small>
+          <span className="text-dark fs-5 fuente-titulos">
+            {formatearPrecio(item.precio * item.cantidad)}
+          </span>
+        </div>
+
+        <div className="col-1 col-md-1 text-end">
+          <button
+            type="button"
+            className="btn p-2 border-0 rounded-circle btn-eliminar"
+            onClick={() => onQuitar(item.id)}
+            aria-label={`Eliminar ${item.nombre}`}
+            title="Eliminar producto"
+          >
+            <BsTrash size={18} />
           </button>
         </div>
       </div>

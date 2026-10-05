@@ -38,6 +38,8 @@ export function useCarrito() {
           precio: producto.precio,
           imagen: producto.imagen,
           stock: producto.stock,
+          descripcion: producto.descripcion,
+          categoria: producto.categoria,
           cantidad,
         },
       ]

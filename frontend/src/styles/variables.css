@@ -2,11 +2,14 @@
 
     /* GENERAL */
     --fuente-base: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --fuente-titulos: "Fraunces", Georgia, "Times New Roman", serif;
+    --fuente-titulos: "Fraunces Variable", Georgia, "Times New Roman", serif;
     --bs-body-font-family: var(--fuente-base);
 
+    /* MAIN */
+    --color-body: #e1e0de;
+
     /* HEADER */
-    --color-header-home: white;   /* fondo del header */
+    --color-header-home: #e1e0de;   /* fondo del header */
     --color-header: #262220;   /* fondo del header */
     --color-titulo-header: white;   /* texto del titulo del header */
     --color-fe-logo: #b07d1e;   /* "Fe" en el titulo del header */
@@ -30,15 +33,15 @@
     --nav-color: #000;
     --table-color: #000;
     --background-color: #333f;
-    --color-body: white;
     --accent-hover: #b07d1e;
 
     --surface: #f4ede4;
-    --color-section-prodDestestacados: #3e3d3a; 
-    --color-marcasDestacadas: white;
-    --color-section-contact: white;
-    --color-informacion-contact: white;
-    --color-section-horarios: white;
+    --color-section-prodDestestacados: #e1e0de; 
+    --color-marcasDestacadas: #e1e0de;
+    --color-section-contact: #e1e0de;
+    --color-informacion-contact: #e1e0de;
+    --color-card-contact: white;
+    --color-section-horarios: #e1e0de;
     --color-horarios-mapa: #3e3d3a;
     --color-titulo-horarios: #cbc8c5;
     --color-horarios: #cbc8c5;

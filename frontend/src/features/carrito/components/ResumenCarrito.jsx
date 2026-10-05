@@ -12,7 +12,7 @@ const COSTO_ENVIO = 1800
 function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
   const [entrega, setEntrega] = useState('null')
   const esRetiro = entrega === 'retiro' || entrega === 'null'
-  const envio = subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTO_ENVIO
+  const envio = subtotal >= ENVIO_GRATIS_DESDE || esRetiro ? 0 : COSTO_ENVIO
   const total = subtotal + envio
   const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotal
 
@@ -42,12 +42,18 @@ function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
       {!esRetiro && 
         (<EscogerUbicacion />)}
 
+      <hr className="my-3 text-secondary opacity-25" />
+
       <div className="card-body">
         <dl className="row mb-0 text-start">
           <dt className="col-7 fw-normal">Subtotal ({cantidadTotal} productos)</dt>
           <dd className="col-5 text-end">{formatearPrecio(subtotal)}</dd>
-          <dt className="col-7 fw-normal">Envío</dt>
-          <dd className="col-5 text-end">{envio === 0 ? 'Gratis' : formatearPrecio(envio)}</dd>
+          {!esRetiro && (
+            <>
+              <dt className="col-7 fw-normal">Envío</dt>
+              <dd className="col-5 text-end">{envio === 0 ? 'Gratis' : formatearPrecio(envio)}</dd>
+            </>
+          )}
           <dt className="col-7 border-top pt-2">Total</dt>
           <dd className="col-5 text-end border-top pt-2 fw-bold">{formatearPrecio(total)}</dd>
         </dl>

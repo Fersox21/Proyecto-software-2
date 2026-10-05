@@ -4,9 +4,7 @@ import "@fontsource/manrope/400.css"
 import "@fontsource/manrope/500.css"
 import "@fontsource/manrope/600.css"
 import "@fontsource/manrope/700.css"
-import "@fontsource/fraunces/400.css"
-import "@fontsource/fraunces/500.css"
-import "@fontsource/fraunces/600.css"
+import "@fontsource-variable/fraunces/opsz.css"
 import 'bootstrap/dist/css/bootstrap.min.css'
 import './styles/variables.css'
 import './index.css'

@@ -1,0 +1,30 @@
+/* Botones de + y - */
+.btn-cantidad {
+  width: 26px;
+  height: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background-color 0.2s ease;
+}
+
+.btn-cantidad:hover:not(:disabled) {
+  background-color: #e9ecef;
+}
+
+/* Botón del tacho de basura */
+.btn-eliminar {
+  color: #6c757d;
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-eliminar:hover {
+  background-color: #f8d7da;
+  color: #dc3545;
+}
