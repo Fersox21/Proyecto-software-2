@@ -171,7 +171,6 @@ nav {
 
 /* Estilos para el Párrafo */
 .imagen-banner-texto p {
-    font-family: 'Montserrat', sans-serif; /* Letra moderna y limpia para contrastar con el título */
     font-size: 1.3em; 
     color: #e3d5ca; /* Un beige un poquito más oscuro que el título para no competir en importancia */
     font-weight: 400;
@@ -179,7 +178,6 @@ nav {
 }
 
 .imagen-banner h2 {
-    font-family: 'Montserrat', sans-serif;
     font-weight: 700; 
     letter-spacing: 3px; /* Separa las letras para un toque más profesional */
     text-transform: uppercase; /* Fuerza las mayúsculas automáticamente */

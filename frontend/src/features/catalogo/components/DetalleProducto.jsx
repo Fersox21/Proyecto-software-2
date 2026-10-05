@@ -49,7 +49,7 @@ function DetalleProducto({ producto, onAgregar }) {
 
         <span className="badge text-bg-light text-uppercase mb-2">{producto.categoria}</span>
         <h1 className="h2">{producto.nombre}</h1>
-        <p className="fs-3 fw-bold">{formatearPrecio(producto.precio)}</p>
+        <p className="fs-3 precio-fraunces">{formatearPrecio(producto.precio)}</p>
         <p className="text-body-secondary">{producto.descripcion}</p>
 
         <h2 className="h6">Cantidad</h2>

@@ -1,8 +1,8 @@
 :root {
 
     /* GENERAL */
-    --fuente-base: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-    --fuente-titulos: Georgia, "Times New Roman", serif;
+    --fuente-base: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --fuente-titulos: "Fraunces", Georgia, "Times New Roman", serif;
     --bs-body-font-family: var(--fuente-base);
 
     /* HEADER */

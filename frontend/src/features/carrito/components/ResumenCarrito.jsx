@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import Boton from '../../../shared/components/Boton'
 import { formatearPrecio } from '../../../shared/utils/formato'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
@@ -8,25 +9,31 @@ const ENVIO_GRATIS_DESDE = 60000
 const COSTO_ENVIO = 1800
 
 function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
+  const [entrega, setEntrega] = useState('null')
+  const esRetiro = entrega === 'retiro'
   const envio = subtotal >= ENVIO_GRATIS_DESDE ? 0 : COSTO_ENVIO
   const total = subtotal + envio
   const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotal
 
   return (
-    <div className="card shadow-sm rounded-4 m-4 p-3">
+    <div className="card shadow-sm rounded-4 mx-4 p-3">
       <h2 className="h5 mb-4 text-start">Resumen de compra</h2>
       <div className="card-entrega">
         <ItemTarjeta
           titulo="Retiro en distribuidora"
           icono={iconoEntregaLocal}
-          texto="Av. Juan Gilberto Funes 460, D5702 San Luis"
+          texto="Av. Juan Gilberto Funes 460"
           descripcion="Listo en 2 horas"
+          seleccionado={entrega === 'retiro'}
+          onSelect={() => setEntrega('retiro')}
           />
         <ItemTarjeta
           titulo="Envío estándar"
           icono={iconoEntregaDomicilio}
           texto="Entrega a domicilio"
           descripcion="Se entregará en 1-2 días hábiles"
+          seleccionado={entrega === 'estandar'}
+          onSelect={() => setEntrega('estandar')}
           />
       </div>
       <div className="card-body">
@@ -39,14 +46,14 @@ function ResumenCarrito({ cantidadTotal, subtotal, onFinalizar, onVaciar }) {
           <dd className="col-5 text-end border-top pt-2 fw-bold">{formatearPrecio(total)}</dd>
         </dl>
 
-        {faltaParaEnvioGratis > 0 && (
+        {!esRetiro && faltaParaEnvioGratis > 0 && (
           <p className="small text-body-secondary">
             Te faltan {formatearPrecio(faltaParaEnvioGratis)} para el envío gratis.
           </p>
         )}
 
         <div className="d-grid gap-2 mt-3">
-          <Boton variante="dark" onClick={onFinalizar}>
+          <Boton variante="dark" onClick={() => onFinalizar(entrega)}>
             Finalizar compra
           </Boton>
           <Boton variante="outline-secondary" onClick={onVaciar}>

@@ -36,8 +36,7 @@ function ItemTarjeta({ titulo, icono, texto, descripcion, seleccionado, onSelect
                         src={icono}
                         alt={titulo}
                         className="img-fluid w-50"
-                        // Asume que el ícono original es oscuro; en seleccionado se vuelve blanco
-                        style={{ filter: seleccionado ? "invert(1) brightness(2)" : "none" }}
+                        style={{ filter: seleccionado ? "brightness(0) invert(1)" : "brightness(0)" }}
                     />
                 )}
             </div>

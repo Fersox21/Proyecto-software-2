@@ -34,10 +34,10 @@ function CarritoPage() {
   }
 
   return (
-    <>
-      <h1 className="h2 mb-4">Carrito</h1>
+    <div className="container my-4">
       <div className="row g-4">
-        <div className="col-lg-8">
+        <div className="col-12 col-lg-8">
+          <h1 className="h2 mb-4">Tu carrito</h1>
           <ul className="list-group shadow-sm">
             {items.map((prod) => (
               <ItemCarrito
@@ -49,7 +49,7 @@ function CarritoPage() {
             ))}
           </ul>
         </div>
-        <div className="col-lg-4">
+        <div className="col-12 col-lg-4">
           <ResumenCarrito
             cantidadTotal={cantidadTotal}
             subtotal={subtotal}
@@ -58,7 +58,7 @@ function CarritoPage() {
           />
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
