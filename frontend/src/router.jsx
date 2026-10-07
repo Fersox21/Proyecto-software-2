@@ -40,6 +40,7 @@ export const router = createBrowserRouter([
       {path: 'provedores', element: <ProveedoresPage />},
       {path: 'vencimiento', element: <VencimientosPage />},
       {path: 'promociones', element: <PromocionesPage />},
+      { path: '*', element: <NoEncontradaPage /> },
     ],
   },
 ]);

@@ -4,7 +4,8 @@
     border-right: 1px solid #E5E5E5;
     width: 250px;
     min-width: 250px;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
     position: fixed;
     top: 0;
     left: 0;
@@ -24,22 +25,13 @@
 }
 
 
-.h2-admin {
-    color: #113269;
-    margin: 5rem 0 3rem 0;
-}
-
-#Fe-h2-admin {
-    color: #8D1D3A;
-}
-
-
 .p-nav {
     font-weight: 600;
     font-size: 0.75rem;
     color: #9CA3AF;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    margin-top: 1rem;
 }
 
 #p-cuenta-nav {
@@ -51,19 +43,41 @@
     flex-direction: column;
     gap: 0.5rem;
     list-style: none;
-    margin: 0 0 2rem 0;
+    margin: 0 0 0 0;
     padding: 0; 
     width: 100%;
 }
 
-.a-nav-admin, .link-admin {
-    display: block;
+.li-nav {
+  width: 100%;
+  display: block; 
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 10px;
+  border-color: #4B5563;
+}
+
+.link-admin{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     text-decoration: none;
+}
+
+
+.a-nav-admin, .link-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    box-sizing: border-box;
     background-color: transparent;
     color: #4B5563;
     font-size: 1rem;
     font-weight: 500;
-    padding: 0.75rem 1rem;
+    padding: 0.60rem 1rem;
     border-radius: 8px;
     transition: all 0.2s ease;
 }
