@@ -46,9 +46,6 @@
     margin-top: 1rem;
 }
 
-/* ==========================================
-   ENLACES Y MENÚ
-   ========================================== */
 .ul-nav-admin {
     display: flex;
     flex-direction: column;
@@ -113,18 +110,21 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
+    @media (max-width: 768px) {
     .sidebar-admin {
         position: fixed;
         top: 0;
-        left: -100%;
+        left: -260px; 
         transition: left 0.3s ease-in-out;
         z-index: 1000;
-        box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+        background-color: #FFFFFF; 
     }
 
     .sidebar-admin.abierto {
         left: 0;
+        box-shadow: 2px 0 15px rgba(0,0,0,0.1);
     }
+}
 
     .btn-cerrar-admin {
         display: block;
