@@ -55,7 +55,8 @@ main {
 .tarjeta-producto .imagen-envoltorio {
   position: relative;
   border-radius: var(--radio-tag) var(--radio-tag) 0 0;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
 }
 
 .tarjeta-producto .card-img-top,

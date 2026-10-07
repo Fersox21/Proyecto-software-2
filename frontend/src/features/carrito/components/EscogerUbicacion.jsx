@@ -18,7 +18,7 @@ function EscogerUbicacion() {
         <h5 className="card-title mb-3">Punto de entrega</h5>
         <form onSubmit={handleSubmit} className="mb-3">
             <label htmlFor="direccionInput" className="form-label small text-body-secondary">
-            Ingresá tu dirección o localidad:
+            Ingresá tu dirección:
             </label>
             <div className="input-group">
                 <input

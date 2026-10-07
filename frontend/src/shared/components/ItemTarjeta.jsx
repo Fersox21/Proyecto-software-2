@@ -21,7 +21,6 @@ function ItemTarjeta({ titulo, icono, texto, descripcion, seleccionado, onSelect
                 backgroundColor: seleccionado ? COLORES.fondoSeleccionado : undefined,
             }}
         >
-            {/* Recuadro del ícono */}
             <div
                 className="d-flex align-items-center justify-content-center rounded-4"
                 style={{
@@ -41,14 +40,12 @@ function ItemTarjeta({ titulo, icono, texto, descripcion, seleccionado, onSelect
                 )}
             </div>
 
-            {/* Textos */}
             <div className="flex-grow-1 ms-3">
                 <h6 className="mb-1">{titulo}</h6>
                 {texto && <p className="h6 text-body-secondary">{texto}</p>}
                 {descripcion && <p className="h6 mb-0 text-dark">{descripcion}</p>}
             </div>
 
-            {/* Radio custom */}
             <div className="ms-3">
                 <div
                     className="d-flex align-items-center justify-content-center rounded-circle bg-white"
