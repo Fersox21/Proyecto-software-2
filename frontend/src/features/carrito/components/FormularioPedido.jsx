@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Link, useOutletContext } from 'react-router'
 import { FaRegClock } from 'react-icons/fa'
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill } from 'react-icons/bs';
 import iconoEntregaLocal from '../../../assets/Items/iconoEntregaLocal.svg'
 import iconoEntregaDomicilio from '../../../assets/Items/iconoEntregaDomicilio.svg'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
@@ -22,10 +22,27 @@ function FormularioPedido(){
     const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotal
     const total = subtotal + envio
     const [compraConfirmada, setCompraConfirmada] = useState(false);
+    const [datosPedido, setDatosPedido] = useState({
+        nombreComercio: '',
+        telefono: '',
+        personaContacto: '',
+        metodoEntrega: null,
+        direccion: '',
+        descripcionDireccion: '',
+        observacionesPedido: ''
+    })
 
-    function handleFinalizar() {
+    function handleFinalizarPedido() {
         vaciarCarrito();
         setCompraConfirmada(true);
+    }
+
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setDatosPedido((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     }
 
     if (compraConfirmada) {
@@ -59,70 +76,152 @@ function FormularioPedido(){
 
             <hr className="text-secondary opacity-25" style={{width: '100%'}}></hr>
 
-            <div className="row g-4">
-                <div className="col-12 col-lg-7 d-flex flex-column gap-4">
-                    <div className="card rounded-4 p-4 border-0 shadow-sm">
-                        <h5 className="fw-bold">Datos del comercio</h5>
-                    </div>
+            <form onSubmit={handleFinalizarPedido}>
+                <div className="row g-4">
+                    <div className="col-12 col-lg-7 d-flex flex-column gap-4">
+                        {/* DATOS DEL COMERCIO */}
+                            <div className="card rounded-4 p-4 border-0 shadow-sm">
+                                <div className="d-flex gap-2">
+                                    <Bs1CircleFill size={33} className="text-dark mb-2"/>
+                                    <div>
+                                        <h5 className="fw-bold">Datos del comercio</h5>
+                                        <p className="small">Usaremos estos datos para identificar tu pedido.</p>
+                                    </div>
+                                </div>
+                                <div className="row g-3">
+                                    <div className="col-12 col-md-12">
+                                        <label className="form-label small fw-semibold">Nombre del comercio</label>
+                                        <input
+                                        type="text"
+                                        name="nombreComercio"
+                                        className="form-control input-form"
+                                        required
+                                        value={datosPedido.nombreComercio}
+                                        onChange={handleChange}
+                                        />
+                                        <p className="small">Ej. Panaderia La Espiga</p>
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                        <label className="form-label small fw-semibold">Teléfono</label>
+                                        <input
+                                        type="tel"
+                                        name="telefono"
+                                        className="form-control input-form"
+                                        required
+                                        value={datosPedido.telefono}
+                                        onChange={handleChange}
+                                        />
+                                        <p className="small">Ej. 2664123456</p>
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                        <label className="form-label small fw-semibold">Persona de contacto</label>
+                                        <input
+                                        type="text"
+                                        name="contacto"
+                                        className="form-control input-form"
+                                        required
+                                        value={datosPedido.personaContacto}
+                                        onChange={handleChange}
+                                        />
+                                        <p className="small">Ej. Pedro Álvarez</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div className="card rounded-4 p-4 border-0 shadow-sm">
-                        <div className="card-entrega">
-                            <h5 className="fw-bold">Método de entrega</h5>
-                            <p className="small">Elegí si retirás por la distribuidora o te lo enviamos.</p>
-                            <ItemTarjeta
-                            titulo="Retiro en distribuidora"
-                            icono={iconoEntregaLocal}
-                            texto="Av. Juan Gilberto Funes 460"
-                            descripcion="Listo en 2 horas"
-                            seleccionado={entrega === 'retiro'}
-                            onSelect={() => setEntrega('retiro')}
-                            />
-                            <ItemTarjeta
-                            titulo="Envío estándar"
-                            icono={iconoEntregaDomicilio}
-                            texto="Entrega a domicilio"
-                            descripcion="Se entregará en 1-2 días hábiles"
-                            seleccionado={entrega === 'estandar'}
-                            onSelect={() => setEntrega('estandar')}
-                            />
+                        {/* METODO DE ENTREGA */}
+                        <div className="card rounded-4 p-4 border-0 shadow-sm">
+                            <div className="card-entrega">
+                                <div className="d-flex gap-2">
+                                    <Bs2CircleFill size={33} className="text-dark mb-2"/>
+                                    <div>
+                                        <h5 className="fw-bold">Método de entrega</h5>
+                                        <p className="small">Elegí si retirás por la distribuidora o te lo enviamos.</p>
+                                    </div>
+                                </div>
+                                <div className="row mt-3">
+                                    <div className="col-12 col-md-6">
+                                        <ItemTarjeta
+                                        titulo="Retiro en distribuidora"
+                                        icono={iconoEntregaLocal}
+                                        texto="Av. Juan Gilberto Funes 460"
+                                        descripcion="Listo en 2 horas"
+                                        seleccionado={entrega === 'retiro'}
+                                        onSelect={() => setEntrega('retiro')}
+                                        />
+                                    </div>
+                                    <div className="col-12 col-md-6">
+                                        <ItemTarjeta
+                                        titulo="Envío estándar"
+                                        icono={iconoEntregaDomicilio}
+                                        texto="Entrega a domicilio"
+                                        descripcion="Se entregará en 1-2 días hábiles"
+                                        seleccionado={entrega === 'estandar'}
+                                        onSelect={() => setEntrega('estandar')}
+                                        />
+                                    </div>
+                                </div>                                
+                            </div>
+
+                            {esRetiro && (
+                                <div className="bg-secondary-subtle rounded-4 px-4 py-2 m-auto">
+                                    <FaRegClock/><p className="m-2 d-inline">Horario</p>
+                                    <p className="small my-2">Lunes a Viernes 8:00-16:00 · Sábado 9:00-13:00</p>
+                                </div>
+                            )}
+
+                            {esEnvio && (
+                                <>
+                                    <EscogerUbicacion />
+                                    <div className="mt-2">
+                                        <label className="form-label small fw-semibold">Información adicional para llegar a la ubicación</label>
+                                        <textarea 
+                                        name="descripcionDireccion"
+                                        rows={3}
+                                        className="form-control input-form"
+                                        value={datosPedido.descripcionDireccion}
+                                        style={{ resize: 'none' }}
+                                        onChange={handleChange}
+                                        />
+                                        <p className="small">Ej. Es sobre el pasaje Sarmiento</p>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        {esRetiro && (
-                            <div className="bg-secondary-subtle rounded-4 px-4 py-2 m-auto">
-                                <FaRegClock/><p className="m-2 d-inline">Horario</p>
-                                <p className="small my-2">Lun a Vie 8:00-16:00 · Sáb 9:00-13:00</p>
-                            </div>
-                        )}
-
-                        {esEnvio && (
-                            <>
-                                <EscogerUbicacion />
-                                <div className="bg-secondary-subtle rounded-4 px-4 py-2 mt-3 m-auto">
-                                    <FaRegClock/><p className="m-2 d-inline">Horario</p>
-                                    <p className="small my-2">Lun a Vie 8:00-16:00 · Sáb 9:00-13:00</p>
+                        {/* INDICACIONES ADICIONALES */}
+                        <div className="card rounded-4 p-4 border-0 shadow-sm">
+                            <div className="d-flex gap-2">
+                                <Bs3CircleFill size={33} className="text-dark mb-2"/>
+                                <div>
+                                    <h5 className="fw-bold">Indicaciones adicionales</h5>
+                                    <p className="small text-body-secondary mb-3">Contanos cualquier detalle útil para preparar o entregar tu pedido.</p>
                                 </div>
-                            </>
-                        )}
+                            </div>
+                            <textarea
+                            name="observacionesPedido"
+                            rows={3}
+                            className="form-control"
+                            value={datosPedido.observacionesPedido}
+                            style={{ resize: 'none' }}
+                            onChange={handleChange}
+                            />
+                        </div>
                     </div>
 
-                    <div className="card rounded-4 p-4 border-0 shadow-sm">
-                        <h5 className="fw-bold">Indicaciones adicionales</h5>
-                        <p className="small">Contanos cualquier detalle útil para preparar o entregar tu pedido.</p>
+                    {/* RESUMEN DEL PEDIDO */}
+                    <div className="col-12 col-lg-5 align-self-stretch">
+                        <ResumenPedido
+                            items={items}
+                            cantidadTotal={cantidadTotal}
+                            subtotal={subtotal}
+                            total={total}
+                            envio={envio}
+                            esRetiro={esRetiro}
+                            faltaParaEnvioGratis={faltaParaEnvioGratis}
+                        />
                     </div>
                 </div>
-
-                <div className="col-12 col-lg-5 align-self-stretch">
-                    <ResumenPedido
-                        items={items}
-                        cantidadTotal={cantidadTotal}
-                        subtotal={subtotal}
-                        total={total}
-                        envio={envio}
-                        esRetiro={esRetiro}
-                        faltaParaEnvioGratis={faltaParaEnvioGratis}
-                    />
-                </div>
-            </div>
+            </form>
         </div>
     </>);
 }

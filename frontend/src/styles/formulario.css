@@ -10,3 +10,11 @@
   pointer-events: none;
   z-index: 2;
 }
+
+.input-form:focus {
+  border: 0 solid #3ff;
+}
+
+.input-form:hover {
+  border: 1px solid #3ff;
+}

@@ -48,8 +48,18 @@ function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro,
                     </dl>
                 </div>
             </div>
-            <div className="d-flex gap-2 m-auto">
-                <BsShieldCheck /><p className="small">Tus datos se usan solo para gestionar el pedido</p>
+
+            {/* BOTON FINALIZAR PEDIDO */}
+            <button 
+                type="submit" 
+                className="btn btn-dark w-100 py-3 rounded-3 fw-bold mt-4 mb-3"
+            >
+                Finalizar pedido
+            </button>
+
+            <div className="d-flex align-items-center justify-content-center gap-2 text-body-secondary">
+                <BsShieldCheck size={16} />
+                <p className="small mb-0">Tus datos se usan solo para gestionar el pedido</p>
             </div>
         </div>
     )
