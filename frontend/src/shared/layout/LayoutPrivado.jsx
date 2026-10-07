@@ -1,6 +1,5 @@
 import NavbarAdmin from './NavBarAdmin'
 import '../../styles/panelAdmin/adminProductos.css'
-
 import { Outlet, ScrollRestoration } from 'react-router'; 
 
 

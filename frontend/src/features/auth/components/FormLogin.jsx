@@ -48,7 +48,7 @@ function FormLogin({ onIngresar }) {
   }
 
   return (
-    <form ref={formularioRef} onSubmit={handleSubmit} noValidate>
+    <form className="login-container" ref={formularioRef} onSubmit={handleSubmit} noValidate>
       {errorServidor && (
         <div className="alert alert-danger py-2" role="alert">
           {errorServidor}

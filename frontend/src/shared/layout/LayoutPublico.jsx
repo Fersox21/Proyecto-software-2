@@ -2,6 +2,8 @@ import { Outlet, ScrollRestoration } from 'react-router';
 import { useCarrito } from '../../features/carrito';
 import Navbar from './NavBar';
 import Footer from './Footer';
+import '../../styles/panelAdmin/adminlogin.css'
+
 
 const ENLACES  = [
   { id: 1, texto: 'Inicio', destino: '/' },

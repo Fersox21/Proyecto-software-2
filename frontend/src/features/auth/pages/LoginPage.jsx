@@ -1,7 +1,7 @@
 import { iniciarSesion } from '../services/authService'
 import { useNavigate } from 'react-router'
 import FormLogin from '../components/FormLogin'
-import '../../../styles/panelAdmin/adminlogin.css'
+
 
 function LoginPage(){
   const navigate = useNavigate()
@@ -13,7 +13,7 @@ function LoginPage(){
 
     return(<>
 
-    <div class="container justify-content-center align-items-center pb-5 pt-5">
+    <div class="container-login justify-content-center align-items-center pb-5 pt-5">
       <div class="row justify-content-center align-items-center g-2">
         <div class="col-sm-10 col-md-7 col-lg-5">
           <section className='login-form'>
