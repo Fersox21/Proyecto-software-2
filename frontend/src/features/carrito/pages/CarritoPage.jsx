@@ -7,22 +7,6 @@ import MensajeVacio from '../../../shared/components/MensajeVacio'
 
 function CarritoPage() {
   const { items, cantidadTotal, subtotal, cambiarCantidad, quitarProducto, vaciarCarrito } = useOutletContext();
-  const [compraConfirmada, setCompraConfirmada] = useState(false);
-
-  function handleFinalizar() {
-    vaciarCarrito();
-    setCompraConfirmada(true);
-  }
-
-  if (compraConfirmada) {
-    return (
-      <MensajeVacio titulo="¡Gracias por tu compra!" texto="Te enviamos un email con el detalle del pedido.">
-        <Link to="/catalogo" className="btn btn-dark">
-          Seguir comprando
-        </Link>
-      </MensajeVacio>
-    )
-  }
 
   if (items.length === 0) {
     return (
@@ -61,7 +45,6 @@ function CarritoPage() {
           <ResumenCarrito
             cantidadTotal={cantidadTotal}
             subtotal={subtotal}
-            onFinalizar={handleFinalizar}
             onVaciar={vaciarCarrito}
           />
         </div>

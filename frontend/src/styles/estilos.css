@@ -4,6 +4,11 @@
     padding: 0;
 }
 
+html, body {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
 body {
     font-family: var(--fuente-base);
 }
@@ -17,7 +22,6 @@ body {
     "main"
     "footer";
     min-height: 100vh;
-    overflow-x: hidden;
 }
 
 header { grid-area: header;}
@@ -574,7 +578,7 @@ footer {
   }
 
     html, body, #root {
-        overflow-x: hidden; 
+        overflow-x: clip; 
         width: 100%;
         max-width: 100vw;
     }

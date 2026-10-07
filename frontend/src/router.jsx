@@ -4,10 +4,10 @@ import LayoutPrivado from './shared/layout/LayoutPrivado'
 import NoEncontradaPage from './shared/pages/NoEncontradaPage'
 import { HomePage } from './features/home'
 import { CatalogoPage, DetalleProductoPage } from './features/catalogo'
-import { FormularioPage } from './features/formulario'
 import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
 import { CarritoPage } from './features/carrito'
-import { AdministradorPage} from './features/administrador' 
+import { AdministradorPage} from './features/administrador'
+import { FormularioPedido } from './features/carrito'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth'
 
 export const router = createBrowserRouter([
@@ -20,8 +20,8 @@ export const router = createBrowserRouter([
       { path: 'catalogo', element: <CatalogoPage /> },
       { path: 'catalogo/:id', element: <DetalleProductoPage /> },
       { path: 'preguntasFrecuentes', element: <PreguntasFrecuentesPage />},
-      { path: 'realizarPedido', element: <FormularioPage /> },
       { path: 'carrito', element: <CarritoPage />},
+      { path: 'finalizar-compra', element: <FormularioPedido />},
       { path: 'login', element: <LoginPage />, loader: redirigirSiHaySesion,},
       { path: '*', element: <NoEncontradaPage /> },
     ],
