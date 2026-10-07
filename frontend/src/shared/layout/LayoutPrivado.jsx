@@ -6,6 +6,7 @@ import { Outlet, ScrollRestoration } from 'react-router';
 const enlacesAdmin = [
   { id: 1, texto: 'Inicio', destino: '/' },
   { id: 2, texto: 'Catálogo', destino: '/catalogo' },
+  { id: 3, texto: 'Vencimiento', destino: '/vencimiento'}
 ];
 
 function LayoutPrivado(){

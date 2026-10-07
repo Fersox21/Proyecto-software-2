@@ -1,1 +1,7 @@
 export { default as AdministradorPage } from './pages/AdministradorPage'
+export { default as EstadisticasPage } from './pages/Estadisticaspage' 
+export { default as VentasPage } from './pages/VentasPage' 
+export { default as PromocionesPage } from './pages/PromocionesPage' 
+export { default as VencimientosPage } from './pages/VencimientosPage' 
+export { default as LotesPage } from './pages/LotesPage' 
+export { default as ProveedoresPage } from './pages/ProveedoresPage' 
