@@ -3,9 +3,9 @@ import { formatearPrecio } from '../../../shared/utils/formato'
 import { Link } from 'react-router'
 import { BsShieldCheck } from 'react-icons/bs';
 
-function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro, faltaParaEnvioGratis }) {
+function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro, esEnvio, faltaParaEnvioGratis }) {
     return (
-        <div className="card rounded-4 p-4 border-0 shadow-sm sticky-top" style={{ top: '2rem' }}>
+        <div className="card rounded-5 p-4 border-0 shadow-sm sticky-top" style={{ top: '2rem' }}>
             <div className="d-flex justify-content-between">
                 <h5 className="fw-semibold">Tu pedido</h5>
                 <Link to="/carrito" className="text-decoration-none text-dark small">Editar carrito</Link>
@@ -27,10 +27,10 @@ function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro,
                     <dl className="row mb-0 text-start">
                         <dt className="col-7 fw-normal" style={{ fontSize: '0.9rem'}}>Subtotal ({cantidadTotal} productos)</dt>
                         <dd className="col-5 text-end fuente-titulos">{formatearPrecio(subtotal)}</dd>
-                        {!esRetiro && (
+                        {esEnvio && (
                             <>
                                 <dt className="col-7 fw-normal">Envío</dt>
-                                <dd className="col-5 text-end fuente-titulos">{envio === 0 ? 'Gratis' : formatearPrecio(envio)}</dd>
+                                <dd className="col-5 text-end fuente-titulos">{formatearPrecio(envio)}</dd>
                             </>
                         )}
 
@@ -40,7 +40,7 @@ function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro,
                             <dt className="col-7 fw-bold fuente-titulos">Total</dt>
                             <dd className="col-5 text-end h2 fuente-titulos">{formatearPrecio(total)}</dd>
                         </div>
-                        {!esRetiro && faltaParaEnvioGratis > 0 && (
+                        {esEnvio && faltaParaEnvioGratis > 0 && (
                             <p className="small text-body-secondary fuente-titulos m-auto">
                                 Te faltan {formatearPrecio(faltaParaEnvioGratis)} para el envío gratis.
                             </p>

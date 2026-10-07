@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { Link, useOutletContext } from 'react-router'
 import { FaRegClock } from 'react-icons/fa'
-import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill } from 'react-icons/bs';
+import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill, BsCheckLg } from 'react-icons/bs';
 import iconoEntregaLocal from '../../../assets/Items/iconoEntregaLocal.svg'
 import iconoEntregaDomicilio from '../../../assets/Items/iconoEntregaDomicilio.svg'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
@@ -69,9 +69,49 @@ function FormularioPedido(){
                         Completá los datos de tu comercio y elegí cómo querés recibir el pedido.
                     </p>
                 </div>
-                <div className="d-flex align-items-center gap-3">
-                    Carrito ------ Datos y Entrega ------ Confirmacion
-                </div>
+                <div className="d-flex align-items-center gap-2 small user-select-none">
+                    
+                    <div className="d-flex align-items-center gap-2">
+                        <span 
+                        className="rounded-circle d-inline-flex align-items-center justify-content-center fw-semibold flex-shrink-0 bg-dark text-white" 
+                        style={{ width: '28px', height: '28px', fontSize: '0.85rem' }}
+                        >
+                        <BsCheckLg size={14} />
+                        </span>
+                        <span className="text-secondary">Carrito</span>
+                    </div>
+
+                    <span 
+                        className="d-inline-block border-bottom border-dark border-opacity-50" 
+                        style={{ width: '40px' }}
+                    />
+
+                    <div className="d-flex align-items-center gap-2">
+                        <span 
+                        className="rounded-circle d-inline-flex align-items-center justify-content-center fw-semibold flex-shrink-0 text-white"
+                        style={{ width: '28px', height: '28px', fontSize: '0.85rem', backgroundColor: '#c59b27' }}
+                        >
+                        2
+                        </span>
+                        <span className="fw-semibold text-dark">Datos y entrega</span>
+                    </div>
+
+                    <span 
+                        className="d-inline-block border-bottom border-dark border-opacity-50" 
+                        style={{ width: '40px' }}
+                    />
+
+                    <div className="d-flex align-items-center gap-2">
+                        <span 
+                        className="rounded-circle d-inline-flex align-items-center justify-content-center fw-semibold flex-shrink-0 bg-dark bg-white text-secondary border border-secondary border-opacity-25" 
+                        style={{ width: '28px', height: '28px', fontSize: '0.85rem' }}
+                        >
+                        3
+                        </span>
+                        <span className="text-secondary">Confirmación</span>
+                    </div>
+
+                    </div>
             </header>
 
             <hr className="text-secondary opacity-25" style={{width: '100%'}}></hr>
@@ -80,7 +120,7 @@ function FormularioPedido(){
                 <div className="row g-4">
                     <div className="col-12 col-lg-7 d-flex flex-column gap-4">
                         {/* DATOS DEL COMERCIO */}
-                            <div className="card rounded-4 p-4 border-0 shadow-sm">
+                            <div className="card rounded-5 p-4 border-0 shadow-sm">
                                 <div className="d-flex gap-2">
                                     <Bs1CircleFill size={33} className="text-dark mb-2"/>
                                     <div>
@@ -94,7 +134,7 @@ function FormularioPedido(){
                                         <input
                                         type="text"
                                         name="nombreComercio"
-                                        className="form-control input-form"
+                                        className="form-control input-form rounded-5"
                                         required
                                         value={datosPedido.nombreComercio}
                                         onChange={handleChange}
@@ -106,7 +146,7 @@ function FormularioPedido(){
                                         <input
                                         type="tel"
                                         name="telefono"
-                                        className="form-control input-form"
+                                        className="form-control input-form rounded-5"
                                         required
                                         value={datosPedido.telefono}
                                         onChange={handleChange}
@@ -118,7 +158,7 @@ function FormularioPedido(){
                                         <input
                                         type="text"
                                         name="contacto"
-                                        className="form-control input-form"
+                                        className="form-control input-form rounded-5"
                                         required
                                         value={datosPedido.personaContacto}
                                         onChange={handleChange}
@@ -129,7 +169,7 @@ function FormularioPedido(){
                             </div>
 
                         {/* METODO DE ENTREGA */}
-                        <div className="card rounded-4 p-4 border-0 shadow-sm">
+                        <div className="card rounded-5 p-4 border-0 shadow-sm">
                             <div className="card-entrega">
                                 <div className="d-flex gap-2">
                                     <Bs2CircleFill size={33} className="text-dark mb-2"/>
@@ -189,7 +229,7 @@ function FormularioPedido(){
                         </div>
 
                         {/* INDICACIONES ADICIONALES */}
-                        <div className="card rounded-4 p-4 border-0 shadow-sm">
+                        <div className="card rounded-5 p-4 border-0 shadow-sm">
                             <div className="d-flex gap-2">
                                 <Bs3CircleFill size={33} className="text-dark mb-2"/>
                                 <div>
@@ -217,6 +257,7 @@ function FormularioPedido(){
                             total={total}
                             envio={envio}
                             esRetiro={esRetiro}
+                            esEnvio={esEnvio}
                             faltaParaEnvioGratis={faltaParaEnvioGratis}
                         />
                     </div>
