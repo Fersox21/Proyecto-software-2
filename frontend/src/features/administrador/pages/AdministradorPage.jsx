@@ -15,8 +15,8 @@ function AdministradorPage() {
         return "Stock alto"
     }
 
-    if (cargando) return <Spinner texto="Cargando catálogo..." />
-    if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />
+    if (cargando) return <Spinner texto="Cargando productos..." />
+    if (error) return <MensajeVacio titulo="No pudimos cargar los productos" texto={error.message} />
 
 return(<>
     <section className="main-admin" id="main-admin">
