@@ -10,13 +10,12 @@ public class Producto {
     private int stock;
     private String categoria;
     private double peso;
-    private Lote lote;
 
     public Producto() {
     }
 
     public Producto(Long id, String nombre, double precioCosto, double precioVenta, String marca, boolean enPromocion,
-            int stock, String categoria, double peso, Lote lote) {
+            int stock, String categoria, double peso) {
         this.id = id;
         this.nombre = nombre;
         this.precioCosto = precioCosto;
@@ -26,7 +25,6 @@ public class Producto {
         this.stock = stock;
         this.categoria = categoria;
         this.peso = peso;
-        this.lote = lote;
     }
 
     public Long getId() {
@@ -99,14 +97,6 @@ public class Producto {
 
     public void setPeso(double peso) {
         this.peso = peso;
-    }
-
-    public Lote getLote() {
-        return lote;
-    }
-
-    public void setLote(Lote lote) {
-        this.lote = lote;
     }
 
     @Override

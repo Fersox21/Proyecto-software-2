@@ -12,12 +12,13 @@ public class Pedido {
     private String direccion;
     private String estado;
     private String motivoRechazo;
+    private Rol rol;
 
     public Pedido() {
     }
 
     public Pedido(Long id, Date fecha, double total, String metodoPago, String comercio, String modalidadEntrega,
-            String direccion, String estado, String motivoRechazo) {
+            String direccion, String estado, String motivoRechazo, Rol rol) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
@@ -27,6 +28,7 @@ public class Pedido {
         this.direccion = direccion;
         this.estado = estado;
         this.motivoRechazo = motivoRechazo;
+        this.rol = rol;
     }
 
     public Long getId() {
@@ -106,5 +108,13 @@ public class Pedido {
         return "Pedido [id=" + id + ", fecha=" + fecha + ", total=" + total + ", metodoPago=" + metodoPago
                 + ", comercio=" + comercio + ", modalidadEntrega=" + modalidadEntrega + ", direccion=" + direccion
                 + ", estado=" + estado + ", motivoRechazo=" + motivoRechazo + "]";
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }

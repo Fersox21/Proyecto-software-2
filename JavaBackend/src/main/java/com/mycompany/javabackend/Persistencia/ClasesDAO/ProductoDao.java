@@ -9,7 +9,6 @@ import java.util.List;
 import java.sql.Types;
 import com.mycompany.javabackend.Persistencia.DAO;
 import com.mycompany.javabackend.Persistencia.Conexion;
-import com.mycompany.javabackend.Logica.Clases.Lote;
 import com.mycompany.javabackend.Logica.Clases.Producto;
 
 public class ProductoDao implements DAO<Producto> {
@@ -19,7 +18,7 @@ public class ProductoDao implements DAO<Producto> {
 
     @Override
     public void agregar(Producto producto) {
-        String sql = "INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, lote) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -32,11 +31,6 @@ public class ProductoDao implements DAO<Producto> {
             ps.setString(7, producto.getCategoria());
             ps.setDouble(8, producto.getPeso());
 
-            if (producto.getLote() != null && producto.getLote().getId() != null) {
-                ps.setLong(4, producto.getLote().getId());
-            } else {
-                ps.setNull(4, Types.BIGINT);
-            }
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -83,7 +77,7 @@ public class ProductoDao implements DAO<Producto> {
 
     @Override
     public Producto obtener(Long id) {
-        String sql = "SELECT id, nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, lote_id FROM productos WHERE id = ?";
+        String sql = "SELECT id, nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso FROM productos WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -103,10 +97,6 @@ public class ProductoDao implements DAO<Producto> {
                     producto.setCategoria(rs.getString("categoria"));
                     producto.setPeso(rs.getDouble("peso"));
 
-                    Lote lote = new Lote();
-                    lote.setId(rs.getLong("lote_id"));
-                    producto.setLote(lote);
-
                     return producto;
                 }
             }
@@ -120,7 +110,7 @@ public class ProductoDao implements DAO<Producto> {
     @Override
     public List<Producto> obtenerTodos() {
         List<Producto> lista = new ArrayList<>();
-        String sql = "SELECT id, nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, lote_id FROM productos ORDER BY id ASC";
+        String sql = "SELECT id, nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso FROM productos ORDER BY id ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -138,10 +128,6 @@ public class ProductoDao implements DAO<Producto> {
                 producto.setStock(rs.getInt("stock"));
                 producto.setCategoria(rs.getString("categoria"));
                 producto.setPeso(rs.getDouble("peso"));
-
-                Lote lote = new Lote();
-                lote.setId(rs.getLong("lote_id"));
-                producto.setLote(lote);
 
                 lista.add(producto);
             }

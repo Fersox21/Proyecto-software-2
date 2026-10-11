@@ -7,6 +7,7 @@ public class Lote {
     private Date fechaArribo;
     private Date fechaVencimiento;
     private OrdenCompra ordenCompra;
+    private Producto producto;
 
     public Lote() {
     }
@@ -48,6 +49,14 @@ public class Lote {
 
     public void setOrdenCompra(OrdenCompra ordenCompra) {
         this.ordenCompra = ordenCompra;
+    }
+
+    public Producto getProducto() {
+        return producto;
+    }
+
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
     @Override

@@ -1,17 +1,17 @@
 package com.mycompany.javabackend.Logica.Clases;
 
-public class Administrador {
+public class Rol {
     private Long id;
     private String correo;
-    private String password_hash;
+    private String password;
 
-    public Administrador() {
+    public Rol() {
     }
 
-    public Administrador(Long id, String correo, String password_hash) {
+    public Rol(Long id, String correo, String password) {
         this.id = id;
         this.correo = correo;
-        this.password_hash = password_hash;
+        this.password = password;
     }
 
     public Long getId() {
@@ -30,16 +30,16 @@ public class Administrador {
         this.correo = correo;
     }
 
-    public String getPassword_hash() {
-        return password_hash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPassword_hash(String password_hash) {
-        this.password_hash = password_hash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override
     public String toString() {
-        return "Administrador [id=" + id + ", correo=" + correo + ", password_hash=" + password_hash + "]";
+        return "Rol [id=" + id + ", correo=" + correo + ", password=" + password + "]";
     }
 }

@@ -1,23 +1,21 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
 
 public class Venta {
     private Long id;
     private Date fecha;
     private double total;
-    private List<Producto> productos = new ArrayList<Producto>();
+    private Pedido pedido;
 
     public Venta() {
     }
 
-    public Venta(Long id, Date fecha, double total, List<Producto> productos) {
+    public Venta(Long id, Date fecha, double total, Pedido pedido) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
-        this.productos = productos;
+        this.pedido = pedido;
     }
 
     public Long getId() {
@@ -44,16 +42,16 @@ public class Venta {
         this.total = total;
     }
 
-    public List<Producto> getProductos() {
-        return productos;
+    public Pedido getPedido() {
+        return pedido;
     }
 
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
     }
 
     @Override
     public String toString() {
-        return "Venta [id=" + id + ", fecha=" + fecha + ", total=" + total + ", productos=" + productos + "]";
+        return "Venta [id=" + id + ", fecha=" + fecha + ", total=" + total + ", pedido=" + pedido + "]";
     }
 }
