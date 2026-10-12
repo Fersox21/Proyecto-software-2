@@ -2,9 +2,8 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import Boton from '../../../shared/components/Boton'
 import { formatearPrecio } from '../../../shared/utils/formato'
-
+import '../../../styles/catalogo.css'
 function DetalleProducto({ producto, onAgregar }) {
-
   const [cantidad, setCantidad] = useState(1)
   const [agregado, setAgregado] = useState(false)
 
@@ -24,60 +23,108 @@ function DetalleProducto({ producto, onAgregar }) {
     setCantidad(1)
   }
 
-  let textoBoton = 'Agregar al carrito'
-  if (sinStock) textoBoton = 'Sin stock'
-
   return (
-    <div className="row g-4 g-lg-5">
-      <div className="col-md-6">
-        <img src={producto.imagen} alt={producto.nombre} className="img-fluid rounded-3 imagen-detalle w-100" />
-      </div>
+    <div className="detalle-producto-container">
+      {/* catalago /el nombre del producto */}
+      <nav className="mb-3">
+        <ol className="breadcrumb align-items-center">
+          <li className="breadcrumb-item">
+            <Link to="/catalogo" className="link-secondary text-decoration-none">
+              Catálogo
+            </Link>
+          </li>
+          <li className="breadcrumb-item active" aria-current="page">
+            {producto.nombre}
+          </li>
+        </ol>
+      </nav>
 
-      <div className="col-md-6">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item">
-              <Link to="/catalogo" className="link-dark">
-                Catálogo
-              </Link>
-            </li>
-            <li className="breadcrumb-item active" aria-current="page">
-              {producto.nombre}
-            </li>
-          </ol>
-        </nav>
-
-        <span className="badge text-bg-light text-uppercase mb-2">{producto.categoria}</span>
-        <h1 className="h2">{producto.nombre}</h1>
-        <p className="fs-3 precio-fraunces">{formatearPrecio(producto.precio)}</p>
-        <p className="text-body-secondary">{producto.descripcion}</p>
-
-        <h2 className="h6">Cantidad</h2>
-        <div className="input-group w-auto mb-4">
-          <button className="btn btn-outline-secondary" type="button" onClick={restar} disabled={sinStock || cantidad === 1} aria-label="Restar">
-            −
-          </button>
-          <span className="input-group-text bg-white px-4">{cantidad}</span>
-          <button className="btn btn-outline-secondary" type="button" onClick={sumar} disabled={sinStock || cantidad === producto.stock} aria-label="Sumar">
-            +
-          </button>
+      {/* contenedor */}
+      <div className="container py-4 px-3 px-md-4">
+      
+        {/* lo divido en 2 columnas*/}
+      <div className="row g-4 align-items-center tarjeta-detalle-wrapper ">
+        
+        {/* columna de la imagen */}
+        <div className="col-md-5 text-center">
+          <div className="imagen-detalle-contenedor">
+            <img 
+              src={producto.imagen} 
+              alt={producto.nombre} 
+              className="img-fluid imagen-detalle-fit" 
+            />
+          </div>
         </div>
 
-        <Boton variante="dark" tamanio="lg" className="w-100" disabled={sinStock} onClick={handleAgregar}>
-          {textoBoton}
-        </Boton>
+        {/* columna con los detalles */}
+        <div className="col-md-7">
+          <div className="info-producto-panel">
+            <span className="categoria-chip-detalle mb-2">{producto.categoria}</span>
+            <h1 className="titulo-producto-detalle mb-2">{producto.nombre}</h1>
+            
+            <p className="precio-tag-detalle mb-3">{formatearPrecio(producto.precio)}</p>
+            
+            {producto.descripcion && (
+              <p className="descripcion-producto text-secondary mb-4">{producto.descripcion}</p>
+            )}
 
-        {!sinStock && <p className="small text-body-secondary mt-2">Quedan {producto.stock} unidades.</p>}
+            <hr className="perforacion my-4" />
 
-        {agregado && (
-          <div className="alert alert-success mt-3 d-flex flex-wrap justify-content-between align-items-center gap-2" role="status">
-            <span>¡Listo! Agregaste el producto al carrito.</span>
-            <Link to="/carrito" className="btn btn-sm btn-success">
-              Ir al carrito
-            </Link>
+            {/* controles de Cantidad */}
+            <div className="mb-4">
+              <label className="rotulo-filtro d-block mb-2">Cantidad</label>
+              <div className="selector-cantidad d-inline-flex align-items-center">
+                <button 
+                  type="button" 
+                  className="btn-cantidad" 
+                  onClick={restar} 
+                  disabled={sinStock || cantidad === 1}
+                >
+                  −
+                </button>
+                <span className="valor-cantidad">{cantidad}</span>
+                <button 
+                  type="button" 
+                  className="btn-cantidad" 
+                  onClick={sumar} 
+                  disabled={sinStock || cantidad === producto.stock}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* boton de Agregar */}
+            <Boton 
+              variante="dark" 
+              tamanio="lg" 
+              className="w-100 btn-agregar-carrito" 
+              disabled={sinStock} 
+              onClick={handleAgregar}
+            >
+              {sinStock ? 'Sin stock' : 'Agregar al carrito'}
+            </Boton>
+
+            {!sinStock && (
+              <p className="stock-info text-muted mt-2 mb-0">
+                Quedan <strong>{producto.stock}</strong> unidades disponibles.
+              </p>
+            )}
+
+            {/* alerta de producto agregado */}
+            {agregado && (
+              <div className="alerta-exito mt-3 d-flex justify-content-between align-items-center">
+                <span>¡Producto agregado al carrito!</span>
+                <Link to="/carrito" className="btn-ir-carrito">
+                  Ver carrito →
+                </Link>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+
       </div>
+      </div>  
     </div>
   )
 }

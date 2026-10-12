@@ -22,7 +22,7 @@ function LayoutPublico() {
           <Outlet context={carrito} />
       </main>
       
-      <Footer />
+      <Footer/>
       <ScrollRestoration />
     </>
   );

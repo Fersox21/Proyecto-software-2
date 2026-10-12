@@ -9,6 +9,7 @@ import Boton from '../../../shared/components/Boton'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
 import '../../../styles/catalogo-filtros.css'
+import '../../../styles/catalogo.css'
 
 function CatalogoPage() {
   const { agregarProducto } = useOutletContext()
@@ -29,6 +30,7 @@ useEffect(function() {
 
   return (
     <>
+    <div className="container py-4">
       <header className="mb-4">
         <h1 className="h2 mb-1 titulo-tag">Catálogo</h1>
         <p className="text-body-secondary mb-0">Filtrá por categoría o nombre.</p>
@@ -36,36 +38,51 @@ useEffect(function() {
 
       <div className="row g-4">
         <aside className="col-lg-3 filtros">
-          <label htmlFor="busqueda" className="rotulo-filtro">
-            Buscar
-          </label>
-          {/* Input controlado: su valor sale del estado y cada tecla lo actualiza */}
-          <input
-            id="busqueda"
-            type="search"
-            className="form-control campo-busqueda-tag mb-4"
-            placeholder="Ej: harina"
-            value={filtros.busqueda}
-            onChange={(e) => filtros.setBusqueda(e.target.value)}
-          />
+  <div className="buscador-contenedor mb-4">
+    <label htmlFor="busqueda" className="rotulo-filtro">
+      Buscar
+    </label>
+    <div className="campo-busqueda-wrapper">
+      <span className="icono-lupa">🔍</span>
+      <input
+        id="busqueda"
+        type="search"
+        className="campo-busqueda-tag"
+        placeholder="Ej: harina, fideos..."
+        value={filtros.busqueda}
+        onChange={(e) => filtros.setBusqueda(e.target.value)}
+        autoComplete="off"
+      />
+      {filtros.busqueda && (
+        <button
+          type="button"
+          className="btn-limpiar-busqueda"
+          onClick={() => filtros.setBusqueda('')}
+          aria-label="Borrar búsqueda"
+        >
+          ×
+        </button>
+      )}
+    </div>
+  </div>
 
-          <FiltroCategorias
-            categorias={filtros.categorias}
-            seleccionada={filtros.categoria}
-            onSeleccionar={filtros.setCategoria}
-          />
-          
-          {filtros.hayFiltrosActivos && (
-            <Boton
-              variante="outline-secondary"
-              tamanio="sm"
-              className="btn-limpiar-tag"
-              onClick={filtros.limpiarFiltros}
-            >
-              Limpiar filtros
-            </Boton>
-          )}
-        </aside>
+  <FiltroCategorias
+    categorias={filtros.categorias}
+    seleccionada={filtros.categoria}
+    onSeleccionar={filtros.setCategoria}
+  />
+  
+  {filtros.hayFiltrosActivos && (
+    <Boton
+      variante="outline-secondary"
+      tamanio="sm"
+      className="btn-limpiar-tag"
+      onClick={filtros.limpiarFiltros}
+    >
+      Limpiar filtros
+    </Boton>
+  )}
+</aside>
 
         <section className="col-lg-9">
           <p className="small text-body-secondary">
@@ -81,6 +98,7 @@ useEffect(function() {
           )}
         </section>
       </div>
+    </div>
     </>
   )
 }

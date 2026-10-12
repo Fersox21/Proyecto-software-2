@@ -157,7 +157,7 @@ function FormularioPedido(){
                                         <label className="form-label small fw-semibold">Persona de contacto</label>
                                         <input
                                         type="text"
-                                        name="contacto"
+                                        name="personaContacto"
                                         className="form-control input-form rounded-5"
                                         required
                                         value={datosPedido.personaContacto}

@@ -1,0 +1,252 @@
+/* tarjeta del producto */
+
+/* Contenedor principal de la tarjeta */
+.tarjeta-producto {
+  position: relative;
+  border-radius: var(--radio-tag);
+  overflow: visible;
+  font-family: var(--fuente-cuerpo);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Efecto al pasar el mouse por la tarjeta */
+.tarjeta-producto:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Envoltorio de la imagen */
+.tarjeta-producto .imagen-envoltorio {
+  position: relative;
+  border-radius: var(--radio-tag) var(--radio-tag) 0 0;
+}
+
+/* Imagen del producto */
+.tarjeta-producto .card-img-top,
+.tarjeta-producto .imagen-detalle {
+  aspect-ratio: 1;
+  object-fit: cover;
+  background-color: var(--marca-fondo-suave);
+}
+
+/* Línea de puntos (perforación) */
+.tarjeta-producto .perforacion {
+  border-top: 1px dashed var(--marca-linea);
+  margin: 0 12px;
+}
+
+/* Etiqueta de categoría */
+.tarjeta-producto .categoria-chip {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--marca-acento);
+  color: var(--marca-acento-texto);
+  font-family: var(--fuente-mono);
+  font-size: 0.7rem;
+}
+
+/* Título y precio */
+.tarjeta-producto .card-title {
+  font-weight: bold;
+}
+
+.tarjeta-producto .precio-tag {
+  font-family: var(--fuente-mono);
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+/* Botón dentro de la tarjeta */
+.tarjeta-producto .btn-outline-dark {
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+
+/* buscador de productos */
+
+.buscador-contenedor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+
+.buscador-contenedor .rotulo-filtro {
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #4a4a4a;
+}
+
+
+.buscador-contenedor .campo-busqueda-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+/* lupa */
+.buscador-contenedor .icono-lupa {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.9rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+
+.buscador-contenedor input.campo-busqueda-tag {
+  width: 100%;
+  height: 40px;
+  padding-left: 38px;  
+  padding-right: 35px; 
+  font-size: 0.9rem;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  background-color: #ffffff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+
+.buscador-contenedor input.campo-busqueda-tag:focus {
+  border-color: #b08226;
+  box-shadow: 0 0 0 2px rgba(176, 130, 38, 0.2);
+}
+
+/* el boton para borrar */
+.buscador-contenedor .btn-limpiar-busqueda {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #8c8c8c;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* saca la cruz default */
+.buscador-contenedor input.campo-busqueda-tag::-webkit-search-decoration,
+.buscador-contenedor input.campo-busqueda-tag::-webkit-search-cancel-button {
+  display: none;
+}
+
+
+/* ==========================================
+   PÁGINA DE DETALLE DE PRODUCTO
+   ========================================== */
+
+/* Tarjeta blanca contenedora */
+.tarjeta-detalle-wrapper {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  border: 1px solid #e2e8f0;
+}
+
+/* Imagen limpia con fondo suave */
+.imagen-detalle-contenedor {
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.imagen-detalle-fit {
+  max-height: 380px;
+  object-fit: contain;
+}
+
+/* Categoría y Títulos */
+.categoria-chip-detalle {
+  display: inline-block;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+}
+
+.titulo-producto-detalle {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.precio-tag-detalle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #2b2b2b;
+}
+
+/* Selector de Cantidad personalizado */
+.selector-cantidad {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.btn-cantidad {
+  border: none;
+  background: transparent;
+  width: 38px;
+  height: 38px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #334155;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.btn-cantidad:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+.btn-cantidad:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.valor-cantidad {
+  width: 44px;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-left: 1px solid #e2e8f0;
+  border-right: 1px solid #e2e8f0;
+  line-height: 38px;
+}
+
+/* Mensaje de Stock y Alertas */
+.stock-info {
+  font-size: 0.82rem;
+}
+
+.alerta-exito {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.88rem;
+}
+
+.btn-ir-carrito {
+  color: #166534;
+  font-weight: bold;
+  text-decoration: underline;
+  font-size: 0.85rem;
+}

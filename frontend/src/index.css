@@ -5,103 +5,13 @@ html {
 
 main {
     background-color: var(--color-body);
+    padding-bottom: 8rem;
 }
 
 /* Texto copiado: */
 
 .navbar .nav-link.active {
   color: var(--marca-acento) !important;
-}
-
-/* ---------- Tarjeta de producto: "hang tag" (etiqueta colgante) ---------- */
-.tarjeta-producto {
-  position: relative;
-  border-radius: var(--radio-tag);
-  overflow: visible;
-  font-family: var(--fuente-cuerpo);
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-}
-
-/* Ligera rotación alternada, como prendas colgadas: se deshace al pasar el mouse */
-.grilla-productos > .col:nth-child(3n + 1) .tarjeta-producto {
-  transform: rotate(-1deg);
-}
-.grilla-productos > .col:nth-child(3n + 2) .tarjeta-producto {
-  transform: rotate(0.8deg);
-}
-.grilla-productos > .col:nth-child(3n) .tarjeta-producto {
-  transform: rotate(-0.4deg);
-}
-
-.tarjeta-producto:hover {
-  transform: translateY(-4px) rotate(0deg);
-  box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
-}
-
-/* "Ojal" de la etiqueta: circulito perforado en el borde superior */
-.tarjeta-producto .ojal {
-  position: absolute;
-  top: -9px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid var(--marca-linea);
-  z-index: 2;
-}
-
-.tarjeta-producto .imagen-envoltorio {
-  position: relative;
-  border-radius: var(--radio-tag) var(--radio-tag) 0 0;
-  overflow-x: clip;
-  overflow-y: visible;
-}
-
-.tarjeta-producto .card-img-top,
-.imagen-detalle {
-  aspect-ratio: 1;
-  object-fit: cover;
-  background-color: var(--marca-fondo-suave);
-}
-
-/* Línea de perforación, como el pliegue de una etiqueta de precio real */
-.tarjeta-producto .perforacion {
-  border-top: 1.5px dashed var(--marca-linea);
-  margin: 0 0.75rem;
-}
-
-.tarjeta-producto .categoria-chip {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: var(--marca-acento);
-  color: var(--marca-acento-texto);
-  font-family: var(--fuente-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.05em;
-}
-
-.tarjeta-producto .card-title {
-  font-weight: 700;
-}
-
-.tarjeta-producto .precio-tag {
-  font-family: var(--fuente-mono);
-  font-weight: 600;
-  font-size: 1.05rem;
-}
-
-.tarjeta-producto .btn-outline-dark {
-  font-family: var(--fuente-mono);
-  font-size: 0.75rem;
-  border-radius: 6px;
-}
-
-.tarjeta-producto .text-bg-secondary {
-  background-color: var(--marca-peligro-suave) !important;
-  color: var(--marca-peligro) !important;
 }
 
 .imagen-carrito {
