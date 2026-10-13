@@ -5,7 +5,7 @@ import MensajeVacio from '../../../shared/components/MensajeVacio';
 
 function VentasPage(){
 
-    const { datos: productos, cargando, error } = useFetch(obtenerVentas)
+    const { datos: ventas, cargando, error } = useFetch(obtenerVentas)
 
 
     if (cargando) return <Spinner texto="Cargando ventas..." />
@@ -25,14 +25,11 @@ function VentasPage(){
                 </thead>
 
                 <tbody id="tabla-admin-body">
-                    {productos.map((prod)=> (
-                        <tr key={prod.id}>
-                                <td className="col-admin col-nombre">{prod.nombre}</td>
-                                <td className="col-admin col-descripcion">{prod.descripcion}</td>
-                                <td className="col-admin col-categoria">{prod.categoria}</td>
-                                <td className="col-admin col-precio">${prod.precio}</td>
-                                <td className="col-admin col-stock">{prod.stock}</td>
-                                <td className="col-admin">{calcularEstado(prod.stock)}</td>
+                    {ventas.map((venta)=> (
+                        <tr key={venta.id}>
+                                <td className="col-admin col-fecha">{venta.fecha}</td>
+                                <td className="col-admin col-total">{venta.total}</td>
+                                <td className="col-admin col-producto">{venta.producto_id}</td>
                                 <td className="col-admin col-acciones">
                                     <button>Editar</button>
                                 </td>
