@@ -3,7 +3,7 @@ import cors from 'cors';
 import { corsOptions } from './config/cors.js';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
-import productosRoutes from './routes/productos.routes.js';
+import productosRoutes from './modules/productos/productos.routes.js';
 
 const app = express();
 

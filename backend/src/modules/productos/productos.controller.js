@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool } from '../../config/db.js';
 
 // Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
 
@@ -30,10 +30,10 @@ export const crear = async (req, res, next) => {
     const { nombre, precio, categoria, talles, stock, destacado, imagen, descripcion } =
       req.body;
     const { rows } = await pool.query(
-      `INSERT INTO productos (nombre, precio, categoria, talles, stock, destacado, imagen, descripcion)
+      `INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [nombre, precio, categoria, talles, stock, destacado, imagen, descripcion]
+      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
@@ -43,15 +43,15 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const { nombre, precio, categoria, talles, stock, destacado, imagen, descripcion } =
+    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso } =
       req.body;
     const { rows } = await pool.query(
       `UPDATE productos
-       SET nombre = $1, precio = $2, categoria = $3, talles = $4,
-           stock = $5, destacado = $6, imagen = $7, descripcion = $8
+       SET nombre = $1, precioCosto = $2, precioVenta = $3, marca = $4,
+           enPromocion = $5, stock = $6, categoria = $7, peso = $8
        WHERE id = $9
        RETURNING *`,
-      [nombre, precio, categoria, talles, stock, destacado, imagen, descripcion, req.params.id]
+      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, req.params.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
