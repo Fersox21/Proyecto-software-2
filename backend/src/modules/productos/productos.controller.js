@@ -27,7 +27,7 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const { nombre, precio, categoria, talles, stock, destacado, imagen, descripcion } =
+    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso } =
       req.body;
     const { rows } = await pool.query(
       `INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso)

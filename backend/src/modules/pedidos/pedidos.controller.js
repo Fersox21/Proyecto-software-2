@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool } from '../../config/db.js';
 
 // Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
 
@@ -27,7 +27,7 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const { nombre, precio, categoria, talles, stock, destacado, imagen, descripcion } =
+    const { fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol } =
       req.body;
     const { rows } = await pool.query(
       `INSERT INTO pedidos (fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol)
@@ -43,15 +43,15 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const { fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol } =
+    const { fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo } =
       req.body;
     const { rows } = await pool.query(
       `UPDATE pedidos
        SET fecha = $1, total = $2, metodoPago = $3, comercio = $4,
-           modalidadEntrega = $5, direccion = $6, estado = $7, motivoRechazo = $8, rol = $9
-       WHERE id = $10
+           modalidadEntrega = $5, direccion = $6, estado = $7, motivoRechazo = $8
+       WHERE id = $9
        RETURNING *`,
-      [fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol, req.params.id]
+      [fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, req.params.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });

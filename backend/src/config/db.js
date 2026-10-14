@@ -1,7 +1,9 @@
 import pkg from 'pg';
 import { env } from './env.js';
 
-const { Pool } = pkg;
+const { Pool, types } = pkg;
+
+types.setTypeParser(1700, (val) => parseFloat(val));
 
 // Pool de conexiones
 export const pool = new Pool({
