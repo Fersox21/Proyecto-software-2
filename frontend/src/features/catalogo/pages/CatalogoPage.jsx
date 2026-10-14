@@ -14,6 +14,7 @@ import '../../../styles/catalogo.css'
 function CatalogoPage() {
   const { agregarProducto } = useOutletContext()
   const { datos: productos, cargando, error } = useFetch(obtenerProductos)
+  console.log(productos)
   const filtros = useFiltros(productos)
 
   const [searchParams] = useSearchParams()

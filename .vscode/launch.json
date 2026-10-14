@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "JavabackendApplication",
+            "request": "launch",
+            "mainClass": "com.mycompany.javabackend.JavabackendApplication",
+            "projectName": "javabackend"
+        },
+        {
             "type": "editor-browser",
             "request": "launch",
             "name": "Open index.html",

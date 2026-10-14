@@ -3,6 +3,8 @@ package com.mycompany.javabackend.Logica.Clases;
 import java.sql.Date;
 import java.util.List;
 import java.util.ArrayList;
+import Logica.Clases.Pedido;
+import Logica.Clases.Producto;
 
 public class Venta {
     private Long id;
@@ -10,7 +12,6 @@ public class Venta {
     private double total;
     private Pedido pedido;
     private List<Producto> productos;
-
 
     public Venta() {
     }
@@ -72,6 +73,7 @@ public class Venta {
 
     @Override
     public String toString() {
-        return "Venta [id=" + id + ", fecha=" + fecha + ", total=" + total + ", pedido=" + pedido + ", productos=" + productos + "]";
+        return "Venta [id=" + id + ", fecha=" + fecha + ", total=" + total + ", pedido=" + pedido + ", productos="
+                + productos + "]";
     }
 }

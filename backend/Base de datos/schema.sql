@@ -26,11 +26,11 @@ CREATE TABLE ordenes_compra (
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
-    precioCosto DECIMAL(10, 2) NOT NULL CHECK (precioCosto > 0),
-    precioVenta DECIMAL(10, 2) NOT NULL CHECK (precioVenta > 0),
+    precio_costo DECIMAL(10, 2) NOT NULL CHECK (precio_costo > 0),
+    precio_venta DECIMAL(10, 2) NOT NULL CHECK (precio_venta > 0),
     marca VARCHAR(25),
-    enPromocion BOOLEAN,
-    precioPromo DECIMAL(10, 2),
+    en_promocion BOOLEAN,
+    precio_promo DECIMAL(10, 2),
     stock INTEGER NOT NULL DEFAULT 0,
     categoria VARCHAR(20) NOT NULL,
     peso VARCHAR(20) NOT NULL
@@ -38,9 +38,9 @@ CREATE TABLE productos (
 -- 4. Tabla Lotes
 CREATE TABLE lotes (
     id SERIAL PRIMARY KEY,
-    fechaArribo DATE NOT NULL,
-    fechaVencimiento DATE NOT NULL,
-    ordenCompra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
+    fecha_arribo DATE NOT NULL,
+    fecha_vencimiento DATE NOT NULL,
+    orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
     producto_id INTEGER NOT NULL REFERENCES productos(id)
 );
 -- 6. Tabla Pedidos
@@ -48,12 +48,12 @@ CREATE TABLE pedidos (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
-    metodoPago VARCHAR(30) NOT NULL,
+    metodo_pago VARCHAR(30) NOT NULL,
     comercio VARCHAR(40) NOT NULL,
-    modalidadEntrega VARCHAR(10) NOT NULL,
+    modalidad_entrega VARCHAR(10) NOT NULL,
     direccion VARCHAR(60),
     estado VARCHAR(15) NOT NULL,
-    motivoRechazo VARCHAR(80),
+    motivo_rechazo VARCHAR(80),
     roles_id INTEGER NOT NULL REFERENCES roles(id)
 );
 -- 7. Tabla Ventas

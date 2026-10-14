@@ -55,7 +55,7 @@ function TarjetaProducto({ producto, onAgregar }) {
             </Link>
           </h3>
           
-          <p className="fs-5 mb-3 precio-fraunces">{formatearPrecio(producto.precioventa)}</p>
+          <p className="fs-5 mb-3 precio-fraunces">{formatearPrecio(producto.precioVenta)}</p>
 
           <div className="mt-auto">
             {sinStock ? (

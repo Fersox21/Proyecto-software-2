@@ -2,10 +2,26 @@ import { pool } from '../../config/db.js';
 
 // Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
 
+const mapearProducto = (row) => {
+  if (!row) return null;
+  return {
+    id: row.id,
+    nombre: row.nombre,
+    precioCosto: row.precio_costo,
+    precioVenta: row.precio_venta,
+    marca: row.marca,
+    enPromocion: row.en_promocion,
+    stock: row.stock,
+    categoria: row.categoria,
+    peso: row.peso
+  };
+};
+
 export const listar = async (req, res, next) => {
   try {
     const { rows } = await pool.query('SELECT * FROM productos ORDER BY id');
-    res.json(rows);
+    const mapeados = rows.map(mapearProducto)
+    res.json(mapeados);
   } catch (err) {
     next(err);
   }
@@ -19,7 +35,7 @@ export const obtener = async (req, res, next) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    res.json(rows[0]);
+    res.json(mapearProducto(rows[0]));
   } catch (err) {
     next(err);
   }
@@ -35,7 +51,7 @@ export const crear = async (req, res, next) => {
        RETURNING *`,
       [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso]
     );
-    res.status(201).json(rows[0]);
+    res.status(201).json(mapearProducto(rows[0]));
   } catch (err) {
     next(err);
   }
@@ -56,7 +72,7 @@ export const actualizar = async (req, res, next) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    res.json(rows[0]);
+    res.json(mapearProducto(rows[0]));
   } catch (err) {
     next(err);
   }

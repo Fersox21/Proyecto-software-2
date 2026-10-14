@@ -1,9 +1,9 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
+import Logica.Clases.Producto;
 
 public class Carrito extends Venta {
-    
 
     public Carrito() {
         super();
@@ -12,7 +12,7 @@ public class Carrito extends Venta {
     public Carrito(Long id, Date fecha, double total) {
         super(id, fecha, total);
     }
-    
+
     public void agregarProducto(Producto producto) {
         this.getProductos().add(producto);
         this.calcularTotal();
@@ -30,6 +30,5 @@ public class Carrito extends Venta {
         }
         this.setTotal(suma);
     }
-    
-    
+
 }
