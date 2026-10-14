@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 
 function validar(valor) {
   const errores = {}
+  if (!esRequerido(valor.email)) errores.email = 'Ingresá tu correo.'
   if (!esRequerido(valor.password)) errores.password = 'Ingresá tu contraseña.'
   return errores
 }
@@ -12,7 +13,7 @@ function validar(valor) {
 
 function FormLogin({ onIngresar }) {
 
-  const [valores, setValores] = useState({ password: '' })
+  const [valores, setValores] = useState({ email: '', password: '' })
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState('')
   const [enviando, setEnviando] = useState(false)

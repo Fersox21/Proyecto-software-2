@@ -1,27 +1,26 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = '/data'
+const URL_BASE = 'http://localhost:3000' 
 const CLAVE_SESION = 'admin:sesion'
 
-  export async function iniciarSesion({password}) {
-  const respuesta = await fetch(`${URL_BASE}/credenciales.json`)
+export async function iniciarSesion({ email, password }) {
+  const respuesta = await fetch(`${URL_BASE}/api/roles/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ correo: email, password }),
+  })
 
   if (!respuesta.ok) {
-    throw new Error('No se pudo verificar el usuario. Intentá más tarde.')
+    const datosError = await respuesta.json().catch(() => ({}))
+    throw new Error(datosError.error || 'Correo o contraseña incorrectos.')
   }
 
-  const usuarios = await respuesta.json()
+  const usuario = await respuesta.json()
 
-  const usuario = usuarios.find((u) => u.password === password)
-
-  if (!usuario) {
-    throw new Error('Contraseña incorrecta.')
-  }
-
-
-  const sesion = {}
   sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario))
-  return sesion
+  return {}
 }
 
 export function obtenerSesion() {

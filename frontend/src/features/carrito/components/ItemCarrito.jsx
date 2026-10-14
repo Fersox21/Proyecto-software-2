@@ -3,12 +3,20 @@ import { BsTrash } from 'react-icons/bs'
 import '../../../styles/carrito.css'
 
 function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
+  const nombreImagen = item.nombre
+    ?.toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
+
+  const imagenUrl = `/images/${nombreImagen}.webp`
+
   return (
     <li className="list-group-item py-4 border-0 border-dark border-top bg-transparent rounded-0">
       <div className="row align-items-center g-3">
         <div className="col-12 col-md-5 d-flex align-items-center gap-3">
           <img
-            src={item.imagen}
+            src={imagenUrl}
             alt={item.nombre}
             className="rounded-4 object-fit-cover flex-shrink-0"
             style={{ width: '100px', height: '100px' }}
@@ -25,9 +33,9 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
             <h6 className="mb-1 fs-5 text-dark lh-sm fuente-titulos">
               {item.nombre}
             </h6>
-            {item.descripcion && (
+            {item.peso && (
               <p className="mb-1 text-body-secondary small">
-                {item.descripcion}
+                {item.peso}
               </p>
             )}
           </div>
@@ -36,7 +44,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-4 col-md-2 text-md-center">
           <small className="text-body-secondary d-block mb-1">Precio unitario</small>
           <span className="text-dark fs-6 fuente-titulos">
-            {formatearPrecio(item.precio)}
+            {formatearPrecio(item.preciocosto)}
           </span>
         </div>
 
@@ -67,7 +75,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-3 col-md-2 text-end text-md-center">
           <small className="text-body-secondary d-block mb-1">Total</small>
           <span className="text-dark fs-5 fuente-titulos">
-            {formatearPrecio(item.precio * item.cantidad)}
+            {formatearPrecio(item.precioventa * item.cantidad)}
           </span>
         </div>
 

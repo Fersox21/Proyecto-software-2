@@ -7,7 +7,7 @@ import { CatalogoPage, DetalleProductoPage } from './features/catalogo'
 import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
 import { CarritoPage } from './features/carrito'
 import { AdministradorPage} from './features/administrador'
-import { FormularioPedido } from './features/carrito'
+import { PedidoPage } from './features/pedido'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth'
 
 export const router = createBrowserRouter([
@@ -21,7 +21,7 @@ export const router = createBrowserRouter([
       { path: 'catalogo/:id', element: <DetalleProductoPage /> },
       { path: 'preguntasFrecuentes', element: <PreguntasFrecuentesPage />},
       { path: 'carrito', element: <CarritoPage />},
-      { path: 'finalizar-compra', element: <FormularioPedido />},
+      { path: 'finalizar-compra', element: <PedidoPage />},
       { path: 'login', element: <LoginPage />, loader: redirigirSiHaySesion,},
       { path: '*', element: <NoEncontradaPage /> },
     ],

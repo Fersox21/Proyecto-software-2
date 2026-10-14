@@ -6,8 +6,8 @@ import FormLogin from '../components/FormLogin'
 function LoginPage(){
   const navigate = useNavigate()
 
-  async function handleIngresar( { password }) {
-    await iniciarSesion({ password }) 
+  async function handleIngresar( { email, password }) {
+    await iniciarSesion({ email, password }) 
     navigate('/administrador', { replace: true })
   }
 

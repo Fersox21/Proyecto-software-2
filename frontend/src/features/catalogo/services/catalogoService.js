@@ -1,9 +1,7 @@
-const URL_BASE = '/public'
-
-
+const URL_BASE = 'http://localhost:3000'
 
 export async function obtenerProductos() {
-  const respuesta = await fetch('/productos.json')
+  const respuesta = await fetch(`${URL_BASE}/api/productos`)
   if (!respuesta.ok) {
     throw new Error('No se pudieron obtener los productos')
   }

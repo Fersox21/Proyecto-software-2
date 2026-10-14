@@ -1,0 +1,1 @@
+export { default as PedidoPage } from './pages/PedidoPage.jsx'

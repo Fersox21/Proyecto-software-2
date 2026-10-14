@@ -35,10 +35,13 @@ export function useCarrito() {
         {
           id: producto.id,
           nombre: producto.nombre,
-          precio: producto.precio,
-          imagen: producto.imagen,
+          preciocosto: producto.preciocosto,
+          precioventa: producto.precioventa,
+          marca: producto.marca,
+          enPromocion: producto.enPromocion,
+          precioPromo: producto.precioPromo,
           stock: producto.stock,
-          descripcion: producto.descripcion,
+          peso: producto.peso,
           categoria: producto.categoria,
           cantidad,
         },
@@ -65,7 +68,7 @@ export function useCarrito() {
   }
 
   const cantidadTotal = items.reduce((acumulado, item) => acumulado + item.cantidad, 0)
-  const subtotal = items.reduce((acumulado, item) => acumulado + item.precio * item.cantidad, 0)
+  const subtotal = items.reduce((acumulado, item) => acumulado + item.precioventa * item.cantidad, 0)
 
   return { items, cantidadTotal, subtotal, agregarProducto, cambiarCantidad, quitarProducto, vaciarCarrito }
 }

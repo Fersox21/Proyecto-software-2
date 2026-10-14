@@ -6,8 +6,8 @@ import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill, BsCheckLg } from 'react-ic
 import iconoEntregaLocal from '../../../assets/Items/iconoEntregaLocal.svg'
 import iconoEntregaDomicilio from '../../../assets/Items/iconoEntregaDomicilio.svg'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
-import EscogerUbicacion from './EscogerUbicacion'
-import ResumenPedido from './ResumenPedido'
+import EscogerUbicacion from '../../carrito/components/EscogerUbicacion'
+import ResumenPedido from '../componets/ResumenPedido'
 import '../../../styles/formulario.css'
 
 const ENVIO_GRATIS_DESDE = 60000

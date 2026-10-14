@@ -3,6 +3,14 @@ import { formatearPrecio } from '../../../shared/utils/formato'
 import { useState, useRef } from 'react'
 
 function TarjetaProducto({ producto, onAgregar }) {
+  const nombreImagen = producto.nombre
+    ?.toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
+
+  const imagenUrl = `/images/${nombreImagen}.webp`
+
   const sinStock = producto.stock === 0
   const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
   // Ref permite controlar el temporizador sin que se pisen entre clics
@@ -32,7 +40,7 @@ function TarjetaProducto({ producto, onAgregar }) {
           
           <Link to={`/catalogo/${producto.id}`}>
             <img 
-              src={producto.imagen} 
+              src={imagenUrl}
               className="card-img-top" 
               alt={producto.nombre} 
               style={{ height: '200px', objectFit: 'contain' }}
@@ -47,7 +55,7 @@ function TarjetaProducto({ producto, onAgregar }) {
             </Link>
           </h3>
           
-          <p className="fs-5 mb-3 precio-fraunces">{formatearPrecio(producto.precio)}</p>
+          <p className="fs-5 mb-3 precio-fraunces">{formatearPrecio(producto.precioventa)}</p>
 
           <div className="mt-auto">
             {sinStock ? (

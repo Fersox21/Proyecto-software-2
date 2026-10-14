@@ -1,13 +1,21 @@
 import { formatearPrecio } from '../../../shared/utils/formato'
 
 function ItemPedido({ item }){
+    const nombreImagen = item.nombre
+    ?.toLowerCase()
+    .trim()
+    .replace(/\s+/g, '-')
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
+
+    const imagenUrl = `/images/${nombreImagen}.webp`
+
     return (
         <li className="list-group-item py-2">
             <div className="row align-items-center g-2">
                 <div className="col-12 col-md-7 d-flex align-items-center gap-3">
                     <div className="position-relative flex-shrink-0" style={{ width: '80px', height: '80px' }}>
                         <img
-                            src={item.imagen}
+                            src={imagenUrl}
                             alt={item.nombre}
                             className="border border-dark border-opacity-25 rounded-4 object-fit-cover w-100 h-100"
                         />
@@ -28,9 +36,9 @@ function ItemPedido({ item }){
                         <h6 className="mb-1 fs-5 lh-sm fuente-titulos fw-medium">
                         {item.nombre}
                         </h6>
-                        {item.descripcion && (
+                        {item.peso && (
                         <p className="mb-1 text-body-secondary small" style={{ fontSize: '0.7rem'}}>
-                            {item.descripcion} · {item.cantidad} x {formatearPrecio(item.precio)}
+                            {item.peso} · {item.cantidad} x {formatearPrecio(item.precioventa)}
                         </p>
                         )}
                     </div>
@@ -38,7 +46,7 @@ function ItemPedido({ item }){
         
                 <div className="col-4 col-md-5 text-end text-end">
                     <span className="text-dark fs-5 fuente-titulos">
-                        {formatearPrecio(item.precio * item.cantidad)}
+                        {formatearPrecio(item.precioventa * item.cantidad)}
                     </span>
                 </div>
             </div>
