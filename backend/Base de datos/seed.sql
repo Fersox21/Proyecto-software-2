@@ -1,9 +1,4 @@
--- ==========================================
--- 1. Tablas Independientes (Sin Foreign Keys)
--- ==========================================
 
--- Aseguramos que el teléfono pueda soportar números grandes (VARCHAR)
-ALTER TABLE proveedores ALTER COLUMN telefono TYPE VARCHAR(20);
 
 INSERT INTO proveedores (nombre, telefono) VALUES
 ('Arcor S.A.', '123'),
@@ -52,6 +47,6 @@ INSERT INTO ventas (fecha, total, pedido_id) VALUES
 
 
 -- Detalle de la venta 1: Vendemos 10 Galletas y 1 Yerba Mate
-INSERT INTO tiene (cantidad, precio, producto_id, venta_id) VALUES
+INSERT INTO tiene (cantidad, precio, producto_id, pedidos_id) VALUES
 (10, 1200.00, 1, 1),
 (1, 2200.00, 2, 1);

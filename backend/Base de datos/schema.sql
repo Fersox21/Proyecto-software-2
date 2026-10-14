@@ -22,14 +22,6 @@ CREATE TABLE ordenes_compra (
     fecha DATE NOT NULL,
     proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
 );
--- 4. Tabla Lotes
-CREATE TABLE lotes (
-    id SERIAL PRIMARY KEY,
-    fechaArribo DATE NOT NULL,
-    fechaVencimiento DATE NOT NULL,
-    ordenCompra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
-    producto_id INTEGER NOT NULL REFERENCES lotes(id) -- Nota: Referencia interna según el diagrama
-);
 -- 5. Tabla Productos
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
@@ -42,6 +34,14 @@ CREATE TABLE productos (
     stock INTEGER NOT NULL DEFAULT 0,
     categoria VARCHAR(20) NOT NULL,
     peso VARCHAR(20) NOT NULL
+);
+-- 4. Tabla Lotes
+CREATE TABLE lotes (
+    id SERIAL PRIMARY KEY,
+    fechaArribo DATE NOT NULL,
+    fechaVencimiento DATE NOT NULL,
+    ordenCompra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
+    producto_id INTEGER NOT NULL REFERENCES productos(id)
 );
 -- 6. Tabla Pedidos
 CREATE TABLE pedidos (
@@ -67,6 +67,7 @@ CREATE TABLE ventas (
 CREATE TABLE tiene (
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
     precio DECIMAL(10, 2) NOT NULL,
-    producto_id INTEGER NOT NULL UNIQUE REFERENCES productos(id),
-    venta_id INTEGER NOT NULL REFERENCES ventas(id)
+    producto_id INTEGER NOT NULL REFERENCES productos(id),
+    pedidos_id INTEGER NOT NULL REFERENCES pedidos(id),
+    PRIMARY KEY (pedidos_id, producto_id) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
 );
