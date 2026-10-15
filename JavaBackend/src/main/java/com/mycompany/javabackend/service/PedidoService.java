@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.mycompany.javabackend.Logica.Clases.Pedido;
 import com.mycompany.javabackend.Logica.Clases.Producto;
+import com.mycompany.javabackend.Logica.Clases.Rol;
 import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.Persistencia.ClasesDAO.PedidoDao;
 import com.mycompany.javabackend.Persistencia.ClasesDAO.TieneDao;
@@ -31,6 +32,10 @@ public class PedidoService {
         pedido.setEstado("PENDIENTE");
         pedido.setMotivoRechazo(null);
 
+        Rol rolPorDefecto = new Rol();
+        rolPorDefecto.setId(1L);
+        pedido.setRol(rolPorDefecto);
+
         // 2. Guardar Pedido y recuperar su ID
         Long idPedido = pedidoDao.agregarYObtenerId(pedido);
 
@@ -51,7 +56,10 @@ public class PedidoService {
                 tiene.setProducto(prod);
                 tiene.setPedido(pedido);
                 tiene.setCantidad(itemDto.getCantidad());
-                tiene.setPrecio(itemDto.getPrecioUnitario());
+                
+                // Si el precio viene nulo en el DTO, puedes evitar que falle
+                Double precio = itemDto.getPrecioUnitario() != null ? itemDto.getPrecioUnitario() : 0.0;
+                tiene.setPrecio(precio);
 
                 tieneDao.agregar(tiene);
             }

@@ -20,7 +20,7 @@ public class TieneDao implements DAO<Tiene> {
     @Override
     public void agregar(Tiene tiene) {
         // Inserción en la tabla de asociación con la clave compuesta
-        String sql = "INSERT INTO tienen (producto_id, pedido_id, cantidad, precio) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO tiene (producto_id, pedidos_id, cantidad, precio) VALUES (?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -32,7 +32,7 @@ public class TieneDao implements DAO<Tiene> {
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Error al insertar detalle del pedido (tienen): " + e.getMessage());
+            System.err.println("Error al insertar detalle del pedido (tiene): " + e.getMessage());
         }
     }
 
@@ -69,7 +69,7 @@ public class TieneDao implements DAO<Tiene> {
 
     @Override
     public Tiene obtener(Long id) {
-        String sql = "SELECT id, cantidad, precio, producto_id, Pedido_id FROM tiene WHERE id = ?";
+        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id FROM tiene WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -88,7 +88,7 @@ public class TieneDao implements DAO<Tiene> {
                     tiene.setProducto(producto);
 
                     Pedido pedido = new Pedido();
-                    pedido.setId(rs.getLong("pedido_id"));
+                    pedido.setId(rs.getLong("pedidos_id"));
                     tiene.setPedido(pedido);
 
                     return tiene;
@@ -104,7 +104,7 @@ public class TieneDao implements DAO<Tiene> {
     @Override
     public List<Tiene> obtenerTodos() {
         List<Tiene> lista = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, producto_id, pedido_id FROM tiene ORDER BY id ASC";
+        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id FROM tiene ORDER BY id ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -122,7 +122,7 @@ public class TieneDao implements DAO<Tiene> {
                 tiene.setProducto(producto);
 
                 Pedido pedido = new Pedido();
-                pedido.setId(rs.getLong("pedido_id"));
+                pedido.setId(rs.getLong("pedidos_id"));
                 tiene.setPedido(pedido);
 
                 lista.add(tiene);

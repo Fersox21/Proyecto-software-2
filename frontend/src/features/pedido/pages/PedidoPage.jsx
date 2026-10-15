@@ -41,12 +41,12 @@ function FormularioPedido(){
             nombreComercio: datosPedido.nombreComercio,
             telefono: datosPedido.telefono,
             personaContacto: datosPedido.personaContacto,
-            metodoEntrega: entrega, // 'retiro' o 'estandar'
-            direccion: datosPedido.direccion, // (Asegúrate de que EscogerUbicacion actualice esto si corresponde)
+            metodoEntrega: entrega,
+            direccion: datosPedido.direccion, 
             descripcionDireccion: datosPedido.descripcionDireccion,
             observacionesPedido: datosPedido.observacionesPedido,
             items: items.map(item => ({
-                productoId: item.id, // o el identificador que uses
+                productoId: item.id,
                 cantidad: item.cantidad,
                 precioUnitario: item.precio
             })),

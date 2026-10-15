@@ -25,7 +25,7 @@ public class PedidoDao implements DAO<Pedido> {
 
     public Long agregarYObtenerId(Pedido pedido) {
         // NOTA: Ajusta los nombres de las columnas según la estructura real de PostgreSQL
-        String sql = "INSERT INTO pedidos (fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pedidos (fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Long idGenerado = null;
 
         try (Connection conn = Conexion.getInstance().getConnection();
@@ -114,7 +114,7 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public Pedido obtener(Long id) {
-        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, rol_id FROM pedidos WHERE id = ?";
+        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id FROM pedidos WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
              PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
@@ -138,7 +138,7 @@ public class PedidoDao implements DAO<Pedido> {
                     pedido.setEstado(rs.getString("estado"));
                     pedido.setMotivoRechazo(rs.getString("motivorechazo"));
 
-                    long rolId = rs.getLong("rol_id");
+                    long rolId = rs.getLong("roles_id");
                     if (!rs.wasNull()) {
                         Rol rol = new Rol();
                         rol.setId(rolId);
@@ -158,7 +158,7 @@ public class PedidoDao implements DAO<Pedido> {
     @Override
     public List<Pedido> obtenerTodos() {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, rol_id FROM pedidos ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id FROM pedidos ORDER BY id ASC";
 
         try (Connection conn = Conexion.getInstance().getConnection();
              PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;
@@ -177,7 +177,7 @@ public class PedidoDao implements DAO<Pedido> {
                 pedido.setEstado(rs.getString("estado"));
                 pedido.setMotivoRechazo(rs.getString("motivorechazo"));
 
-                long rolId = rs.getLong("rol_id");
+                long rolId = rs.getLong("roles_id");
                 if (!rs.wasNull()) {
                     Rol rol = new Rol();
                     rol.setId(rolId);
