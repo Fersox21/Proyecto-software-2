@@ -1,26 +1,35 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = 'http://localhost:3000' 
+const URL_BASE = '/data/credenciales.json' 
 const CLAVE_SESION = 'admin:sesion'
 
 export async function iniciarSesion({ email, password }) {
-  const respuesta = await fetch(`${URL_BASE}/api/roles/login`, {
-    method: 'POST',
+  // 1. Petición GET para obtener las credenciales desde el JSON estático
+  const respuesta = await fetch(URL_BASE, {
+    method: 'GET',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ correo: email, password }),
   })
 
   if (!respuesta.ok) {
-    const datosError = await respuesta.json().catch(() => ({}))
-    throw new Error(datosError.error || 'Correo o contraseña incorrectos.')
+    throw new Error('No se pudo cargar la base de datos de credenciales.')
   }
 
-  const usuario = await respuesta.json()
+  const usuarios = await respuesta.json()
 
-  sessionStorage.setItem(CLAVE_SESION, JSON.stringify(usuario))
-  return {}
+  const usuarioEncontrado = usuarios.find(
+    (u) => u.email === email && u.password === password
+  )
+
+  if (!usuarioEncontrado) {
+    throw new Error('Email o contraseña incorrectos.')
+  }
+
+  const { password: _, ...datosUsuario } = usuarioEncontrado
+
+  sessionStorage.setItem(CLAVE_SESION, JSON.stringify(datosUsuario))
+  return datosUsuario
 }
 
 export function obtenerSesion() {
