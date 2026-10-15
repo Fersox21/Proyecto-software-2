@@ -9,16 +9,15 @@ public class Conexion {
     private static Conexion instancia = null;
     private Connection conexion = null;
 
-    private final String URL = "jdbc:postgresql://localhost:5433/distribuidora";
+    private final String URL = "jdbc:postgresql://localhost:5432/distribuidora";
     private final String USER = "postgres";
     private final String PASSWORD = "admin";
 
     private Conexion() {
         try {
             Class.forName("org.postgresql.Driver");
-            this.conexion = DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (ClassNotFoundException | SQLException e) {
-            System.err.println("Error al conectar a la base de datos: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("Error al cargar el driver de PostgreSQL: " + e.getMessage());
         }
     }
 
@@ -30,7 +29,15 @@ public class Conexion {
     }
 
     public Connection getConnection() {
-        return conexion;
+        try {
+            if (this.conexion == null || this.conexion.isClosed()) {
+                this.conexion = DriverManager.getConnection(URL, USER, PASSWORD);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener la conexión a PostgreSQL: " + e.getMessage());
+            this.conexion = null;
+        }
+        return this.conexion;
     }
 
     public void cerrarConexion() {
