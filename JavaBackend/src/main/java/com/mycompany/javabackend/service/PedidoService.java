@@ -2,6 +2,7 @@ package com.mycompany.javabackend.service;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -66,5 +67,9 @@ public class PedidoService {
         }
 
         return idPedido;
+    }
+
+    public List<Pedido> obtenerTodosLosPedidos() {
+    return pedidoDao.obtenerTodos();
     }
 }

@@ -11,8 +11,9 @@ const enlacesAdmin = [
   { id: 5, texto: 'Promociones', destino: '/administrador/promociones'},
   { id: 6, texto: 'Proveedores', destino: '/administrador/proveedores'},
   { id: 7, texto: 'Vencimientos', destino: '/administrador/vencimientos'},
-  { id: 8, texto: 'Ventas', destino: '/administrador/ventas'},
-  { id: 9, texto: 'Pagina Principal', destino: '/'},
+  { id: 8, texto: 'Pedidos', destino: '/administrador/pedidos'},
+  { id: 9, texto: 'Ventas', destino: '/administrador/ventas'},
+  { id: 10, texto: 'Pagina Principal', destino: '/'},
 
 ];
 

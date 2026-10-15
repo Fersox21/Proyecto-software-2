@@ -1,11 +1,15 @@
 package com.mycompany.javabackend.controller;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mycompany.javabackend.Logica.Clases.Pedido;
 import com.mycompany.javabackend.dto.PedidoDTO;
 import com.mycompany.javabackend.dto.RespuestaPedidoDTO;
 import com.mycompany.javabackend.service.PedidoService;
@@ -25,5 +29,11 @@ public class PedidoController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new RespuestaPedidoDTO(false, e.getMessage(), null));
         }
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Pedido>> obtenerTodos() {
+        List<Pedido> pedidos = pedidoService.obtenerTodosLosPedidos();
+        return ResponseEntity.ok(pedidos);
     }
 }
