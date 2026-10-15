@@ -1,11 +1,19 @@
 import NavbarAdmin from './NavBarAdmin'
-import '../../styles/panelAdmin/adminProductos.css'
+import '../../styles/panelAdmin/adminGeneral.css'
 import { Outlet, ScrollRestoration } from 'react-router'; 
 
 
 const enlacesAdmin = [
-  { id: 1, texto: 'Inicio', destino: '/' },
+  { id: 1, texto: 'Inicio', destino: '/administrador' },
   { id: 2, texto: 'Catálogo', destino: '/catalogo' },
+  { id: 3, texto: 'Estadisticas', destino: '/administrador/estadisticas'},
+  { id: 4, texto: 'Lotes', destino: '/administrador/lotes'},
+  { id: 5, texto: 'Promociones', destino: '/administrador/promociones'},
+  { id: 6, texto: 'Proveedores', destino: '/administrador/proveedores'},
+  { id: 7, texto: 'Vencimientos', destino: '/administrador/vencimientos'},
+  { id: 8, texto: 'Ventas', destino: '/administrador/ventas'},
+  { id: 9, texto: 'Pagina Principal', destino: '/'},
+
 ];
 
 function LayoutPrivado(){

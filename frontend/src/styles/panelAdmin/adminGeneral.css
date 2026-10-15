@@ -1,0 +1,131 @@
+.main-admin {
+  flex: 1;
+  font-family: var(--fuente-base);
+  min-width: 0;
+  padding: 2rem;
+  margin-left: 15rem;
+  background-color: #F6F6F6;
+  overflow-y: auto;
+}
+
+.layout-admin-principal {
+  flex: 1;
+  background-color: #F6F6F6; 
+  padding: 2rem;
+  overflow-y: auto;
+  width: 100%;
+}
+
+.header-admin {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.agregar-prod {
+  padding: 0.8rem 1.2rem;
+  background-color: #113269;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.agregar-prod:hover {
+  background-color: #164085;
+}
+
+
+.sec-prod-admin {
+  width: 100%;
+  max-width: 100%;
+  display: block;
+  overflow-x: auto;
+  background: #FFFFFF;
+  border-radius: 12px;
+  border: 1px solid #E5E5E5;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tabla-prod-admin {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-prod-admin th {
+  padding: 1.2rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #E5E5E5;
+  color: #6B7280; 
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tabla-prod-admin td {
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #F3F4F6;
+  color: #212121;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+.tabla-prod-admin tr:hover td {
+  background-color: #F9FAFB;
+}
+
+
+.tabla-admin-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #E5E5E5;
+  color: #6B7280;
+  font-size: 0.85rem;
+}
+
+.control-pag {
+  display: flex;
+  gap: 0.5rem;
+}
+
+a {
+  color: #113269;
+  text-decoration: none;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+a:hover {
+  opacity: 0.8;
+  color: #0E2C5B;
+}
+
+
+@media (max-width: 1020px) {
+  .layout-admin-principal,
+  .main-admin {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 5rem 1rem 1rem 1rem; 
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden; 
+  }
+
+  .header-admin {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .agregar-prod {
+    width: 100%;
+  }
+}

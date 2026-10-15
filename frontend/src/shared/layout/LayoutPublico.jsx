@@ -2,7 +2,7 @@ import { Outlet, ScrollRestoration } from 'react-router';
 import { useCarrito } from '../../features/carrito';
 import Navbar from './NavBar';
 import Footer from './Footer';
-import '../../styles/panelAdmin/adminlogin.css'
+import '../../styles/panelAdmin/adminLogin.css'
 
 
 const ENLACES  = [

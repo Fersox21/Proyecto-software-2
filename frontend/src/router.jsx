@@ -6,7 +6,7 @@ import { HomePage } from './features/home'
 import { CatalogoPage, DetalleProductoPage } from './features/catalogo'
 import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
 import { CarritoPage } from './features/carrito'
-import { AdministradorPage} from './features/administrador'
+import { AdministradorPage, EstadisticasPage, LotesPage, PromocionesPage, ProveedoresPage, VencimientosPage, VentasPage} from './features/administrador' 
 import { PedidoPage } from './features/pedido'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth'
 
@@ -33,7 +33,14 @@ export const router = createBrowserRouter([
     loader: protegerRuta, 
     errorElement: <NoEncontradaPage />,
     children: [
-      { index: true, element: <AdministradorPage /> }
+      { index: true, element: <AdministradorPage /> },
+      { path: 'estadisticas', element: <EstadisticasPage />},
+      { path: 'ventas', element: <VentasPage />},
+      { path: 'lotes', element: <LotesPage />},
+      { path: 'provedores', element: <ProveedoresPage />},
+      { path: 'vencimiento', element: <VencimientosPage />},
+      { path: 'promociones', element: <PromocionesPage />},
+      { path: '*', element: <NoEncontradaPage /> },
     ],
   },
 ]);

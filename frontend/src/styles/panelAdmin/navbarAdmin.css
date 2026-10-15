@@ -1,10 +1,11 @@
-
-
 .sidebar-admin {
-    background-color: var(--color-header-admin);
+    font-family: var(--fuente-base);
+    background-color: #FFFFFF;
+    border-right: 1px solid #E5E5E5;
     width: 250px;
     min-width: 250px;
-    min-height: 100vh;
+    height: 100vh;
+    overflow-y: auto;
     position: fixed;
     top: 0;
     left: 0;
@@ -23,86 +24,130 @@
     padding: 0 1.5rem;
 }
 
-.h2-admin {
-    color: white;
-    margin: 5rem 0 3rem 0;
-}
-
-#Fe-h2-admin {
-    color: var(--color-Fe-h1-admin);
-}
-
-.ul-nav-admin {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
-    list-style: none;
-    margin: 0 0 2rem 0;
-    padding: 0; 
-    width: 100%;
-}
 
 .p-nav {
-    font-weight: bold;
-    color: var(--color-p-nav-admin);
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 1rem;
 }
 
 #p-cuenta-nav {
     margin-top: 1rem;
 }
 
-.a-nav-admin, .link-admin{
-    display: block;
+.ul-nav-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    list-style: none;
+    margin: 0 0 0 0;
+    padding: 0; 
+    width: 100%;
+}
+
+.li-nav {
+  width: 100%;
+  display: block; 
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 10px;
+  border-color: #4B5563;
+}
+
+.link-admin{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
     text-decoration: none;
-    background-color: var(--color-header-admin);
-    color: white;
-    font-size: 1.5rem;
-    border-radius: 10px;
-    font-weight: bold;
 }
 
 
-/* Media Query */
+.a-nav-admin, .link-admin {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    text-decoration: none;
+    box-sizing: border-box;
+    background-color: transparent;
+    color: #4B5563;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 0.60rem 1rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+
+.a-nav-admin:hover, .link-admin:hover {
+    background-color: rgba(17, 50, 105, 0.05);
+    color: #113269;
+}
+
+
+.btn-CerrarSesion {
+    width: 100%;
+    background-color: transparent;
+    color: #8D1D3A;
+    border: 1px solid #8D1D3A;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-CerrarSesion:hover {
+    background-color: #8D1D3A;
+    color: #FFFFFF;
+}
+
+
 @media (max-width: 768px) {
     .btn-hamburguesa-admin {
         display: block;
         position: fixed;
         top: 15px;
         left: 15px;
-        background: var(--color-header-admin, #2c2c2c);
-        color: white;
-        border: none;
-        border-radius: 5px;
+        background: #FFFFFF;
+        color: #113269;
+        border: 1px solid #E5E5E5;
+        border-radius: 8px;
         padding: 0.5rem 0.8rem;
         font-size: 1.5rem;
         cursor: pointer;
         z-index: 900;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    
+    @media (max-width: 768px) {
     .sidebar-admin {
         position: fixed;
         top: 0;
-        left: -100%;
+        left: -260px; 
         transition: left 0.3s ease-in-out;
         z-index: 1000;
-        box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+        background-color: #FFFFFF; 
     }
 
     .sidebar-admin.abierto {
         left: 0;
+        box-shadow: 2px 0 15px rgba(0,0,0,0.1);
     }
+}
 
     .btn-cerrar-admin {
         display: block;
         background: transparent;
-        color: white;
+        color: #212121;
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
         margin-top: 1rem;
         align-self: flex-end; 
     }
-
-
 }

@@ -5,6 +5,7 @@ import {cerrarSesion} from '../../features/auth'
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { FaBars, FaTimes } from 'react-icons/fa';
+import iconoFlecha from '../../assets/Items/iconoFlecha.svg';
 
 function NavBarAdmin({enlaces}){
 
@@ -36,14 +37,13 @@ function NavBarAdmin({enlaces}){
                         <FaTimes />
             </button>
 
-            <h2 className="h2-admin">La <span id="Fe-h2-admin">Fe</span> · admin</h2>
-
             <p className="p-nav">GENERAL</p>
             <ul className="ul-nav-admin">
                 {enlaces.map((enlace) => (
                     <li key={enlace.id} className="li-nav">
                         <Link className="link-admin" to={enlace.destino}>
-                            {enlace.texto}
+                            {enlace.texto} 
+                            <img src={iconoFlecha} alt="ErrorCargaImg" />
                         </Link>
                     </li>
                 ))}
