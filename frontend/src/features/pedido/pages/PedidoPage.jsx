@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { Link, useOutletContext } from 'react-router'
 import { FaRegClock } from 'react-icons/fa'
-import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill, BsCheckLg } from 'react-icons/bs';
+import { Bs1CircleFill, Bs2CircleFill, Bs3CircleFill, BsCheckLg } from 'react-icons/bs'
+import MensajeVacio from '../../../shared/components/MensajeVacio'
 import iconoEntregaLocal from '../../../assets/Items/iconoEntregaLocal.svg'
 import iconoEntregaDomicilio from '../../../assets/Items/iconoEntregaDomicilio.svg'
 import ItemTarjeta from '../../../shared/components/ItemTarjeta'
@@ -32,9 +33,52 @@ function FormularioPedido(){
         observacionesPedido: ''
     })
 
-    function handleFinalizarPedido() {
-        vaciarCarrito();
-        setCompraConfirmada(true);
+    async function handleFinalizarPedido(e) {
+        e.preventDefault(); // Evita que recargue la página por defecto
+
+        // Construimos el DTO que espera el backend
+        const pedidoCompleto = {
+            nombreComercio: datosPedido.nombreComercio,
+            telefono: datosPedido.telefono,
+            personaContacto: datosPedido.personaContacto,
+            metodoEntrega: entrega, // 'retiro' o 'estandar'
+            direccion: datosPedido.direccion, // (Asegúrate de que EscogerUbicacion actualice esto si corresponde)
+            descripcionDireccion: datosPedido.descripcionDireccion,
+            observacionesPedido: datosPedido.observacionesPedido,
+            items: items.map(item => ({
+                productoId: item.id, // o el identificador que uses
+                cantidad: item.cantidad,
+                precioUnitario: item.precio
+            })),
+            subtotal: subtotal,
+            envio: envio,
+            total: total
+        };
+
+        try {
+            const response = await fetch('http://localhost:8080/api/pedidos', { // Ajusta tu URL base
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pedidoCompleto)
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al registrar el pedido en el servidor');
+            }
+
+            const resultado = await response.json();
+            console.log("Pedido guardado con éxito:", resultado);
+
+            // Si todo sale bien, vaciamos el carrito y mostramos el mensaje de éxito
+            vaciarCarrito();
+            setCompraConfirmada(true);
+
+        }catch (error) {
+            console.error("Hubo un problema con la conexión:", error);
+            alert("No se pudo procesar tu pedido. Intenta nuevamente.");
+        }
     }
 
     function handleChange(e) {
