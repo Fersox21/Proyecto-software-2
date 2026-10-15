@@ -1,10 +1,8 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
-import java.util.List;
 import java.util.ArrayList;
-import Logica.Clases.Pedido;
-import Logica.Clases.Producto;
+import java.util.List;
 
 public class Venta {
     private Long id;

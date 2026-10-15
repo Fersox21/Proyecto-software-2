@@ -1,7 +1,6 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
-import Logica.Clases.Producto;
 
 public class Carrito extends Venta {
 
