@@ -44,7 +44,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-4 col-md-2 text-md-center">
           <small className="text-body-secondary d-block mb-1">Precio unitario</small>
           <span className="text-dark fs-6 fuente-titulos">
-            {formatearPrecio(item.preciocosto)}
+            {formatearPrecio(item.precioVenta)}
           </span>
         </div>
 
@@ -75,7 +75,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-3 col-md-2 text-end text-md-center">
           <small className="text-body-secondary d-block mb-1">Total</small>
           <span className="text-dark fs-5 fuente-titulos">
-            {formatearPrecio(item.precioventa * item.cantidad)}
+            {formatearPrecio(item.precioVenta * item.cantidad)}
           </span>
         </div>
 

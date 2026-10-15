@@ -70,7 +70,7 @@ function DetalleProducto({ producto, onAgregar }) {
             <span className="categoria-chip-detalle mb-2">{producto.categoria}</span>
             <h1 className="titulo-producto-detalle mb-2">{producto.nombre}</h1>
             
-            <p className="precio-tag-detalle mb-3">{formatearPrecio(producto.precioventa)}</p>
+            <p className="precio-tag-detalle mb-3">{formatearPrecio(producto.precioVenta)}</p>
             
             {producto.peso && (
               <p className="descripcion-producto text-secondary mb-4">{producto.peso}</p>

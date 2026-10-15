@@ -35,8 +35,8 @@ export function useCarrito() {
         {
           id: producto.id,
           nombre: producto.nombre,
-          preciocosto: producto.preciocosto,
-          precioventa: producto.precioventa,
+          precioCosto: producto.precioCosto,
+          precioVenta: producto.precioVenta,
           marca: producto.marca,
           enPromocion: producto.enPromocion,
           precioPromo: producto.precioPromo,
@@ -68,7 +68,7 @@ export function useCarrito() {
   }
 
   const cantidadTotal = items.reduce((acumulado, item) => acumulado + item.cantidad, 0)
-  const subtotal = items.reduce((acumulado, item) => acumulado + item.precioventa * item.cantidad, 0)
+  const subtotal = items.reduce((acumulado, item) => acumulado + item.precioVenta * item.cantidad, 0)
 
   return { items, cantidadTotal, subtotal, agregarProducto, cambiarCantidad, quitarProducto, vaciarCarrito }
 }

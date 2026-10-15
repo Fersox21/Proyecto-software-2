@@ -38,7 +38,7 @@ function ItemPedido({ item }){
                         </h6>
                         {item.peso && (
                         <p className="mb-1 text-body-secondary small" style={{ fontSize: '0.7rem'}}>
-                            {item.peso} · {item.cantidad} x {formatearPrecio(item.precioventa)}
+                            {item.peso} · {item.cantidad} x {formatearPrecio(item.precioVenta)}
                         </p>
                         )}
                     </div>
@@ -46,7 +46,7 @@ function ItemPedido({ item }){
         
                 <div className="col-4 col-md-5 text-end text-end">
                     <span className="text-dark fs-5 fuente-titulos">
-                        {formatearPrecio(item.precioventa * item.cantidad)}
+                        {formatearPrecio(item.precioVenta * item.cantidad)}
                     </span>
                 </div>
             </div>
