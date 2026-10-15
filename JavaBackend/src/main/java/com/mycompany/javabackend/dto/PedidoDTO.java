@@ -1,5 +1,7 @@
 package com.mycompany.javabackend.dto;
 
+import java.util.List;
+
 public class PedidoDTO {
     private String nombreComercio;
     private String telefono;
@@ -11,6 +13,7 @@ public class PedidoDTO {
     private Double subtotal;
     private Double envio;
     private Double total;
+    private List<ItemPedidoDTO> items;
 
 
     public String getNombreComercio() {
@@ -91,6 +94,14 @@ public class PedidoDTO {
 
     public void setTotal(Double total) {
         this.total = total;
+    }
+
+    public List<ItemPedidoDTO> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemPedidoDTO> items) {
+        this.items = items;
     }
     
 }

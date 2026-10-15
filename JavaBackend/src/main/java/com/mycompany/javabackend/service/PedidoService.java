@@ -6,32 +6,57 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 
 import com.mycompany.javabackend.Logica.Clases.Pedido;
+import com.mycompany.javabackend.Logica.Clases.Producto;
+import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.Persistencia.ClasesDAO.PedidoDao;
+import com.mycompany.javabackend.Persistencia.ClasesDAO.TieneDao;
+import com.mycompany.javabackend.dto.ItemPedidoDTO;
 import com.mycompany.javabackend.dto.PedidoDTO;
 
 @Service
 public class PedidoService {
 
     private final PedidoDao pedidoDao = new PedidoDao();
+    private final TieneDao tieneDao = new TieneDao();
 
     public Long procesarYGuardarPedido(PedidoDTO dto) {
+        // 1. Instanciar y llenar la entidad Pedido
         Pedido pedido = new Pedido();
-        
-        // Mapeamos los datos que vienen del Frontend (DTO) hacia tu Entidad
+        pedido.setFecha(Date.valueOf(LocalDate.now()));
+        pedido.setTotal(dto.getTotal());
+        pedido.setMetodoPago("EFECTIVO"); // O el valor mapeado del dto
         pedido.setComercio(dto.getNombreComercio());
-        pedido.setTotal(dto.getTotal()); // Según los getters de tu DTO
         pedido.setModalidadEntrega(dto.getMetodoEntrega());
         pedido.setDireccion(dto.getDireccion() != null ? dto.getDireccion() : "Retiro en local");
-        pedido.setEstado("PENDIENTE"); // Estado inicial por defecto
-        pedido.setFecha(Date.valueOf(LocalDate.now())); // Fecha actual
-        pedido.setMetodoPago("Efectivo/Transferencia"); // O el que manejes
+        pedido.setEstado("PENDIENTE");
+        pedido.setMotivoRechazo(null);
 
-        // Llamamos a tu DAO existente para insertar en la base de datos
-        pedidoDao.agregar(pedido);
+        // 2. Guardar Pedido y recuperar su ID
+        Long idPedido = pedidoDao.agregarYObtenerId(pedido);
 
-        // Si necesitas guardar los ítems del carrito, aquí mismo harías un bucle 
-        // recorriendo dto.getItems() y llamando a un ItemPedidoDao.
+        if (idPedido == null) {
+            throw new RuntimeException("No se pudo generar el ID del pedido.");
+        }
 
-        return 1L; // Retornas el ID generado o simulado
+        pedido.setId(idPedido);
+
+        // 3. Guardar los ítems en la tabla intermedia 'tienen'
+        if (dto.getItems() != null && !dto.getItems().isEmpty()) {
+            for (ItemPedidoDTO itemDto : dto.getItems()) {
+                Tiene tiene = new Tiene();
+                
+                Producto prod = new Producto();
+                prod.setId(itemDto.getProductoId());
+
+                tiene.setProducto(prod);
+                tiene.setPedido(pedido);
+                tiene.setCantidad(itemDto.getCantidad());
+                tiene.setPrecio(itemDto.getPrecioUnitario());
+
+                tieneDao.agregar(tiene);
+            }
+        }
+
+        return idPedido;
     }
 }

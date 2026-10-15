@@ -5,17 +5,17 @@ public class Tiene {
     private int cantidad;
     private double precio;
     private Producto producto;
-    private Venta venta;
+    private Pedido pedido;
 
     public Tiene() {
     }
 
-    public Tiene(Long id, int cantidad, double precio, Producto producto, Venta venta) {
+    public Tiene(Long id, int cantidad, double precio, Producto producto, Pedido pedido) {
         this.id = id;
         this.cantidad = cantidad;
         this.precio = precio;
         this.producto = producto;
-        this.venta = venta;
+        this.pedido = pedido;    
     }
 
     public int getCantidad() {
@@ -42,17 +42,17 @@ public class Tiene {
         this.producto = producto;
     }
 
-    public Venta getVenta() {
-        return venta;
+    public Pedido getPedido() {
+        return pedido;
     }
 
-    public void setVenta(Venta venta) {
-        this.venta = venta;
+    public void setPedido(Pedido pedido) {
+        this.pedido = pedido;
     }
 
     @Override
     public String toString() {
-        return "Tiene [cantidad=" + cantidad + ", precio=" + precio + ", producto=" + producto + ", venta=" + venta
+        return "Tiene [cantidad=" + cantidad + ", precio=" + precio + ", producto=" + producto + ", pedido=" + pedido
                 + "]";
     }
 

@@ -56,7 +56,7 @@ function FormularioPedido(){
         };
 
         try {
-            const response = await fetch('http://localhost:8080/api/pedidos', { // Ajusta tu URL base
+            const response = await fetch('http://localhost:8081/api/pedidos', { // Ajusta tu URL base
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
