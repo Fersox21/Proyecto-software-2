@@ -17,7 +17,7 @@ public class ProductoDao implements DAO<Producto> {
 
     @Override
     public void agregar(Producto producto) {
-        String sql = "INSERT INTO productos (nombre, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, peso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO productos (nombre, preciocosto, precioventa, marca, enpromocion, preciopromo, stock, categoria, peso) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -54,7 +54,7 @@ public class ProductoDao implements DAO<Producto> {
 
     @Override
     public void modificar(Producto producto) {
-        String sql = "UPDATE productos SET nombre = ?, precio_costo = ?, precio_venta = ?, marca = ?, en_promocion = ?, precio_promo = ?, stock = ?, categoria = ?, peso = ? WHERE id = ?";
+        String sql = "UPDATE productos SET nombre = ?, preciocosto = ?, precioventa = ?, marca = ?, enpromocion = ?, preciopromo = ?, stock = ?, categoria = ?, peso = ? WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -78,7 +78,7 @@ public class ProductoDao implements DAO<Producto> {
 
     @Override
     public Producto obtener(Long id) {
-        String sql = "SELECT id, nombre, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, peso FROM productos WHERE id = ?";
+        String sql = "SELECT id, nombre, preciocosto, precioventa, marca, enpromocion, preciopromo, stock, categoria, peso FROM productos WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -90,11 +90,11 @@ public class ProductoDao implements DAO<Producto> {
 
                     producto.setId(rs.getLong("id"));
                     producto.setNombre(rs.getString("nombre"));
-                    producto.setPrecioCosto(rs.getDouble("precio_costo"));
-                    producto.setPrecioVenta(rs.getDouble("precio_venta"));
+                    producto.setPrecioCosto(rs.getDouble("preciocosto"));
+                    producto.setPrecioVenta(rs.getDouble("precioventa"));
                     producto.setMarca(rs.getString("marca"));
-                    producto.setEnPromocion(rs.getBoolean("en_promocion"));
-                    producto.setPrecioPromo(rs.getDouble("precio_promo"));
+                    producto.setEnPromocion(rs.getBoolean("enpromocion"));
+                    producto.setPrecioPromo(rs.getDouble("preciopromo"));
                     producto.setStock(rs.getInt("stock"));
                     producto.setCategoria(rs.getString("categoria"));
                     producto.setPeso(rs.getString("peso"));
@@ -114,8 +114,8 @@ public class ProductoDao implements DAO<Producto> {
         List<Producto> lista = new ArrayList<>();
         String sql = "SELECT id, nombre, preciocosto, precioventa, marca, enpromocion, preciopromo, stock, categoria, peso FROM productos ORDER BY id ASC";
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+                PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 Producto producto = new Producto();

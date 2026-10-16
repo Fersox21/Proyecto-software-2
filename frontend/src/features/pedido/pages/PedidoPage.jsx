@@ -14,7 +14,7 @@ import '../../../styles/formulario.css'
 const ENVIO_GRATIS_DESDE = 60000
 const COSTO_ENVIO = 1800
 
-function FormularioPedido(){
+function PedidoPage(){
     const { items, cantidadTotal, subtotal, vaciarCarrito } = useOutletContext();
     const [entrega, setEntrega] = useState(null)
     const esRetiro = entrega === 'retiro'
@@ -311,4 +311,4 @@ function FormularioPedido(){
     </>);
 }
 
-export default FormularioPedido;
+export default PedidoPage;
