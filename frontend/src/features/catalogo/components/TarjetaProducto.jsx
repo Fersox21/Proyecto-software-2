@@ -40,7 +40,7 @@ function TarjetaProducto({ producto, onAgregar }) {
           
           <Link to={`/catalogo/${producto.id}`}>
             <img 
-              src={imagenUrl}
+              src='/images/harina.webp'
               className="card-img-top" 
               alt={producto.nombre} 
               style={{ height: '200px', objectFit: 'contain' }}

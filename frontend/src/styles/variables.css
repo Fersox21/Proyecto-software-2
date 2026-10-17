@@ -3,6 +3,7 @@
     /* GENERAL */
     --fuente-base: "Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
     --fuente-titulos: "Fraunces Variable", Georgia, "Times New Roman", serif;
+    --fuente-lafe-titulo: serif;
     --bs-body-font-family: var(--fuente-base);
 
     /* MAIN */
@@ -10,16 +11,20 @@
 
     /* HEADER */
     --color-header-home: #e1e0de;   /* fondo del header */
-    --color-header: #262220;   /* fondo del header */
-    --color-titulo-header: white;   /* texto del titulo del header */
-    --color-fe-logo: #b07d1e;   /* "Fe" en el titulo del header */
+    --color-header: white;   /* fondo del header */
+    --color-titulo-header: black;   /* texto del titulo del header */
 
     /* NAV */
-    --color-a-nav: white;   /* texto de los links del nav */
-    --color-a-nav-hover: #b07d1e;   /* hover para links del nav */
+    --color-nav: white;
+    --color-a-nav: #5f6370;   /* texto de los links del nav */
+    --color-a-nav-hover: #1f3ea4;   /* hover para links del nav */
+    --color-a-nav-hover-border: #872b38; /* hover del borde para los links del nav */
+    --color-lafe-nav: #102055;  /* "LaFe" en el titulo del header */
+    --color-distri-nav: #872b38;  /* "Distribuidora" en el titulo del header */
+    --color-destacado-banner: #872b38;
 
     /* TOPBAR */
-    --color-topbar: black;   /* fondo del topbar */
+    --color-topbar: #0A1331;   /* fondo del topbar */
     --color-topbar-texto: white;   /* texto e iconos del topbar */
 
 

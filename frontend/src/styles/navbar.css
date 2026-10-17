@@ -5,16 +5,12 @@
 
 .sidebar-home {
     background-color: var(--color-header-home);
-    min-height: 100vh;
+    height: 100%;
     max-width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-}
-
-.sidebar {
-    background-color: var(--color-header);
 }
 
 .btn-hamburguesa {
@@ -31,14 +27,50 @@
     display: none;
 }
 
+.logo {
+    max-width: 60px;
+    height: auto;
+    display: block;
+    mix-blend-mode: multiply
+}
+
+.titulo-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.texto-titulo-header {
+    display: flex;
+    flex-direction: column;
+    text-align: start;
+    justify-content: center;
+    align-items: start;
+    line-height: 1;
+}
+
+/* span del "LaFe" en el titulo del header */
+.lafe {
+    color: var(--color-lafe-nav);
+    font-family: var(--fuente-lafe-titulo);
+}
+
+/* span del "distribuidora" en el titulo del header */
+.distribuidora {
+    color: var(--color-distri-nav);
+    letter-spacing: 0.2rem;
+    font-size: 0.8rem;
+}
+
 /* nav */
 nav {
+    background-color: var(--color-nav);
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
     flex-wrap: wrap;
     gap: 1.5rem;
-    padding: 1.4rem 2rem;
+    padding: 0.2rem 2rem;
     width: 100%;
     position: relative;
     box-sizing: border-box;
@@ -50,11 +82,6 @@ nav {
     text-decoration: none;
     font-weight: 700;
     font-size: 1.5rem;
-}
-
-/* span del "Fe" en el titulo del header */
-.fe-logo {
-    color: var(--color-fe-logo);
 }
 
 /* topbar */
@@ -97,6 +124,7 @@ nav {
     justify-content: center;
     align-items: center;
     gap: 1.75rem;
+    margin: 0;
 }
 
 /* links del nav */
@@ -113,6 +141,15 @@ nav {
     transition: color 0.15s;
 }
 
+.num-carrito {
+    color: var(--color-a-nav-hover);
+}
+
+.a-nav-home {
+    color: var(--color-a-nav);
+    font-weight: 600;
+}
+
 /* subrayado para links del nav */
 .a-nav::after {
   content: "";
@@ -121,7 +158,7 @@ nav {
   right: 0;
   bottom: 0;
   height: 2px;
-  background: var(--color-a-nav-hover);
+  background: var(--color-a-nav-hover-border);
   transform: scaleX(0);
   transform-origin: center;
   transition: transform 0.2s ease;
@@ -135,24 +172,25 @@ nav {
 }
 
 .imagen-banner {
-    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("../assets/Backgrounds/fondo-inicio.png");
+    background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url("../assets/Backgrounds/panes.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     margin: 0;
     display: flex;
     flex-direction: column;
-    justify-content: start;
-    align-items: center;
-    text-align: center;
+    justify-content: center;
+    align-items: start;
+    text-align: start;
     flex: 1;
     width: 100%;
-    padding-bottom: 5rem;
+    padding: 5rem 0;
     gap: 5rem;
     position: relative;
     box-sizing: border-box;
-    min-height: 100vh;
+    min-height: calc(100vh - 90px);
     margin-bottom: 1rem;
+    z-index: 10;
 }
 
 .imagen-banner-texto {
@@ -186,16 +224,76 @@ nav {
     margin-bottom: 20px;
 }
 
+.gradiente-general {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    background: linear-gradient(to right, var(--color-topbar) 17%, transparent 100%);
+    z-index: 11;
+}
+
 .div-banner {
-    
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+    flex: 1;
+    padding: 0 11rem;
+    z-index: 12;
+}
+
+.subtitulo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 1rem;
+    color: #e3d5ca;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+.subtitulo-banner::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 2px;
+    background-color: var(--color-destacado-banner);
 }
 
 #div-banner-general {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
+    align-items: start;
     flex: 1;
+}
+
+.titulo-banner {
+  font-family: var(--fuente-titulos);
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: #fbf9f5;
+  line-height: 1.15;
+  margin: 1rem 0;
+  text-align: start;
+}
+
+.destacado-banner {
+  font-style: italic;
+  color: var(--color-destacado-banner);
+}
+
+.catalogo-banner {
+    border-radius: 2.2rem;
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.13rem;
+    background-color: var(--color-destacado-banner);
+    padding: 1rem
 }
 
 .indicador-scroll {
@@ -204,11 +302,9 @@ nav {
     left: 0;
     width: 100%;
     height: 20%;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); 
     display: flex;
     justify-content: center;
-    align-items: flex-end;
-    padding-bottom: 2rem;
+    align-items: center;
     pointer-events: none;
 }
 
@@ -320,7 +416,7 @@ nav {
         min-height: 100vh;
     }
 
-    .a-logo {
+    .logo {
         font-size: 1.8rem;
     }
 
