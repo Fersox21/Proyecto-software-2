@@ -1,0 +1,376 @@
+/* BIENVENIDOSHOME */
+
+.seccion-bienvenidos {
+    width: 80%;
+    margin: 3rem auto;
+    padding: 0 1.5rem;
+    background-color: var(--color-section-prodDestestacados);
+}
+
+.bienvenidos-texto {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 3rem auto;
+}
+
+.grilla-fotos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 1.5rem;
+}
+
+.card-foto {
+    background-color: white;
+    border-radius: 30px;
+    overflow: hidden;
+    border: 1px solid #ebe5dc;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-foto:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+}
+
+.card-img-box {
+    width: 100%;
+    height: 18rem;
+    position: relative;
+    background-color: #e9e4dc;
+}
+
+.card-img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease;
+}
+
+.card-badge-icono {
+    position: absolute;
+    bottom: -20px;
+    left: 1.4rem;
+    width: 45px;
+    height: 45px;
+    background-color: var(--color-bienvenidos-badge);
+    color: #fbf9f5;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+}
+
+/* textos de las tarjetas */
+.card-cuerpo {
+    padding: 2rem 1.4rem 1.6rem 1.4rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
+.card-cuerpo h3 {
+    font-family: var(--fuente-titulos);
+    font-size: 1.25rem;
+    color: #262422;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+}
+
+.card-cuerpo p {
+    font-size: 0.92rem;
+    color: #635d55;
+    line-height: 1.55;
+    margin: 0;
+}
+
+.bienvenidos-subtitulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: var(--color-destacado-banner);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-align: center;
+}
+
+.bienvenidos-subtitulo::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: var(--color-destacado-banner);
+}
+
+.bienvenidos-titulo {
+    color: var(--color-texto-general);
+    font-weight: 600;
+    font-size: 3rem;
+}
+
+.bienvenidos-descripcion {
+    color: var(--color-bienvenidos-descripcion);
+    font-size: 1.15rem;
+}
+
+/* ProductosDestacados */
+.destacados-seccion {
+    background-color: var(--color-destacados-seccion);
+    min-width: 100%;
+    padding: 2rem 0;
+}
+
+.destacados-subtitulo {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 1rem;
+    color: var(--color-destacado-banner);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.destacados-subtitulo::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: var(--color-destacado-banner);
+}
+
+.destacados-titulo {
+    font-size: 3.5rem;
+    color: var(--color-texto-general);
+}
+
+.destacados-catalogo {
+    color: var(--color-texto-general);
+    font-weight: 600;
+}
+
+/* HorariosYUbicacion */
+.horarios-subtitulo {
+    display: flex;
+    align-items: center;
+    justify-content: start;
+    gap: 1rem;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.horarios-subtitulo::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 3px;
+    border-radius: 10px;
+    background-color: var(--color-destacado-banner);
+}
+
+.horarios-titulo {
+    font-size: 3.5rem;
+    color: white;
+}
+
+.horarios-descripcion {
+    color: var(--color-horarios-descripcion);
+}
+
+/*mapa*/
+.section-horarios-mapa {
+    background-color: var(--color-section-horarios, #faf7f2);
+    padding: 3rem 1.5rem;
+}
+
+.horarios-mapa {
+    max-width: 100%;
+    margin: 0 auto;
+    background-color: var(--color-horarios-mapa);
+    border-radius: 12px;
+    box-shadow: 0 2px 20px rgb(26, 25, 25);
+    display: grid;
+    grid-template-columns: 1fr 1.3fr;
+    gap: 2rem;
+    padding: 2rem;
+    align-items: center;
+}
+
+.contacto-metodos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.contactos {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    border-radius: 26px;
+    text-decoration: none;
+    background-color: var(--color-card-contact);
+}
+
+.contactos:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.contacto-icono {
+    width: 4rem;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    border-radius: 20px;
+}
+
+.contactos.wsp .contacto-icono {
+    background-color: var(--color-destacado-banner);
+    color: var(--color-iconos-contactos);
+}
+
+.contactos.mail .contacto-icono {
+    background-color: var(--color-destacado-banner);
+    color: var(--color-iconos-contactos);
+}
+
+.contactos.ubicacion .contacto-icono {
+    background-color: var(--color-destacado-banner);
+    color: var(--color-iconos-contactos);
+}
+
+.contacto-detalle {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.contacto-etiqueta {
+    font-size: 1rem;
+    color: #9c9a9a;
+    font-weight: 500;
+}
+
+.contacto-valor {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: white;
+}
+
+.horarios {
+    margin: 2rem 0;
+    font-size: 1.6rem;
+    color: var(--color-titulo-horarios);
+    text-align: start;
+}
+
+.lista-horarios {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    font-weight: bold;
+    color: var(--color-horarios);
+}
+
+.lista-horarios li {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #9a9999;
+    padding-bottom: 0.4rem;
+    font-size: 1.3rem;
+}
+
+.extra-info h4 {
+    color: var(--color-horarios-extra);
+    margin-bottom: 0.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.extra-info p {
+    color: var(--color-horarios-extra);
+    font-size: 0.9rem;
+}
+
+.contenedor-mapa {
+    width: 100%;
+    height: 320px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.contenedor-mapa iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+/* para celulares 768px o menos  */
+@media screen and (max-width: 768px) {
+
+    /* BIENVENIDOSHOME */
+    .seccion-bienvenidos {
+        width: 90%;
+        margin: 3rem auto;
+        padding: 0 0.5rem;
+    }
+
+    .bienvenidos-texto {
+        margin-bottom: 2rem;
+    }
+
+    .bienvenidos-texto h2 {
+        
+        font-size: 1.65rem;
+    }
+
+    .bienvenidos-texto p {
+        font-size: 0.95rem;
+    }
+
+    .grilla-fotos {
+
+        grid-template-columns: 1fr;
+        gap: 1.25rem;
+    }
+
+    .card-img-box {
+        height: 180px; 
+    }
+
+    .card-cuerpo {
+        padding: 1.15rem;
+    }
+
+    .horarios-mapa {
+        grid-template-columns: 1fr;
+        padding: 1.2rem;
+        gap: 1.5rem;
+    }
+
+    .contenedor-mapa {
+        height: 250px;
+    }
+
+}

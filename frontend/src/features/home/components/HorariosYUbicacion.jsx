@@ -1,4 +1,4 @@
-import { FaRegClock } from "react-icons/fa";
+import { FaRegClock, FaWhatsapp, FaRegEnvelope, FaMapMarkerAlt,  } from "react-icons/fa";
 
 function HorariosYUbicacion(){
     return (<>
@@ -8,7 +8,51 @@ function HorariosYUbicacion(){
                     
                     {/* Tarjeta de Información y Horarios */}
                     <div className="tarjeta-info">
-                        <h3><FaRegClock /> Horarios de Atención</h3>
+                        <p className="horarios-subtitulo">CONTACTO</p>
+                        <h2 className="horarios-titulo">
+                            Comunicate <br/> con nosotros
+                        </h2>
+                        <p className="horarios-descripcion">Hacé tu pedido, consultá precios o acercate a retirar directamente en nuestro depósito.</p>
+                        
+                        {/* Tarjetas de contacto */}
+                        <div className="contacto-metodos">
+                            {/* WhatsApp */}
+                            <a className="contactos wsp" href="https://wa.me/5492664238128?text=Hola,%20quisiera%20recibir%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer">
+                                <div className="contacto-icono">
+                                    <FaWhatsapp />
+                                </div>
+                                <div className="contacto-detalle">
+                                    <span className="contacto-etiqueta">WHATSAPP</span>
+                                    <span className="contacto-valor">+54 9 2664238128</span>
+                                </div>
+                            </a>
+
+                            {/* Correo Electrónico */}
+                            <a className="contactos mail" href="mailto:info@lafe.com">
+                                <div className="contacto-icono">
+                                    <FaRegEnvelope />
+                                </div>
+                                <div className="contacto-detalle">
+                                    <span className="contacto-etiqueta">CORREO ELECTRÓNICO</span>
+                                    <span className="contacto-valor">info@lafe.com</span>
+                                </div>
+                            </a>
+
+                            {/* Ubicacion */}
+                            <a className="contactos ubicacion" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
+                                <div className="contacto-icono">
+                                    <FaMapMarkerAlt />
+                                </div>
+                                <div className="contacto-detalle">
+                                    <span className="contacto-etiqueta">DEPÓSITO</span>
+                                    <span className="contacto-valor">Juan Gilberto Funes 460, San Luis</span>
+                                </div>
+                            </a>
+                        </div>
+                        
+                        
+                        
+                        <h3 className="horarios"><FaRegClock /> Horarios de Atención</h3>
                         <ul className="lista-horarios">
                             <li>
                                 <span className="dia">Lunes a Viernes:</span>
@@ -23,11 +67,6 @@ function HorariosYUbicacion(){
                                 <span className="hora">Cerrado</span>
                             </li>
                         </ul>
-
-                        <div className="extra-info">
-                            <h4><i className="fas fa-map-marker-alt"></i> Retiro en local</h4>
-                            <p>Acercate a retirar tus pedidos directamente en nuestro depósito.</p>
-                        </div>
                     </div>
 
                     {/* Contenedor del Mapa */}

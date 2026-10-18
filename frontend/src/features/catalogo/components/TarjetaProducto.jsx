@@ -1,6 +1,7 @@
 import { Link } from 'react-router'
 import { formatearPrecio } from '../../../shared/utils/formato'
 import { useState, useRef } from 'react'
+import '../../../styles/tarjetaProducto.css'
 
 function TarjetaProducto({ producto, onAgregar }) {
   const nombreImagen = producto.nombre
@@ -31,47 +32,49 @@ function TarjetaProducto({ producto, onAgregar }) {
 
   return (
     <>
-      <article className="card h-100 shadow-sm">
-        <div className="position-relative p-3 pb-0 text-center">
+      <article className="card h-100 shadow-sm tarjeta-borde">
+        <div className="position-relative p-3 pb-0 text-center tarjeta-imagen-contenedor">
           
-          <span className="badge text-bg-dark position-absolute top-0 end-0 m-3 z-1 text-uppercase">
+          <span className="badge position-absolute top-0 m-3 z-1 text-uppercase tarjeta-categoria">
             {producto.categoria}
           </span>
           
           <Link to={`/catalogo/${producto.id}`}>
             <img 
               src='/images/harina.webp'
-              className="card-img-top" 
-              alt={producto.nombre} 
-              style={{ height: '200px', objectFit: 'contain' }}
+              className="tarjeta-imagen"
+              alt={producto.nombre}
             />
           </Link>
         </div>
 
         <div className="card-body d-flex flex-column">
           <h3 className="h6 card-title">
-            <Link to={`/catalogo/${producto.id}`} className="link-dark text-decoration-none">
+            <Link to={`/catalogo/${producto.id}`} className="text-decoration-none tarjeta-nombre">
               {producto.nombre}
             </Link>
           </h3>
+          <p className="tarjeta-peso">{producto.peso}</p>
           
-          <p className="fs-5 mb-3 precio-fraunces">{formatearPrecio(producto.precioVenta)}</p>
+          <div className="mt-auto d-flex justify-content-between align-items-center">
+            <p className="precio-fraunces tarjeta-precio">{formatearPrecio(producto.precioVenta)}</p>
 
-          <div className="mt-auto">
-            {sinStock ? (
-              <span className="badge text-bg-secondary w-100 py-2">Sin stock</span>
-            ) : (
-              onAgregar && (
-                <button
-                  type="button"
-                  className="btn btn-sm btn-outline-dark w-100"
-                  onClick={manejarAgregar}
-                  aria-label={`Agregar ${producto.nombre} al carrito`}
-                >
-                  Agregar al carrito
-                </button>
-              )
-            )}
+            <div>
+              {sinStock ? (
+                <span className="badge text-bg-secondary py-2 px-3">Sin stock</span>
+              ) : (
+                onAgregar && (
+                  <button
+                    type="button"
+                    className="btn tarjeta-agregar-a-carrito"
+                    onClick={manejarAgregar}
+                    aria-label={`Agregar ${producto.nombre} al carrito`}
+                  >
+                    +
+                  </button>
+                )
+              )}
+            </div>
           </div>
         </div>
       </article>

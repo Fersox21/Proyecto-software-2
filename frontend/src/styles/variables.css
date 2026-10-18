@@ -7,15 +7,15 @@
     --bs-body-font-family: var(--fuente-base);
 
     /* MAIN */
-    --color-body: #e1e0de;
+    --color-body: #F9F6F2;
 
     /* HEADER */
-    --color-header-home: #e1e0de;   /* fondo del header */
+    --color-header-home: #F9F6F2;   /* fondo del header */
     --color-header: white;   /* fondo del header */
     --color-titulo-header: black;   /* texto del titulo del header */
 
     /* NAV */
-    --color-nav: white;
+    --color-nav: #F9F6F2;
     --color-a-nav: #5f6370;   /* texto de los links del nav */
     --color-a-nav-hover: #1f3ea4;   /* hover para links del nav */
     --color-a-nav-hover-border: #872b38; /* hover del borde para los links del nav */
@@ -41,20 +41,31 @@
     --accent-hover: #b07d1e;
 
     --surface: #f4ede4;
-    --color-section-prodDestestacados: #e1e0de; 
-    --color-marcasDestacadas: #e1e0de;
-    --color-section-contact: #e1e0de;
-    --color-informacion-contact: #e1e0de;
-    --color-card-contact: white;
-    --color-section-horarios: #e1e0de;
-    --color-horarios-mapa: #3e3d3a;
-    --color-titulo-horarios: #cbc8c5;
-    --color-horarios: #cbc8c5;
-    --color-horarios-extra: #aaa8a6;
     --color-section-bienvenida: #3e3d3a;
     --color-icono-bienvenida: white;
     --color-titulo-bienvenida: #b08968;
     --color-mensaje-bienvenida: #aaa8a6;
+    --color-texto-general: #1b2c61;
+    
+
+    /* home */
+    /* BienvenidosHome */
+    --color-bienvenidos-descripcion: #959390;
+    --color-bienvenidos-badge: #1b2c61;
+
+    /* ProductosDestacados */
+    --color-destacados-seccion: #EFEBE2;
+    --color-marcasDestacadas: #F9F6F2;
+    --color-section-contact: #F9F6F2;
+    --color-horarios-descripcion: #c1bebb;
+    --color-informacion-contact: #F9F6F2;
+    --color-iconos-contactos: white;
+    --color-card-contact: #28386C;
+    --color-section-horarios: #F9F6F2;
+    --color-horarios-mapa: #1D2E65;
+    --color-titulo-horarios: #cbc8c5;
+    --color-horarios: #cbc8c5;
+    --color-horarios-extra: #aaa8a6;
 
     /* catalogo */
     --color-input: #000;

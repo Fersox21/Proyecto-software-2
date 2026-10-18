@@ -197,16 +197,6 @@ nav {
     max-width: 100%;
 }
 
-.imagen-banner-texto h1 {
-    font-family: var(--fuente-titulos);
-    font-size: 3.5em; 
-    font-weight: bold;
-    color: #fcf9f2; 
-    line-height: 1.2; /* el renglon */
-    margin-bottom: 20px; 
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
-}
-
 /* Estilos para el Párrafo */
 .imagen-banner-texto p {
     font-size: 1.3em; 
@@ -273,12 +263,13 @@ nav {
 
 .titulo-banner {
   font-family: var(--fuente-titulos);
-  font-size: 3.5rem;
   font-weight: 700;
   color: #fbf9f5;
   line-height: 1.15;
   margin: 1rem 0;
   text-align: start;
+  font-size: 5rem;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4); 
 }
 
 .destacado-banner {
@@ -449,7 +440,7 @@ nav {
         font-size: 1.3rem;
     }
 
-    .imagen-banner-texto h1 {
+    .titulo-banner {
         font-size: 2.5rem;
     }
 
@@ -491,7 +482,7 @@ nav {
         font-size: 0.8rem;
     }
 
-    .imagen-banner-texto h1 {
+    .titulo-banner {
         font-size: 1.4rem;
     }
 
