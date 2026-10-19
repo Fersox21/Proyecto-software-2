@@ -66,7 +66,7 @@ function Footer() {
       {/* Contenedor que agrupa la fila inferior en línea horizontal */}
       <div className="derechos">
         <p className="copyright">© 2026 LaFe Distribuidora. Todos los derechos reservados.</p>
-        <NavLink className="Acceso-Admin" to="/login">
+        <NavLink className="acceso-admin" to="/login">
           <FiLock/> Acceso Administrativo
         </NavLink>
       </div>

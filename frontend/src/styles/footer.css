@@ -12,7 +12,6 @@ footer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     width: 100%;
-    text-align: left;
 }
 
 .footer-cuadro a,
@@ -61,61 +60,35 @@ footer > a:hover {
   color: var(--color-footer-secciones);
 }
 
-.derechos {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  min-width: 100%;
-  margin-top: 1rem;
-  border-top: 1px solid white;
-  padding: 0 3rem;
-}
-
 .derechos a {
-  font-size: 1rem;
-  color: #a0a0a0;
   text-decoration: none;
 }
 
 .copyright {
   margin-left: 6rem;
-}
-    
-.Acceso-Admin {
-  color: #888888;
-  text-decoration: none;
-  margin-right: 6rem;
-}
-
-.Acceso-Admin:hover {
-  color: #ffffff;
-  text-decoration: underline;
+  color: var(--color-footer-secciones);
+  padding: 1rem 0;
 }
 
 .derechos {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  max-width: 1100px;
-  font-size: 0.85rem;
-  color: #a0a0a0;
-  padding: 0 1rem;
+  align-items: end;
+  min-width: 100%;
+  border-top: 1px solid #344273;
+  height: 100%;
 }
 
-.derechos p {
-  margin: 0;
-}
-
-.Acceso-Admin {
-  color: #888888;
+.acceso-admin {
+  color: var(--color-footer-secciones);
   text-decoration: none;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
+  margin-right: 6rem;
+  padding: 1rem 0;
 }
 
-.Acceso-Admin:hover {
+.acceso-admin:hover {
   color: #ffffff;
-  text-decoration: underline;
 }
 
 .footer-titulos {
