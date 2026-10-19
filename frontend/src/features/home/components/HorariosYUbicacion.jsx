@@ -1,4 +1,5 @@
-import { FaRegClock, FaWhatsapp, FaRegEnvelope, FaMapMarkerAlt,  } from "react-icons/fa";
+import { FaRegClock, FaWhatsapp, FaRegEnvelope, FaMapMarkerAlt, FaExternalLinkAlt } from "react-icons/fa";
+import { HiArrowUpRight } from 'react-icons/hi2';
 
 function HorariosYUbicacion(){
     return (<>
@@ -7,7 +8,7 @@ function HorariosYUbicacion(){
                 <div className="horarios-mapa">
                     
                     {/* Tarjeta de Información y Horarios */}
-                    <div className="tarjeta-info">
+                    <div className="horarios-info">
                         <p className="horarios-subtitulo">CONTACTO</p>
                         <h2 className="horarios-titulo">
                             Comunicate <br/> con nosotros
@@ -18,53 +19,64 @@ function HorariosYUbicacion(){
                         <div className="contacto-metodos">
                             {/* WhatsApp */}
                             <a className="contactos wsp" href="https://wa.me/5492664238128?text=Hola,%20quisiera%20recibir%20m%C3%A1s%20informaci%C3%B3n" target="_blank" rel="noopener noreferrer">
-                                <div className="contacto-icono">
-                                    <FaWhatsapp />
+                                <div className="contenedor-horarios">
+                                    <div className="contacto-icono">
+                                        <FaWhatsapp />
+                                    </div>
+                                    <div className="contacto-detalle">
+                                        <span className="contacto-etiqueta">WHATSAPP</span>
+                                        <span className="contacto-valor">+54 9 2664 23-8128</span>
+                                    </div>
                                 </div>
-                                <div className="contacto-detalle">
-                                    <span className="contacto-etiqueta">WHATSAPP</span>
-                                    <span className="contacto-valor">+54 9 2664238128</span>
-                                </div>
+                                <span className="contacto-flecha"><HiArrowUpRight /></span>
+                                
                             </a>
 
                             {/* Correo Electrónico */}
                             <a className="contactos mail" href="mailto:info@lafe.com">
-                                <div className="contacto-icono">
-                                    <FaRegEnvelope />
+                                <div className="contenedor-horarios">
+                                    <div className="contacto-icono">
+                                        <FaRegEnvelope />
+                                    </div>
+                                    <div className="contacto-detalle">
+                                        <span className="contacto-etiqueta">CORREO ELECTRÓNICO</span>
+                                        <span className="contacto-valor">info@lafe.com</span>
+                                    </div>
                                 </div>
-                                <div className="contacto-detalle">
-                                    <span className="contacto-etiqueta">CORREO ELECTRÓNICO</span>
-                                    <span className="contacto-valor">info@lafe.com</span>
-                                </div>
+                                <span className="contacto-flecha"><HiArrowUpRight /></span>
+
                             </a>
 
                             {/* Ubicacion */}
                             <a className="contactos ubicacion" href="https://maps.app.goo.gl/CwepvbVbgh7MhPcr7" target="_blank" rel="noopener noreferrer">
-                                <div className="contacto-icono">
-                                    <FaMapMarkerAlt />
+                                <div className="contenedor-horarios">
+                                    <div className="contacto-icono">
+                                        <FaMapMarkerAlt />
+                                    </div>
+                                    <div className="contacto-detalle">
+                                        <span className="contacto-etiqueta">DEPÓSITO</span>
+                                        <span className="contacto-valor">Juan Gilberto Funes 460, San Luis</span>
+                                    </div>
                                 </div>
-                                <div className="contacto-detalle">
-                                    <span className="contacto-etiqueta">DEPÓSITO</span>
-                                    <span className="contacto-valor">Juan Gilberto Funes 460, San Luis</span>
-                                </div>
+                                <span className="contacto-flecha"><HiArrowUpRight /></span>
                             </a>
                         </div>
                         
                         
                         
-                        <h3 className="horarios"><FaRegClock /> Horarios de Atención</h3>
+                        <h3 className="horarios"><FaRegClock /> HORARIOS DE ATENCIÓN</h3>
                         <ul className="lista-horarios">
                             <li>
-                                <span className="dia">Lunes a Viernes:</span>
+                                <span className="dia">Lunes a Viernes</span>
                                 <span className="hora">8:00 AM - 6:00 PM</span>
                             </li>
                             <li>
-                                <span className="dia">Sábados:</span>
+                                <span className="dia">Sábados</span>
                                 <span className="hora">9:00 AM - 12:00 PM</span>
                             </li>
                             <li>
-                                <span className="dia">Domingos:</span>
-                                <span className="hora">Cerrado</span>
+                                <span className="dia">Domingos</span>
+                                <span className="hora horarios-cerrado">Cerrado</span>
                             </li>
                         </ul>
                     </div>

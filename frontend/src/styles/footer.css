@@ -1,15 +1,22 @@
+footer {
+    background-color: var(--color-footer-fondo);
+    padding-top: 4rem;
+    padding-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .footer-cuadro {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 2rem;
     width: 100%;
     text-align: left;
-    margin-bottom: 1rem;
 }
 
 .footer-cuadro a,
 footer > a {
-  color: #e3d5ca;
   text-decoration: none;
   transition: color 0.2s ease;
 }
@@ -34,34 +41,50 @@ footer > a:hover {
   transform: translateX(4px);
 }
 
+.footer-logo {
+  margin-left: 3rem;
+}
 
 .footer-logo img {
-    max-width: 140px;
+    max-width: 90px;
     height: auto;
     display: block;
-    mix-blend-mode: multiply
+    border-radius: 10px;
+}
+
+.footer-descripcion {
+  font-size: 0.82rem;
+  color: var(--color-footer-secciones);
+}
+
+.footer-secciones {
+  color: var(--color-footer-secciones);
 }
 
 .derechos {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  width: 100%;
-  margin: 1rem auto 0 auto;
-  
+  min-width: 100%;
+  margin-top: 1rem;
+  border-top: 1px solid white;
+  padding: 0 3rem;
 }
 
-.derechos span,
 .derechos a {
   font-size: 1rem;
   color: #a0a0a0;
   text-decoration: none;
 }
+
+.copyright {
+  margin-left: 6rem;
+}
     
 .Acceso-Admin {
   color: #888888;
   text-decoration: none;
+  margin-right: 6rem;
 }
 
 .Acceso-Admin:hover {
@@ -95,6 +118,10 @@ footer > a:hover {
   text-decoration: underline;
 }
 
+.footer-titulos {
+  color: var(--color-footer-titulos);
+  font-weight: 600;
+}
 
 @media screen and (max-width: 768px) {
   .derechos {

@@ -193,20 +193,25 @@
 /*mapa*/
 .section-horarios-mapa {
     background-color: var(--color-section-horarios, #faf7f2);
-    padding: 3rem 1.5rem;
+    padding: 3rem 3rem;
+    margin-top: 4rem;
 }
 
 .horarios-mapa {
     max-width: 100%;
-    margin: 0 auto;
     background-color: var(--color-horarios-mapa);
-    border-radius: 12px;
-    box-shadow: 0 2px 20px rgb(26, 25, 25);
+    border-radius: 2rem;
     display: grid;
     grid-template-columns: 1fr 1.3fr;
     gap: 2rem;
-    padding: 2rem;
+    padding-left: 2rem;
     align-items: center;
+    margin: 0 5rem;
+}
+
+.contenedor-horarios {
+    display: flex;
+    gap: 1rem;
 }
 
 .contacto-metodos {
@@ -217,6 +222,7 @@
 
 .contactos {
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 1.25rem;
     padding: 1.25rem;
@@ -225,14 +231,18 @@
     background-color: var(--color-card-contact);
 }
 
+.contacto-flecha {
+    color: white;
+}
+
 .contactos:hover {
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .contacto-icono {
-    width: 4rem;
-    height: 4rem;
+    width: 3rem;
+    height: 3rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -259,25 +269,27 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    color: white;
 }
 
 .contacto-etiqueta {
-    font-size: 1rem;
-    color: #9c9a9a;
+    font-size: 0.8rem;
+    color: #A5ABBA;
     font-weight: 500;
 }
 
 .contacto-valor {
-    font-size: 1.3rem;
+    font-size: 1rem;
     font-weight: 600;
     color: white;
 }
 
 .horarios {
     margin: 2rem 0;
-    font-size: 1.6rem;
+    font-size: 1rem;
     color: var(--color-titulo-horarios);
     text-align: start;
+    font-weight: 600;
 }
 
 .lista-horarios {
@@ -287,16 +299,20 @@
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    font-weight: bold;
+    font-weight: 600;
     color: var(--color-horarios);
 }
 
 .lista-horarios li {
     display: flex;
     justify-content: space-between;
-    border-bottom: 1px solid #9a9999;
+    border-bottom: 1px solid #344273;
     padding-bottom: 0.4rem;
-    font-size: 1.3rem;
+    font-size: 1rem;
+}
+
+.hora {
+    font-size: 0.9rem;
 }
 
 .extra-info h4 {
@@ -314,16 +330,25 @@
 
 .contenedor-mapa {
     width: 100%;
-    height: 320px;
-    border-radius: 8px;
+    height: 100%;
     overflow: hidden;
 }
 
 .contenedor-mapa iframe {
     width: 100%;
     height: 100%;
+    max-width: 100%;
+    max-height: 100%;
     border: 0;
-    display: block;
+}
+
+.horarios-cerrado {
+    color: #F3AF9F;
+    font-weight: 900;
+}
+
+.horarios-info {
+    padding: 2rem 0 2rem 1rem;
 }
 
 /* para celulares 768px o menos  */
