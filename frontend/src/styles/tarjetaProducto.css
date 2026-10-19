@@ -1,0 +1,64 @@
+/* TarjetaProducto */
+.tarjeta-categoria {
+    background-color: white;
+    color: var(--color-texto-general);
+    box-shadow: 0 0 2px rgb(75, 74, 74);
+    border-radius: 16px;
+}
+
+.tarjeta-agregar-a-carrito {
+    width: 45px;
+    height: 45px;
+    border-radius: 55%;
+    background-color: var(--color-texto-general);
+    color: #fbf9f5;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.tarjeta-agregar-a-carrito:hover {
+    background-color: #1b2a4a;
+    color: #fbf9f5;
+    transform: scale(1.05);
+}
+
+.tarjeta-precio {
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--color-texto-general);
+}
+
+.tarjeta-nombre {
+    font-weight: 600;
+    color: black;
+}
+
+.tarjeta-peso {
+    font-weight: 300;
+    color: #635d55;
+}
+
+.tarjeta-borde {
+    border-radius: 18px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.tarjeta-imagen {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.tarjeta-imagen-contenedor {
+    width: 100%;
+    height: 100%;
+}
