@@ -20,7 +20,7 @@ CREATE TABLE ordenes_compra (
     cantidad INTEGER NOT NULL,
     total INTEGER NOT NULL,
     fecha DATE NOT NULL,
-    proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
+    proveedorId INTEGER NOT NULL REFERENCES proveedores(id)
 );
 -- 5. Tabla Productos
 CREATE TABLE productos (
@@ -40,8 +40,8 @@ CREATE TABLE lotes (
     id SERIAL PRIMARY KEY,
     fechaArribo DATE NOT NULL,
     fechaVencimiento DATE NOT NULL,
-    orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
-    producto_id INTEGER NOT NULL REFERENCES productos(id)
+    ordenCompraId INTEGER NOT NULL REFERENCES ordenes_compra(id),
+    productoId INTEGER NOT NULL REFERENCES productos(id)
 );
 -- 6. Tabla Pedidos
 CREATE TABLE pedidos (
@@ -54,20 +54,20 @@ CREATE TABLE pedidos (
     direccion VARCHAR(60),
     estado VARCHAR(15) NOT NULL,
     motivoRechazo VARCHAR(80),
-    roles_id INTEGER NOT NULL REFERENCES roles(id)
+    rolesId INTEGER NOT NULL REFERENCES roles(id)
 );
 -- 7. Tabla Ventas
 CREATE TABLE ventas (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
-    pedido_id INTEGER NOT NULL REFERENCES pedidos(id)
+    pedidoId INTEGER NOT NULL REFERENCES pedidos(id)
 );
 -- 8. Tabla Tiene (Relación Ventas - Productos)
 CREATE TABLE tiene (
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
     precio DECIMAL(10, 2) NOT NULL,
-    producto_id INTEGER NOT NULL REFERENCES productos(id),
-    pedidos_id INTEGER NOT NULL REFERENCES pedidos(id),
-    PRIMARY KEY (pedidos_id, producto_id) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
+    productoId INTEGER NOT NULL REFERENCES productos(id),
+    pedidoId INTEGER NOT NULL REFERENCES pedidos(id),
+    PRIMARY KEY (pedidoId, productoId) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
 );

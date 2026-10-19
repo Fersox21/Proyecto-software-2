@@ -121,11 +121,11 @@ public class ProductoDao implements DAO<Producto> {
                 Producto producto = new Producto();
                 producto.setId(rs.getLong("id"));
                 producto.setNombre(rs.getString("nombre"));
-                producto.setPrecioCosto(rs.getDouble("preciocosto"));
-                producto.setPrecioVenta(rs.getDouble("precioventa"));
+                producto.setPrecioCosto(rs.getDouble("precioCosto"));
+                producto.setPrecioVenta(rs.getDouble("precioVenta"));
                 producto.setMarca(rs.getString("marca"));
-                producto.setEnPromocion(rs.getBoolean("enpromocion"));
-                producto.setPrecioPromo(rs.getDouble("preciopromo"));
+                producto.setEnPromocion(rs.getBoolean("enPromocion"));
+                producto.setPrecioPromo(rs.getDouble("precioPromo"));
                 producto.setStock(rs.getInt("stock"));
                 producto.setCategoria(rs.getString("categoria"));
                 producto.setPeso(rs.getString("peso"));
