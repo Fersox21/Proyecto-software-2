@@ -46,32 +46,7 @@ export const crear = async (req, res, next) => {
   }
 };
 
-export const login = async (req, res, next) => {
-  try {
-    const { correo, password } = req.body;
 
-    const { rows } = await pool.query('SELECT * FROM roles WHERE correo = $1', [correo]);
-    
-    if (rows.length === 0) {
-      return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
-    }
-
-    const usuario = rows[0];
-
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-
-    if (!passwordValida) {
-      return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
-    }
-
-    res.json({
-      id: usuario.id,
-      correo: usuario.correo
-    });
-  } catch (err) {
-    next(err);
-  }
-};
 
 
 export const actualizar = async (req, res, next) => {

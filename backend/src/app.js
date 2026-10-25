@@ -11,12 +11,14 @@ import proveedoresRoutes from './modules/proveedores/proveedores.routes.js';
 import rolesRoutes from './modules/roles/roles.routes.js';
 import tieneRoutes from './modules/tiene/tiene.routes.js';
 import ventasRoutes from './modules/ventas/ventas.routes.js';
+import authRoutes from './modules/auth/auth.routes.js'
 
 const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
 
+app.use('/api/auth', authRoutes);
 app.use('/api/lotes', lotesRoutes);
 app.use('/api/ordenesCompra', ordenesCompraRoutes);
 app.use('/api/pedidos', pedidosRoutes);

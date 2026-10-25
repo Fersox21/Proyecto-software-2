@@ -1,4 +1,4 @@
-const URL_BASE = 'http://localhost:8081'
+const URL_BASE = 'http://localhost:3000'
 
 export async function obtenerPedidos() {
   const respuesta = await fetch(`${URL_BASE}/api/pedidos`)
