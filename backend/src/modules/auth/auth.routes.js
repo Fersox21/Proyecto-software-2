@@ -5,7 +5,7 @@ import { verificarToken } from '../../middlewares/verificarToken.js';
 const router = Router();
 
 router.post('/login', controller.login);
-router.get('/administrador', verificarToken, controller.administrador);
+router.get('/administrador', verificarToken, controller.usuario);
 
 
 export default router;

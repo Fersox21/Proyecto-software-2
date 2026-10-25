@@ -1,7 +1,6 @@
 import { redirect } from 'react-router'
 
 const URL_BASE = 'http://localhost:3000' 
-const CLAVE_SESION = 'admin:sesion'
 
 export async function iniciarSesion({ email, password }) {
 
@@ -13,20 +12,43 @@ export async function iniciarSesion({ email, password }) {
     body: JSON.stringify({ email, password }),
   })
 
+
+
   const datos = await respuesta.json()
 
-
   if (!respuesta.ok) {
-    throw new Error(datos.error || datos.mensaje || 'Email o contraseña incorrectos.')
+    throw new Error(datos.error || 'Ocurrió un error al iniciar sesión.')
   }
 
-  sessionStorage.setItem(CLAVE_SESION, datos.token)
-  return datos.token
+  localStorage.setItem('token', datos.token)
+
+}
+
+export async function obtenerUsuario() {
+  const token = obtenerSesion()
+  if (!token) return null
+
+  const respuesta = await fetch(`${URL_BASE}/api/auth/usuario`, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const datos = await respuesta.json()
+
+  if (!respuesta.ok) {
+    cerrarSesion()
+    throw new Error(datos.error || 'Sesión inválida o expirada.')
+  }
+
+  return datos 
 }
 
 export function obtenerSesion() {
   try {
-    return sessionStorage.getItem(CLAVE_SESION)
+    return localStorage.getItem('token')
   } catch {
     return null
   }
@@ -41,7 +63,7 @@ export function protegerRuta() {
 }
 
 export function cerrarSesion() {
-  sessionStorage.removeItem(CLAVE_SESION)
+  localStorage.removeItem('token')
 }
 
 export function redirigirSiHaySesion() {
