@@ -20,11 +20,13 @@ function CatalogoPage() {
   const [searchParams] = useSearchParams()
   const categoriaUrl = searchParams.get('categoria')
 
-useEffect(function() {
+  useEffect(function() {
   if (categoriaUrl !== null) {
     filtros.setCategoria(categoriaUrl)
-  }
-}, [categoriaUrl])
+  } else {
+    filtros.setCategoria('todas')
+          }
+  }, [categoriaUrl])
 
   if (cargando) return <Spinner texto="Cargando catálogo..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />
@@ -38,52 +40,55 @@ useEffect(function() {
       </header>
 
       <div className="row g-4">
-        <aside className="col-lg-3 filtros">
-          <div className="buscador-contenedor mb-4">
-            <label htmlFor="busqueda" className="rotulo-filtro">
-              Buscar
-            </label>
-            <div className="campo-busqueda-wrapper">
-              <span className="icono-lupa">🔍</span>
-              <input
-                id="busqueda"
-                type="search"
-                className="campo-busqueda-tag"
-                placeholder="Ej: harina, fideos..."
-                value={filtros.busqueda}
-                onChange={(e) => filtros.setBusqueda(e.target.value)}
-                autoComplete="off"
-              />
-              {filtros.busqueda && (
-                <button
-                  type="button"
-                  className="btn-limpiar-busqueda"
-                  onClick={() => filtros.setBusqueda('')}
-                  aria-label="Borrar búsqueda"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-          </div>
+       <aside className="col-lg-3">
+  <div className="tarjeta-filtros">
+    <div className="buscador-contenedor mb-4">
+      <label htmlFor="busqueda" className="rotulo-filtro">
+        Buscar
+      </label>
+      <div className="campo-busqueda-wrapper">
+        <span className="icono-lupa">🔍</span>
+        <input
+          id="busqueda"
+          type="search"
+          className="campo-busqueda-tag"
+          placeholder="Ej: harina, fideos..."
+          value={filtros.busqueda}
+          onChange={(e) => filtros.setBusqueda(e.target.value)}
+          autoComplete="off"
+        />
+        {filtros.busqueda && (
+          <button
+            type="button"
+            className="btn-limpiar-busqueda"
+            onClick={() => filtros.setBusqueda('')}
+            aria-label="Borrar búsqueda"
+          >
+            ×
+          </button>
+        )}
+      </div>
+    </div>
 
-          <FiltroCategorias
-            categorias={filtros.categorias}
-            seleccionada={filtros.categoria}
-            onSeleccionar={filtros.setCategoria}
-          />
-          
-          {filtros.hayFiltrosActivos && (
-            <Boton
-              variante="outline-secondary"
-              tamanio="sm"
-              className="btn-limpiar-tag"
-              onClick={filtros.limpiarFiltros}
-            >
-              Limpiar filtros
-            </Boton>
-          )}
-        </aside>
+    <FiltroCategorias
+      categorias={filtros.categorias}
+      seleccionada={filtros.categoria}
+      onSeleccionar={filtros.setCategoria}
+      productos={productos || []}
+    />
+    
+    {filtros.hayFiltrosActivos && (
+      <Boton
+        variante="outline-secondary"
+        tamanio="sm"
+        className="btn-limpiar-tag"
+        onClick={filtros.limpiarFiltros}
+      >
+        Limpiar filtros
+      </Boton>
+    )}
+  </div>
+</aside>
 
         <section className="col-lg-9">
           <p className="small text-body-secondary">

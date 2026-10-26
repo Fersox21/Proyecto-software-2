@@ -5,67 +5,150 @@
   letter-spacing: 0.02em;
 }
 
-/* ---------- Catálogo: filtros ---------- */
-.filtros .rotulo-filtro {
+/* ---------- Marco contenedor de los filtros ---------- */
+.tarjeta-filtros {
+  background-color: var(--main-bgc, #ffffff);
+  border-radius: 16px;
+  border: 1px solid #ede8e3;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+  
+  /* Mantiene los filtros visibles al scrollear */
+  position: sticky;
+  top: 24px;
+}
+
+/* Rótulos de sección */
+.rotulo-filtro {
   display: block;
   font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: #262422;
-  opacity: 0.65;
+  letter-spacing: 0.08em;
+  color: var(--color-a-nav);
   margin-bottom: 0.5rem;
 }
 
-.filtros .campo-busqueda-tag {
-  border: none;
-  border-bottom: 2px solid #e6ccb2;
-  border-radius: 0;
-  background: transparent;
-  padding-left: 0.1rem;
-  padding-right: 0.1rem;
+/* ---------- Buscador refinado ---------- */
+.campo-busqueda-wrapper {
+  position: relative;
+  width: 100%;
 }
 
-.filtros .campo-busqueda-tag:focus {
+.icono-lupa {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+input.campo-busqueda-tag {
+  width: 100%;
+  height: 42px;
+  padding: 0 34px 0 36px;
+  font-size: 0.9rem;
+  color: var(--color-input, #212529);
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background-color: var(--color-body, #f8fafc);
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+input.campo-busqueda-tag:focus {
+  background-color: #ffffff;
   border-color: var(--accent-hover);
-  box-shadow: none;
+  box-shadow: 0 0 0 3px rgba(176, 125, 30, 0.15);
 }
 
+.btn-limpiar-busqueda {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: var(--color-a-nav);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.btn-limpiar-busqueda:hover {
+  color: var(--color-topbar);
+}
+
+/* ---------- Lista de Categorías moderna ---------- */
 .lista-categorias-tag {
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
+  gap: 0.3rem;
 }
 
-.lista-categorias-tag button {
-  text-align: left;
-  background: none;
+.item-categoria-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-a-nav);
+  background-color: transparent;
   border: none;
-  border-bottom: 1px solid transparent;
-  padding: 0.4rem 0.1rem;
-  font-size: 0.95rem;
-  color: #262422;
-  opacity: 0.65;
+  border-radius: 8px;
   cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: left;
 }
 
-.lista-categorias-tag button.activa {
-  font-weight: 700;
-  opacity: 1;
-  border-bottom-color: var(--accent-hover);
+.item-categoria-btn:hover {
+  background-color: var(--color-marcasDestacadas);
+  color: var(--color-lafe-nav);
 }
 
+/* Categoría seleccionada / activa */
+.item-categoria-btn.activa {
+  background-color: var(--color-topbar); /* #0A1331 de tu paleta */
+  color: var(--color-topbar-texto);      /* white */
+  font-weight: 600;
+}
+
+/* Contador de ítems por categoría */
+.badge-contador {
+  font-size: 0.72rem;
+  padding: 2px 7px;
+  border-radius: 12px;
+  background-color: var(--color-destacados-seccion); /* #EFEBE2 */
+  color: var(--color-texto-general);
+}
+
+.item-categoria-btn.activa .badge-contador {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: var(--color-topbar-texto);
+}
+
+/* Botón limpiar filtros */
 .btn-limpiar-tag {
-  background: none !important;
-  border: none !important;
-  color: #262422 !important;
-  opacity: 0.65;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  padding: 0 !important;
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.5rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-distri-nav); /* #872b38 bordó de la marca */
+  background: #fdf2f4;
+  border: 1px solid #f9d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background 0.15s ease;
 }
 
-.imagen-detalle {
-  aspect-ratio: 1;
-  object-fit: cover;
-  background-color: var(--surface);
+.btn-limpiar-tag:hover {
+  background: #f9d5db;
 }
