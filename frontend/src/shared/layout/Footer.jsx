@@ -20,9 +20,9 @@ function Footer() {
           <h6>
             <NavLink className="footer-titulos" to="/catalogo">PRODUCTOS</NavLink>
           </h6>
-          <NavLink className="footer-secciones" to="/catalogo?categoria=harinas">Harinas</NavLink>
-          <NavLink className="footer-secciones" to="/catalogo?categoria=pastas">Pastas</NavLink>
-          <NavLink className="footer-secciones" to="/catalogo?categoria=lacteos">Lacteos</NavLink>
+         <NavLink className="footer-secciones" to="/catalogo?categoria=Almacén">Almacén</NavLink>
+         <NavLink className="footer-secciones" to="/catalogo?categoria=Aceites">Aceites</NavLink>
+         <NavLink className="footer-secciones" to="/catalogo?categoria=Lácteos">Lácteos</NavLink>
         </div>
 
         <div className="footer-preguntas">
