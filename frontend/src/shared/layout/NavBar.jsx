@@ -41,12 +41,10 @@ function NavBar({enlaces, cantidadCarrito}){
                     <FaBars />
                 </button>
 
-                {!menuAbierto && (
-                        <NavLink className="titulo-header a-logo" to="/">
-                            <img className="logo" src="/Logo-Lafe.svg"/>
-                            <div className="texto-titulo-header"><span className="lafe">LaFe</span> <span className="distribuidora">DISTRIBUIDORA</span></div>
-                        </NavLink>
-                )}
+                <NavLink className="titulo-header a-logo" to="/">
+                    <img className="logo" src="/Logo-Lafe.svg"/>
+                    <div className="texto-titulo-header"><span className="lafe">LaFe</span> <span className="distribuidora">DISTRIBUIDORA</span></div>
+                </NavLink>
 
                 <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
 
@@ -58,8 +56,9 @@ function NavBar({enlaces, cantidadCarrito}){
                     {menuAbierto && (
                         <>
                             <li>
-                                <NavLink className="a-logo logo" to="/">
-                                    La<span className="fe-logo">Fe</span> Distribuidora
+                                <NavLink className="titulo-header a-logo" to="/">
+                                    <img className="logo" src="/Logo-Lafe.svg"/>
+                                    <div className="texto-titulo-header"><span className="lafe">LaFe</span> <span className="distribuidora">DISTRIBUIDORA</span></div>
                                 </NavLink>
                             </li>
                             <hr className="divisor-menu" />

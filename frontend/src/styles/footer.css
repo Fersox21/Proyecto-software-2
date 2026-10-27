@@ -73,7 +73,7 @@ footer > a:hover {
 .derechos {
   display: flex;
   justify-content: space-between;
-  align-items: end;
+  align-items: center;
   min-width: 100%;
   border-top: 1px solid #344273;
   height: 100%;
@@ -97,9 +97,66 @@ footer > a:hover {
 }
 
 @media screen and (max-width: 768px) {
+  
   .derechos {
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
     text-align: center;
+  }
+
+  .copyright {
+    text-align: center;
+    margin: 0;
+    margin-top: 1rem;
+    padding: 0;
+    font-size: 0.9rem;
+  }
+
+  .acceso-admin {
+    margin: 0;
+    padding: 0;
+  }
+
+  .footer-titulos {
+    font-size: 1rem;
+  }
+
+  .footer-secciones {
+    font-size: 0.9rem;
+  }
+
+  .footer-descripcion {
+    font-size: 0.7rem;
+  }
+
+}
+
+@media screen and (max-width: 426px) {
+  .footer-catalogo {
+    display: none;
+  }
+
+  .footer-preguntas {
+    display: none;
+  }
+
+  .footer-titulos {
+    font-size: 0.8rem;
+  }
+
+  .footer-secciones {
+    font-size: 0.8rem;
+  }
+
+  .footer-direccion {
+    display: none;
+  }
+
+  .footer-descripcion {
+    font-size: 0.7rem;
+  }
+
+  .footer-logo img {
+    height: 3rem;
   }
 }

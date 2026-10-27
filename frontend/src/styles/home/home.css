@@ -366,12 +366,15 @@
     }
 
     .bienvenidos-texto h2 {
-        
         font-size: 1.65rem;
     }
 
-    .bienvenidos-texto p {
-        font-size: 0.95rem;
+    .bienvenidos-subtitulo {
+        font-size: 0.8rem;
+    }
+
+    .bienvenidos-descripcion {
+        font-size: 1.1rem;
     }
 
     .grilla-fotos {
@@ -392,10 +395,71 @@
         grid-template-columns: 1fr;
         padding: 1.2rem;
         gap: 1.5rem;
+        margin: 0;
     }
 
     .contenedor-mapa {
         height: 250px;
+        border-radius: 1.7rem;
     }
+
+    .destacados-titulo {
+        font-size: 2rem;
+        color: var(--color-texto-general);
+    }
+
+}
+
+@media screen and (max-width: 496px) {
+    .section-horarios-mapa {
+        padding: 0;
+    }
+
+    .card-cuerpo p {
+        font-size: 0.80rem;
+    }
+
+    .horarios-subtitulo {
+        font-size: 0.7rem;
+    }
+
+    .horarios-titulo {
+        font-size: 1.9rem;
+    }
+
+    .horarios-descripcion {
+        font-size: 0.9rem;
+    }
+
+    .horarios-mapa {
+        width: 90%;
+        margin: auto;
+    }
+
+    .horarios-info {
+        padding: 1rem;
+        padding-bottom: 0;
+    }
+
+    .contacto-metodos {
+        width: 100%;
+        margin: auto;
+    }
+
+    .contacto-etiqueta {
+        font-size: 0.6rem;
+    }
+
+    .contacto-valor {
+        font-size: 0.8rem;
+    }
+
+    .contacto-icono {
+        font-size: 0.9rem;
+        border-radius: 0.7rem;
+        height: 2rem;
+        width: 2rem;
+    }
+    
 
 }

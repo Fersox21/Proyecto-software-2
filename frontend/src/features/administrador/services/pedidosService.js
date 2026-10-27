@@ -1,4 +1,4 @@
-const URL_BASE = 'http://localhost:8081'
+const URL_BASE = 'http://localhost:3000' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
 
 export async function obtenerPedidos() {
   const respuesta = await fetch(`${URL_BASE}/api/pedidos`)

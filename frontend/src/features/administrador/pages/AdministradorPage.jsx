@@ -29,11 +29,16 @@ return(<>
                 <thead>
                     <tr>
                         <th>Producto</th>
+                        <th>Marca</th>
                         <th>Descripción</th>
                         <th>Categoría</th>
-                        <th>Precio</th>
+                        <th>Precio venta</th>
+                        <th>Precio costo</th>
                         <th>Stock</th>
+                        <th>En promocion</th>
+                        <th>Precio con promo</th>
                         <th>Estado</th>
+                        <th>Destacado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -42,11 +47,16 @@ return(<>
                     {productos.map((prod)=> (
                         <tr key={prod.id}>
                                 <td className="col-admin col-nombre">{prod.nombre}</td>
-                                <td className="col-admin col-descripcion">{prod.descripcion}</td>
+                                <td className="col-admin">{prod.marca}</td>
+                                <td className="col-admin col-descripcion">{prod.peso}</td>
                                 <td className="col-admin col-categoria">{prod.categoria}</td>
-                                <td className="col-admin col-precio">${prod.precio}</td>
+                                <td className="col-admin col-precio">${prod.precioVenta}</td>
+                                <td className="col-admin col-precio">${prod.precioCosto}</td>
                                 <td className="col-admin col-stock">{prod.stock}</td>
+                                <td className="col-admin">{prod.enPromocion ? 'Si' : 'No' }</td>
+                                <td className="col-admin">${prod.precioPromo}</td>
                                 <td className="col-admin">{calcularEstado(prod.stock)}</td>
+                                <td className="col-admin">{prod.destacado ? 'Si' : 'No' }</td>
                                 <td className="col-admin col-acciones">
                                     <button>Editar</button>
                                 </td>
