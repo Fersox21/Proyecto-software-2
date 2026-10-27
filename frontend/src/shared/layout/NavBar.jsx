@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { NavLink, useLocation } from 'react-router';
-import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock, FaChevronDown, FaBars, FaTimes } from 'react-icons/fa';
+import { Link, NavLink, useLocation } from 'react-router';
+import { FaWhatsapp, FaEnvelope, FaMapMarkerAlt, FaRegClock, FaChevronDown, FaBars, FaTimes, FaArrowRight } from 'react-icons/fa';
 import iconoCarrito from '../../assets/Items/iconoCarrito.svg';
 import '../../styles/navbar.css';
 
@@ -32,78 +32,79 @@ function NavBar({enlaces, cantidadCarrito}){
                 </div>
             </div>
 
-            <div className={esHome ? "imagen-banner" : "navbar-modificado"}>
-                <nav aria-label="Navegación principal">
+            <nav aria-label="Navegación principal">
+                <button
+                    className="btn-hamburguesa" 
+                    onClick={toggleMenu} 
+                    aria-label="Alternar menú"
+                >
+                    <FaBars />
+                </button>
 
-                    <button 
-                        className="btn-hamburguesa" 
-                        onClick={toggleMenu} 
-                        aria-label="Alternar menú"
-                    >
-                        <FaBars />
+                <NavLink className="titulo-header a-logo" to="/">
+                    <img className="logo" src="/Logo-Lafe.svg"/>
+                    <div className="texto-titulo-header"><span className="lafe">LaFe</span> <span className="distribuidora">DISTRIBUIDORA</span></div>
+                </NavLink>
+
+                <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
+
+                <ul className={`ul-nav ${menuAbierto ? 'abierto' : ''}`}>
+                    <button className="btn-cerrar-menu" onClick={cerrarMenu} aria-label="Cerrar menú">
+                        <FaTimes />
                     </button>
 
-                    {!menuAbierto && (
-                        <NavLink className="a-logo" to="/">
-                            La<span className="fe-logo">Fe</span> Distribuidora
-                        </NavLink>
-                    )}
-
-                    <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
-
-                    <ul className={`ul-nav ${menuAbierto ? 'abierto' : ''}`}>
-                        <button className="btn-cerrar-menu" onClick={cerrarMenu} aria-label="Cerrar menú">
-                            <FaTimes />
-                        </button>
-
-                        {menuAbierto && (
-                            <>
-                                <li>
-                                    <NavLink className="a-logo logo" to="/">
-                                        La<span className="fe-logo">Fe</span> Distribuidora
-                                    </NavLink>
-                                </li>
-                                <hr className="divisor-menu" />
-                            </>
-                        )}
-                        
-                        {enlaces.map((enlace) => (
-                            <li key={enlace.id}>
-                                <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
-                                    {enlace.texto}
+                    {menuAbierto && (
+                        <>
+                            <li>
+                                <NavLink className="titulo-header a-logo" to="/">
+                                    <img className="logo" src="/Logo-Lafe.svg"/>
+                                    <div className="texto-titulo-header"><span className="lafe">LaFe</span> <span className="distribuidora">DISTRIBUIDORA</span></div>
                                 </NavLink>
                             </li>
-                        ))}
-
-                        <li className="carrito-desktop">
-                            <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
-                                <img  src={iconoCarrito} alt='iconoCarrito'/>
-                                {cantidadCarrito}
+                            <hr className="divisor-menu" />
+                        </>
+                    )}
+                        
+                    {enlaces.map((enlace) => (
+                        <li key={enlace.id}>
+                            <NavLink className="a-nav" to={enlace.destino} end={enlace.destino === '/'} onClick={cerrarMenu}>
+                                {enlace.texto}
                             </NavLink>
                         </li>
-                    </ul>
+                    ))}
+                </ul>
 
-                    <NavLink className="a-nav carrito-mobile" to="/carrito" onClick={cerrarMenu}>
-                        <img src={iconoCarrito} alt='iconoCarrito'/>
-                        {cantidadCarrito}
+                <div className="carrito-desktop">
+                    <NavLink className="a-nav" to="/carrito" onClick={cerrarMenu}>
+                        <img  src={iconoCarrito} alt='iconoCarrito'/>
+                        <span className="num-carrito">{cantidadCarrito}</span>
                     </NavLink>
-                </nav>
+                </div>
 
-                {esHome && (
+                <NavLink className="a-nav carrito-mobile" to="/carrito" onClick={cerrarMenu}>
+                    <img src={iconoCarrito} alt='iconoCarrito'/>
+                    {cantidadCarrito}
+                </NavLink>
+            </nav>
+
+            {esHome && (
+                <div className="imagen-banner">
+                    <div className="gradiente-general"></div>
                     <div className="div-banner">
                         <div id="div-banner-general">
-                            <h2>LAFE Distribuidora</h2>
+                            <p className="subtitulo-banner">DISTRIBUIDORA MAYORISTA · SAN LUIS</p>
                             <div className="imagen-banner-texto">
-                                <h1>Insumos de calidad para tu panaderia</h1>
-                                <p>Acompañamos el cremiento de tu negocio con stock garantizado</p>
+                                <h1 className="titulo-banner">Insumos de calidad <br/>para tu <span className="destacado-banner">panadería</span></h1>
+                                <p>Acompañamos el cremiento de tu negocio con stock garantizado, <br/> las mejores marcas y reparto directo a tu puerta.</p>
                             </div>
                         </div>
+                        <Link to={'/catalogo'} className="catalogo-banner">Ver catálogo <FaArrowRight/></Link>
                         <div className="indicador-scroll">
                             <FaChevronDown className="flecha-animada" />
                         </div>
-                    </div>    
-                )}
-            </div>
+                    </div>
+                </div>
+            )}
         </header>
     </>);
 }

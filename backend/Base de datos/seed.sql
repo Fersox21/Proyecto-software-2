@@ -1,24 +1,33 @@
+/*ESTO ES PARA BORRAR TODOS LOS DATOS DE LAS TABLAS*/
+TRUNCATE TABLE tiene,
+ventas,
+lotes,
+pedidos,
+ordenes_compra,
+productos,
+roles,
+proveedores RESTART IDENTITY CASCADE;
+/*Inserciones*/
 INSERT INTO proveedores (nombre, telefono)
 VALUES ('Arcor S.A.', '123'),
     ('Molinos Río de la Plata', '123'),
     ('Diarco Mayorista', '123');
-INSERT INTO roles (correo, contraseña)
+INSERT INTO roles (correo, password)
 VALUES (
         'admin@lafedistribuidora.com',
         '$2b$10$iOHyUoB1PPs4CBhfwDVmhOcB.WdMn9PpcDfB.GTKbMJMzIQQg/jwm'
-    ),
-    ('vendedor1@lafedistribuidora.com', 'ventas2026'),
-    ('cliente_kiosco@gmail.com', 'kiosco22');
+    );
 INSERT INTO productos (
         nombre,
-        preciocosto,
-        precioventa,
+        precio_costo,
+        precio_venta,
         marca,
-        enpromocion,
-        preciopromo,
+        en_promocion,
+        precio_promo,
         stock,
         categoria,
-        peso
+        peso,
+        destacado
     )
 VALUES (
         'Galletas Surtidas',
@@ -29,7 +38,8 @@ VALUES (
         NULL,
         150,
         'Galletas',
-        '400g'
+        '400g',
+        false
     ),
     (
         'Yerba Mate',
@@ -40,7 +50,8 @@ VALUES (
         1950.00,
         80,
         'Infusiones',
-        '1kg'
+        '1kg',
+        true
     ),
     (
         'Aceite de Girasol',
@@ -51,7 +62,8 @@ VALUES (
         NULL,
         200,
         'Almacén',
-        '900ml'
+        '900ml',
+        false
     ),
     (
         'Fideos Tallarines',
@@ -62,7 +74,8 @@ VALUES (
         800.00,
         300,
         'Pastas',
-        '500g'
+        '500g',
+        true
     );
 -- ==========================================
 -- 2. Tablas con 1 Nivel de Dependencia
@@ -75,13 +88,13 @@ VALUES (500, 400000, '2026-10-10', 1),
 INSERT INTO pedidos (
         fecha,
         total,
-        metodopago,
+        metodo_pago,
         comercio,
-        modalidadentrega,
+        modalidad_entrega,
         direccion,
         estado,
-        motivorechazo,
-        roles_id
+        motivo_rechazo,
+        rol_id
     )
 VALUES (
         '2026-10-13',
@@ -92,7 +105,7 @@ VALUES (
         'Av. Illia 123',
         'Aprobado',
         NULL,
-        3
+        1
     ),
     (
         '2026-10-14',
@@ -103,16 +116,16 @@ VALUES (
         NULL,
         'Pendiente',
         NULL,
-        3
+        1
     );
 -- ==========================================
 -- 3. Tablas con Múltiples Dependencias
 -- ==========================================
 -- Los lotes dependen de ordenes_compra y productos
 INSERT INTO lotes (
-        fechaarribo,
-        fechavencimiento,
-        ordencompra_id,
+        fecha_arribo,
+        fecha_vencimiento,
+        orden_compra_id,
         producto_id
     )
 VALUES ('2026-10-11', '2027-05-10', 1, 1),
@@ -121,6 +134,6 @@ VALUES ('2026-10-11', '2027-05-10', 1, 1),
 INSERT INTO ventas (fecha, total, pedido_id)
 VALUES ('2026-10-13', 14000.00, 1);
 -- Detalle de la venta 1: Vendemos 10 Galletas y 1 Yerba Mate
-INSERT INTO tiene (cantidad, precio, producto_id, pedidos_id)
+INSERT INTO tiene (cantidad, precio, producto_id, pedido_id)
 VALUES (10, 1200.00, 1, 1),
     (1, 2200.00, 2, 1);

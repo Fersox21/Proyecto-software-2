@@ -11,9 +11,11 @@ const mapearProducto = (row) => {
     precioVenta: row.precio_venta,
     marca: row.marca,
     enPromocion: row.en_promocion,
+    precioPromo: row.precio_promo,
     stock: row.stock,
     categoria: row.categoria,
-    peso: row.peso
+    peso: row.peso,
+    destacado: row.destacado
   };
 };
 
@@ -43,13 +45,13 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso } =
+    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado } =
       req.body;
     const { rows } = await pool.query(
-      `INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso)
+      `INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso]
+      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado]
     );
     res.status(201).json(mapearProducto(rows[0]));
   } catch (err) {
@@ -59,15 +61,15 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso } =
+    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado } =
       req.body;
     const { rows } = await pool.query(
       `UPDATE productos
        SET nombre = $1, precioCosto = $2, precioVenta = $3, marca = $4,
-           enPromocion = $5, stock = $6, categoria = $7, peso = $8
-       WHERE id = $9
+           enPromocion = $5, stock = $6, categoria = $7, peso = $8, destacado = $9
+       WHERE id = $10
        RETURNING *`,
-      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, req.params.id]
+      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado, req.params.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });

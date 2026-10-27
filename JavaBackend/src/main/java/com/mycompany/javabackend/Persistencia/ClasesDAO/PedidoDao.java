@@ -24,12 +24,14 @@ public class PedidoDao implements DAO<Pedido> {
     }
 
     public Long agregarYObtenerId(Pedido pedido) {
-        // NOTA: Ajusta los nombres de las columnas según la estructura real de PostgreSQL
-        String sql = "INSERT INTO pedidos (fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // NOTA: Ajusta los nombres de las columnas según la estructura real de
+        // PostgreSQL
+        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Long idGenerado = null;
 
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS) : null) {
+                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
+                        : null) {
 
             if (conn == null) {
                 System.err.println("Error: La conexión a la base de datos es nula.");
@@ -74,7 +76,7 @@ public class PedidoDao implements DAO<Pedido> {
         String sql = "DELETE FROM pedidos WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
+                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
 
             if (ps != null) {
                 ps.setLong(1, id);
@@ -88,10 +90,10 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public void modificar(Pedido pedido) {
-        String sql = "UPDATE pedidos SET fecha = ?, total = ?, metodopago = ?, comercio = ?, modalidadentrega = ?, direccion = ?, estado = ?, motivorechazo = ? WHERE id = ?";
+        String sql = "UPDATE pedidos SET fecha = ?, total = ?, metodo_pago = ?, comercio = ?, modalidad_entrega = ?, direccion = ?, estado = ?, motivo_rechazo = ? WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
+                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
 
             if (ps != null) {
                 ps.setDate(1, pedido.getFecha());
@@ -103,7 +105,7 @@ public class PedidoDao implements DAO<Pedido> {
                 ps.setString(7, pedido.getEstado());
                 ps.setString(8, pedido.getMotivoRechazo());
                 ps.setLong(9, pedido.getId());
-                
+
                 ps.executeUpdate();
             }
 
@@ -114,12 +116,13 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public Pedido obtener(Long id) {
-        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id FROM pedidos WHERE id = ?";
+        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id FROM pedidos WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
+                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
 
-            if (ps == null) return null;
+            if (ps == null)
+                return null;
 
             ps.setLong(1, id);
 
@@ -131,14 +134,14 @@ public class PedidoDao implements DAO<Pedido> {
                     pedido.setId(rs.getLong("id"));
                     pedido.setFecha(rs.getDate("fecha"));
                     pedido.setTotal(rs.getDouble("total"));
-                    pedido.setMetodoPago(rs.getString("metodopago"));
+                    pedido.setMetodoPago(rs.getString("metodo_pago"));
                     pedido.setComercio(rs.getString("comercio"));
-                    pedido.setModalidadEntrega(rs.getString("modalidadentrega"));
+                    pedido.setModalidadEntrega(rs.getString("modalidad_entrega"));
                     pedido.setDireccion(rs.getString("direccion"));
                     pedido.setEstado(rs.getString("estado"));
-                    pedido.setMotivoRechazo(rs.getString("motivorechazo"));
+                    pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
 
-                    long rolId = rs.getLong("roles_id");
+                    long rolId = rs.getLong("rol_id");
                     if (!rs.wasNull()) {
                         Rol rol = new Rol();
                         rol.setId(rolId);
@@ -158,11 +161,11 @@ public class PedidoDao implements DAO<Pedido> {
     @Override
     public List<Pedido> obtenerTodos() {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, metodopago, comercio, modalidadentrega, direccion, estado, motivorechazo, roles_id FROM pedidos ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id FROM pedidos ORDER BY id ASC";
 
         try (Connection conn = Conexion.getInstance().getConnection();
-             PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;
-             ResultSet rs = (ps != null) ? ps.executeQuery() : null) {
+                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;
+                ResultSet rs = (ps != null) ? ps.executeQuery() : null) {
 
             while (rs != null && rs.next()) {
                 Pedido pedido = new Pedido();
@@ -170,14 +173,14 @@ public class PedidoDao implements DAO<Pedido> {
                 pedido.setId(rs.getLong("id"));
                 pedido.setFecha(rs.getDate("fecha"));
                 pedido.setTotal(rs.getDouble("total"));
-                pedido.setMetodoPago(rs.getString("metodopago"));
+                pedido.setMetodoPago(rs.getString("metodo_pago"));
                 pedido.setComercio(rs.getString("comercio"));
-                pedido.setModalidadEntrega(rs.getString("modalidadentrega"));
+                pedido.setModalidadEntrega(rs.getString("modalidad_entrega"));
                 pedido.setDireccion(rs.getString("direccion"));
                 pedido.setEstado(rs.getString("estado"));
-                pedido.setMotivoRechazo(rs.getString("motivorechazo"));
+                pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
 
-                long rolId = rs.getLong("roles_id");
+                long rolId = rs.getLong("rol_id");
                 if (!rs.wasNull()) {
                     Rol rol = new Rol();
                     rol.setId(rolId);
