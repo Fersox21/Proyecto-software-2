@@ -1,55 +1,69 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = '/data/credenciales.json' 
-const CLAVE_SESION = 'admin:sesion'
+const URL_BASE = 'http://localhost:3000' 
 
 export async function iniciarSesion({ email, password }) {
-  // 1. Petición GET para obtener las credenciales desde el JSON estático
-  const respuesta = await fetch(URL_BASE, {
+
+  const respuesta = await fetch(`${URL_BASE}/api/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ email, password }),
+  })
+
+
+
+  const datos = await respuesta.json()
+
+  if (!respuesta.ok) {
+    throw new Error(datos.error || 'Ocurrió un error al iniciar sesión.')
+  }
+
+  sessionStorage.setItem('token', datos.token)
+
+}
+
+export async function obtenerUsuario() {
+  const token = obtenerSesion()
+  if (!token) return null
+
+  const respuesta = await fetch(`${URL_BASE}/api/auth/usuario`, {
     method: 'GET',
     headers: {
+      'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json',
     },
   })
 
+  const datos = await respuesta.json()
+
   if (!respuesta.ok) {
-    throw new Error('No se pudo cargar la base de datos de credenciales.')
+    cerrarSesion()
+    throw new Error(datos.error || 'Sesión inválida o expirada.')
   }
 
-  const usuarios = await respuesta.json()
-
-  const usuarioEncontrado = usuarios.find(
-    (u) => u.email === email && u.password === password
-  )
-
-  if (!usuarioEncontrado) {
-    throw new Error('Email o contraseña incorrectos.')
-  }
-
-  const { password: _, ...datosUsuario } = usuarioEncontrado
-
-  sessionStorage.setItem(CLAVE_SESION, JSON.stringify(datosUsuario))
-  return datosUsuario
+  return datos 
 }
 
 export function obtenerSesion() {
   try {
-    return JSON.parse(sessionStorage.getItem(CLAVE_SESION))
+    return sessionStorage.getItem('token')
   } catch {
     return null
   }
 }
 
 export function protegerRuta() {
-  const sesion = obtenerSesion()
-  if (!sesion) {
+  const token = obtenerSesion()
+  if (!token) {
     throw redirect('/login')
   }
-  return sesion 
+  return token 
 }
 
 export function cerrarSesion() {
-  sessionStorage.removeItem(CLAVE_SESION)
+  sessionStorage.removeItem('token')
 }
 
 export function redirigirSiHaySesion() {
