@@ -20,7 +20,7 @@ export async function iniciarSesion({ email, password }) {
     throw new Error(datos.error || 'Ocurrió un error al iniciar sesión.')
   }
 
-  localStorage.setItem('token', datos.token)
+  sessionStorage.setItem('token', datos.token)
 
 }
 
@@ -48,7 +48,7 @@ export async function obtenerUsuario() {
 
 export function obtenerSesion() {
   try {
-    return localStorage.getItem('token')
+    return sessionStorage.getItem('token')
   } catch {
     return null
   }
@@ -63,7 +63,7 @@ export function protegerRuta() {
 }
 
 export function cerrarSesion() {
-  localStorage.removeItem('token')
+  sessionStorage.removeItem('token')
 }
 
 export function redirigirSiHaySesion() {
