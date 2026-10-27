@@ -1,6 +1,6 @@
 package com.mycompany.javabackend.dto;
 
-public class ProductoResponseDto {
+public class ProductoDto {
     private Long id;
     private String nombre;
     private double precioVenta;
@@ -10,13 +10,14 @@ public class ProductoResponseDto {
     private int stock;
     private String categoria;
     private String peso;
+    private boolean destacado;
 
-    public ProductoResponseDto() {
+    public ProductoDto() {
     }
 
-    public ProductoResponseDto(Long id, String nombre, double precioVenta, String marca, boolean enPromocion,
+    public ProductoDto(Long id, String nombre, double precioVenta, String marca, boolean enPromocion,
             double precioPromo, int stock,
-            String categoria, String peso) {
+            String categoria, String peso, boolean destacado) {
         this.id = id;
         this.nombre = nombre;
         this.precioVenta = precioVenta;
@@ -26,10 +27,19 @@ public class ProductoResponseDto {
         this.stock = stock;
         this.categoria = categoria;
         this.peso = peso;
+        this.destacado = destacado;
     }
 
     public Long getId() {
         return id;
+    }
+
+    public boolean isDestacado() {
+        return destacado;
+    }
+
+    public void setDestacado(boolean destacado) {
+        this.destacado = destacado;
     }
 
     public void setId(Long id) {

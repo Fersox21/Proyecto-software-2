@@ -2,7 +2,7 @@ import { pool } from '../../config/db.js';
 
 // Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
 
-const mapearProducto = (row) => {
+const mapearPedido = (row) => {
   if (!row) return null;
   return {
     id: row.id,
@@ -21,7 +21,7 @@ const mapearProducto = (row) => {
 export const listar = async (req, res, next) => {
   try {
     const { rows } = await pool.query('SELECT * FROM pedidos ORDER BY id');
-    const mapeados = rows.map(mapearProducto)
+    const mapeados = rows.map(mapearPedido)
     res.json(mapeados);
   } catch (err) {
     next(err);
@@ -36,7 +36,7 @@ export const obtener = async (req, res, next) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    res.json(mapearProducto(rows[0]));
+    res.json(mapearPedido(rows[0]));
   } catch (err) {
     next(err);
   }
@@ -47,12 +47,12 @@ export const crear = async (req, res, next) => {
     const { fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol } =
       req.body;
     const { rows } = await pool.query(
-      `INSERT INTO pedidos (fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol)
+      `INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, rol]
     );
-    res.status(201).json(mapearProducto(rows[0]));
+    res.status(201).json(mapearPedido(rows[0]));
   } catch (err) {
     next(err);
   }
@@ -64,8 +64,8 @@ export const actualizar = async (req, res, next) => {
       req.body;
     const { rows } = await pool.query(
       `UPDATE pedidos
-       SET fecha = $1, total = $2, metodoPago = $3, comercio = $4,
-           modalidadEntrega = $5, direccion = $6, estado = $7, motivoRechazo = $8
+       SET fecha = $1, total = $2, metodo_pago = $3, comercio = $4,
+           modalidad_entrega = $5, direccion = $6, estado = $7, motivo_rechazo = $8
        WHERE id = $9
        RETURNING *`,
       [fecha, total, metodoPago, comercio, modalidadEntrega, direccion, estado, motivoRechazo, req.params.id]
@@ -73,7 +73,7 @@ export const actualizar = async (req, res, next) => {
     if (rows.length === 0) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
-    res.json(mapearProducto(rows[0]));
+    res.json(mapearPedido(rows[0]));
   } catch (err) {
     next(err);
   }
