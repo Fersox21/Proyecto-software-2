@@ -4,17 +4,17 @@ import { useState, useRef } from 'react'
 import '../../../styles/tarjetaProducto.css'
 
 function TarjetaProducto({ producto, onAgregar }) {
-  const nombreImagen = producto.nombre
+  const nombreImagen = producto?.nombre
     ?.toLowerCase()
     .trim()
     .replace(/\s+/g, '-')
     .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
 
   const imagenUrl = `/images/${nombreImagen}.webp`
+  const imagendefault = '/images/harina.webp'
 
-  const sinStock = producto.stock === 0
+  const sinStock = producto?.stock === 0
   const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
-  // Ref permite controlar el temporizador sin que se pisen entre clics
   const temporizador = useRef(null)
 
   const manejarAgregar = () => {
@@ -30,34 +30,39 @@ function TarjetaProducto({ producto, onAgregar }) {
     }, 2500)
   }
 
+  const manejarErrorImagen = (e) => {
+    e.target.onerror = null // Previene bucle infinito si harina.webp tampoco existiera
+    e.target.src = imagendefault
+  }
+
   return (
     <>
       <article className="card h-100 shadow-sm tarjeta-borde">
         <div className="position-relative p-3 pb-0 text-center tarjeta-imagen-contenedor">
-          
           <span className="badge position-absolute top-0 m-3 z-1 text-uppercase tarjeta-categoria">
-            {producto.categoria}
+            {producto?.categoria}
           </span>
           
-          <Link to={`/catalogo/${producto.id}`}>
+          <Link to={`/catalogo/${producto?.id}`}>
             <img 
-              src='/images/harina.webp'
-              className="tarjeta-imagen"
-              alt={producto.nombre}
+              src={imagenUrl}
+              onError={manejarErrorImagen}
+              className="tarjeta-imagen" 
+              alt={producto?.nombre || 'Producto'} 
             />
           </Link>
         </div>
 
         <div className="card-body d-flex flex-column">
           <h3 className="h6 card-title">
-            <Link to={`/catalogo/${producto.id}`} className="text-decoration-none tarjeta-nombre">
-              {producto.nombre}
+            <Link to={`/catalogo/${producto?.id}`} className="text-decoration-none tarjeta-nombre">
+              {producto?.nombre}
             </Link>
           </h3>
-          <p className="tarjeta-peso">{producto.peso}</p>
+          <p className="tarjeta-peso">{producto?.peso}</p>
           
           <div className="mt-auto d-flex justify-content-between align-items-center">
-            <p className="precio-fraunces tarjeta-precio">{formatearPrecio(producto.precioVenta)}</p>
+            <p className="precio-fraunces tarjeta-precio">{formatearPrecio(producto?.precioVenta)}</p>
 
             <div>
               {sinStock ? (
@@ -68,7 +73,7 @@ function TarjetaProducto({ producto, onAgregar }) {
                     type="button"
                     className="btn tarjeta-agregar-a-carrito"
                     onClick={manejarAgregar}
-                    aria-label={`Agregar ${producto.nombre} al carrito`}
+                    aria-label={`Agregar ${producto?.nombre} al carrito`}
                   >
                     +
                   </button>
@@ -79,22 +84,21 @@ function TarjetaProducto({ producto, onAgregar }) {
         </div>
       </article>
 
-      {/* Notificación flotante al agregar producto */}
-        {mostrarNotificacion && (
-          <div 
-            className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-auto shadow-lg" 
-            style={{ zIndex: 1050 }}
-            role="alert" 
-            aria-live="assertive" 
-            aria-atomic="true"
-          >
-            <div className="d-flex">
-              <div className="toast-body fs-6">
-                Agregaste <strong>{producto.nombre}</strong> al carrito
-              </div>
+      {mostrarNotificacion && (
+        <div 
+          className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-auto shadow-lg" 
+          style={{ zIndex: 1050 }}
+          role="alert" 
+          aria-live="assertive" 
+          aria-atomic="true"
+        >
+          <div className="d-flex">
+            <div className="toast-body fs-6">
+              Agregaste <strong>{producto?.nombre}</strong> al carrito
             </div>
           </div>
-        )}
+        </div>
+      )}
     </>
   )
 }
