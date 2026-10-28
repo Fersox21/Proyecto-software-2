@@ -1,6 +1,7 @@
 import { pool } from '../../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import * as authRepository from './auth.repository.js';
 
 export const login = async (correo, password) => {
     if (!correo || !password) {
@@ -8,7 +9,7 @@ export const login = async (correo, password) => {
   }
 
   
-    const { rows } = await pool.query('SELECT * FROM roles WHERE correo = $1', [correo]);
+    const { rows } = authRepository.obtenerVenta(correo);
     const usuario = rows[0];
 
     if (!usuario || !usuario.password) {
