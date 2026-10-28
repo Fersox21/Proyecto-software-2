@@ -9,7 +9,7 @@ export const registrar = async (req, res, next) => {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     const { rows } = await pool.query(
-      `INSERT INTO roles (correo, contraseña)
+      `INSERT INTO roles (correo, password)
        VALUES ($1, $2)
        RETURNING id, correo`,
       [correo, passwordHash]
