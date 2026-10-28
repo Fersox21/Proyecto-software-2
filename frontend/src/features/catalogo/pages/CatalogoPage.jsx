@@ -35,7 +35,7 @@ function CatalogoPage() {
     <>
     <div className="container py-4">
       <header className="mb-4">
-        <h1 className="h2 mb-1 titulo-tag">Catálogo</h1>
+        <h1 className="mb-1 titulo-catalogo">Catálogo</h1>
         <p className="text-body-secondary mb-0">Filtrá por categoría o nombre.</p>
       </header>
 

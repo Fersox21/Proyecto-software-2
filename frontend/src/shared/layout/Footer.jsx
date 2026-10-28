@@ -12,7 +12,7 @@ function Footer() {
             <img src={logo} alt="Logo LaFe" />
           </NavLink>
           <p className="footer-descripcion">
-            Insumos de panadería y pastelería para negocios de San Luis. Av. Juan Gilberto Funes 460, San Luis.
+            Insumos de panadería y pastelería para negocios de San Luis Capital. Av. Juan Gilberto Funes 460, San Luis.
           </p>
         </div>
 
