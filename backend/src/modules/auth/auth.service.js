@@ -9,7 +9,7 @@ export const login = async (correo, password) => {
   }
 
   
-    const { rows } = authRepository.obtenerVenta(correo);
+    const rows = await authRepository.obtenerUsuario(correo);
     const usuario = rows[0];
 
     if (!usuario || !usuario.password) {
