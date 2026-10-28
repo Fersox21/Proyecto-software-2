@@ -15,7 +15,7 @@ export const obtener = async (req, res, next) => {
     const { id } = req.params;
     const venta = await ventasService.obtenerVenta(id);
 
-    res.json(venta);
+    res.status(200).json(venta);
   } catch (err) {
     next(err);
   }
@@ -23,7 +23,7 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const nuevoVenta = await service.crearVenta(req.body);
+    const nuevoVenta = await ventasService.crearVenta(req.body);
     res.status(201).json(nuevoVenta);
   } catch (err) {
     next(err);
@@ -32,7 +32,7 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const ventaActualizada = await service.actualizarVenta(req.params.id, req.body);
+    const ventaActualizada = await ventasService.actualizarVenta(req.params.id, req.body);
     res.json(ventaActualizada);
   } catch (err) {
     next(err);
@@ -41,8 +41,17 @@ export const actualizar = async (req, res, next) => {
 
 export const eliminar = async (req, res, next) => {
   try {
-    await service.eliminarVenta(req.params.id);
+    await ventasService.eliminarVenta(req.params.id);
     res.status(204).end();
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const ventasUltimoMes = async (req, res, next) => {
+  try {
+    const ventas = await ventasService.ventasUltimoMes(req.params.id);
+    return res.status(200).json(ventas);
   } catch (err) {
     next(err);
   }

@@ -1,19 +1,26 @@
 import * as ventasRepository from './ventas.repository.js';
 
 export const listarVentas = async () => {
-  const ventas = await ventasRepository.listar();
+  const rows = await ventasRepository.listar();
     if (rows.length === 0) {
       return null;
     }
-  return ventas;
+  return rows;
 };
 
 export const obtenerVenta = async (id) => {
   const rows = await ventasRepository.obtener(id);
-    if (rows.length === 0) {
-    const error = new Error('Venta no encontrada');
-    error.statusCode = 404;
+  
+  if (!rows) {
+    const error = new Error(`La venta con ID ${id} no existe`);
+    error.status = 404;
     throw error;
   }
+
   return rows[0];
 };
+
+export const ventasUltimoMes = async () => {
+  const rows = await ventasRepository.obtenerVentasMes();
+  return rows;
+}
