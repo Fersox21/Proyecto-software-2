@@ -1,25 +1,21 @@
-import { pool } from '../../config/db.js';
 
-// Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
+import * as ventasService from './ventas.service.js'
 
-export const listar = async (req, res, next) => {
+export const listar = async (req, res, next) => { 
   try {
-    const { rows } = await pool.query('SELECT * FROM ventas ORDER BY id');
-    res.json(rows);
-  } catch (err) {
+    const ventas = await ventasService.listarVentas();
+    return res.json(ventas);
+  }catch (err){
     next(err);
   }
 };
 
 export const obtener = async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM ventas WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.json(rows[0]);
+    const { id } = req.params;
+    const venta = await ventasService.obtenerVenta(id);
+
+    res.json(venta);
   } catch (err) {
     next(err);
   }

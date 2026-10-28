@@ -132,7 +132,9 @@ VALUES ('2026-10-11', '2027-05-10', 1, 1),
     ('2026-10-13', '2028-10-01', 2, 2);
 -- Las ventas dependen de pedidos
 INSERT INTO ventas (fecha, total, pedido_id)
-VALUES ('2026-10-13', 14000.00, 1);
+VALUES ('2026-10-13', 14000.00, 1),
+        ('2026-09-01', 10000.00, 2),
+        ('2026-04-01', 20000.00, 2)
 -- Detalle de la venta 1: Vendemos 10 Galletas y 1 Yerba Mate
 INSERT INTO tiene (cantidad, precio, producto_id, pedido_id)
 VALUES (10, 1200.00, 1, 1),
