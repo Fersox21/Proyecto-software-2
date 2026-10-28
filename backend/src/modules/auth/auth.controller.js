@@ -27,7 +27,6 @@ export const login = async (req, res, next) => {
     const { password } = req.body;
     
     const token = await authService.login(correo, password);
-    
     res.json({ token });
   } catch (err) {
     next(err);

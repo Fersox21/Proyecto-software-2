@@ -24,3 +24,8 @@ export const eliminar = async () => {
   const { rows } = await pool.query('SELECT * FROM ventas');
   return rows;
 };
+
+export const obtenerVentasMes = async () => {
+  const { rows } = await pool.query('SELECT id, fecha, total, pedido_id FROM ventas WHERE fecha >= DATE_TRUNC(\'month\', CURRENT_DATE - INTERVAL \'1 month\') AND fecha < DATE_TRUNC(\'month\', CURRENT_DATE) ORDER BY fecha DESC;')
+  return rows;
+}

@@ -2,6 +2,7 @@ import { pool } from '../../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as authRepository from './auth.repository.js';
+import { env } from '../../config/env.js'
 
 export const login = async (correo, password) => {
     if (!correo || !password) {
@@ -12,16 +13,22 @@ export const login = async (correo, password) => {
     const rows = await authRepository.obtenerUsuario(correo);
     const usuario = rows[0];
 
-    if (!usuario || !usuario.password) {
-    throw new Error('Credenciales invalidas');
+
+    if (!usuario) {
+    const error = new Error('Credenciales inválidas');
+    error.status = 401; 
+    throw error;
   }
+
 
     const passwordOk = usuario && (await bcrypt.compare(password, usuario.password));
 
 
     if (!passwordOk) {
-      return new Error('Credenciales invalidas');
-    }
+    const error = new Error('Credenciales inválidas');
+    error.status = 401; 
+    throw error;
+  }
 
 
     const token = jwt.sign(
