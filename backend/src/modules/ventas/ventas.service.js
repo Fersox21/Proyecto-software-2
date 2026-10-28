@@ -1,11 +1,11 @@
 import * as ventasRepository from './ventas.repository.js';
 
 export const listarVentas = async () => {
-  const ventas = await ventasRepository.listar();
+  const rows = await ventasRepository.listar();
     if (rows.length === 0) {
       return null;
     }
-  return ventas;
+  return rows;
 };
 
 export const obtenerVenta = async (id) => {
