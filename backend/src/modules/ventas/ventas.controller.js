@@ -1,17 +1,20 @@
-import * as service from './ventas.service.js';
 
-export const listar = async (req, res, next) => {
+import * as ventasService from './ventas.service.js'
+
+export const listar = async (req, res, next) => { 
   try {
-    const venta = await service.listarVenta();
-    res.json(venta);
-  } catch (err) {
+    const ventas = await ventasService.listarVentas();
+    return res.json(ventas);
+  }catch (err){
     next(err);
   }
 };
 
 export const obtener = async (req, res, next) => {
   try {
-    const venta = await service.obtenerVentaPorId(req.params.id);
+    const { id } = req.params;
+    const venta = await ventasService.obtenerVenta(id);
+
     res.json(venta);
   } catch (err) {
     next(err);
