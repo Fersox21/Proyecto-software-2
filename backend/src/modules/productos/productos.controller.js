@@ -1,29 +1,9 @@
-import { pool } from '../../config/db.js';
-
-// Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
-
-const mapearProducto = (row) => {
-  if (!row) return null;
-  return {
-    id: row.id,
-    nombre: row.nombre,
-    precioCosto: row.precio_costo,
-    precioVenta: row.precio_venta,
-    marca: row.marca,
-    enPromocion: row.en_promocion,
-    precioPromo: row.precio_promo,
-    stock: row.stock,
-    categoria: row.categoria,
-    peso: row.peso,
-    destacado: row.destacado
-  };
-};
+import * as service from './productos.service.js';
 
 export const listar = async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM productos ORDER BY id');
-    const mapeados = rows.map(mapearProducto)
-    res.json(mapeados);
+    const productos = await service.listarProductos();
+    res.json(productos);
   } catch (err) {
     next(err);
   }
@@ -31,13 +11,8 @@ export const listar = async (req, res, next) => {
 
 export const obtener = async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM productos WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.json(mapearProducto(rows[0]));
+    const producto = await service.obtenerProductoPorId(req.params.id);
+    res.json(producto);
   } catch (err) {
     next(err);
   }
@@ -45,15 +20,8 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado } =
-      req.body;
-    const { rows } = await pool.query(
-      `INSERT INTO productos (nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING *`,
-      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado]
-    );
-    res.status(201).json(mapearProducto(rows[0]));
+    const nuevoProducto = await service.crearProducto(req.body);
+    res.status(201).json(nuevoProducto);
   } catch (err) {
     next(err);
   }
@@ -61,20 +29,8 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const { nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado } =
-      req.body;
-    const { rows } = await pool.query(
-      `UPDATE productos
-       SET nombre = $1, precioCosto = $2, precioVenta = $3, marca = $4,
-           enPromocion = $5, stock = $6, categoria = $7, peso = $8, destacado = $9
-       WHERE id = $10
-       RETURNING *`,
-      [nombre, precioCosto, precioVenta, marca, enPromocion, stock, categoria, peso, destacado, req.params.id]
-    );
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.json(mapearProducto(rows[0]));
+    const productoActualizado = await service.actualizarProducto(req.params.id, req.body);
+    res.json(productoActualizado);
   } catch (err) {
     next(err);
   }
@@ -82,12 +38,7 @@ export const actualizar = async (req, res, next) => {
 
 export const eliminar = async (req, res, next) => {
   try {
-    const { rowCount } = await pool.query('DELETE FROM productos WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (rowCount === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
+    await service.eliminarProducto(req.params.id);
     res.status(204).end();
   } catch (err) {
     next(err);

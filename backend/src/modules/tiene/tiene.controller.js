@@ -1,11 +1,9 @@
-import { pool } from '../../config/db.js';
-
-// Toda la lógica de acceso a datos vive en el controller consulta la DB directamente.
+import * as service from './tiene.service.js';
 
 export const listar = async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM tiene ORDER BY id');
-    res.json(rows);
+    const tiene = await service.listarTiene();
+    res.json(tiene);
   } catch (err) {
     next(err);
   }
@@ -13,13 +11,8 @@ export const listar = async (req, res, next) => {
 
 export const obtener = async (req, res, next) => {
   try {
-    const { rows } = await pool.query('SELECT * FROM tiene WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.json(rows[0]);
+    const tiene = await service.obtenerTienePorId(req.params.id);
+    res.json(tiene);
   } catch (err) {
     next(err);
   }
@@ -27,15 +20,8 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const { cantidad, precio, producto, venta } =
-      req.body;
-    const { rows } = await pool.query(
-      `INSERT INTO tiene (cantidad, precio, producto, venta)
-       VALUES ($1, $2, $3, $4)
-       RETURNING *`,
-      [cantidad, precio, producto, venta]
-    );
-    res.status(201).json(rows[0]);
+    const nuevoTiene = await service.crearTiene(req.body);
+    res.status(201).json(nuevoTiene);
   } catch (err) {
     next(err);
   }
@@ -43,19 +29,8 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const { cantidad, precio } =
-      req.body;
-    const { rows } = await pool.query(
-      `UPDATE tiene
-       SET cantidad = $1, precio = $2
-       WHERE id = $3
-       RETURNING *`,
-      [cantidad, precio, req.params.id]
-    );
-    if (rows.length === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
-    res.json(rows[0]);
+    const tieneActualizado = await service.actualizarTiene(req.params.id, req.body);
+    res.json(tieneActualizado);
   } catch (err) {
     next(err);
   }
@@ -63,12 +38,7 @@ export const actualizar = async (req, res, next) => {
 
 export const eliminar = async (req, res, next) => {
   try {
-    const { rowCount } = await pool.query('DELETE FROM tiene WHERE id = $1', [
-      req.params.id,
-    ]);
-    if (rowCount === 0) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
-    }
+    await service.eliminarTiene(req.params.id);
     res.status(204).end();
   } catch (err) {
     next(err);
