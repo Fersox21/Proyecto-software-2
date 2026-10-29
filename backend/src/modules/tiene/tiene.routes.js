@@ -11,3 +11,4 @@ router.put('/', verificarToken, controller.actualizar)
 router.delete('/:pedido_id/:producto_id', verificarToken, controller.eliminar);
 
 export default router;
+ 

@@ -18,7 +18,7 @@ export const findByPedidoYProducto = async (pedido_id, producto_id) => {
   `, [pedido_id, producto_id]);
   return rows[0];
 };
-
+ 
 
 export const create = async (data) => {
   const { cantidad, precio, producto_id, pedido_id } = data;
