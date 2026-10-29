@@ -4,6 +4,16 @@ import jwt from 'jsonwebtoken';
 import * as authRepository from './auth.repository.js';
 import { env } from '../../config/env.js'
 
+
+export const registro = async (correo, password) => {
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
+
+
+    return await authRepository.registro(correo, passwordHash);
+    
+}
+
 export const login = async (correo, password) => {
     if (!correo || !password) {
     throw new Error('Mail y correo son obligatorios');
