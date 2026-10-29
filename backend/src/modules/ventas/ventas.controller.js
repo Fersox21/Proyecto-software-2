@@ -3,6 +3,13 @@ import * as ventasService from './ventas.service.js'
 
 export const listar = async (req, res, next) => { 
   try {
+    const { periodo } = req.query;  
+
+    if (periodo === 'ultimo-mes') {
+      const ventas = await ventasService.ventasUltimoMes();
+      return res.status(200).json(ventas);
+    }
+
     const ventas = await ventasService.listarVentas();
     return res.json(ventas);
   }catch (err){
@@ -32,7 +39,7 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const ventaActualizada = await ventasService.actualizarVenta(req.params.id, req.body);
+    const ventaActualizada = await ventasService.update(req.params.id, req.body);
     res.json(ventaActualizada);
   } catch (err) {
     next(err);
@@ -41,17 +48,8 @@ export const actualizar = async (req, res, next) => {
 
 export const eliminar = async (req, res, next) => {
   try {
-    await ventasService.eliminarVenta(req.params.id);
+    await ventasService.remove(req.params.id);
     res.status(204).end();
-  } catch (err) {
-    next(err);
-  }
-};
-
-export const ventasUltimoMes = async (req, res, next) => {
-  try {
-    const ventas = await ventasService.ventasUltimoMes(req.params.id);
-    return res.status(200).json(ventas);
   } catch (err) {
     next(err);
   }
