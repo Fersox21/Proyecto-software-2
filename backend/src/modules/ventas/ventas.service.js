@@ -24,6 +24,7 @@ export const obtenerVenta = async (id) => {
   return rows[0];
 };
 
+
 export const crearVenta = async (data) => {
   const pedidoExistente = await repositoryPedidos.findById(data.pedido_id);
 
