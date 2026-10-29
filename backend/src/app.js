@@ -25,7 +25,7 @@ app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/roles', rolesRoutes);
-app.use('/api/tiene', tieneRoutes);
+app.use('/api/items', tieneRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use(notFound);
 app.use(errorHandler);
