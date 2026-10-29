@@ -2,7 +2,7 @@ import { pool } from '../../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as authRepository from './auth.repository.js';
-import { env } from '../../config/env.js';a
+import { env } from '../../config/env.js';
 
 export const login = async (correo, password) => {
     if (!correo || !password) {
