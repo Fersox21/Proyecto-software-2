@@ -2,7 +2,7 @@ import * as service from './lotes.service.js';
 
 export const listar = async (req, res, next) => {
   try {
-    const lotes = await service.listarlotes();
+    const lotes = await service.listarLotes();
     res.json(lotes);
   } catch (err) {
     next(err);

@@ -20,8 +20,8 @@ export const crearLote = async (data) => {
   const ordenCompraExistente = repositoryOrdenCompra.findById(data.ordenCompra)
   const productoExistente = repositoryProducto.findById(data.producto)
 
-  if (!data.id || !data.cantidad || !data.fechaVencimiento || !ordenCompraExistente || !productoExistente) {
-    const error = new Error('Faltan datos obligatorios para crear el lote (nroLote, cantidad, fechaVencimiento)');
+  if (!data.cantidad || !data.fechaVencimiento || !ordenCompraExistente || !productoExistente) {
+    const error = new Error('Faltan datos obligatorios para crear el lote (cantidad, fechaVencimiento)');
     error.status = 400;
     throw error;
   }

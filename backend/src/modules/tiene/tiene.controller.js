@@ -29,16 +29,18 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const tieneActualizado = await service.actualizarTiene(req.params.id, req.body);
+    const tieneActualizado = await service.actualizarTiene(req.body);
     res.json(tieneActualizado);
   } catch (err) {
     next(err);
   }
 };
-
+ 
 export const eliminar = async (req, res, next) => {
   try {
-    await service.eliminarTiene(req.params.id);
+    const { pedido_id, producto_id } = req.params;
+
+    await service.eliminarTiene(pedido_id, producto_id);
     res.status(204).end();
   } catch (err) {
     next(err);
