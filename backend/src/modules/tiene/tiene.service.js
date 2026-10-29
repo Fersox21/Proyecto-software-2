@@ -16,7 +16,7 @@ export const obtenerTienePorId = async (pedido_id) => {
   }
   return rows;
 };
-
+ 
 export const crearTiene = async (data) => {
   const [productoExistente, pedidoExistente, itemExistente] = await Promise.all([
     repositoryProducto.findById(data.producto_id),

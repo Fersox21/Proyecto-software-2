@@ -35,7 +35,7 @@ export const actualizar = async (req, res, next) => {
     next(err);
   }
 };
-
+ 
 export const eliminar = async (req, res, next) => {
   try {
     const { pedido_id, producto_id } = req.params;

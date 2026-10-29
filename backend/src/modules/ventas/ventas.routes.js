@@ -11,3 +11,4 @@ router.put('/:id', verificarToken, controller.actualizar)
 router.delete('/:id', verificarToken, controller.eliminar);
 
 export default router;
+ 

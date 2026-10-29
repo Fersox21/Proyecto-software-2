@@ -23,7 +23,7 @@ export const obtenerVenta = async (id) => {
 
 export const crearVenta = async (data) => {
   const pedidoExistente = await repositoryPedidos.findById(data.pedido_id);
-
+ 
   if(!pedidoExistente){
     const error = new Error('No existe pedido con ese id');
     error.status = 404;

@@ -20,7 +20,7 @@ export const obtener = async (req, res, next) => {
     next(err);
   }
 };
-
+ 
 export const crear = async (req, res, next) => {
   try {
     const nuevoVenta = await service.crearVenta(req.body);
