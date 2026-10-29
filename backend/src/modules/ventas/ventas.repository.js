@@ -27,20 +27,12 @@ export const remove = async (id) => {
   return rowCount;
 };
 
-
-export const update = async (id, { fecha, total, pedido_id }) => {
-  const { rows } = await pool.query(`
-    UPDATE ventas
-    SET fecha = $1,
-        total = $2,
-        pedido_id = $3
-    WHERE id = $4
-    RETURNING id, fecha, total, pedido_id;
-  `, [fecha, total, pedido_id, id]);
-  return rows[0];
+export const actualizar = async () => {
+  const { rows } = await pool.query('SELECT * FROM ventas');
+  return rows;
 };
 
-export const obtenerVentasMes = async () => {
-  const { rows } = await pool.query('SELECT id, fecha, total, pedido_id FROM ventas WHERE fecha >= DATE_TRUNC(\'month\', CURRENT_DATE - INTERVAL \'1 month\') AND fecha < DATE_TRUNC(\'month\', CURRENT_DATE) ORDER BY fecha DESC;')
+export const eliminar = async () => {
+  const { rows } = await pool.query('SELECT * FROM ventas');
   return rows;
-}
+};

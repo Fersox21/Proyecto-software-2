@@ -4,10 +4,10 @@ import { verificarToken } from '../../middlewares/verificarToken.js';
 
 const router = Router();
 
-router.get('/', verificarToken, controller.listar);
+router.get('/', controller.listar);
+router.get('/:id', controller.obtener);
 router.post('/', verificarToken, controller.crear);
-router.get('/:id', verificarToken, controller.obtener);
-router.put('/:id', verificarToken, controller.actualizar);
+router.put('/:id', verificarToken, controller.actualizar)
 router.delete('/:id', verificarToken, controller.eliminar);
 
 export default router;

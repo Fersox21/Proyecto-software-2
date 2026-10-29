@@ -68,7 +68,7 @@ export const actualizarProducto = async (id, data) => {
     throw error;
   }
 
-  if (data.precioPromo = undefined && data.precioPromo <= 0) {
+  if (data.precioPromo !== undefined && data.precioPromo <= 0) {
     const error = new Error('El precio del producto en promocion debe ser mayor a 0');
     error.status = 400;
     throw error;

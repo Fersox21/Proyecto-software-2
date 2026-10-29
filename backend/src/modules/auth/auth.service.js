@@ -2,17 +2,7 @@ import { pool } from '../../config/db.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import * as authRepository from './auth.repository.js';
-import { env } from '../../config/env.js'
-
-
-export const registro = async (correo, password) => {
-    const saltRounds = 10;
-    const passwordHash = await bcrypt.hash(password, saltRounds);
-
-
-    return await authRepository.registro(correo, passwordHash);
-    
-}
+import { env } from '../../config/env.js';
 
 export const login = async (correo, password) => {
     if (!correo || !password) {
@@ -23,22 +13,16 @@ export const login = async (correo, password) => {
     const rows = await authRepository.obtenerUsuario(correo);
     const usuario = rows[0];
 
-
-    if (!usuario) {
-    const error = new Error('Credenciales inválidas');
-    error.status = 401; 
-    throw error;
+    if (!usuario || !usuario.password) {
+    throw new Error('Credenciales invalidas');
   }
-
 
     const passwordOk = usuario && (await bcrypt.compare(password, usuario.password));
 
 
     if (!passwordOk) {
-    const error = new Error('Credenciales inválidas');
-    error.status = 401; 
-    throw error;
-  }
+      return new Error('Credenciales invalidas');
+    }
 
 
     const token = jwt.sign(
