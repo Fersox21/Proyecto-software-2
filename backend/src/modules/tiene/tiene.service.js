@@ -8,7 +8,7 @@ export const listarTiene = async () => {
 };
 
 export const obtenerTienePorId = async (pedido_id) => {
-  const rows = await repository.finByPedido(pedido_id);
+  const rows = await repository.findByPedido(pedido_id);
   if (rows.length === 0) {
     const error = new Error('Item no encontrado');
     error.status = 404;
