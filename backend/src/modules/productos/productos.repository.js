@@ -43,7 +43,7 @@ export const update = async (id, data) => {
   const { rows } = await pool.query(
     `UPDATE productos
      SET nombre = $1, precio_costo = $2, precio_venta = $3, marca = $4,
-         en_promocion = $5, precio_promo = $6 stock = $7, categoria = $8, peso = $9, destacado = $10
+         en_promocion = $5, precio_promo = $6, stock = $7, categoria = $8, peso = $9, destacado = $10
      WHERE id = $11
      RETURNING *`,
     [nombre, precioCosto, precioVenta, marca, enPromocion, precioPromo, stock, categoria, peso, destacado, id]
