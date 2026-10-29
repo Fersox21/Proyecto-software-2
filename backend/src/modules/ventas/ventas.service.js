@@ -1,11 +1,15 @@
 import * as ventasRepository from './ventas.repository.js';
+import * as repositoryPedidos from '../pedidos/pedidos.repository.js';
+
 
 export const listarVentas = async () => {
-  const ventas = await ventasRepository.listar();
+  const rows = await ventasRepository.listar();
     if (rows.length === 0) {
-      return null;
+      const error = new Error(`No hay ventas cargadas`);
+      error.status = 404;
+      throw error;
     }
-  return ventas;
+  return rows;
 };
 
 export const obtenerVenta = async (id) => {
@@ -20,10 +24,9 @@ export const obtenerVenta = async (id) => {
   return rows[0];
 };
 
-
 export const crearVenta = async (data) => {
   const pedidoExistente = await repositoryPedidos.findById(data.pedido_id);
-
+ 
   if(!pedidoExistente){
     const error = new Error('No existe pedido con ese id');
     error.status = 404;
@@ -75,8 +78,19 @@ export const remove = async (id) => {
   const rowCount = await ventasRepository.remove(id);
   if (rowCount === 0) {
     const error = new Error('Venta no encontrada');
-    error.statusCode = 404;
+    error.status = 404;
     throw error;
   }
-  return rows[0];
+  return true;
 };
+
+export const ventasUltimoMes = async () => {
+  const rows = await ventasRepository.obtenerVentasMes();
+  if (rows.length === 0) {
+    const error = new Error('Ventas no encontradas');
+    error.status = 404;
+    throw error;
+  }
+  return rows;
+
+}
