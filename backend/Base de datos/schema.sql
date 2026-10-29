@@ -11,7 +11,7 @@ CREATE TABLE proveedores (
 -- 2. Tabla Roles
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
-    correo VARCHAR(50) NOT NULL CHECK (correo LIKE '%@%'),
+    correo VARCHAR(50) NOT NULL UNIQUE CHECK (correo LIKE '%@%'),
     password VARCHAR(255) NOT NULL
 );
 -- 3. Tabla OrdenesCompra
