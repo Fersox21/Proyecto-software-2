@@ -17,11 +17,11 @@ export const obtenerLotePorId = async (id) => {
 };
 
 export const crearLote = async (data) => {
-  const ordenCompraExistente = repositoryOrdenCompra.findById(data.ordenCompra)
-  const productoExistente = repositoryProducto.findById(data.producto)
 
-  if (!data.id || !data.cantidad || !data.fechaVencimiento || !ordenCompraExistente || !productoExistente) {
-    const error = new Error('Faltan datos obligatorios para crear el lote (nroLote, cantidad, fechaVencimiento)');
+  const { cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
+
+  if (!cantidad || !fechaArribo || !fechaVencimiento || !ordenCompra || !producto) {
+    const error = new Error('Faltan datos obligatorios para crear el lote (cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto)');
     error.status = 400;
     throw error;
   }
@@ -29,6 +29,21 @@ export const crearLote = async (data) => {
   if (data.cantidad <= 0) {
     const error = new Error('La cantidad del lote debe ser mayor a 0');
     error.status = 400;
+    throw error;
+  }
+
+  const ordenCompraExistente = await repositoryOrdenCompra.findById(ordenCompra);
+  const productoExistente = await repositoryProducto.findById(producto);
+
+  if (!ordenCompraExistente) {
+    const error = new Error('La orden de compra especificada no existe');
+    error.status = 404;
+    throw error;
+  }
+
+  if (!productoExistente) {
+    const error = new Error('El producto especificado no existe');
+    error.status = 404;
     throw error;
   }
   

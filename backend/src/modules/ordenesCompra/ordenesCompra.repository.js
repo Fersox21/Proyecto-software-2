@@ -13,7 +13,7 @@ export const findById = async (id) => {
 export const create = async (data) => {
   const { cantidad, total, fecha, proveedor } = data;
   const { rows } = await pool.query(
-    `INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor)
+    `INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id)
     VALUES ($1, $2, $3, $4)
     RETURNING *`,
     [cantidad, total, fecha, proveedor]

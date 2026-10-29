@@ -4,6 +4,7 @@ const mapearLote = (row) => {
     if (!row) return null;
     return {
         id: row.id,
+        cantidad: row.cantidad,
         fechaArribo: row.fecha_arribo,
         fechaVencimiento: row.fecha_vencimiento,
         ordenCompra: row.orden_compra,
@@ -22,24 +23,24 @@ export const findById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id } = data;
+  const { cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
   const { rows } = await pool.query(
-    `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id)
-    VALUES ($1, $2, $3, $4)
+    `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id)
+    VALUES ($1, $2, $3, $4, $5)
     RETURNING *`,
-    [fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id]
+    [cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto]
   );
   return mapearLote(rows[0]);
 };
 
 export const update = async (id, data) => {
-  const { fecha_arribo, fecha_vencimiento } = data;
+  const { cantidad, fechaArribo, fechaVencimiento } = data;
   const { rows } = await pool.query(
     `UPDATE lotes
-    SET fecha_arribo = $1, fecha_vencimiento = $2
-    WHERE id = $3
+    SET cantidad = $1, fecha_arribo = $2, fecha_vencimiento = $3
+    WHERE id = $4
     RETURNING *`,
-    [fecha_arribo, fecha_vencimiento, id]
+    [cantidad, fechaArribo, fechaVencimiento, id]
   );
   return mapearLote(rows[0]);
 };

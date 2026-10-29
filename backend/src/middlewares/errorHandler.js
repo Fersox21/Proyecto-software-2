@@ -1,4 +1,3 @@
-// Middleware de errores: tiene 4 parámetros y se registra al final de app.js
 export const errorHandler = (err, req, res, next) => {
   const status = err.status ?? 500;
 
