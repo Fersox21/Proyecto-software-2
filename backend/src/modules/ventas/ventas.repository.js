@@ -18,7 +18,7 @@ export const create = async ({ pedido_id, fecha, total }) => {
   `, [pedido_id, fecha, total]);
   return rows[0];
 };
- 
+
 export const remove = async (id) => {
   const { rowCount } = await pool.query(`
     DELETE FROM ventas
