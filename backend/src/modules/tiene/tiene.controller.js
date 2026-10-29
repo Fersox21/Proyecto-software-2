@@ -29,7 +29,7 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    const tieneActualizado = await service.actualizarTiene(req.body);
+    const tieneActualizado = await service.actualizarTiene(req.params.id, req.body);
     res.json(tieneActualizado);
   } catch (err) {
     next(err);
@@ -38,9 +38,7 @@ export const actualizar = async (req, res, next) => {
 
 export const eliminar = async (req, res, next) => {
   try {
-    const { pedido_id, producto_id } = req.params;
-
-    await service.eliminarTiene(pedido_id, producto_id);
+    await service.eliminarTiene(req.params.id);
     res.status(204).end();
   } catch (err) {
     next(err);
