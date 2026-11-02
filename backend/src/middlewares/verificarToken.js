@@ -18,7 +18,7 @@ export const verificarToken = (req, res, next) => {
     const payload = jwt.verify(token, env.JWT_SECRET);
 
     
-    req.usuario = { id: payload.id, nombre: payload.nombre, email: payload.email };
+    req.usuario = { id: payload.id, correo: payload.correo };
     next(); 
   } catch (err) {
     const mensaje = err.name === 'TokenExpiredError' ? 'Token vencido' : 'Token inválido';

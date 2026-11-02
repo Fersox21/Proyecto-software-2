@@ -4,13 +4,13 @@
   min-width: 0;
   padding: 2rem;
   margin-left: 15rem;
-  background-color: #F6F6F6;
+  background-color: var(--admin-fondo);
   overflow-y: auto;
 }
 
 .layout-admin-principal {
   flex: 1;
-  background-color: #F6F6F6;
+  background-color: var(--admin-fondo);
   padding: 2rem;
   overflow-y: auto;
   width: 100%;
@@ -26,7 +26,7 @@
 .h1-admin {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #212121;
+  color: var(--admin-texto);
   margin: 0;
 }
 
@@ -34,7 +34,7 @@
 .btn-agregar,
 .agregar-prod {
   padding: 0.8rem 1.2rem;
-  background-color: #113269;
+  background-color: var(--admin-primario);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -46,7 +46,7 @@
 
 .btn-agregar:hover,
 .agregar-prod:hover {
-  background-color: #164085;
+  background-color: var(--admin-primario-hover);
 }
 
 /* Estructura de Tabla Unificada (Ventas y Pedidos) */
@@ -57,10 +57,10 @@
   max-width: 100%;
   display: block;
   overflow-x: auto;
-  background: #FFFFFF;
+  background: var(--admin-superficie);
   border-radius: 12px;
-  border: 1px solid #E5E5E5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--admin-borde);
+  box-shadow: var(--admin-sombra);
 }
 
 .tabla-admin,
@@ -75,8 +75,8 @@
 .tabla-ventas-admin th {
   padding: 1.2rem 1.5rem;
   text-align: left;
-  border-bottom: 1px solid #E5E5E5;
-  color: #6B7280;
+  border-bottom: 1px solid var(--admin-borde);
+  color: var(--admin-texto-secundario);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -88,8 +88,8 @@
 .tabla-ventas-admin td {
   padding: 1rem 1.5rem;
   text-align: left;
-  border-bottom: 1px solid #F3F4F6;
-  color: #212121;
+  border-bottom: 1px solid var(--admin-borde-suave);
+  color: var(--admin-texto);
   font-size: 0.9rem;
   vertical-align: middle;
 }
@@ -97,13 +97,13 @@
 .tabla-admin tr:hover td,
 .tabla-prod-admin tr:hover td,
 .tabla-ventas-admin tr:hover td {
-  background-color: #F9FAFB;
+  background-color: var(--admin-hover);
 }
 
 /* Formato de Celdas Específicas */
 .col-id {
   font-weight: 600;
-  color: #113269;
+  color: var(--admin-acento);
 }
 
 .col-monto {
@@ -118,7 +118,7 @@
 .col-vacia {
   text-align: center;
   padding: 2rem !important;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 /* Botones de Acción dentro de la Tabla */
@@ -128,24 +128,24 @@
   font-size: 0.85rem;
   font-weight: 500;
   cursor: pointer;
-  border: 1px solid #D1D5DB;
-  background-color: #FFFFFF;
-  color: #374151;
+  border: 1px solid var(--admin-borde-btn);
+  background-color: var(--admin-superficie);
+  color: var(--admin-texto-btn);
   transition: all 0.2s ease;
 }
 
 .btn-accion:hover {
-  background-color: #F3F4F6;
-  border-color: #9CA3AF;
+  background-color: var(--admin-hover-btn);
+  border-color: var(--admin-texto-terciario);
 }
 
 .btn-editar {
-  border-color: #113269;
-  color: #113269;
+  border-color: var(--admin-acento);
+  color: var(--admin-acento);
 }
 
 .btn-editar:hover {
-  background-color: #113269;
+  background-color: var(--admin-primario);
   color: #FFFFFF;
 }
 
@@ -161,18 +161,18 @@
 
 .estado-completado,
 .estado-entregado {
-  background-color: #DEF7EC;
-  color: #03543F;
+  background-color: var(--admin-badge-ok-fondo);
+  color: var(--admin-badge-ok-texto);
 }
 
 .estado-pendiente {
-  background-color: #FEF3C7;
-  color: #92400E;
+  background-color: var(--admin-badge-warn-fondo);
+  color: var(--admin-badge-warn-texto);
 }
 
 .estado-cancelado {
-  background-color: #FDE8E8;
-  color: #9B1C1C;
+  background-color: var(--admin-badge-error-fondo);
+  color: var(--admin-badge-error-texto);
 }
 
 /* Pie de Tabla y Paginación */
@@ -181,8 +181,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #E5E5E5;
-  color: #6B7280;
+  border-top: 1px solid var(--admin-borde);
+  color: var(--admin-texto-secundario);
   font-size: 0.85rem;
 }
 
@@ -194,35 +194,35 @@
 
 .btn-pag {
   padding: 0.35rem 0.75rem;
-  border: 1px solid #E5E5E5;
-  background-color: #FFFFFF;
+  border: 1px solid var(--admin-borde);
+  background-color: var(--admin-superficie);
   border-radius: 6px;
-  color: #374151;
+  color: var(--admin-texto-btn);
   cursor: pointer;
   font-weight: 600;
   transition: background-color 0.2s ease;
 }
 
 .btn-pag:hover {
-  background-color: #F3F4F6;
+  background-color: var(--admin-hover-btn);
 }
 
 .nums-pag {
   padding: 0 0.5rem;
   font-weight: 600;
-  color: #113269;
+  color: var(--admin-acento);
 }
 
 /* Enlaces */
 a {
-  color: #113269;
+  color: var(--admin-acento);
   text-decoration: none;
   transition: opacity 0.2s ease, color 0.2s ease;
 }
 
 a:hover {
   opacity: 0.8;
-  color: #0E2C5B;
+  color: var(--admin-acento-hover);
 }
 
 /* Adaptación Responsive */
