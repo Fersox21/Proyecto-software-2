@@ -12,6 +12,7 @@ import rolesRoutes from './modules/roles/roles.routes.js';
 import tieneRoutes from './modules/tiene/tiene.routes.js';
 import ventasRoutes from './modules/ventas/ventas.routes.js';
 import authRoutes from './modules/auth/auth.routes.js'
+import estadisticasRoutes from './modules/estadisticas/estadisticas.routes.js'
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/proveedores', proveedoresRoutes);
 app.use('/api/roles', rolesRoutes);
 app.use('/api/items', tieneRoutes);
 app.use('/api/ventas', ventasRoutes);
+app.use('/api/estadisticas', estadisticasRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

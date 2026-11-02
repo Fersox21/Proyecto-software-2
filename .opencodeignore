@@ -1,0 +1,11 @@
+# Archivos de entorno y credenciales
+.env
+.env.*
+*.env
+
+# Archivos de configuración con contraseñas
+backend/src/config/env.js
+backend/.env
+
+# Clave o tokens generados
+*.token
