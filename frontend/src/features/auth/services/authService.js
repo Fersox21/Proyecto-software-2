@@ -17,7 +17,7 @@ export async function iniciarSesion({ email, password }) {
   const datos = await respuesta.json()
 
   if (!respuesta.ok) {
-    throw new Error(datos.error || 'Ocurrió un error al iniciar sesión.')
+    throw new Error(datos.message || datos.error || 'Ocurrió un error al iniciar sesión.')
   }
 
   sessionStorage.setItem('token', datos.token)
@@ -36,14 +36,17 @@ export async function obtenerUsuario() {
     },
   })
 
-  const datos = await respuesta.json()
+  const datos = await respuesta.json().catch(() => ({}))
 
   if (!respuesta.ok) {
     cerrarSesion()
-    throw new Error(datos.error || 'Sesión inválida o expirada.')
+    
+    const error = new Error(datos.error || 'Sesión inválida o expirada.')
+    error.status = respuesta.status
+    throw error
   }
 
-  return datos 
+  return datos
 }
 
 export function obtenerSesion() {
@@ -54,12 +57,24 @@ export function obtenerSesion() {
   }
 }
 
-export function protegerRuta() {
+export async function protegerRuta() {
   const token = obtenerSesion()
   if (!token) {
     throw redirect('/login')
   }
-  return token 
+
+  try {
+    await obtenerUsuario()
+  } catch (error) {
+    if (error.status === 401 || error.status === 403) {
+      cerrarSesion()
+      throw redirect('/login')
+    }
+    // Fallo de red o error del servidor: propagar al errorElement
+    throw error
+  }
+
+  return token
 }
 
 export function cerrarSesion() {

@@ -4,13 +4,13 @@
   min-width: 0;
   padding: 2rem;
   margin-left: 15rem;
-  background-color: #F6F6F6;
+  background-color: var(--admin-fondo);
   overflow-y: auto;
 }
 
 .layout-admin-principal {
   flex: 1;
-  background-color: #F6F6F6; 
+  background-color: var(--admin-fondo);
   padding: 2rem;
   overflow-y: auto;
   width: 100%;
@@ -25,7 +25,7 @@
 
 .agregar-prod {
   padding: 0.8rem 1.2rem;
-  background-color: #113269;
+  background-color: var(--admin-primario);
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -35,7 +35,7 @@
 }
 
 .agregar-prod:hover {
-  background-color: #164085;
+  background-color: var(--admin-primario-hover);
 }
 
 
@@ -44,10 +44,10 @@
   max-width: 100%;
   display: block;
   overflow-x: auto;
-  background: #FFFFFF;
+  background: var(--admin-superficie);
   border-radius: 12px;
-  border: 1px solid #E5E5E5;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--admin-borde);
+  box-shadow: var(--admin-sombra);
 }
 
 .tabla-prod-admin {
@@ -58,8 +58,8 @@
 .tabla-prod-admin th {
   padding: 1.2rem 1.5rem;
   text-align: left;
-  border-bottom: 1px solid #E5E5E5;
-  color: #6B7280; 
+  border-bottom: 1px solid var(--admin-borde);
+  color: var(--admin-texto-secundario);
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -69,14 +69,14 @@
 .tabla-prod-admin td {
   padding: 1rem 1.5rem;
   text-align: left;
-  border-bottom: 1px solid #F3F4F6;
-  color: #212121;
+  border-bottom: 1px solid var(--admin-borde-suave);
+  color: var(--admin-texto);
   font-size: 0.9rem;
   vertical-align: middle;
 }
 
 .tabla-prod-admin tr:hover td {
-  background-color: #F9FAFB;
+  background-color: var(--admin-hover);
 }
 
 
@@ -85,8 +85,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-top: 1px solid #E5E5E5;
-  color: #6B7280;
+  border-top: 1px solid var(--admin-borde);
+  color: var(--admin-texto-secundario);
   font-size: 0.85rem;
 }
 
@@ -96,14 +96,14 @@
 }
 
 a {
-  color: #113269;
+  color: var(--admin-acento);
   text-decoration: none;
   transition: opacity 0.2s ease, color 0.2s ease;
 }
 
 a:hover {
   opacity: 0.8;
-  color: #0E2C5B;
+  color: var(--admin-acento-hover);
 }
 
 

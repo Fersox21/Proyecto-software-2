@@ -1,3 +1,5 @@
 /JavaBackend/target/
 node_modules/
 .env
+.agents
+.codegraph

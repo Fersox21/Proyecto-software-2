@@ -1,7 +1,7 @@
 .sidebar-admin {
     font-family: var(--fuente-base);
-    background-color: #FFFFFF;
-    border-right: 1px solid #E5E5E5;
+    background-color: var(--admin-superficie);
+    border-right: 1px solid var(--admin-borde);
     width: 250px;
     min-width: 250px;
     height: 100vh;
@@ -28,7 +28,7 @@
 .p-nav {
     font-weight: 600;
     font-size: 0.75rem;
-    color: #9CA3AF;
+    color: var(--admin-texto-terciario);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-top: 1rem;
@@ -54,7 +54,7 @@
   border-style: solid;
   border-width: 1px;
   border-radius: 10px;
-  border-color: #4B5563;
+  border-color: var(--admin-li-borde);
 }
 
 .link-admin{
@@ -74,7 +74,7 @@
     text-decoration: none;
     box-sizing: border-box;
     background-color: transparent;
-    color: #4B5563;
+    color: var(--admin-texto-nav);
     font-size: 1rem;
     font-weight: 500;
     padding: 0.60rem 1rem;
@@ -84,16 +84,16 @@
 
 
 .a-nav-admin:hover, .link-admin:hover {
-    background-color: rgba(17, 50, 105, 0.05);
-    color: #113269;
+    background-color: var(--admin-nav-hover);
+    color: var(--admin-acento);
 }
 
 
 .btn-CerrarSesion {
     width: 100%;
     background-color: transparent;
-    color: #8D1D3A;
-    border: 1px solid #8D1D3A;
+    color: var(--admin-peligro);
+    border: 1px solid var(--admin-peligro);
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-weight: 600;
@@ -102,7 +102,7 @@
 }
 
 .btn-CerrarSesion:hover {
-    background-color: #8D1D3A;
+    background-color: var(--admin-peligro-hover);
     color: #FFFFFF;
 }
 
@@ -113,9 +113,9 @@
         position: fixed;
         top: 15px;
         left: 15px;
-        background: #FFFFFF;
-        color: #113269;
-        border: 1px solid #E5E5E5;
+        background: var(--admin-superficie);
+        color: var(--admin-acento);
+        border: 1px solid var(--admin-borde);
         border-radius: 8px;
         padding: 0.5rem 0.8rem;
         font-size: 1.5rem;
@@ -131,7 +131,7 @@
         left: -260px; 
         transition: left 0.3s ease-in-out;
         z-index: 1000;
-        background-color: #FFFFFF; 
+        background-color: var(--admin-superficie); 
     }
 
     .sidebar-admin.abierto {
@@ -143,7 +143,7 @@
     .btn-cerrar-admin {
         display: block;
         background: transparent;
-        color: #212121;
+        color: var(--admin-texto);
         border: none;
         font-size: 1.5rem;
         cursor: pointer;
