@@ -6,7 +6,7 @@ import { HomePage } from './features/home'
 import { CatalogoPage, DetalleProductoPage } from './features/catalogo'
 import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
 import { CarritoPage } from './features/carrito'
-import { AdministradorPage, EstadisticasPage, LotesPage, PedidosPage, PromocionesPage, ProveedoresPage, VencimientosPage, VentasPage} from './features/administrador' 
+import { AdministradorPage, ConfiguracionPage, EstadisticasPage, LotesPage, PedidosPage, PromocionesPage, ProveedoresPage, VencimientosPage, VentasPage} from './features/administrador' 
 import { PedidoPage } from './features/pedido'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth'
 
@@ -33,14 +33,15 @@ export const router = createBrowserRouter([
     loader: protegerRuta, 
     errorElement: <NoEncontradaPage />,
     children: [
-      { index: true, element: <AdministradorPage /> },
-      { path: 'estadisticas', element: <EstadisticasPage />},
-      { path: 'ventas', element: <VentasPage />},
-      { path: 'lotes', element: <LotesPage />},
-      { path: 'provedores', element: <ProveedoresPage />},
-      { path: 'vencimiento', element: <VencimientosPage />},
-      { path: 'promociones', element: <PromocionesPage />},
-      { path: 'pedidos', element: <PedidosPage />},
+      { index: true, element: <AdministradorPage />, loader: protegerRuta },
+      { path: 'estadisticas', element: <EstadisticasPage />, loader: protegerRuta },
+      { path: 'ventas', element: <VentasPage />, loader: protegerRuta },
+      { path: 'lotes', element: <LotesPage />, loader: protegerRuta },
+      { path: 'provedores', element: <ProveedoresPage />, loader: protegerRuta },
+      { path: 'vencimiento', element: <VencimientosPage />, loader: protegerRuta },
+      { path: 'promociones', element: <PromocionesPage />, loader: protegerRuta },
+      { path: 'pedidos', element: <PedidosPage />, loader: protegerRuta },
+      { path: 'configuracion', element: <ConfiguracionPage />, loader: protegerRuta },
       { path: '*', element: <NoEncontradaPage /> },
     ],
   },

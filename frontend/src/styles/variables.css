@@ -88,3 +88,114 @@
     --color-Fe-h1-admin: #3b4cce;
     --color-p-nav-admin: #5F5F5F;
 }
+
+/* =========================================================
+   APARIENCIA DEL PANEL DE ADMINISTRACIÓN
+   Tema claro (defecto) y tema oscuro. Estas variables solo
+   las consumen los CSS de styles/panelAdmin/, por lo que el
+   sitio público no se ve afectado por el tema oscuro.
+   ========================================================= */
+:root {
+    /* Tema claro (defecto) */
+    --admin-fondo: #F6F6F6;
+    --admin-superficie: #FFFFFF;
+    --admin-borde: #E5E5E5;
+    --admin-borde-suave: #F3F4F6;
+    --admin-borde-btn: #D1D5DB;
+    --admin-hover: #F9FAFB;
+    --admin-hover-btn: #F3F4F6;
+    --admin-texto: #212121;
+    --admin-texto-secundario: #6B7280;
+    --admin-texto-terciario: #9CA3AF;
+    --admin-texto-nav: #4B5563;
+    --admin-texto-btn: #374151;
+    --admin-acento: #113269;
+    --admin-acento-hover: #0E2C5B;
+    --admin-primario: #113269;
+    --admin-primario-hover: #164085;
+    --admin-primario-claro: #C7D2E6;
+    --admin-nav-hover: rgba(17, 50, 105, 0.05);
+    --admin-li-borde: #4B5563;
+    --admin-peligro: #8D1D3A;
+    --admin-peligro-hover: #8D1D3A;
+    --admin-oro: #B07D1E;
+    --admin-sombra: 0 2px 8px rgba(0, 0, 0, 0.02);
+    --admin-badge-ok-fondo: #DEF7EC;
+    --admin-badge-ok-texto: #03543F;
+    --admin-badge-warn-fondo: #FEF3C7;
+    --admin-badge-warn-texto: #92400E;
+    --admin-badge-error-fondo: #FDE8E8;
+    --admin-badge-error-texto: #9B1C1C;
+}
+
+/* Tema oscuro: se activa con data-tema="oscuro" en <html>. El selector :has()
+   lo limita al panel de administración (el sitio público queda en claro). */
+html[data-tema="oscuro"]:has(.layout-admin-contenedor) {
+    --admin-fondo: #12141A;
+    --admin-superficie: #1C1F26;
+    --admin-borde: #2C313B;
+    --admin-borde-suave: #242933;
+    --admin-borde-btn: #3E4652;
+    --admin-hover: #232833;
+    --admin-hover-btn: #2C313B;
+    --admin-texto: #E5E7EB;
+    --admin-texto-secundario: #9CA3AF;
+    --admin-texto-terciario: #6B7280;
+    --admin-texto-nav: #C7CBD4;
+    --admin-texto-btn: #D1D5DB;
+    --admin-acento: #7FA9FF;
+    --admin-acento-hover: #A9C4FF;
+    --admin-primario: #2F62D4;
+    --admin-primario-hover: #3F74E8;
+    --admin-primario-claro: #5B7FC7;
+    --admin-nav-hover: rgba(127, 169, 255, 0.12);
+    --admin-li-borde: #3E4652;
+    --admin-peligro: #FF8FA3;
+    --admin-peligro-hover: #B3284A;
+    --admin-oro: #C9931F;
+    --admin-sombra: 0 2px 8px rgba(0, 0, 0, 0.35);
+    --admin-badge-ok-fondo: #123528;
+    --admin-badge-ok-texto: #6EE7B7;
+    --admin-badge-warn-fondo: #3A3013;
+    --admin-badge-warn-texto: #FCD34D;
+    --admin-badge-error-fondo: #3B1A1F;
+    --admin-badge-error-texto: #FCA5A5;
+
+    background-color: #12141A;
+    color-scheme: dark;
+}
+
+html[data-tema="oscuro"]:has(.layout-admin-contenedor) body {
+    background-color: #12141A;
+}
+
+/* Componentes compartidos de Bootstrap (Spinner, MensajeVacio, bordes)
+   dentro del panel en tema oscuro. */
+html[data-tema="oscuro"] .layout-admin-contenedor {
+    --bs-body-bg: #12141A;
+    --bs-body-color: #E5E7EB;
+    --bs-secondary-color: rgba(229, 231, 235, 0.75);
+    --bs-tertiary-bg: #1C1F26;
+    --bs-border-color: #2C313B;
+    --bs-link-color: #7FA9FF;
+    --bs-link-hover-color: #A9C4FF;
+}
+
+/* .text-dark de Bootstrap usa !important y valor fijo: se anula solo en el panel. */
+html[data-tema="oscuro"] .layout-admin-contenedor .text-dark {
+    color: #E5E7EB !important;
+}
+
+/* Tamaño de fuente del panel (data-fuente en <html>).
+   :has() limita el cambio al panel; fuera de él se mantiene el tamaño por defecto. */
+html:has(.layout-admin-contenedor)[data-fuente="chica"] {
+    font-size: 14px;
+}
+
+html:has(.layout-admin-contenedor)[data-fuente="normal"] {
+    font-size: 16px;
+}
+
+html:has(.layout-admin-contenedor)[data-fuente="grande"] {
+    font-size: 18px;
+}

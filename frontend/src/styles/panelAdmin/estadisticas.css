@@ -8,11 +8,11 @@
 }
 
 .estadistica-kpi {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
   border-radius: 12px;
   padding: 1.25rem 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--admin-sombra);
 }
 
 .estadistica-kpi-titulo {
@@ -21,21 +21,21 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 .estadistica-kpi-valor {
   margin: 0;
   font-size: 1.6rem;
   font-weight: 700;
-  color: #113269;
+  color: var(--admin-acento);
   font-variant-numeric: tabular-nums;
 }
 
 .estadistica-kpi-subtitulo {
   margin: 0.4rem 0 0;
   font-size: 0.8rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 /* Grilla principal */
@@ -46,11 +46,11 @@
 }
 
 .estadistica-card {
-  background: #FFFFFF;
-  border: 1px solid #E5E5E5;
+  background: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--admin-sombra);
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -69,12 +69,12 @@
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #212121;
+  color: var(--admin-texto);
 }
 
 .estadistica-vacio {
   margin: 0;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
   font-size: 0.9rem;
   padding: 1rem 0;
 }
@@ -102,7 +102,7 @@
 
 .estadistica-barra-valor {
   font-size: 0.65rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -110,7 +110,7 @@
 .estadistica-barra {
   width: 60%;
   min-height: 4px;
-  background-color: #113269;
+  background-color: var(--admin-primario);
   border-radius: 6px 6px 0 0;
   transition: height 0.3s ease;
 }
@@ -130,16 +130,16 @@
 }
 
 .estadistica-barra-ingresos {
-  background-color: #C7D2E6;
+  background-color: var(--admin-primario-claro);
 }
 
 .estadistica-barra-ganancia {
-  background-color: #113269;
+  background-color: var(--admin-primario);
 }
 
 .estadistica-barra-etiqueta {
   font-size: 0.65rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
   text-align: center;
   white-space: nowrap;
 }
@@ -151,7 +151,7 @@
   margin: 0;
   padding: 0;
   font-size: 0.8rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 .estadistica-leyenda li {
@@ -168,11 +168,11 @@
 }
 
 .estadistica-cuadro-ingresos {
-  background-color: #C7D2E6;
+  background-color: var(--admin-primario-claro);
 }
 
 .estadistica-cuadro-ganancia {
-  background-color: #113269;
+  background-color: var(--admin-primario);
 }
 
 /* Selector de mes */
@@ -182,23 +182,23 @@
   gap: 0.5rem;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 .estadistica-selector-mes input {
   padding: 0.45rem 0.6rem;
-  border: 1px solid #D1D5DB;
+  border: 1px solid var(--admin-borde-btn);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.85rem;
-  color: #212121;
-  background-color: #FFFFFF;
+  color: var(--admin-texto);
+  background-color: var(--admin-superficie);
 }
 
 .estadistica-selector-mes input:focus {
-  outline: 2px solid #113269;
+  outline: 2px solid var(--admin-acento);
   outline-offset: 1px;
-  border-color: #113269;
+  border-color: var(--admin-acento);
 }
 
 /* Ranking más vendidos */
@@ -222,7 +222,7 @@
   width: 26px;
   height: 26px;
   border-radius: 50%;
-  background-color: #113269;
+  background-color: var(--admin-primario);
   color: #FFFFFF;
   font-size: 0.8rem;
   font-weight: 700;
@@ -232,7 +232,7 @@
 }
 
 .estadistica-ranking-item:nth-child(1) .estadistica-ranking-pos {
-  background-color: #B07D1E;
+  background-color: var(--admin-oro);
 }
 
 .estadistica-ranking-datos {
@@ -245,7 +245,7 @@
 
 .estadistica-ranking-nombre {
   font-size: 0.9rem;
-  color: #212121;
+  color: var(--admin-texto);
   font-weight: 600;
   display: flex;
   gap: 0.5rem;
@@ -255,20 +255,20 @@
 
 .estadistica-ranking-marca {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
   font-weight: 400;
 }
 
 .estadistica-ranking-progreso {
   height: 8px;
-  background-color: #F3F4F6;
+  background-color: var(--admin-borde-suave);
   border-radius: 9999px;
   overflow: hidden;
 }
 
 .estadistica-ranking-relleno {
   height: 100%;
-  background-color: #113269;
+  background-color: var(--admin-primario);
   border-radius: 9999px;
   transition: width 0.3s ease;
 }
@@ -279,13 +279,13 @@
   flex-direction: column;
   align-items: flex-end;
   font-size: 0.85rem;
-  color: #212121;
+  color: var(--admin-texto);
   font-variant-numeric: tabular-nums;
 }
 
 .estadistica-ranking-cifras span {
   font-size: 0.75rem;
-  color: #6B7280;
+  color: var(--admin-texto-secundario);
 }
 
 /* Tabla de vencidos */
@@ -301,8 +301,8 @@
 .estadistica-tabla th {
   padding: 0.9rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #E5E5E5;
-  color: #6B7280;
+  border-bottom: 1px solid var(--admin-borde);
+  color: var(--admin-texto-secundario);
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -312,14 +312,14 @@
 .estadistica-tabla td {
   padding: 0.8rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #F3F4F6;
-  color: #212121;
+  border-bottom: 1px solid var(--admin-borde-suave);
+  color: var(--admin-texto);
   font-size: 0.85rem;
   vertical-align: middle;
 }
 
 .estadistica-tabla tr:hover td {
-  background-color: #F9FAFB;
+  background-color: var(--admin-hover);
 }
 
 /* Responsive */
