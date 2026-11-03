@@ -1,13 +1,21 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
+import java.util.List;
 
 public class OrdenCompra {
     private Long id;
+
+    /**
+     * Unidades totales declaradas en la orden.
+     * No es derivable: la tabla lotes no registra cantidad por producto.
+     */
     private int cantidad;
+
     private double total;
     private Date fecha;
     private Proveedor proveedor;
+    private List<Lote> lotes;
 
     public OrdenCompra() {
     }
@@ -60,9 +68,17 @@ public class OrdenCompra {
         this.proveedor = proveedor;
     }
 
+    public List<Lote> getLotes() {
+        return lotes;
+    }
+
+    public void setLotes(List<Lote> lotes) {
+        this.lotes = lotes;
+    }
+
     @Override
     public String toString() {
         return "OrdenCompra [id=" + id + ", cantidad=" + cantidad + ", total=" + total + ", fecha=" + fecha
-                + ", proveedor=" + proveedor + "]";
+                + ", proveedor=" + proveedor + ", lotes=" + lotes + "]";
     }
 }

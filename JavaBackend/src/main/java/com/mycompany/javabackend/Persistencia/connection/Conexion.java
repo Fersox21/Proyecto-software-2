@@ -9,9 +9,9 @@ public class Conexion {
     private static Conexion instancia = null;
     private Connection conexion = null;
 
-    private final String URL = "jdbc:postgresql://localhost:5433/distribuidora";
+    private final String URL = "jdbc:postgresql://localhost:5432/distribuidora";
     private final String USER = "postgres";
-    private final String PASSWORD = "admin";
+private final String PASSWORD = "uli45982380@";
 
     private Conexion() {
         try {

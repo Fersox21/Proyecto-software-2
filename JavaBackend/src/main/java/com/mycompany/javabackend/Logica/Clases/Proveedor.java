@@ -3,12 +3,14 @@ package com.mycompany.javabackend.Logica.Clases;
 public class Proveedor {
     private Long id;
     private String nombre;
-    private int telefono;
+
+    // VARCHAR(40) en el schema: no es un entero.
+    private String telefono;
 
     public Proveedor() {
     }
 
-    public Proveedor(Long id, String nombre, int telefono) {
+    public Proveedor(Long id, String nombre, String telefono) {
         this.id = id;
         this.nombre = nombre;
         this.telefono = telefono;
@@ -30,11 +32,11 @@ public class Proveedor {
         this.nombre = nombre;
     }
 
-    public int getTelefono() {
+    public String getTelefono() {
         return telefono;
     }
 
-    public void setTelefono(int telefono) {
+    public void setTelefono(String telefono) {
         this.telefono = telefono;
     }
 
