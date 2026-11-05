@@ -1,4 +1,3 @@
-
 import * as ventasService from './ventas.service.js'
 
 export const listar = async (req, res, next) => { 

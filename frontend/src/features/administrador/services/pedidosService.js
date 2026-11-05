@@ -1,7 +1,7 @@
 const URL_BASE = 'http://localhost:3000' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
 
 export async function obtenerPedidos() {
-  const token = sessionStorage.getItem('token')
+  const token = sessionStorage.getItem('token') // Ajusta la clave según tu app
 
   const respuesta = await fetch(`${URL_BASE}/api/pedidos`, {
     method: 'GET',
