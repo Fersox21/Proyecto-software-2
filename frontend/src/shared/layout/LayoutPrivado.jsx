@@ -13,6 +13,7 @@ const enlacesAdmin = [
   { id: 7, texto: 'Vencimientos', destino: '/administrador/vencimientos'},
   { id: 8, texto: 'Pedidos', destino: '/administrador/pedidos'},
   { id: 9, texto: 'Ventas', destino: '/administrador/ventas'},
+  { id: 11, texto: 'Órdenes de compra', destino: '/administrador/ordenes-compra'},
   { id: 10, texto: 'Pagina Principal', destino: '/'},
 
 ];

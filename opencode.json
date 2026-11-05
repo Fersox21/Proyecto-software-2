@@ -1,0 +1,6 @@
+{
+  "provider": "openai",
+  "model": "Qwen3.5-4B",
+  "apiKey": "not-needed",
+  "baseUrl": "http://127.0.0.1:9931/v1"
+}

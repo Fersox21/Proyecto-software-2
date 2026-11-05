@@ -1,5 +1,6 @@
 import * as repository from './pedidos.repository.js';
 import * as repositoryRol from '../roles/roles.repository.js';
+import * as repositoryTiene from '../tiene/tiene.repository.js';
 
 export const listarPedidos = async () => {
   return await repository.findAll();
@@ -30,7 +31,7 @@ export const crearPedido = async (data) => {
     throw error;
   }
 
-  const estadosPermitidos = ['PENDIENTE', 'APROBADO', 'RECHAZADO', 'ENTREGADO'];
+  const estadosPermitidos = ['PENDIENTE', 'APROBADO', 'RECHAZADO', 'ENTREGADO', 'ELIMINADO'];
   if (data.estado && !estadosPermitidos.includes(data.estado.toUpperCase())) {
     const error = new Error('El estado del pedido no es válido');
     error.status = 400;
@@ -66,4 +67,50 @@ export const eliminarPedido = async (id) => {
     throw error;
   }
   return true;
+};
+
+export const eliminarItemDePedido = async (pedido_id, producto_id) => {
+  // 1. Eliminación física del ítem
+  const rowCount = await repositoryTiene.remove(pedido_id, producto_id);
+  
+  if (rowCount === 0) {
+    const error = new Error('Ítem no encontrado en el pedido');
+    error.status = 404;
+    throw error;
+  }
+
+  // 2. Verificación de ítems restantes
+  const itemsRestantes = await repositoryTiene.findByPedido(pedido_id);
+  let pedidoEliminado = false;
+  let nuevoTotal = 0;
+
+  if (itemsRestantes.length > 0) {
+    nuevoTotal = itemsRestantes.reduce((acc, item) => acc + (parseFloat(item.precio) * item.cantidad), 0);
+  }
+
+  // 3. Actualizar el pedido
+  const pedido = await repository.findById(pedido_id);
+  if (pedido) {
+    const dataActualizacion = { ...pedido };
+    
+    if (itemsRestantes.length === 0) {
+      dataActualizacion.estado = 'ELIMINADO';
+      pedidoEliminado = true;
+    } else {
+      dataActualizacion.total = nuevoTotal;
+    }
+    
+    await repository.update(pedido_id, dataActualizacion);
+  }
+
+  return {
+    success: true,
+    message: pedidoEliminado 
+      ? 'Ítem eliminado y pedido marcado como ELIMINADO' 
+      : 'Ítem eliminado y total del pedido actualizado',
+    pedido_id,
+    producto_id,
+    pedido_eliminado: pedidoEliminado,
+    nuevo_total: nuevoTotal
+  };
 };

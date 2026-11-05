@@ -44,3 +44,20 @@ export const eliminar = async (req, res, next) => {
     next(err);
   }
 };
+
+export const eliminarItem = async (req, res, next) => {
+  try {
+    const { pedido_id, producto_id } = req.params;
+    if (!pedido_id || !producto_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'Se requieren pedido_id y producto_id',
+        statusCode: 400
+      });
+    }
+    const resultado = await service.eliminarItemDePedido(pedido_id, producto_id);
+    res.json(resultado);
+  } catch (err) {
+    next(err);
+  }
+};
