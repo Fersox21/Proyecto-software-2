@@ -146,11 +146,6 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         return lista;
     }
 
-    // ------------------------------------------------------------------
-    // Operaciones transaccionales (orden + lotes)
-    // Son el único punto del DAO que propaga la excepción: sin eso no hay
-    // rollback posible y la orden quedaría sin sus lotes.
-    // ------------------------------------------------------------------
 
     /**
      * Inserta la orden junto con sus lotes en una sola transacción.
