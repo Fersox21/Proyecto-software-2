@@ -188,7 +188,12 @@ public class OrdenCompraService {
                 throw new IllegalArgumentException("El producto del lote " + posicion + " es obligatorio");
             }
 
+            if (loteDto.getCantidad() != null && loteDto.getCantidad() <= 0) {
+                throw new IllegalArgumentException("La cantidad del lote " + posicion + " debe ser mayor a 0");
+            }
+
             Lote lote = new Lote();
+            lote.setCantidad(loteDto.getCantidad());
             lote.setFechaArribo(parsearFecha(loteDto.getFechaArribo(),
                     "La fecha de arribo del lote " + posicion));
             lote.setFechaVencimiento(parsearFecha(loteDto.getFechaVencimiento(),

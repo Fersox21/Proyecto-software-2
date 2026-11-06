@@ -29,6 +29,21 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
+    // Misma URL que el backend Java: si solo viene fechaVencimiento se edita
+    // únicamente esa columna y se conserva el resto del lote.
+    const claves = Object.keys(req.body ?? {});
+    const soloVencimiento =
+      claves.length > 0 && claves.every((clave) => clave === 'fechaVencimiento');
+
+    if (soloVencimiento) {
+      const lote = await service.actualizarVencimiento(req.params.id, req.body);
+      return res.json({
+        success: true,
+        mensaje: 'Vencimiento del lote actualizado',
+        idLote: lote.id
+      });
+    }
+
     const loteActualizado = await service.actualizarLote(req.params.id, req.body);
     res.json(loteActualizado);
   } catch (err) {

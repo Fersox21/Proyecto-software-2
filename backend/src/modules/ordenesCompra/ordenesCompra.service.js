@@ -16,7 +16,7 @@ export const obtenerOrdenCompraPorId = async (id) => {
 };
 
 export const crearOrdenCompra = async (data) => {
-  const proveedorExistente = repositoryProveedor.findById(data.proveedor);
+  const proveedorExistente = await repositoryProveedor.findById(data.proveedor);
   
     if (!data.id || !data.cantidad || !data.total || !data.fecha || !proveedorExistente) {
     const error = new Error('Faltan datos obligatorios para crear el lote (nroOrdenCompra, cantidad, total, fecha)');

@@ -9,7 +9,7 @@ let proximaLlave = 0
 
 function nuevoLote() {
   proximaLlave += 1
-  return { llave: proximaLlave, productoId: '', fechaArribo: '', fechaVencimiento: '' }
+  return { llave: proximaLlave, productoId: '', cantidad: '', fechaArribo: '', fechaVencimiento: '' }
 }
 
 function mapearLotes(orden) {
@@ -18,6 +18,7 @@ function mapearLotes(orden) {
     return {
       llave: proximaLlave,
       productoId: lote.producto?.id != null ? String(lote.producto.id) : '',
+      cantidad: lote.cantidad != null ? String(lote.cantidad) : '',
       fechaArribo: normalizarFecha(lote.fechaArribo),
       fechaVencimiento: normalizarFecha(lote.fechaVencimiento),
     }
@@ -133,6 +134,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       if (!lote.productoId) {
         nuevosErrores[`lote-${indice}-producto`] = 'Elegí un producto'
       }
+
+      const cantidad = Number(lote.cantidad)
+      if (lote.cantidad === '' || !Number.isInteger(cantidad) || cantidad <= 0) {
+        nuevosErrores[`lote-${indice}-cantidad`] = 'La cantidad debe ser un entero mayor a 0'
+      }
+
       if (!lote.fechaArribo) {
         nuevosErrores[`lote-${indice}-arribo`] = 'La fecha de arribo es obligatoria'
       }
@@ -153,6 +160,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       proveedorId: Number(valores.proveedorId),
       lotes: valores.lotes.map((lote) => ({
         productoId: Number(lote.productoId),
+        cantidad: Number(lote.cantidad),
         fechaArribo: lote.fechaArribo,
         fechaVencimiento: lote.fechaVencimiento,
       })),
@@ -345,6 +353,23 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                   </select>
                   {errores[`lote-${indice}-producto`] && (
                     <p className="orden-campo-error">{errores[`lote-${indice}-producto`]}</p>
+                  )}
+                </div>
+
+                <div className="orden-campo">
+                  <label htmlFor={`orden-lote-cantidad-${indice}`}>Cantidad</label>
+                  <input
+                    id={`orden-lote-cantidad-${indice}`}
+                    type="number"
+                    min="1"
+                    step="1"
+                    inputMode="numeric"
+                    value={lote.cantidad}
+                    onChange={(evento) => cambiarLote(indice, 'cantidad', evento.target.value)}
+                    aria-invalid={Boolean(errores[`lote-${indice}-cantidad`])}
+                  />
+                  {errores[`lote-${indice}-cantidad`] && (
+                    <p className="orden-campo-error">{errores[`lote-${indice}-cantidad`]}</p>
                   )}
                 </div>
 
