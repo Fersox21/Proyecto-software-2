@@ -254,7 +254,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     // ------------------------------------------------------------------
 
     private Long insertarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, activo, proveedor_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setParametrosOrden(ps, ordenCompra);
@@ -274,11 +274,11 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     }
 
     private void actualizarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, activo = ?, proveedor_id = ? WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, proveedor_id = ? WHERE id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             setParametrosOrden(ps, ordenCompra);
-            ps.setLong(6, ordenCompra.getId());
+            ps.setLong(5, ordenCompra.getId());
             ps.executeUpdate();
         }
     }
