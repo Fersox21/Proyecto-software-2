@@ -199,6 +199,7 @@ public class LoteDao implements DAO<Lote> {
         lote.setId(rs.getLong("id"));
         lote.setFechaArribo(rs.getDate("fecha_arribo"));
         lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+        lote.setActivo(rs.getBoolean("activo"));
 
         long ordenCompraId = rs.getLong("orden_compra_id");
         if (!rs.wasNull()) {

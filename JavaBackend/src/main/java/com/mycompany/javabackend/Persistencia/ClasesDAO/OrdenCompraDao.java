@@ -233,7 +233,8 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
             eliminarLotesDeOrden(conn, id);
 
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ordenes_compra WHERE id = ?")) {
+            try (PreparedStatement ps = conn
+                    .prepareStatement("UPDATE ordenes_compra SET activo = false WHERE id = ?")) {
                 ps.setLong(1, id);
                 ps.executeUpdate();
             }
@@ -253,7 +254,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     // ------------------------------------------------------------------
 
     private Long insertarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, activo, proveedor_id) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setParametrosOrden(ps, ordenCompra);
@@ -273,17 +274,18 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     }
 
     private void actualizarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, proveedor_id = ? WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, activo = ?, proveedor_id = ? WHERE id = ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             setParametrosOrden(ps, ordenCompra);
-            ps.setLong(5, ordenCompra.getId());
+            ps.setLong(6, ordenCompra.getId());
             ps.executeUpdate();
         }
     }
 
     private void eliminarLotesDeOrden(Connection conn, Long ordenCompraId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM lotes WHERE orden_compra_id = ?")) {
+        try (PreparedStatement ps = conn
+                .prepareStatement("UPDATE lotes SET activo = false WHERE orden_compra_id = ?")) {
             ps.setLong(1, ordenCompraId);
             ps.executeUpdate();
         }
@@ -317,11 +319,12 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         ps.setInt(1, ordenCompra.getCantidad());
         ps.setDouble(2, ordenCompra.getTotal());
         ps.setDate(3, ordenCompra.getFecha());
+        ps.setBoolean(4, ordenCompra.isActivo());
 
         if (ordenCompra.getProveedor() != null && ordenCompra.getProveedor().getId() != null) {
-            ps.setLong(4, ordenCompra.getProveedor().getId());
+            ps.setLong(5, ordenCompra.getProveedor().getId());
         } else {
-            ps.setNull(4, Types.BIGINT);
+            ps.setNull(5, Types.BIGINT);
         }
     }
 
@@ -332,6 +335,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         ordenCompra.setCantidad(rs.getInt("cantidad"));
         ordenCompra.setTotal(rs.getDouble("total"));
         ordenCompra.setFecha(rs.getDate("fecha"));
+        ordenCompra.setActivo(rs.getBoolean("activo"));
 
         long proveedorId = rs.getLong("proveedor_id");
         if (!rs.wasNull()) {
