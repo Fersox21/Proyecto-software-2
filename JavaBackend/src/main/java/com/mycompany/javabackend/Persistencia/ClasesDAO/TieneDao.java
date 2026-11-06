@@ -38,7 +38,7 @@ public class TieneDao implements DAO<Tiene> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM tiene WHERE id = ?";
+        String sql = "UPDATE tiene SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -69,7 +69,7 @@ public class TieneDao implements DAO<Tiene> {
 
     @Override
     public Tiene obtener(Long id) {
-        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id FROM tiene WHERE id = ?";
+        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -91,6 +91,7 @@ public class TieneDao implements DAO<Tiene> {
                     pedido.setId(rs.getLong("pedidos_id"));
                     tiene.setPedido(pedido);
 
+                    tiene.setActivo(rs.getBoolean("activo"));
                     return tiene;
                 }
             }
@@ -104,7 +105,7 @@ public class TieneDao implements DAO<Tiene> {
     @Override
     public List<Tiene> obtenerTodos() {
         List<Tiene> lista = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id FROM tiene ORDER BY id ASC";
+        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene ORDER BY activo DESC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -124,6 +125,7 @@ public class TieneDao implements DAO<Tiene> {
                 Pedido pedido = new Pedido();
                 pedido.setId(rs.getLong("pedidos_id"));
                 tiene.setPedido(pedido);
+                tiene.setActivo(rs.getBoolean("activo"));
 
                 lista.add(tiene);
             }
@@ -133,6 +135,41 @@ public class TieneDao implements DAO<Tiene> {
         }
 
         return lista;
+    }
+
+    public List<Tiene> obtenerPorVenta(Long idVenta) {
+        List<Tiene> listaItems = new ArrayList<>();
+        String sql = "SELECT id, cantidad, precio, activo, producto_id, pedidos_id FROM tiene WHERE pedidos_id = ? ORDER BY id ASC";
+        Connection conn = Conexion.getInstance().getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, idVenta);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Tiene tiene = new Tiene();
+
+                tiene.setId(rs.getLong("id"));
+                tiene.setCantidad(rs.getInt("cantidad"));
+                tiene.setPrecio(rs.getDouble("precio"));
+                tiene.setActivo(rs.getBoolean("activo"));
+
+                Producto producto = new Producto();
+                producto.setId(rs.getLong("producto_id"));
+                tiene.setProducto(producto);
+
+                Pedido pedido = new Pedido();
+                pedido.setId(rs.getLong("pedidos_id"));
+                tiene.setPedido(pedido);
+
+                listaItems.add(tiene);
+            }
+
+        } catch (SQLException e) {
+            System.err.println("Error al listar todos los tiene: " + e.getMessage());
+        }
+
+        return listaItems;
     }
 
 }

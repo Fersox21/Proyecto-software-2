@@ -46,7 +46,7 @@ class OrdenCompraServiceTest {
         loteDao = mock(LoteDao.class);
         service = new OrdenCompraService(ordenCompraDao, proveedorDao, loteDao);
 
-        when(proveedorDao.obtener(1L)).thenReturn(new Proveedor(1L, "Distribuidora Norte", "111222333"));
+        when(proveedorDao.obtener(1L)).thenReturn(new Proveedor(1L, "Distribuidora Norte", "111222333", true));
     }
 
     @Test

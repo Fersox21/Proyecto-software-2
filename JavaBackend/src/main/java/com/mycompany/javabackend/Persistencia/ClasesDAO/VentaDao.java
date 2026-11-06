@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.mycompany.javabackend.Logica.Clases.Pedido;
+import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.Logica.Clases.Venta;
 import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
@@ -41,8 +42,14 @@ public class VentaDao implements DAO<Venta> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM ventas WHERE id = ?";
+        String sql = "UPDATE ventas SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
+        List<Tiene> itemsVenta = new ArrayList<>();
+        itemsVenta = new TieneDao().obtenerPorVenta(id);
+
+        for (Tiene item : itemsVenta) {
+            new TieneDao().eliminar(item.getId());
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -72,7 +79,7 @@ public class VentaDao implements DAO<Venta> {
 
     @Override
     public Venta obtener(Long id) {
-        String sql = "SELECT id, fecha, total, pedido_id FROM ventas WHERE id = ?";
+        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -85,7 +92,7 @@ public class VentaDao implements DAO<Venta> {
                     venta.setId(rs.getLong("id"));
                     venta.setFecha(rs.getDate("fecha"));
                     venta.setTotal(rs.getDouble("total"));
-
+                    venta.setActivo(rs.getBoolean("activo"));
                     Pedido pedido = new Pedido();
                     pedido.setId(rs.getLong("pedido_id"));
                     venta.setPedido(pedido);
@@ -103,7 +110,7 @@ public class VentaDao implements DAO<Venta> {
     @Override
     public List<Venta> obtenerTodos() {
         List<Venta> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, pedido_id FROM ventas ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas ORDER BY activo DESC, fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -115,7 +122,7 @@ public class VentaDao implements DAO<Venta> {
                 venta.setId(rs.getLong("id"));
                 venta.setFecha(rs.getDate("fecha"));
                 venta.setTotal(rs.getDouble("total"));
-
+                venta.setActivo(rs.getBoolean("activo"));
                 Pedido pedido = new Pedido();
                 pedido.setId(rs.getLong("pedido_id"));
                 venta.setPedido(pedido);

@@ -14,17 +14,19 @@ public class OrdenCompra {
 
     private double total;
     private Date fecha;
+    private boolean activo;
     private Proveedor proveedor;
     private List<Lote> lotes;
 
     public OrdenCompra() {
     }
 
-    public OrdenCompra(Long id, int cantidad, double total, Date fecha, Proveedor proveedor) {
+    public OrdenCompra(Long id, int cantidad, double total, Date fecha, boolean activo, Proveedor proveedor) {
         this.id = id;
         this.cantidad = cantidad;
         this.total = total;
         this.fecha = fecha;
+        this.activo = activo;
         this.proveedor = proveedor;
     }
 
@@ -60,6 +62,14 @@ public class OrdenCompra {
         this.fecha = fecha;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     public Proveedor getProveedor() {
         return proveedor;
     }
@@ -79,6 +89,6 @@ public class OrdenCompra {
     @Override
     public String toString() {
         return "OrdenCompra [id=" + id + ", cantidad=" + cantidad + ", total=" + total + ", fecha=" + fecha
-                + ", proveedor=" + proveedor + ", lotes=" + lotes + "]";
+                + ", activo=" + activo + ", proveedor=" + proveedor + ", lotes=" + lotes + "]";
     }
 }
