@@ -1,0 +1,335 @@
+/* Vencimientos — panel de administración.
+   Se apoyan los tokens --admin-* y se reutilizan clases de ordenesCompra.css
+   (tabla base, botones, modal y alertas), que la vista importa antes que este
+   archivo. Acá sólo viven los estilos propios de la pantalla. */
+
+/* Resumen */
+
+.venc-resumen {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.venc-tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--admin-borde);
+  border-left-width: 4px;
+  border-radius: 12px;
+  background-color: var(--admin-superficie);
+  color: var(--admin-texto);
+  font-family: inherit;
+  text-align: left;
+  box-shadow: var(--admin-sombra);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+}
+
+.venc-tarjeta:hover {
+  background-color: var(--admin-hover);
+  transform: translateY(-1px);
+}
+
+.venc-tarjeta:focus-visible {
+  outline: 2px solid var(--admin-acento);
+  outline-offset: 2px;
+}
+
+.venc-tarjeta.activa {
+  outline: 2px solid var(--admin-acento);
+  outline-offset: 1px;
+}
+
+.venc-tarjeta-vencido {
+  border-left-color: var(--admin-badge-error-texto);
+}
+
+.venc-tarjeta-proximo {
+  border-left-color: var(--admin-badge-warn-texto);
+}
+
+.venc-tarjeta-ok {
+  border-left-color: var(--admin-badge-ok-texto);
+}
+
+.venc-tarjeta-total {
+  border-left-color: var(--admin-acento);
+  cursor: default;
+}
+
+.venc-tarjeta-total:hover {
+  background-color: var(--admin-superficie);
+  transform: none;
+}
+
+.venc-tarjeta-valor {
+  font-size: 1.65rem;
+  font-weight: 700;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.venc-tarjeta-etiqueta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-texto-secundario);
+}
+
+/* Filtros */
+
+.venc-filtros {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--admin-borde);
+  border-radius: 12px;
+  background-color: var(--admin-superficie);
+  box-shadow: var(--admin-sombra);
+}
+
+.venc-filtros .orden-campo input,
+.venc-filtros .orden-campo select {
+  min-width: 0;
+}
+
+.venc-campo-busqueda {
+  grid-column: span 2;
+}
+
+.venc-filtros-pie {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 0.25rem;
+  border-top: 1px solid var(--admin-borde-suave);
+}
+
+.venc-conteo {
+  font-size: 0.85rem;
+  color: var(--admin-texto-secundario);
+}
+
+/* Tabla */
+
+.venc-tabla {
+  min-width: 1080px;
+}
+
+.venc-ordenar {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+}
+
+.venc-ordenar:hover {
+  color: var(--admin-acento);
+}
+
+.venc-ordenar:focus-visible {
+  outline: 2px solid var(--admin-acento);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.venc-codigo {
+  font-weight: 700;
+  color: var(--admin-acento);
+  white-space: nowrap;
+}
+
+.venc-fecha,
+.venc-dias {
+  white-space: nowrap;
+}
+
+.venc-dias {
+  color: var(--admin-texto-secundario);
+  font-size: 0.85rem;
+}
+
+.venc-secundario {
+  color: var(--admin-texto-secundario);
+  font-weight: 400;
+}
+
+.venc-tabla .venc-col-numero {
+  text-align: right;
+}
+
+.venc-numero {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.venc-tabla .orden-col-acciones {
+  text-align: right;
+}
+
+/* Badges de estado */
+
+.venc-badge {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.venc-badge-vencido {
+  background-color: var(--admin-badge-error-fondo);
+  color: var(--admin-badge-error-texto);
+}
+
+.venc-badge-proximo {
+  background-color: var(--admin-badge-warn-fondo);
+  color: var(--admin-badge-warn-texto);
+}
+
+.venc-badge-en-regla {
+  background-color: var(--admin-badge-ok-fondo);
+  color: var(--admin-badge-ok-texto);
+}
+
+.venc-badge-desconocido {
+  background-color: var(--admin-hover-btn);
+  color: var(--admin-texto-secundario);
+}
+
+/* Detalle expandible */
+
+.venc-fila-detalle > td {
+  padding: 1rem 1.5rem 1.25rem;
+  background-color: var(--admin-fondo);
+}
+
+.venc-fila-detalle:hover > td {
+  background-color: var(--admin-fondo);
+}
+
+.venc-detalle {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  text-align: left;
+}
+
+.venc-detalle-bloque {
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--admin-borde);
+  border-radius: 10px;
+  background-color: var(--admin-superficie);
+}
+
+.venc-detalle-titulo {
+  margin: 0 0 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--admin-texto-secundario);
+}
+
+.venc-detalle-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.venc-dato {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+}
+
+.venc-dato dt {
+  color: var(--admin-texto-secundario);
+}
+
+.venc-dato dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+  color: var(--admin-texto);
+}
+
+/* Modal de edición */
+
+.venc-editor-contexto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--admin-borde);
+  border-radius: 10px;
+  background-color: var(--admin-fondo);
+}
+
+.venc-editor-contexto dt {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--admin-texto-secundario);
+}
+
+.venc-editor-contexto dd {
+  margin: 0.15rem 0 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--admin-texto);
+}
+
+.venc-aviso {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--admin-badge-warn-texto);
+}
+
+/* Responsive */
+
+@media (max-width: 760px) {
+  .venc-resumen {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .venc-filtros {
+    grid-template-columns: 1fr;
+  }
+
+  .venc-campo-busqueda {
+    grid-column: auto;
+  }
+
+  .venc-filtros-pie {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .venc-filtros-pie .orden-btn {
+    width: 100%;
+  }
+}

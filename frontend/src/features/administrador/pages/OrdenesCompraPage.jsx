@@ -195,7 +195,6 @@ function OrdenesCompraPage() {
                 <th scope="col">#</th>
                 <th scope="col">Fecha</th>
                 <th scope="col">Proveedor</th>
-                <th scope="col">Cantidad</th>
                 <th scope="col">Total</th>
                 <th scope="col" className="orden-col-acciones">
                   Acciones
@@ -212,7 +211,6 @@ function OrdenesCompraPage() {
                       <td className="orden-col-id">{orden.id}</td>
                       <td>{formatearFecha(orden.fecha)}</td>
                       <td>{nombreProveedor(orden)}</td>
-                      <td>{orden.cantidad}</td>
                       <td className="orden-col-monto">{formatearPrecio(orden.total)}</td>
                       <td className="orden-col-acciones">
                         <div className="orden-acciones">
@@ -274,6 +272,7 @@ function OrdenesCompraPage() {
                                 <thead>
                                   <tr>
                                     <th scope="col">Producto</th>
+                                    <th scope="col">Cantidad</th>
                                     <th scope="col">Fecha de arribo</th>
                                     <th scope="col">Fecha de vencimiento</th>
                                   </tr>
@@ -291,6 +290,7 @@ function OrdenesCompraPage() {
                                               ? `Producto #${idProducto}`
                                               : 'Sin producto')}
                                         </td>
+                                        <td>{lote.cantidad} Unidades </td>
                                         <td>{formatearFecha(lote.fechaArribo)}</td>
                                         <td>{formatearFecha(lote.fechaVencimiento)}</td>
                                       </tr>

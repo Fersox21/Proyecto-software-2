@@ -4,6 +4,7 @@ import java.sql.Date;
 
 public class Lote {
     private Long id;
+    private Integer cantidad;
     private Date fechaArribo;
     private Date fechaVencimiento;
     private OrdenCompra ordenCompra;
@@ -25,6 +26,14 @@ public class Lote {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 
     public Date getFechaArribo() {
@@ -61,7 +70,7 @@ public class Lote {
 
     @Override
     public String toString() {
-        return "Lote [id=" + id + ", fechaArribo=" + fechaArribo + ", fechaVencimiento=" + fechaVencimiento
-                + ", ordenCompra=" + ordenCompra + "]";
+        return "Lote [id=" + id + ", cantidad=" + cantidad + ", fechaArribo=" + fechaArribo
+                + ", fechaVencimiento=" + fechaVencimiento + ", ordenCompra=" + ordenCompra + "]";
     }
 }

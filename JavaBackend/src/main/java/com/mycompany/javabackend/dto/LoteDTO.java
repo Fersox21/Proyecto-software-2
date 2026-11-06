@@ -6,6 +6,7 @@ package com.mycompany.javabackend.dto;
  */
 public class LoteDTO {
     private Long productoId;
+    private Integer cantidad;
     private String fechaArribo;
     private String fechaVencimiento;
 
@@ -13,7 +14,12 @@ public class LoteDTO {
     }
 
     public LoteDTO(Long productoId, String fechaArribo, String fechaVencimiento) {
+        this(productoId, null, fechaArribo, fechaVencimiento);
+    }
+
+    public LoteDTO(Long productoId, Integer cantidad, String fechaArribo, String fechaVencimiento) {
         this.productoId = productoId;
+        this.cantidad = cantidad;
         this.fechaArribo = fechaArribo;
         this.fechaVencimiento = fechaVencimiento;
     }
@@ -24,6 +30,14 @@ public class LoteDTO {
 
     public void setProductoId(Long productoId) {
         this.productoId = productoId;
+    }
+
+    public Integer getCantidad() {
+        return cantidad;
+    }
+
+    public void setCantidad(Integer cantidad) {
+        this.cantidad = cantidad;
     }
 
     public String getFechaArribo() {
@@ -44,7 +58,7 @@ public class LoteDTO {
 
     @Override
     public String toString() {
-        return "LoteDTO [productoId=" + productoId + ", fechaArribo=" + fechaArribo + ", fechaVencimiento="
-                + fechaVencimiento + "]";
+        return "LoteDTO [productoId=" + productoId + ", cantidad=" + cantidad + ", fechaArribo=" + fechaArribo
+                + ", fechaVencimiento=" + fechaVencimiento + "]";
     }
 }

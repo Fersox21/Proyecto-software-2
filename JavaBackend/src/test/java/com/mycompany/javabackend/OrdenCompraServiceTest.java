@@ -137,6 +137,22 @@ class OrdenCompraServiceTest {
     }
 
     @Test
+    void crearRechazaCantidadDeLoteNoPositiva() {
+        OrdenCompraDTO cero = dtoValido();
+        cero.getLotes().get(0).setCantidad(0);
+
+        OrdenCompraDTO negativa = dtoValido();
+        negativa.getLotes().get(0).setCantidad(-3);
+
+        for (OrdenCompraDTO dto : List.of(cero, negativa)) {
+            IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
+            assertTrue(ex.getMessage().contains("cantidad"), "Mensaje inesperado: " + ex.getMessage());
+        }
+
+        verify(ordenCompraDao, never()).crearConLotes(any(), anyList());
+    }
+
+    @Test
     void crearGuardaLaOrdenConSusLotesYDevuelveElId() {
         when(ordenCompraDao.crearConLotes(any(OrdenCompra.class), anyList())).thenReturn(42L);
 
@@ -162,6 +178,7 @@ class OrdenCompraServiceTest {
 
         Lote lote = lotes.get(0);
         assertEquals(10L, lote.getProducto().getId().longValue());
+        assertEquals(10, lote.getCantidad().intValue());
         assertEquals(Date.valueOf("2026-11-10"), lote.getFechaArribo());
         assertEquals(Date.valueOf("2027-05-10"), lote.getFechaVencimiento());
     }
@@ -257,7 +274,7 @@ class OrdenCompraServiceTest {
 
     private OrdenCompraDTO dtoValido() {
         List<LoteDTO> lotes = new ArrayList<>();
-        lotes.add(new LoteDTO(10L, "2026-11-10", "2027-05-10"));
+        lotes.add(new LoteDTO(10L, 10, "2026-11-10", "2027-05-10"));
 
         return new OrdenCompraDTO(10, 25000.0, "2026-11-03", 1L, lotes);
     }

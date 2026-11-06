@@ -8,21 +8,15 @@ CREATE TABLE proveedores (
     nombre VARCHAR(100) NOT NULL,
     telefono VARCHAR(40) NOT NULL
 );
--- 2. Tabla Roles
+
+-- Tabla 2: Roles (Usuarios)
 CREATE TABLE roles (
     id SERIAL PRIMARY KEY,
     correo VARCHAR(50) NOT NULL UNIQUE CHECK (correo LIKE '%@%'),
     password VARCHAR(255) NOT NULL
 );
--- 3. Tabla OrdenesCompra
-CREATE TABLE ordenes_compra (
-    id SERIAL PRIMARY KEY,
-    cantidad INTEGER NOT NULL,
-    total INTEGER NOT NULL,
-    fecha DATE NOT NULL,
-    proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
-);
--- 5. Tabla Productos
+
+-- Tabla 3: Productos
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
@@ -36,15 +30,17 @@ CREATE TABLE productos (
     peso VARCHAR(20) NOT NULL,
     destacado BOOLEAN
 );
--- 4. Tabla Lotes
-CREATE TABLE lotes (
+
+-- Tabla 4: Órdenes de Compra (Depende de Proveedores)
+CREATE TABLE ordenes_compra (
     id SERIAL PRIMARY KEY,
-    fecha_arribo DATE NOT NULL,
-    fecha_vencimiento DATE NOT NULL,
-    orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
-    producto_id INTEGER NOT NULL REFERENCES productos(id)
+    cantidad INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    fecha DATE NOT NULL,
+    proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
 );
--- 6. Tabla Pedidos
+
+-- Tabla 5: Pedidos (Depende de Roles)
 CREATE TABLE pedidos (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
@@ -57,18 +53,30 @@ CREATE TABLE pedidos (
     motivo_rechazo VARCHAR(80),
     rol_id INTEGER NOT NULL REFERENCES roles(id)
 );
--- 7. Tabla Ventas
+
+-- Tabla 6: Lotes (Depende de OrdenesCompra y Productos)
+CREATE TABLE lotes (
+    id SERIAL PRIMARY KEY,
+    fecha_arribo DATE NOT NULL,
+    fecha_vencimiento DATE NOT NULL,
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
+    producto_id INTEGER NOT NULL REFERENCES productos(id)
+);
+
+-- Tabla 7: Ventas (Depende de Pedidos)
 CREATE TABLE ventas (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     pedido_id INTEGER NOT NULL REFERENCES pedidos(id)
 );
--- 8. Tabla Tiene (Relación Ventas - Productos)
+
+-- Tabla 8: Tiene (Relación N:M entre Pedidos y Productos)
 CREATE TABLE tiene (
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
     precio DECIMAL(10, 2) NOT NULL,
     producto_id INTEGER NOT NULL REFERENCES productos(id),
     pedido_id INTEGER NOT NULL REFERENCES pedidos(id),
-    PRIMARY KEY (pedido_id, producto_id) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
+    PRIMARY KEY (pedido_id, producto_id)
 );

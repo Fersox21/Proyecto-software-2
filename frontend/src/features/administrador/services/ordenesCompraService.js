@@ -30,7 +30,7 @@ function mensajeDeError(estado, cuerpo) {
   return 'No se pudo completar la operación'
 }
 
-async function pedir(url, opciones = {}) {
+export async function pedir(url, opciones = {}) {
   let respuesta
 
   try {
