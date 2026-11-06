@@ -17,14 +17,13 @@ public class RolDao implements DAO<Rol> {
 
     @Override
     public void agregar(Rol rol) {
-        String sql = "INSERT INTO roles (rol, correo, password, activo) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO roles (rol, correo, password) VALUES (?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, rol.getRol());
             ps.setString(2, rol.getCorreo());
             ps.setString(3, rol.getPassword());
-            ps.setBoolean(4, rol.isActivo());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -93,7 +92,7 @@ public class RolDao implements DAO<Rol> {
     @Override
     public List<Rol> obtenerTodos() {
         List<Rol> lista = new ArrayList<>();
-        String sql = "SELECT id, rol, correo, password, activo FROM roles ORDER BY id ASC";
+        String sql = "SELECT id, rol, correo, password, activo FROM roles ORDER BY activo DESC, rol ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);

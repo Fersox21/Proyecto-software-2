@@ -20,18 +20,17 @@ public class VentaDao implements DAO<Venta> {
 
     @Override
     public void agregar(Venta venta) {
-        String sql = "INSERT INTO ventas (fecha, total, activo, pedido) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ventas (fecha, total, pedido) VALUES (?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, venta.getFecha());
             ps.setDouble(2, venta.getTotal());
-            ps.setBoolean(3, venta.isActivo());
 
             if (venta.getPedido() != null && venta.getPedido().getId() != null) {
-                ps.setLong(4, venta.getPedido().getId());
+                ps.setLong(3, venta.getPedido().getId());
             } else {
-                ps.setNull(4, Types.BIGINT);
+                ps.setNull(3, Types.BIGINT);
             }
 
             ps.executeUpdate();
@@ -111,7 +110,7 @@ public class VentaDao implements DAO<Venta> {
     @Override
     public List<Venta> obtenerTodos() {
         List<Venta> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas ORDER BY activo DESC, fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);

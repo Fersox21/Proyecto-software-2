@@ -17,7 +17,7 @@ public class ProveedorDao implements DAO<Proveedor> {
 
     @Override
     public void agregar(Proveedor proveedor) {
-        String sql = "INSERT INTO proveedores (nombre, telefono, activo) VALUES (?, ?)";
+        String sql = "INSERT INTO proveedores (nombre, telefono) VALUES (?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al insertar proveedor: no hay conexión disponible");
@@ -27,7 +27,6 @@ public class ProveedorDao implements DAO<Proveedor> {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, proveedor.getNombre());
             ps.setString(2, proveedor.getTelefono());
-            ps.setBoolean(3, proveedor.isActivo());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -106,7 +105,7 @@ public class ProveedorDao implements DAO<Proveedor> {
     @Override
     public List<Proveedor> obtenerTodos() {
         List<Proveedor> lista = new ArrayList<>();
-        String sql = "SELECT id, nombre, telefono, activo FROM proveedores ORDER BY id ASC";
+        String sql = "SELECT id, nombre, telefono, activo FROM proveedores ORDER BY activo DESC, nombre ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al listar proveedores: no hay conexión disponible");

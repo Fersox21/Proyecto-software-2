@@ -98,7 +98,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     public OrdenCompra obtener(Long id) {
         String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ? ORDER BY oc.activo DESC, oc.fecha ASC";
+                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ?";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener ordenCompra por ID: no hay conexión disponible");

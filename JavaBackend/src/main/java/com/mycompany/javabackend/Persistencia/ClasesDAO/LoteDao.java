@@ -115,7 +115,7 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public Lote obtener(Long id) {
-        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes WHERE id = ? ORDER BY activo DESC, fecha_arribo ASC";
+        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener lote por ID: no hay conexión disponible");

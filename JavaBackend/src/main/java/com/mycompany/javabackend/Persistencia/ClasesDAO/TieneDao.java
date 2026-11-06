@@ -20,7 +20,7 @@ public class TieneDao implements DAO<Tiene> {
     @Override
     public void agregar(Tiene tiene) {
         // Inserción en la tabla de asociación con la clave compuesta
-        String sql = "INSERT INTO tiene (producto_id, pedidos_id, cantidad, precio, activo) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO tiene (producto_id, pedidos_id, cantidad, precio) VALUES (?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -28,7 +28,6 @@ public class TieneDao implements DAO<Tiene> {
             ps.setLong(2, tiene.getPedido().getId());
             ps.setInt(3, tiene.getCantidad());
             ps.setDouble(4, tiene.getPrecio());
-            ps.setBoolean(5, tiene.isActivo());
 
             ps.executeUpdate();
 
@@ -106,7 +105,7 @@ public class TieneDao implements DAO<Tiene> {
     @Override
     public List<Tiene> obtenerTodos() {
         List<Tiene> lista = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene ORDER BY id ASC";
+        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene ORDER BY activo DESC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);

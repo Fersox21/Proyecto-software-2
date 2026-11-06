@@ -6,7 +6,7 @@ export const listar = async () => {
 };
 
 export const obtener = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM ventas WHERE id = $1 ORDER BY activo DESC, fecha ASC', [id]);
+  const { rows } = await pool.query('SELECT * FROM ventas WHERE id = $1', [id]);
   return rows;
 };
 

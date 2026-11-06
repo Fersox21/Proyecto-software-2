@@ -6,7 +6,7 @@ export const findAll = async () => {
 };
 
 export const findByPedido = async (pedido_id) => {
-  const { rows } = await pool.query('SELECT * FROM tiene WHERE pedido_id = $1 ORDER BY activo DESC', [pedido_id]);
+  const { rows } = await pool.query('SELECT * FROM tiene WHERE pedido_id = $1', [pedido_id]);
   return rows;
 };
 

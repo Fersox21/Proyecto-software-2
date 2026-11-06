@@ -23,7 +23,7 @@ export const findAll = async () => {
 };
 
 export const findById = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM pedidos WHERE id = $1 ORDER BY activo DESC, fecha ASC', [id]);
+  const { rows } = await pool.query('SELECT * FROM pedidos WHERE id = $1', [id]);
   return mapearPedido(rows[0]);
 };
 

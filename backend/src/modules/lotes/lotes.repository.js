@@ -19,7 +19,7 @@ export const findAll = async () => {
 };
 
 export const findById = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM lotes WHERE id = $1 ORDER BY activo DESC, fecha_arribo ASC', [id]);
+  const { rows } = await pool.query('SELECT * FROM lotes WHERE id = $1', [id]);
   return mapearLote(rows[0]);
 };
 
