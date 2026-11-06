@@ -1,12 +1,12 @@
 import { pool } from '../../config/db.js';
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM ordenes_compra ORDER BY id');
+  const { rows } = await pool.query('SELECT * FROM ordenes_compra ORDER BY activo DESC, fecha ASC;');
   return rows;
 };
 
 export const findById = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM ordenes_compra WHERE id = $1', [id]);
+  const { rows } = await pool.query('SELECT * FROM ordenes_compra WHERE id = $1 ORDER BY activo DESC, fecha ASC', [id]);
   return rows[0];
 };
 
@@ -34,6 +34,6 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM ordenes_compra WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE ordenes_compra SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };

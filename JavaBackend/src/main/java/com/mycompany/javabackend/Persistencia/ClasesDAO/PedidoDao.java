@@ -26,7 +26,7 @@ public class PedidoDao implements DAO<Pedido> {
     public Long agregarYObtenerId(Pedido pedido) {
         // NOTA: Ajusta los nombres de las columnas según la estructura real de
         // PostgreSQL
-        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Long idGenerado = null;
 
         try (Connection conn = Conexion.getInstance().getConnection();
@@ -46,12 +46,11 @@ public class PedidoDao implements DAO<Pedido> {
             ps.setString(6, pedido.getDireccion());
             ps.setString(7, pedido.getEstado());
             ps.setString(8, pedido.getMotivoRechazo());
-            ps.setBoolean(9, pedido.isActivo());
 
             if (pedido.getRol() != null && pedido.getRol().getId() != null) {
-                ps.setLong(10, pedido.getRol().getId());
+                ps.setLong(9, pedido.getRol().getId());
             } else {
-                ps.setNull(10, Types.BIGINT);
+                ps.setNull(9, Types.BIGINT);
             }
 
             int filasAfectadas = ps.executeUpdate();
@@ -162,7 +161,7 @@ public class PedidoDao implements DAO<Pedido> {
     @Override
     public List<Pedido> obtenerTodos() {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos ORDER BY activo DESC, fecha ASC";
 
         try (Connection conn = Conexion.getInstance().getConnection();
                 PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;

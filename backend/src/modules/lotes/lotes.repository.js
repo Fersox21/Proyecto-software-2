@@ -6,18 +6,20 @@ const mapearLote = (row) => {
         id: row.id,
         fechaArribo: row.fecha_arribo,
         fechaVencimiento: row.fecha_vencimiento,
+        activo: row.activo,
+        cantidad: row.cantidad,
         ordenCompra: row.orden_compra,
         producto: row.producto
     };
 };
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM lotes ORDER BY id');
+  const { rows } = await pool.query('SELECT * FROM lotes ORDER BY activo DESC, fecha_arribo ASC');
   return rows.map(mapearLote);
 };
 
 export const findById = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM lotes WHERE id = $1', [id]);
+  const { rows } = await pool.query('SELECT * FROM lotes WHERE id = $1 ORDER BY activo DESC, fecha_arribo ASC', [id]);
   return mapearLote(rows[0]);
 };
 
@@ -45,6 +47,6 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM lotes WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE lotes SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };

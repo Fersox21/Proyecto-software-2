@@ -40,23 +40,22 @@ public class LoteDao implements DAO<Lote> {
      * quien abrió la transacción pueda hacer rollback.
      */
     public void agregar(Connection conn, Lote lote, Long ordenCompraId) throws SQLException {
-        String sql = "INSERT INTO lotes (fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO lotes (fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, lote.getFechaArribo());
             ps.setDate(2, lote.getFechaVencimiento());
-            ps.setBoolean(3, lote.isActivo());
 
             if (ordenCompraId != null) {
-                ps.setLong(4, ordenCompraId);
+                ps.setLong(3, ordenCompraId);
             } else {
-                ps.setNull(4, Types.BIGINT);
+                ps.setNull(3, Types.BIGINT);
             }
 
             if (lote.getProducto() != null && lote.getProducto().getId() != null) {
-                ps.setLong(5, lote.getProducto().getId());
+                ps.setLong(4, lote.getProducto().getId());
             } else {
-                ps.setNull(5, Types.BIGINT);
+                ps.setNull(4, Types.BIGINT);
             }
 
             ps.executeUpdate();
@@ -116,7 +115,7 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public Lote obtener(Long id) {
-        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes WHERE id = ?";
+        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes WHERE id = ? ORDER BY activo DESC, fecha_arribo ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener lote por ID: no hay conexión disponible");
@@ -141,7 +140,7 @@ public class LoteDao implements DAO<Lote> {
     @Override
     public List<Lote> obtenerTodos() {
         List<Lote> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes ORDER BY id ASC";
+        String sql = "SELECT id, fecha_arribo, fecha_vencimiento, activo, orden_compra_id, producto_id FROM lotes ORDER BY activo DESC, fecha_arribo ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al listar lotes: no hay conexión disponible");

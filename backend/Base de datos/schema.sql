@@ -78,6 +78,6 @@ CREATE TABLE tiene (
     precio DECIMAL(10, 2) NOT NULL,
     activo BOOLEAN NOT NULL DEFAULT true,
     producto_id INTEGER NOT NULL REFERENCES productos(id),
-    venta_id INTEGER NOT NULL REFERENCES ventas(id),
-    PRIMARY KEY (venta_id, producto_id) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
+    pedido_id INTEGER NOT NULL REFERENCES pedidos(id),
+    PRIMARY KEY (pedido_id, producto_id) -- Un producto no se puede repetir en la MISMA venta, pero sí en ventas distintas
 );

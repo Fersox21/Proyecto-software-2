@@ -30,7 +30,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
      * Inserta la orden y devuelve el id generado por la base.
      */
     public Long agregarYObtenerId(OrdenCompra ordenCompra) {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, activo, proveedor_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al insertar ordenCompra: no hay conexión disponible");
@@ -98,7 +98,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     public OrdenCompra obtener(Long id) {
         String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ?";
+                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ? ORDER BY oc.activo DESC, oc.fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener ordenCompra por ID: no hay conexión disponible");
@@ -125,7 +125,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         List<OrdenCompra> lista = new ArrayList<>();
         String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.id ASC";
+                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.activo DESC, oc.fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al listar ordenesCompra: no hay conexión disponible");

@@ -1,12 +1,12 @@
 import { pool } from '../../config/db.js'; // Ajusta la ruta a tu conexión de pool
 
 export const listar = async () => {
-  const { rows } = await pool.query('SELECT * FROM ventas');
+  const { rows } = await pool.query('SELECT * FROM ventas ORDER BY activo DESC, fecha ASC');
   return rows;
 };
 
 export const obtener = async (id) => {
-  const { rows } = await pool.query('SELECT * FROM ventas WHERE id = $1', [id]);
+  const { rows } = await pool.query('SELECT * FROM ventas WHERE id = $1 ORDER BY activo DESC, fecha ASC', [id]);
   return rows;
 };
 
@@ -21,7 +21,8 @@ export const create = async ({ pedido_id, fecha, total }) => {
  
 export const remove = async (id) => {
   const { rowCount } = await pool.query(`
-    DELETE FROM ventas
+    UPDATE ventas
+    SET activo = false
     WHERE id = $1;
   `, [id]);
   return rowCount;
