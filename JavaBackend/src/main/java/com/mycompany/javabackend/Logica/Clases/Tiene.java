@@ -4,18 +4,20 @@ public class Tiene {
     private Long id;
     private int cantidad;
     private double precio;
+    private boolean activo;
     private Producto producto;
     private Pedido pedido;
 
     public Tiene() {
     }
 
-    public Tiene(Long id, int cantidad, double precio, Producto producto, Pedido pedido) {
+    public Tiene(Long id, int cantidad, double precio, boolean activo, Producto producto, Pedido pedido) {
         this.id = id;
         this.cantidad = cantidad;
         this.precio = precio;
+        this.activo = activo;
         this.producto = producto;
-        this.pedido = pedido;    
+        this.pedido = pedido;
     }
 
     public int getCantidad() {
@@ -50,9 +52,18 @@ public class Tiene {
         this.pedido = pedido;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public String toString() {
-        return "Tiene [cantidad=" + cantidad + ", precio=" + precio + ", producto=" + producto + ", pedido=" + pedido
+        return "Tiene [cantidad=" + cantidad + ", precio=" + precio + ", activo=" + activo + ", producto=" + producto
+                + ", pedido=" + pedido
                 + "]";
     }
 

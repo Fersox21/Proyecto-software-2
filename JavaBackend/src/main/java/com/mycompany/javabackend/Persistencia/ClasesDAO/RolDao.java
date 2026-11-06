@@ -17,12 +17,14 @@ public class RolDao implements DAO<Rol> {
 
     @Override
     public void agregar(Rol rol) {
-        String sql = "INSERT INTO roles (correo, password) VALUES (?, ?)";
+        String sql = "INSERT INTO roles (rol, correo, password, activo) VALUES (?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, rol.getCorreo());
-            ps.setString(2, rol.getPassword());
+            ps.setString(1, rol.getRol());
+            ps.setString(2, rol.getCorreo());
+            ps.setString(3, rol.getPassword());
+            ps.setBoolean(4, rol.isActivo());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -32,7 +34,7 @@ public class RolDao implements DAO<Rol> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM roles WHERE id = ?";
+        String sql = "UPDATE roles SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -63,7 +65,7 @@ public class RolDao implements DAO<Rol> {
 
     @Override
     public Rol obtener(Long id) {
-        String sql = "SELECT id, correo, password FROM roles WHERE id = ?";
+        String sql = "SELECT id, rol, correo, password, activo FROM roles WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -74,9 +76,10 @@ public class RolDao implements DAO<Rol> {
                     Rol rol = new Rol();
 
                     rol.setId(rs.getLong("id"));
+                    rol.setRol(rs.getString("rol"));
                     rol.setCorreo(rs.getString("correo"));
                     rol.setPassword(rs.getString("password"));
-
+                    rol.setActivo(rs.getBoolean("activo"));
                     return rol;
                 }
             }
@@ -90,7 +93,7 @@ public class RolDao implements DAO<Rol> {
     @Override
     public List<Rol> obtenerTodos() {
         List<Rol> lista = new ArrayList<>();
-        String sql = "SELECT id, correo, password FROM roles ORDER BY id ASC";
+        String sql = "SELECT id, rol, correo, password, activo FROM roles ORDER BY id ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
@@ -100,9 +103,10 @@ public class RolDao implements DAO<Rol> {
                 Rol rol = new Rol();
 
                 rol.setId(rs.getLong("id"));
+                rol.setRol(rs.getString("rol"));
                 rol.setCorreo(rs.getString("correo"));
                 rol.setPassword(rs.getString("password"));
-
+                rol.setActivo(rs.getBoolean("activo"));
                 lista.add(rol);
             }
 

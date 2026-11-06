@@ -13,12 +13,13 @@ public class Pedido {
     private String estado;
     private String motivoRechazo;
     private Rol rol;
+    private boolean activo;
 
     public Pedido() {
     }
 
     public Pedido(Long id, Date fecha, double total, String metodoPago, String comercio, String modalidadEntrega,
-            String direccion, String estado, String motivoRechazo, Rol rol) {
+            String direccion, String estado, String motivoRechazo, Rol rol, boolean activo) {
         this.id = id;
         this.fecha = fecha;
         this.total = total;
@@ -29,6 +30,7 @@ public class Pedido {
         this.estado = estado;
         this.motivoRechazo = motivoRechazo;
         this.rol = rol;
+        this.activo = activo;
     }
 
     public Long getId() {
@@ -107,7 +109,7 @@ public class Pedido {
     public String toString() {
         return "Pedido [id=" + id + ", fecha=" + fecha + ", total=" + total + ", metodoPago=" + metodoPago
                 + ", comercio=" + comercio + ", modalidadEntrega=" + modalidadEntrega + ", direccion=" + direccion
-                + ", estado=" + estado + ", motivoRechazo=" + motivoRechazo + "]";
+                + ", estado=" + estado + ", motivoRechazo=" + motivoRechazo + ", activo=" + activo + "]";
     }
 
     public Rol getRol() {
@@ -116,5 +118,13 @@ public class Pedido {
 
     public void setRol(Rol rol) {
         this.rol = rol;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }

@@ -4,14 +4,18 @@ public class Rol {
     private Long id;
     private String correo;
     private String password;
+    private String rol;
+    private boolean activo;
 
     public Rol() {
     }
 
-    public Rol(Long id, String correo, String password) {
+    public Rol(Long id, String correo, String password, String rol, boolean activo) {
         this.id = id;
         this.correo = correo;
         this.password = password;
+        this.rol = rol;
+        this.activo = activo;
     }
 
     public Long getId() {
@@ -38,8 +42,25 @@ public class Rol {
         this.password = password;
     }
 
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public String toString() {
-        return "Rol [id=" + id + ", correo=" + correo + ", password=" + password + "]";
+        return "Rol [id=" + id + ", correo=" + correo + ", password=" + password + ", rol=" + rol + ", activo=" + activo
+                + "]";
     }
 }

@@ -6,17 +6,21 @@ public class Lote {
     private Long id;
     private Date fechaArribo;
     private Date fechaVencimiento;
+    private boolean activo;
     private OrdenCompra ordenCompra;
     private Producto producto;
 
     public Lote() {
     }
 
-    public Lote(Long id, Date fechaArribo, Date fechaVencimiento, OrdenCompra ordenCompra) {
+    public Lote(Long id, Date fechaArribo, Date fechaVencimiento, boolean activo, OrdenCompra ordenCompra,
+            Producto producto) {
         this.id = id;
         this.fechaArribo = fechaArribo;
         this.fechaVencimiento = fechaVencimiento;
+        this.activo = activo;
         this.ordenCompra = ordenCompra;
+        this.producto = producto;
     }
 
     public Long getId() {
@@ -49,6 +53,14 @@ public class Lote {
 
     public void setOrdenCompra(OrdenCompra ordenCompra) {
         this.ordenCompra = ordenCompra;
+    }
+
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 
     public Producto getProducto() {

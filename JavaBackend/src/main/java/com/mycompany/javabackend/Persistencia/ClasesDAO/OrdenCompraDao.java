@@ -30,7 +30,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
      * Inserta la orden y devuelve el id generado por la base.
      */
     public Long agregarYObtenerId(OrdenCompra ordenCompra) {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, activo, proveedor_id) VALUES (?, ?, ?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al insertar ordenCompra: no hay conexión disponible");
@@ -59,7 +59,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM ordenes_compra WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al eliminar ordenCompra: no hay conexión disponible");
@@ -96,7 +96,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public OrdenCompra obtener(Long id) {
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.proveedor_id, "
+        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
                 + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ?";
         Connection conn = Conexion.getInstance().getConnection();
@@ -123,7 +123,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     @Override
     public List<OrdenCompra> obtenerTodos() {
         List<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.proveedor_id, "
+        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
                 + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.id ASC";
         Connection conn = Conexion.getInstance().getConnection();
@@ -145,7 +145,6 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
         return lista;
     }
-
 
     /**
      * Inserta la orden junto con sus lotes en una sola transacción.

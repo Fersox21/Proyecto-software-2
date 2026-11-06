@@ -26,7 +26,7 @@ public class PedidoDao implements DAO<Pedido> {
     public Long agregarYObtenerId(Pedido pedido) {
         // NOTA: Ajusta los nombres de las columnas según la estructura real de
         // PostgreSQL
-        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         Long idGenerado = null;
 
         try (Connection conn = Conexion.getInstance().getConnection();
@@ -46,11 +46,12 @@ public class PedidoDao implements DAO<Pedido> {
             ps.setString(6, pedido.getDireccion());
             ps.setString(7, pedido.getEstado());
             ps.setString(8, pedido.getMotivoRechazo());
+            ps.setBoolean(9, pedido.isActivo());
 
             if (pedido.getRol() != null && pedido.getRol().getId() != null) {
-                ps.setLong(9, pedido.getRol().getId());
+                ps.setLong(10, pedido.getRol().getId());
             } else {
-                ps.setNull(9, Types.BIGINT);
+                ps.setNull(10, Types.BIGINT);
             }
 
             int filasAfectadas = ps.executeUpdate();
@@ -73,7 +74,7 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM pedidos WHERE id = ?";
+        String sql = "UPDATE pedidos SET activo = false WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
                 PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
@@ -116,7 +117,7 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public Pedido obtener(Long id) {
-        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id FROM pedidos WHERE id = ?";
+        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos WHERE id = ?";
 
         try (Connection conn = Conexion.getInstance().getConnection();
                 PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
@@ -140,7 +141,7 @@ public class PedidoDao implements DAO<Pedido> {
                     pedido.setDireccion(rs.getString("direccion"));
                     pedido.setEstado(rs.getString("estado"));
                     pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
-
+                    pedido.setActivo(rs.getBoolean("activo"));
                     long rolId = rs.getLong("rol_id");
                     if (!rs.wasNull()) {
                         Rol rol = new Rol();
@@ -161,7 +162,7 @@ public class PedidoDao implements DAO<Pedido> {
     @Override
     public List<Pedido> obtenerTodos() {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id FROM pedidos ORDER BY id ASC";
+        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos ORDER BY id ASC";
 
         try (Connection conn = Conexion.getInstance().getConnection();
                 PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;
@@ -179,6 +180,7 @@ public class PedidoDao implements DAO<Pedido> {
                 pedido.setDireccion(rs.getString("direccion"));
                 pedido.setEstado(rs.getString("estado"));
                 pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
+                pedido.setActivo(rs.getBoolean("activo"));
 
                 long rolId = rs.getLong("rol_id");
                 if (!rs.wasNull()) {
