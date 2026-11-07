@@ -71,7 +71,7 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM lotes WHERE id = ?";
+        String sql = "UPDATE lotes SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al eliminar lote: no hay conexión disponible");
@@ -355,6 +355,7 @@ public class LoteDao implements DAO<Lote> {
 
         lote.setFechaArribo(rs.getDate("fecha_arribo"));
         lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+        lote.setActivo(rs.getBoolean("activo"));
 
         long ordenCompraId = rs.getLong("orden_compra_id");
         if (!rs.wasNull()) {
@@ -367,7 +368,7 @@ public class LoteDao implements DAO<Lote> {
         if (!rs.wasNull()) {
             Producto producto = new Producto();
             producto.setId(productoId);
-            
+
             // Si la consulta SQL incluyó producto_nombre, lo mapeamos
             try {
                 String nombreProd = rs.getString("producto_nombre");
@@ -377,7 +378,7 @@ public class LoteDao implements DAO<Lote> {
             } catch (SQLException ignored) {
                 // Si la columna no está presente en la query, se ignora de forma segura
             }
-            
+
             lote.setProducto(producto);
         }
 

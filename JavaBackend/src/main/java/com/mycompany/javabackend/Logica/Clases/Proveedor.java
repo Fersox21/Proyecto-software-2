@@ -3,6 +3,7 @@ package com.mycompany.javabackend.Logica.Clases;
 public class Proveedor {
     private Long id;
     private String nombre;
+    private boolean activo;
 
     // VARCHAR(40) en el schema: no es un entero.
     private String telefono;
@@ -10,10 +11,11 @@ public class Proveedor {
     public Proveedor() {
     }
 
-    public Proveedor(Long id, String nombre, String telefono) {
+    public Proveedor(Long id, String nombre, String telefono, boolean activo) {
         this.id = id;
         this.nombre = nombre;
         this.telefono = telefono;
+        this.activo = activo;
     }
 
     public Long getId() {
@@ -40,8 +42,16 @@ public class Proveedor {
         this.telefono = telefono;
     }
 
+    public boolean isActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
+    }
+
     @Override
     public String toString() {
-        return "Proveedor [id=" + id + ", nombre=" + nombre + ", telefono=" + telefono + "]";
+        return "Proveedor [id=" + id + ", nombre=" + nombre + ", telefono=" + telefono + ", activo=" + activo + "]";
     }
 }

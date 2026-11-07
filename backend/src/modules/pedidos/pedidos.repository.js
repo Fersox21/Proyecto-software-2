@@ -12,12 +12,13 @@ const mapearPedido = (row) => {
     direccion: row.direccion,
     estado: row.estado,
     motivoRechazo: row.motivo_rechazo,
+    activo: row.activo,
     rol: row.rol
   };
 };
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM pedidos ORDER BY id');
+  const { rows } = await pool.query('SELECT * FROM pedidos ORDER BY activo DESC, fecha ASC');
   return rows.map(mapearPedido);
 };
 
@@ -51,6 +52,6 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM pedidos WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE pedidos SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };

@@ -18,7 +18,7 @@ const mapearProducto = (row) => {
 };
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM productos ORDER BY id');
+  const { rows } = await pool.query('SELECT * FROM productos ORDER BY activo DESC, nombre ASC');
   return rows.map(mapearProducto);
 };
 
@@ -52,6 +52,6 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM productos WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE productos SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };

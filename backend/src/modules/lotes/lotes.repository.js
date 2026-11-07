@@ -102,6 +102,6 @@ export const updateFechaVencimiento = async (id, fechaVencimiento) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM lotes WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE lotes SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };

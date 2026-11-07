@@ -59,7 +59,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public void eliminar(Long id) {
-        String sql = "DELETE FROM ordenes_compra WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al eliminar ordenCompra: no hay conexión disponible");
@@ -96,7 +96,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public OrdenCompra obtener(Long id) {
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.proveedor_id, "
+        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
                 + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ?";
         Connection conn = Conexion.getInstance().getConnection();
@@ -123,9 +123,9 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     @Override
     public List<OrdenCompra> obtenerTodos() {
         List<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.proveedor_id, "
+        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
                 + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.id ASC";
+                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.activo DESC, oc.fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al listar ordenesCompra: no hay conexión disponible");
@@ -145,7 +145,6 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
         return lista;
     }
-
 
     /**
      * Inserta la orden junto con sus lotes en una sola transacción.
@@ -234,7 +233,8 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
             eliminarLotesDeOrden(conn, id);
 
-            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM ordenes_compra WHERE id = ?")) {
+            try (PreparedStatement ps = conn
+                    .prepareStatement("UPDATE ordenes_compra SET activo = false WHERE id = ?")) {
                 ps.setLong(1, id);
                 ps.executeUpdate();
             }
@@ -284,7 +284,8 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     }
 
     private void eliminarLotesDeOrden(Connection conn, Long ordenCompraId) throws SQLException {
-        try (PreparedStatement ps = conn.prepareStatement("DELETE FROM lotes WHERE orden_compra_id = ?")) {
+        try (PreparedStatement ps = conn
+                .prepareStatement("UPDATE lotes SET activo = false WHERE orden_compra_id = ?")) {
             ps.setLong(1, ordenCompraId);
             ps.executeUpdate();
         }
@@ -318,11 +319,12 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         ps.setInt(1, ordenCompra.getCantidad());
         ps.setDouble(2, ordenCompra.getTotal());
         ps.setDate(3, ordenCompra.getFecha());
+        ps.setBoolean(4, ordenCompra.isActivo());
 
         if (ordenCompra.getProveedor() != null && ordenCompra.getProveedor().getId() != null) {
-            ps.setLong(4, ordenCompra.getProveedor().getId());
+            ps.setLong(5, ordenCompra.getProveedor().getId());
         } else {
-            ps.setNull(4, Types.BIGINT);
+            ps.setNull(5, Types.BIGINT);
         }
     }
 
@@ -333,6 +335,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         ordenCompra.setCantidad(rs.getInt("cantidad"));
         ordenCompra.setTotal(rs.getDouble("total"));
         ordenCompra.setFecha(rs.getDate("fecha"));
+        ordenCompra.setActivo(rs.getBoolean("activo"));
 
         long proveedorId = rs.getLong("proveedor_id");
         if (!rs.wasNull()) {

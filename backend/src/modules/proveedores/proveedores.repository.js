@@ -1,7 +1,7 @@
 import { pool } from '../../config/db.js';
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM proveedores ORDER BY id');
+  const { rows } = await pool.query('SELECT * FROM proveedores ORDER BY activo DESC, nombre ASC');
   return rows;
 };
 
@@ -34,6 +34,6 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('DELETE FROM proveedores WHERE id = $1', [id]);
+  const { rowCount } = await pool.query('UPDATE proveedores SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };
