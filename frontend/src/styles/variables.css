@@ -126,6 +126,14 @@
     --admin-badge-warn-texto: #92400E;
     --admin-badge-error-fondo: #FDE8E8;
     --admin-badge-error-texto: #9B1C1C;
+
+    /* NavBarAdmin: fondo propio para separarlo del fondo de pantalla, de las
+       tarjetas y de los botones. Los valores oscuros se aplican con
+       html[data-tema="oscuro"] en navbarAdmin.css. */
+    --admin-barra-fondo: #FFFFFF;
+    --admin-barra-borde: #E5E5E5;
+    --admin-barra-fondo-oscuro: #1B2233;
+    --admin-barra-borde-oscuro: #2F3A52;
 }
 
 /* Tema oscuro: se activa con data-tema="oscuro" en <html>. El selector :has()
@@ -133,6 +141,8 @@
 html[data-tema="oscuro"]:has(.layout-admin-contenedor) {
     --admin-fondo: #12141A;
     --admin-superficie: #1C1F26;
+    --admin-barra-fondo: #1B2233;
+    --admin-barra-borde: #2F3A52;
     --admin-borde: #2C313B;
     --admin-borde-suave: #242933;
     --admin-borde-btn: #3E4652;

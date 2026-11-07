@@ -1,7 +1,7 @@
 .sidebar-admin {
     font-family: var(--fuente-base);
-    background-color: var(--admin-superficie);
-    border-right: 1px solid var(--admin-borde);
+    background-color: var(--admin-barra-fondo);
+    border-right: 1px solid var(--admin-barra-borde);
     width: 250px;
     min-width: 250px;
     height: 100vh;
@@ -10,6 +10,14 @@
     top: 0;
     left: 0;
     z-index: 1000;
+}
+
+
+/* Tema oscuro: se aplica directo sobre el sidebar (que solo existe dentro del
+   panel) para no depender de :has() ni de las variables del layout. */
+html[data-tema="oscuro"] .nav-admin {
+    background-color: var(--admin-barra-fondo-oscuro);
+    border-right-color: var(--admin-barra-borde-oscuro);
 }
 
 .btn-hamburguesa-admin,
@@ -113,9 +121,9 @@
         position: fixed;
         top: 15px;
         left: 15px;
-        background: var(--admin-superficie);
+        background: var(--admin-barra-fondo);
         color: var(--admin-acento);
-        border: 1px solid var(--admin-borde);
+        border: 1px solid var(--admin-barra-borde);
         border-radius: 8px;
         padding: 0.5rem 0.8rem;
         font-size: 1.5rem;
@@ -124,21 +132,24 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    @media (max-width: 768px) {
+    html[data-tema="oscuro"] .btn-hamburguesa-admin {
+        background: var(--admin-barra-fondo-oscuro);
+        border-color: var(--admin-barra-borde-oscuro);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+    }
+
     .sidebar-admin {
         position: fixed;
         top: 0;
         left: -260px; 
         transition: left 0.3s ease-in-out;
         z-index: 1000;
-        background-color: var(--admin-superficie); 
     }
 
     .sidebar-admin.abierto {
         left: 0;
         box-shadow: 2px 0 15px rgba(0,0,0,0.1);
     }
-}
 
     .btn-cerrar-admin {
         display: block;

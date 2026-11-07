@@ -29,8 +29,7 @@ export const crear = async (req, res, next) => {
 
 export const actualizar = async (req, res, next) => {
   try {
-    // Misma URL que el backend Java: si solo viene fechaVencimiento se edita
-    // únicamente esa columna y se conserva el resto del lote.
+
     const claves = Object.keys(req.body ?? {});
     const soloVencimiento =
       claves.length > 0 && claves.every((clave) => clave === 'fechaVencimiento');
