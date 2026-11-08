@@ -1,4 +1,4 @@
-const URL_BASE = 'http://localhost:8081' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
+const URL_BASE = 'http://localhost:3000' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
 
 async function get(path) {
   const token = sessionStorage.getItem('token')
