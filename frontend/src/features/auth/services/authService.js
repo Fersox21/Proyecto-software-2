@@ -1,6 +1,6 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = 'http://localhost:8081' 
+const URL_BASE = 'http://localhost:3000' 
 
 export async function iniciarSesion({ email, password }) {
 
