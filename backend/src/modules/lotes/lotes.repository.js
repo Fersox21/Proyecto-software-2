@@ -60,12 +60,14 @@ const mapearLoteConDetalle = (row) => {
 };
 
 export const findAll = async () => {
-  const { rows } = await pool.query(`${SQL_DETALLE} ORDER BY l.fecha_vencimiento ASC, l.id ASC`);
+  const { rows } = await pool.query(
+    `${SQL_DETALLE} WHERE l.activo = true ORDER BY l.fecha_vencimiento ASC, l.id ASC`
+  );
   return rows.map(mapearLoteConDetalle);
 };
 
 export const findById = async (id) => {
-  const { rows } = await pool.query(`${SQL_DETALLE} WHERE l.id = $1`, [id]);
+  const { rows } = await pool.query(`${SQL_DETALLE} WHERE l.id = $1 AND l.activo = true`, [id]);
   return mapearLoteConDetalle(rows[0]);
 };
 
