@@ -4,3 +4,4 @@ node_modules/
 .agents
 .codegraph
 opencode.json
+.opencode

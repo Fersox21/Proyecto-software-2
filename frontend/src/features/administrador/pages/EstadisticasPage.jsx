@@ -196,7 +196,6 @@ function EstadisticasPage() {
           )}
         </article>
 
-        {/* Más vendidos por mes */}
         <article className="estadistica-card">
           <div className="estadistica-card-encabezado">
             <h2 className="estadistica-card-titulo">Más vendidos por mes</h2>
@@ -244,7 +243,6 @@ function EstadisticasPage() {
           )}
         </article>
 
-        {/* Productos vencidos */}
         <article className="estadistica-card">
           <h2 className="estadistica-card-titulo">Productos vencidos</h2>
           {vencidos.cargando ? (
