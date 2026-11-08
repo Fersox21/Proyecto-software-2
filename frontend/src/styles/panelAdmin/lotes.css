@@ -1,0 +1,78 @@
+/* Panel de lotes: búsqueda y tabla. Los botones, modales, formularios y
+   tablas base se reutilizan desde ordenesCompra.css. */
+
+.lotes-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--admin-superficie);
+    border: 1px solid var(--admin-borde);
+    border-radius: 12px;
+    box-shadow: var(--admin-sombra);
+}
+
+.lotes-campo-busqueda {
+    flex: 1 1 320px;
+    max-width: 520px;
+}
+
+.lotes-conteo {
+    margin-left: auto;
+    color: var(--admin-texto-secundario);
+    font-size: 0.85rem;
+    line-height: 2.4;
+}
+
+.lotes-tabla {
+    min-width: 880px;
+}
+
+.lotes-tabla th,
+.lotes-tabla td {
+    white-space: nowrap;
+}
+
+.lotes-codigo {
+    font-weight: 600;
+}
+
+.lotes-secundario {
+    color: var(--admin-texto-secundario);
+}
+
+.lotes-col-numero {
+    text-align: right;
+}
+
+.lotes-numero {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Separación entre la sección de producto/orden y la de cantidad/fechas. */
+.orden-form .orden-form-grilla + .orden-form-grilla {
+    margin-top: 1rem;
+}
+
+.orden-campo input:disabled {
+    opacity: 0.8;
+    cursor: not-allowed;
+}
+
+@media (max-width: 1020px) {
+    .lotes-filtros {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .lotes-campo-busqueda {
+        max-width: none;
+    }
+
+    .lotes-conteo {
+        margin-left: 0;
+        line-height: normal;
+    }
+}
