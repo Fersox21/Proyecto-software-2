@@ -11,24 +11,34 @@ export const findById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { cantidad, total, fecha, proveedor } = data;
+  const { total, fecha, proveedor_id } = data;
   const { rows } = await pool.query(
-    `INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor)
-    VALUES ($1, $2, $3, $4)
+    `INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id)
+    VALUES ($1, $2, true, $3)
     RETURNING *`,
-    [cantidad, total, fecha, proveedor]
+    [fecha, total, proveedor_id]
   );
   return rows[0];
 };
 
 export const update = async (id, data) => {
-  const { cantidad, total, fecha } = data;
+  const { total, fecha, proveedor_id } = data;
+  if (proveedor_id !== undefined) {
+    const { rows } = await pool.query(
+      `UPDATE ordenes_compra
+      SET total = $1, fecha = $2, proveedor_id = $3
+      WHERE id = $4
+      RETURNING *`,
+      [total, fecha, proveedor_id, id]
+    );
+    return rows[0];
+  }
   const { rows } = await pool.query(
     `UPDATE ordenes_compra
-    SET cantidad = $1, total = $2, fecha = $3
-    WHERE id = $4
+    SET total = $1, fecha = $2
+    WHERE id = $3
     RETURNING *`,
-    [cantidad, total, fecha, id]
+    [total, fecha, id]
   );
   return rows[0];
 };

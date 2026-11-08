@@ -1,5 +1,5 @@
 import * as repository from './ordenesCompra.repository.js';
-import * as repositoryProveedor from '../proveedores/proveedores.repository.js'
+import * as repositoryProveedor from '../proveedores/proveedores.repository.js';
 
 export const listarOrdenesCompra = async () => {
   return await repository.findAll();
@@ -16,16 +16,11 @@ export const obtenerOrdenCompraPorId = async (id) => {
 };
 
 export const crearOrdenCompra = async (data) => {
-  const proveedorExistente = await repositoryProveedor.findById(data.proveedor);
-  
-    if (!data.id || !data.cantidad || !data.total || !data.fecha || !proveedorExistente) {
-    const error = new Error('Faltan datos obligatorios para crear el lote (nroOrdenCompra, cantidad, total, fecha)');
-    error.status = 400;
-    throw error;
-  }
+  const proveedorId = data.proveedor_id ?? data.proveedorId ?? data.proveedor;
+  const proveedorExistente = proveedorId ? await repositoryProveedor.findById(proveedorId) : null;
 
-  if (data.cantidad <= 0) {
-    const error = new Error('La cantidad de la orden de compra debe ser mayor a 0');
+  if (!data.total || !data.fecha || !proveedorExistente) {
+    const error = new Error('Faltan datos obligatorios para crear la orden de compra (total, fecha, proveedor)');
     error.status = 400;
     throw error;
   }
@@ -36,11 +31,14 @@ export const crearOrdenCompra = async (data) => {
     throw error;
   }
 
-  return await repository.create(data);
+  return await repository.create({
+    total: data.total,
+    fecha: data.fecha,
+    proveedor_id: proveedorId
+  });
 };
 
 export const actualizarOrdenCompra = async (id, data) => {
-  
   const ordenCompraExistente = await repository.findById(id);
   if (!ordenCompraExistente) {
     const error = new Error('Orden de compra no encontrada');
@@ -48,19 +46,29 @@ export const actualizarOrdenCompra = async (id, data) => {
     throw error;
   }
 
-  if (data.cantidad !== undefined && data.cantidad <= 0) {
-      const error = new Error('La cantidad de la orden de compra debe ser mayor a 0');
-      error.status = 400;
-      throw error;
-    }
-
   if (data.total !== undefined && data.total <= 0) {
-      const error = new Error('El total de la orden de compra debe ser mayor a 0');
-      error.status = 400;
+    const error = new Error('El total de la orden de compra debe ser mayor a 0');
+    error.status = 400;
+    throw error;
+  }
+
+  const proveedorId = data.proveedor_id ?? data.proveedorId ?? data.proveedor;
+  if (proveedorId !== undefined) {
+    const proveedorExistente = await repositoryProveedor.findById(proveedorId);
+    if (!proveedorExistente) {
+      const error = new Error('Proveedor no encontrado');
+      error.status = 404;
       throw error;
     }
+  }
 
-  const ordenCompraActualizado = await repository.update(id, data);
+  const datosActualizar = {
+    total: data.total ?? ordenCompraExistente.total,
+    fecha: data.fecha ?? ordenCompraExistente.fecha,
+    ...(proveedorId !== undefined && { proveedor_id: proveedorId })
+  };
+
+  const ordenCompraActualizado = await repository.update(id, datosActualizar);
   return ordenCompraActualizado;
 };
 

@@ -7,12 +7,6 @@ import java.util.List;
  */
 public class OrdenCompraDTO {
 
-    /**
-     * Unidades totales declaradas en la orden.
-     * No es derivable: la tabla lotes no registra cantidad por producto.
-     */
-    private Integer cantidad;
-
     private Double total;
     private String fecha;
     private Long proveedorId;
@@ -26,20 +20,11 @@ public class OrdenCompraDTO {
     public OrdenCompraDTO() {
     }
 
-    public OrdenCompraDTO(Integer cantidad, Double total, String fecha, Long proveedorId, List<LoteDTO> lotes) {
-        this.cantidad = cantidad;
+    public OrdenCompraDTO(Double total, String fecha, Long proveedorId, List<LoteDTO> lotes) {
         this.total = total;
         this.fecha = fecha;
         this.proveedorId = proveedorId;
         this.lotes = lotes;
-    }
-
-    public Integer getCantidad() {
-        return cantidad;
-    }
-
-    public void setCantidad(Integer cantidad) {
-        this.cantidad = cantidad;
     }
 
     public Double getTotal() {
@@ -76,7 +61,7 @@ public class OrdenCompraDTO {
 
     @Override
     public String toString() {
-        return "OrdenCompraDTO [cantidad=" + cantidad + ", total=" + total + ", fecha=" + fecha + ", proveedorId="
+        return "OrdenCompraDTO [total=" + total + ", fecha=" + fecha + ", proveedorId="
                 + proveedorId + ", lotes=" + lotes + "]";
     }
 }

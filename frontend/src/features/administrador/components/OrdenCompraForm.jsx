@@ -35,7 +35,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   const [intentoCatalogos, setIntentoCatalogos] = useState(0)
 
   const [valores, setValores] = useState(() => ({
-    cantidad: editando ? String(orden.cantidad ?? '') : '',
     total: editando ? String(orden.total ?? '') : '',
     fecha: normalizarFecha(orden?.fecha),
     proveedorId: orden?.proveedor?.id != null ? String(orden.proveedor.id) : '',
@@ -112,11 +111,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   function validar() {
     const nuevosErrores = {}
 
-    const cantidad = Number(valores.cantidad)
-    if (valores.cantidad === '' || Number.isNaN(cantidad) || cantidad <= 0) {
-      nuevosErrores.cantidad = 'La cantidad debe ser mayor a 0'
-    }
-
     const total = Number(valores.total)
     if (valores.total === '' || Number.isNaN(total) || total <= 0) {
       nuevosErrores.total = 'El total debe ser mayor a 0'
@@ -154,7 +148,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
   function construirDatos() {
     const datos = {
-      cantidad: Number(valores.cantidad),
       total: Number(valores.total),
       fecha: valores.fecha,
       proveedorId: Number(valores.proveedorId),
@@ -270,26 +263,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
             {errores.fecha && (
               <p className="orden-campo-error" id="orden-error-fecha">
                 {errores.fecha}
-              </p>
-            )}
-          </div>
-
-          <div className="orden-campo">
-            <label htmlFor="orden-cantidad">Cantidad</label>
-            <input
-              id="orden-cantidad"
-              type="number"
-              min="1"
-              step="1"
-              inputMode="numeric"
-              value={valores.cantidad}
-              onChange={(evento) => cambiarCampo('cantidad', evento.target.value)}
-              aria-invalid={Boolean(errores.cantidad)}
-              aria-describedby={errores.cantidad ? 'orden-error-cantidad' : undefined}
-            />
-            {errores.cantidad && (
-              <p className="orden-campo-error" id="orden-error-cantidad">
-                {errores.cantidad}
               </p>
             )}
           </div>

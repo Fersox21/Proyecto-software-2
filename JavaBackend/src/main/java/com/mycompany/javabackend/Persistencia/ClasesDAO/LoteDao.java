@@ -41,7 +41,8 @@ public class LoteDao implements DAO<Lote> {
      * quien abrió la transacción pueda hacer rollback.
      */
     public void agregar(Connection conn, Lote lote, Long ordenCompraId) throws SQLException {
-        String sql = "INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo) "
+                + "VALUES (?, ?, ?, ?, ?, true)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             if (lote.getCantidad() != null) {
@@ -89,7 +90,8 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public void modificar(Lote lote) {
-        String sql = "UPDATE lotes SET cantidad = ?, fecha_arribo = ?, fecha_vencimiento = ?, orden_compra_id = ?, producto_id = ? WHERE id = ?";
+        String sql = "UPDATE lotes SET cantidad = ?, fecha_arribo = ?, fecha_vencimiento = ?, "
+                + "orden_compra_id = ?, producto_id = ? WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al modificar lote: no hay conexión disponible");
@@ -128,7 +130,8 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public Lote obtener(Long id) {
-        String sql = "SELECT id, cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id FROM lotes WHERE id = ?";
+        String sql = "SELECT id, cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo "
+                + "FROM lotes WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener lote por ID: no hay conexión disponible");
@@ -152,11 +155,23 @@ public class LoteDao implements DAO<Lote> {
 
     @Override
     public List<Lote> obtenerTodos() {
+        String sql = "SELECT id, cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo "
+                + "FROM lotes WHERE activo = true ORDER BY id ASC";
+        return listar(sql, "Error al listar lotes activos: ");
+    }
+
+    @Override
+    public List<Lote> obtenerTodosIncluyendoInactivos() {
+        String sql = "SELECT id, cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo "
+                + "FROM lotes ORDER BY activo DESC, id ASC";
+        return listar(sql, "Error al listar todos los lotes: ");
+    }
+
+    private List<Lote> listar(String sql, String mensajeError) {
         List<Lote> lista = new ArrayList<>();
-        String sql = "SELECT id, cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id FROM lotes ORDER BY id ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
-            System.err.println("Error al listar lotes: no hay conexión disponible");
+            System.err.println(mensajeError + "no hay conexión disponible");
             return lista;
         }
 
@@ -168,25 +183,41 @@ public class LoteDao implements DAO<Lote> {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todos los lotes: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
     }
 
     /**
-     * Lotes asociados a una orden de compra, para el detalle del GET.
+     * Lotes activos asociados a una orden de compra, para el detalle del GET.
      */
     public List<Lote> listarPorOrdenCompra(Long ordenCompraId) {
-        List<Lote> lista = new ArrayList<>();
-        String sql = "SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.orden_compra_id, l.producto_id, "
-                + "p.nombre AS producto_nombre "
+        String sql = "SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.orden_compra_id, "
+                + "l.producto_id, l.activo, p.nombre AS producto_nombre "
                 + "FROM lotes l "
                 + "LEFT JOIN productos p ON p.id = l.producto_id "
-                + "WHERE l.orden_compra_id = ? ORDER BY l.id ASC";
+                + "WHERE l.orden_compra_id = ? AND l.activo = true ORDER BY l.id ASC";
+        return listarPorOrdenCompra(ordenCompraId, sql, "Error al listar los lotes activos de la orden ");
+    }
+
+    /**
+     * Lotes de una orden incluyendo los dados de baja lógicamente.
+     */
+    public List<Lote> listarPorOrdenCompraIncluyendoInactivos(Long ordenCompraId) {
+        String sql = "SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.orden_compra_id, "
+                + "l.producto_id, l.activo, p.nombre AS producto_nombre "
+                + "FROM lotes l "
+                + "LEFT JOIN productos p ON p.id = l.producto_id "
+                + "WHERE l.orden_compra_id = ? ORDER BY l.activo DESC, l.id ASC";
+        return listarPorOrdenCompra(ordenCompraId, sql, "Error al listar todos los lotes de la orden ");
+    }
+
+    private List<Lote> listarPorOrdenCompra(Long ordenCompraId, String sql, String mensajeError) {
+        List<Lote> lista = new ArrayList<>();
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
-            System.err.println("Error al listar lotes de la orden: no hay conexión disponible");
+            System.err.println(mensajeError + ": no hay conexión disponible");
             return lista;
         }
 
@@ -200,23 +231,36 @@ public class LoteDao implements DAO<Lote> {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar los lotes de la orden " + ordenCompraId + ": " + e.getMessage());
+            System.err.println(mensajeError + ordenCompraId + ": " + e.getMessage());
         }
 
         return lista;
     }
 
     /**
-     * Lotes con producto, orden de compra y proveedor resueltos, ordenados por
-     * fecha de vencimiento. Es la consulta que alimenta la vista de
-     * Vencimientos, evitando que el frontend tenga que pedir cada orden.
+     * Lotes activos con producto, orden de compra y proveedor resueltos,
+     * ordenados por fecha de vencimiento. Es la consulta que alimenta la vista
+     * de Vencimientos, evitando que el frontend tenga que pedir cada orden.
      */
     public List<Lote> listarTodosConDetalle() {
+        return listarConDetalle(SQL_DETALLE + " WHERE l.activo = true ORDER BY l.fecha_vencimiento ASC, l.id ASC",
+                "Error al listar lotes activos con detalle: ");
+    }
+
+    /**
+     * Igual que {@link #listarTodosConDetalle()} pero incluyendo los lotes dados
+     * de baja lógicamente.
+     */
+    public List<Lote> listarTodosConDetalleIncluyendoInactivos() {
+        return listarConDetalle(SQL_DETALLE + " ORDER BY l.activo DESC, l.fecha_vencimiento ASC, l.id ASC",
+                "Error al listar todos los lotes con detalle: ");
+    }
+
+    private List<Lote> listarConDetalle(String sql, String mensajeError) {
         List<Lote> lista = new ArrayList<>();
-        String sql = SQL_DETALLE + " ORDER BY l.fecha_vencimiento ASC, l.id ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
-            System.err.println("Error al listar lotes con detalle: no hay conexión disponible");
+            System.err.println(mensajeError + "no hay conexión disponible");
             return lista;
         }
 
@@ -228,17 +272,18 @@ public class LoteDao implements DAO<Lote> {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar lotes con detalle: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
     }
 
     /**
-     * Un lote con su producto, orden de compra y proveedor, o null si no existe.
+     * Un lote activo con su producto, orden de compra y proveedor, o null si no
+     * existe o está dado de baja.
      */
     public Lote obtenerConDetalle(Long id) {
-        String sql = SQL_DETALLE + " WHERE l.id = ?";
+        String sql = SQL_DETALLE + " WHERE l.id = ? AND l.activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener lote con detalle: no hay conexión disponible");
@@ -265,10 +310,11 @@ public class LoteDao implements DAO<Lote> {
      * Actualiza únicamente la fecha de vencimiento, sin reemplazar el lote ni
      * tocar sus demás columnas.
      *
-     * @return true si se modificó una fila, false si el lote no existe.
+     * @return true si se modificó una fila, false si el lote no existe o está
+     *         dado de baja.
      */
     public boolean actualizarFechaVencimiento(Long id, java.sql.Date fechaVencimiento) {
-        String sql = "UPDATE lotes SET fecha_vencimiento = ? WHERE id = ?";
+        String sql = "UPDATE lotes SET fecha_vencimiento = ? WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             throw new RuntimeException("No hay conexión disponible con la base de datos");
@@ -283,13 +329,13 @@ public class LoteDao implements DAO<Lote> {
         }
     }
 
-    private static final String SQL_DETALLE = "SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, "
+    private static final String SQL_DETALLE = "SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.activo, "
             + "p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca, "
             + "p.categoria AS producto_categoria, p.peso AS producto_peso, p.stock AS producto_stock, "
             + "p.precio_costo AS producto_precio_costo, p.precio_venta AS producto_precio_venta, "
             + "p.en_promocion AS producto_en_promocion, p.precio_promo AS producto_precio_promo, "
             + "p.destacado AS producto_destacado, "
-            + "oc.id AS orden_id, oc.cantidad AS orden_cantidad, oc.total AS orden_total, oc.fecha AS orden_fecha, "
+            + "oc.id AS orden_id, oc.total AS orden_total, oc.fecha AS orden_fecha, "
             + "pr.id AS proveedor_id, pr.nombre AS proveedor_nombre, pr.telefono AS proveedor_telefono "
             + "FROM lotes l "
             + "JOIN productos p ON p.id = l.producto_id "
@@ -308,6 +354,7 @@ public class LoteDao implements DAO<Lote> {
 
         lote.setFechaArribo(rs.getDate("fecha_arribo"));
         lote.setFechaVencimiento(rs.getDate("fecha_vencimiento"));
+        lote.setActivo(rs.getBoolean("activo"));
 
         Producto producto = new Producto();
         producto.setId(rs.getLong("producto_id"));
@@ -325,7 +372,6 @@ public class LoteDao implements DAO<Lote> {
 
         OrdenCompra ordenCompra = new OrdenCompra();
         ordenCompra.setId(rs.getLong("orden_id"));
-        ordenCompra.setCantidad(rs.getInt("orden_cantidad"));
         ordenCompra.setTotal(rs.getDouble("orden_total"));
         ordenCompra.setFecha(rs.getDate("orden_fecha"));
 

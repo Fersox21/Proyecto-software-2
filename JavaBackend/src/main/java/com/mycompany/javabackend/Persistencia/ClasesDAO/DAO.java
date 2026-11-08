@@ -13,4 +13,6 @@ public interface DAO<Type> {
     Type obtener(Long id);
 
     List<Type> obtenerTodos();
+
+    List<Type> obtenerTodosIncluyendoInactivos();
 }

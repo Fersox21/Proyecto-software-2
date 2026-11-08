@@ -15,6 +15,9 @@ import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
 public class PedidoDao implements DAO<Pedido> {
 
+    private static final String SQL_SELECT = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, "
+            + "direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos";
+
     public PedidoDao() {
     }
 
@@ -24,20 +27,16 @@ public class PedidoDao implements DAO<Pedido> {
     }
 
     public Long agregarYObtenerId(Pedido pedido) {
-        // NOTA: Ajusta los nombres de las columnas según la estructura real de
-        // PostgreSQL
-        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, rol_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, "
+                + "estado, motivo_rechazo, rol_id, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, true)";
         Long idGenerado = null;
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al insertar pedido: no hay conexión disponible");
+            return null;
+        }
 
-        try (Connection conn = Conexion.getInstance().getConnection();
-                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)
-                        : null) {
-
-            if (conn == null) {
-                System.err.println("Error: La conexión a la base de datos es nula.");
-                return null;
-            }
-
+        try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setDate(1, pedido.getFecha());
             ps.setDouble(2, pedido.getTotal());
             ps.setString(3, pedido.getMetodoPago());
@@ -74,14 +73,15 @@ public class PedidoDao implements DAO<Pedido> {
     @Override
     public void eliminar(Long id) {
         String sql = "UPDATE pedidos SET activo = false WHERE id = ?";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al eliminar pedido: no hay conexión disponible");
+            return;
+        }
 
-        try (Connection conn = Conexion.getInstance().getConnection();
-                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
-
-            if (ps != null) {
-                ps.setLong(1, id);
-                ps.executeUpdate();
-            }
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             System.err.println("Error al eliminar pedido: " + e.getMessage());
@@ -90,24 +90,27 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public void modificar(Pedido pedido) {
-        String sql = "UPDATE pedidos SET fecha = ?, total = ?, metodo_pago = ?, comercio = ?, modalidad_entrega = ?, direccion = ?, estado = ?, motivo_rechazo = ? WHERE id = ?";
+        String sql = "UPDATE pedidos SET fecha = ?, total = ?, metodo_pago = ?, comercio = ?, "
+                + "modalidad_entrega = ?, direccion = ?, estado = ?, motivo_rechazo = ? "
+                + "WHERE id = ? AND activo = true";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al modificar pedido: no hay conexión disponible");
+            return;
+        }
 
-        try (Connection conn = Conexion.getInstance().getConnection();
-                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDate(1, pedido.getFecha());
+            ps.setDouble(2, pedido.getTotal());
+            ps.setString(3, pedido.getMetodoPago());
+            ps.setString(4, pedido.getComercio());
+            ps.setString(5, pedido.getModalidadEntrega());
+            ps.setString(6, pedido.getDireccion());
+            ps.setString(7, pedido.getEstado());
+            ps.setString(8, pedido.getMotivoRechazo());
+            ps.setLong(9, pedido.getId());
 
-            if (ps != null) {
-                ps.setDate(1, pedido.getFecha());
-                ps.setDouble(2, pedido.getTotal());
-                ps.setString(3, pedido.getMetodoPago());
-                ps.setString(4, pedido.getComercio());
-                ps.setString(5, pedido.getModalidadEntrega());
-                ps.setString(6, pedido.getDireccion());
-                ps.setString(7, pedido.getEstado());
-                ps.setString(8, pedido.getMotivoRechazo());
-                ps.setLong(9, pedido.getId());
-
-                ps.executeUpdate();
-            }
+            ps.executeUpdate();
 
         } catch (SQLException e) {
             System.err.println("Error al modificar pedido: " + e.getMessage());
@@ -116,39 +119,19 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public Pedido obtener(Long id) {
-        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos WHERE id = ?";
+        String sql = SQL_SELECT + " WHERE id = ? AND activo = true";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al obtener pedido por ID: no hay conexión disponible");
+            return null;
+        }
 
-        try (Connection conn = Conexion.getInstance().getConnection();
-                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null) {
-
-            if (ps == null)
-                return null;
-
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Pedido pedido = new Pedido();
-
-                    // LECTURA CORRECTA DESDE EL RESULTSET
-                    pedido.setId(rs.getLong("id"));
-                    pedido.setFecha(rs.getDate("fecha"));
-                    pedido.setTotal(rs.getDouble("total"));
-                    pedido.setMetodoPago(rs.getString("metodo_pago"));
-                    pedido.setComercio(rs.getString("comercio"));
-                    pedido.setModalidadEntrega(rs.getString("modalidad_entrega"));
-                    pedido.setDireccion(rs.getString("direccion"));
-                    pedido.setEstado(rs.getString("estado"));
-                    pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
-                    pedido.setActivo(rs.getBoolean("activo"));
-                    long rolId = rs.getLong("rol_id");
-                    if (!rs.wasNull()) {
-                        Rol rol = new Rol();
-                        rol.setId(rolId);
-                        pedido.setRol(rol);
-                    }
-
-                    return pedido;
+                    return mapearPedido(rs);
                 }
             }
         } catch (SQLException e) {
@@ -160,41 +143,59 @@ public class PedidoDao implements DAO<Pedido> {
 
     @Override
     public List<Pedido> obtenerTodos() {
+        String sql = SQL_SELECT + " WHERE activo = true ORDER BY fecha ASC, id ASC";
+        return listar(sql, "Error al listar los pedidos activos: ");
+    }
+
+    @Override
+    public List<Pedido> obtenerTodosIncluyendoInactivos() {
+        String sql = SQL_SELECT + " ORDER BY activo DESC, fecha ASC, id ASC";
+        return listar(sql, "Error al listar todos los pedidos: ");
+    }
+
+    private List<Pedido> listar(String sql, String mensajeError) {
         List<Pedido> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id FROM pedidos ORDER BY activo DESC, fecha ASC";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println(mensajeError + "no hay conexión disponible");
+            return lista;
+        }
 
-        try (Connection conn = Conexion.getInstance().getConnection();
-                PreparedStatement ps = (conn != null) ? conn.prepareStatement(sql) : null;
-                ResultSet rs = (ps != null) ? ps.executeQuery() : null) {
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
 
-            while (rs != null && rs.next()) {
-                Pedido pedido = new Pedido();
-
-                pedido.setId(rs.getLong("id"));
-                pedido.setFecha(rs.getDate("fecha"));
-                pedido.setTotal(rs.getDouble("total"));
-                pedido.setMetodoPago(rs.getString("metodo_pago"));
-                pedido.setComercio(rs.getString("comercio"));
-                pedido.setModalidadEntrega(rs.getString("modalidad_entrega"));
-                pedido.setDireccion(rs.getString("direccion"));
-                pedido.setEstado(rs.getString("estado"));
-                pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
-                pedido.setActivo(rs.getBoolean("activo"));
-
-                long rolId = rs.getLong("rol_id");
-                if (!rs.wasNull()) {
-                    Rol rol = new Rol();
-                    rol.setId(rolId);
-                    pedido.setRol(rol);
-                }
-
-                lista.add(pedido);
+            while (rs.next()) {
+                lista.add(mapearPedido(rs));
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todos los pedidos: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
+    }
+
+    private Pedido mapearPedido(ResultSet rs) throws SQLException {
+        Pedido pedido = new Pedido();
+
+        pedido.setId(rs.getLong("id"));
+        pedido.setFecha(rs.getDate("fecha"));
+        pedido.setTotal(rs.getDouble("total"));
+        pedido.setMetodoPago(rs.getString("metodo_pago"));
+        pedido.setComercio(rs.getString("comercio"));
+        pedido.setModalidadEntrega(rs.getString("modalidad_entrega"));
+        pedido.setDireccion(rs.getString("direccion"));
+        pedido.setEstado(rs.getString("estado"));
+        pedido.setMotivoRechazo(rs.getString("motivo_rechazo"));
+        pedido.setActivo(rs.getBoolean("activo"));
+
+        long rolId = rs.getLong("rol_id");
+        if (!rs.wasNull()) {
+            Rol rol = new Rol();
+            rol.setId(rolId);
+            pedido.setRol(rol);
+        }
+
+        return pedido;
     }
 }

@@ -1,0 +1,48 @@
+{
+  "name": "MiddlewareAgent",
+  "description": "Subagente especializado en intercepción de peticiones, autenticación, validación de esquemas y manejo global de errores en Express.",
+  "mode": "subagent",
+  "tools": {
+    "file_system": true,
+    "terminal": true
+  },
+  "permissions": {
+    "file_system": {
+      "allow_read": [
+        "src/middlewares/**",
+        "src/errors/**",
+        "src/schemas/**",
+        "src/routes/**",
+        "src/controllers/**",
+        "package.json",
+        ".env.example"
+      ],
+      "allow_write": [
+        "src/middlewares/**",
+        "src/errors/**",
+        "src/schemas/**",
+        "tests/middlewares/**"
+      ],
+      "deny": [
+        ".env",
+        ".env.*",
+        "src/services/**",
+        "src/repositories/**",
+        "src/models/**",
+        "src/config/db.js"
+      ]
+    },
+    "terminal": {
+      "allow_commands": [
+        "npm test -- src/middlewares/**",
+        "npx vitest src/middlewares/**",
+        "npx jest src/middlewares/**"
+      ],
+      "deny_commands": [
+        "npm install*",
+        "git commit*",
+        "rm -rf *"
+      ]
+    }
+  }
+}

@@ -61,7 +61,6 @@ function DetalleLote({ lote }) {
         <dl className="venc-detalle-datos">
           <Dato etiqueta="Número">{ordenCompra.id != null ? `#${ordenCompra.id}` : '—'}</Dato>
           <Dato etiqueta="Fecha">{formatearFecha(ordenCompra.fecha)}</Dato>
-          <Dato etiqueta="Unidades totales">{ordenCompra.cantidad ?? '—'}</Dato>
           <Dato etiqueta="Total">
             {ordenCompra.total != null ? formatearPrecio(ordenCompra.total) : '—'}
           </Dato>
