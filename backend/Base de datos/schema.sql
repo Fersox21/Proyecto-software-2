@@ -17,15 +17,6 @@ CREATE TABLE roles (
     activo BOOLEAN NOT NULL DEFAULT true,
     password VARCHAR(255) NOT NULL
 );
--- 3. Tabla OrdenesCompra
-CREATE TABLE ordenes_compra (
-    id SERIAL PRIMARY KEY,
-    cantidad INTEGER NOT NULL,
-    total INTEGER NOT NULL,
-    fecha DATE NOT NULL,
-    activo BOOLEAN NOT NULL DEFAULT true,
-    proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
-);
 -- 5. Tabla Productos
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
@@ -44,11 +35,11 @@ CREATE TABLE productos (
 -- Tabla 4: Órdenes de Compra (Depende de Proveedores)
 CREATE TABLE ordenes_compra (
     id SERIAL PRIMARY KEY,
-    fecha_arribo DATE NOT NULL,
-    fecha_vencimiento DATE NOT NULL,
+    fecha DATE NOT NULL,
+    cantidad INTEGER NOT NULL,
+    total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     activo BOOLEAN NOT NULL DEFAULT true,
-    orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
-    producto_id INTEGER NOT NULL REFERENCES productos(id)
+    proveedor_id INTEGER NOT NULL REFERENCES proveedores(id)
 );
 -- Tabla 5: Pedidos (Depende de Roles)
 CREATE TABLE pedidos (
@@ -70,6 +61,7 @@ CREATE TABLE lotes (
     fecha_arribo DATE NOT NULL,
     fecha_vencimiento DATE NOT NULL,
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    activo BOOLEAN NOT NULL DEFAULT true,
     orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
     producto_id INTEGER NOT NULL REFERENCES productos(id)
 );

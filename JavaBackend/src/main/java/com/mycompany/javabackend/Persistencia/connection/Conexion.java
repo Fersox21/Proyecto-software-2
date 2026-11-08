@@ -11,7 +11,7 @@ public class Conexion {
 
     private final String URL = "jdbc:postgresql://localhost:5432/distribuidora";
     private final String USER = "postgres";
-private final String PASSWORD = "uli45982380@";
+    private final String PASSWORD = "admin";
 
     private Conexion() {
         try {

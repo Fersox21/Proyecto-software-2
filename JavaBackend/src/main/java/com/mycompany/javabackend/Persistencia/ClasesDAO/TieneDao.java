@@ -69,7 +69,7 @@ public class TieneDao implements DAO<Tiene> {
 
     @Override
     public Tiene obtener(Long id) {
-        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene WHERE id = ?";
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo FROM tiene WHERE pedido_id = ? AND producto_id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
