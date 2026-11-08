@@ -5,130 +5,65 @@ lotes,
 pedidos,
 ordenes_compra,
 productos,
-roles,
+usuarios,
 proveedores RESTART IDENTITY CASCADE;
 /*Inserciones*/
-INSERT INTO proveedores (nombre, telefono)
-VALUES ('Arcor S.A.', '123'),
-    ('Molinos Río de la Plata', '123'),
-    ('Diarco Mayorista', '123');
-INSERT INTO roles (correo, rol, password)
-VALUES (
-        'admin@lafedistribuidora.com',
-        'admin',
-        '$2b$10$iOHyUoB1PPs4CBhfwDVmhOcB.WdMn9PpcDfB.GTKbMJMzIQQg/jwm'
-    );
-INSERT INTO productos (
-        nombre,
-        precio_costo,
-        precio_venta,
-        marca,
-        en_promocion,
-        precio_promo,
-        stock,
-        categoria,
-        peso,
-        destacado
-    )
-VALUES (
-        'Galletas Surtidas',
-        800.00,
-        1200.00,
-        'Bagley',
-        false,
-        NULL,
-        150,
-        'Galletas',
-        '400g',
-        false
-    ),
-    (
-        'Yerba Mate',
-        1500.00,
-        2200.00,
-        'Taragüí',
-        true,
-        1950.00,
-        80,
-        'Infusiones',
-        '1kg',
-        true
-    ),
-    (
-        'Aceite de Girasol',
-        950.00,
-        1400.00,
-        'Cocinero',
-        false,
-        NULL,
-        200,
-        'Almacén',
-        '900ml',
-        false
-    ),
-    (
-        'Fideos Tallarines',
-        600.00,
-        900.00,
-        'Lucchetti',
-        true,
-        800.00,
-        300,
-        'Pastas',
-        '500g',
-        true
-    );
--- Entidades con 1 nivel de dependencia
-INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id)
-VALUES (500, 400000, '2026-10-10', 1),
-    (200, 300000, '2026-10-12', 2);
-INSERT INTO pedidos (
-        fecha,
-        total,
-        metodo_pago,
-        comercio,
-        modalidad_entrega,
-        direccion,
-        estado,
-        motivo_rechazo,
-        rol_id
-    )
-VALUES (
-        '2026-10-13',
-        14000.00,
-        'Efectivo',
-        'Kiosco El Sol',
-        'Reparto',
-        'Av. Illia 123',
-        'Aprobado',
-        NULL,
-        1
-    ),
-    (
-        '2026-10-14',
-        4400.00,
-        'Transferencia',
-        'Despensa María',
-        'Retiro',
-        NULL,
-        'Pendiente',
-        NULL,
-        1
-    );
--- Entidades con múltiples dependencias
-INSERT INTO lotes (
-        fecha_arribo,
-        fecha_vencimiento,
-        cantidad,
-        orden_compra_id,
-        producto_id
-    )
-VALUES ('2026-10-11', '2027-05-10', 500, 1, 1),
-    ('2026-10-13', '2028-10-01', 200, 2, 2);
-INSERT INTO ventas (fecha, total, pedido_id)
-VALUES ('2026-10-13', 14000.00, 1),
-    ('2026-09-01', 10000.00, 2),
-    ('2026-04-01', 20000.00, 2);
-INSERT INTO tiene (cantidad, precio, producto_id, pedido_id)
-VALUES (10, 1200.00, 1, 1),
-    (1, 2200.00, 2, 1);
+-- 1. Instancias para Proveedores
+-- 1. Proveedores
+-- 1. Proveedores
+-- 1. Proveedores
+INSERT INTO proveedores (nombre, activo, telefono) VALUES
+('Molinos del Sur S.A.', true, '+541145550101'),
+('Distribuidora Arcor', true, '+541145550102'),
+('Lácteos La Serenísima', true, '+541145550103'),
+('Insumos El Campo', false, '+541145550104');
+
+-- 2. Usuarios
+INSERT INTO usuarios (correo, rol, activo, password) VALUES
+('admin@lafedistribuidora.com', 'admin', true, '$2b$10$iOHyUoB1PPs4CBhfwDVmhOcB.WdMn9PpcDfB.GTKbMJMzIQQg/jwm'),
+('cliente1@gmail.com', 'cliente', true, '$2b$10$e88z0s.4x5T3sH9f8g7h6e5d4c3b2a1o0p9q8r7s6t5u4v3w2x1y0'),
+('cliente2@gmail.com', 'cliente', true, '$2b$10$z99a1t.5y6U4tI0g9h8i7f6e5d4c3b2a1o0p9q8r7s6t5u4v3w2');
+
+-- 3. Productos
+INSERT INTO productos (nombre, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, peso, destacado, activo) VALUES
+('Harina 0000 1kg', 450.00, 750.00, 'Favorita', false, NULL, 120, 'Almacén', '1 kg', true, true),
+('Leche Entera 1L', 600.00, 950.00, 'La Serenísima', true, 850.00, 50, 'Lácteos', '1 L', true, true),
+('Aceite Girasol 1.5L', 1200.00, 1850.00, 'Natura', false, NULL, 80, 'Almacén', '1.5 L', false, true),
+('Mozzarella 500g', 2100.00, 3100.00, 'Barraza', true, 2800.00, 30, 'Frescos', '500 g', true, true),
+('Puré Tomate 520g', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', '520 g', false, true);
+
+-- 4. Órdenes de Compra (Asociadas al Proveedor)
+INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id) VALUES
+('2026-10-01', 225000.00, true, 1),
+('2026-10-10', 120000.00, true, 3),
+('2026-10-15', 420000.00, true, 2),
+('2026-11-01', 210000.00, true, 3);
+
+-- 5. Lotes (Vincular la OC con el Producto correspondientes)
+INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, activo, orden_compra_id, producto_id) VALUES
+('2026-10-03', '2027-04-03', 300, true, 1, 1),
+('2026-10-11', '2026-11-25', 200, true, 2, 2),
+('2026-10-17', '2027-10-17', 350, true, 3, 3),
+('2026-11-02', '2026-12-15', 100, false, 4, 4);
+
+-- 6. Pedidos (Asociados al Usuario / rol_id)
+INSERT INTO pedidos (fecha, total, metodo_pago, comercio, modalidad_entrega, direccion, estado, motivo_rechazo, activo, rol_id) VALUES
+('2026-11-05', 2550.00, 'Efectivo', 'La Fe Distribuidora', 'Delivery', 'Av. San Martín 1234', 'entregado', NULL, true, 2),
+('2026-11-06', 5650.00, 'Transferencia', 'La Fe Distribuidora', 'Retiro', NULL, 'aprobado', NULL, true, 3),
+('2026-11-07', 1850.00, 'Mercado Pago', 'La Fe Distribuidora', 'Delivery', 'Calle Belgrano 456', 'pendiente', NULL, true, 2),
+('2026-11-08', 3100.00, 'Efectivo', 'La Fe Distribuidora', 'Delivery', 'Rivadavia 789', 'rechazado', 'Sin stock suficiente', true, 3);
+
+-- 7. Tabla intermedia Tiene
+INSERT INTO tiene (pedido_id, producto_id, cantidad, precio, activo) VALUES
+(1, 2, 2, 850.00, true),
+(1, 1, 1, 850.00, true),
+(2, 4, 1, 2800.00, true),
+(2, 5, 3, 580.00, true),
+(2, 3, 1, 1110.00, true),
+(3, 3, 1, 1850.00, true),
+(4, 4, 1, 3100.00, true);
+
+-- 8. Ventas (Consolidación de Pedidos)
+INSERT INTO ventas (fecha, total, activo, pedido_id) VALUES
+('2026-11-05', 2550.00, true, 1),
+('2026-11-06', 5650.00, true, 2);

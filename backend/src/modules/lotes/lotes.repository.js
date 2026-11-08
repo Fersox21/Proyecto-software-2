@@ -3,13 +3,13 @@ import { pool } from '../../config/db.js';
 // Consulta base: cada lote con su producto, su orden de compra y el proveedor
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
 const SQL_DETALLE = `
-  SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento,
+  SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.activo,
          p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca,
          p.categoria AS producto_categoria, p.peso AS producto_peso, p.stock AS producto_stock,
          p.precio_costo AS producto_precio_costo, p.precio_venta AS producto_precio_venta,
          p.en_promocion AS producto_en_promocion, p.precio_promo AS producto_precio_promo,
          p.destacado AS producto_destacado,
-         oc.id AS orden_id, oc.cantidad AS orden_cantidad, oc.total AS orden_total,
+         oc.id AS orden_id, oc.total AS orden_total,
          oc.fecha AS orden_fecha,
          pr.id AS proveedor_id, pr.nombre AS proveedor_nombre, pr.telefono AS proveedor_telefono
   FROM lotes l
@@ -23,7 +23,6 @@ const mapearLoteConDetalle = (row) => {
 
   const ordenCompra = {
     id: row.orden_id,
-    cantidad: row.orden_cantidad,
     total: row.orden_total,
     fecha: row.orden_fecha,
     proveedor: null
@@ -42,12 +41,13 @@ const mapearLoteConDetalle = (row) => {
     cantidad: row.cantidad,
     fechaArribo: row.fecha_arribo,
     fechaVencimiento: row.fecha_vencimiento,
+    activo: row.activo,
     producto: {
       id: row.producto_id,
       nombre: row.producto_nombre,
       marca: row.producto_marca,
       categoria: row.producto_categoria,
-      peso: row.producto_peso,
+      peso: row.peso ?? row.producto_peso,
       stock: row.producto_stock,
       precioCosto: row.producto_precio_costo,
       precioVenta: row.producto_precio_venta,
@@ -74,8 +74,8 @@ export const findById = async (id) => {
 export const create = async (data) => {
   const { cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
   const { rows } = await pool.query(
-    `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id)
-    VALUES ($1, $2, $3, $4, $5)
+    `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
+    VALUES ($1, $2, $3, $4, $5, true)
     RETURNING id`,
     [cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto]
   );

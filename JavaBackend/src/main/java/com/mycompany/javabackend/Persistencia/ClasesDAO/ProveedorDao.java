@@ -12,12 +12,14 @@ import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
 public class ProveedorDao implements DAO<Proveedor> {
 
+    private static final String SQL_SELECT = "SELECT id, nombre, telefono, activo FROM proveedores";
+
     public ProveedorDao() {
     }
 
     @Override
     public void agregar(Proveedor proveedor) {
-        String sql = "INSERT INTO proveedores (nombre, telefono) VALUES (?, ?)";
+        String sql = "INSERT INTO proveedores (nombre, telefono, activo) VALUES (?, ?, true)";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al insertar proveedor: no hay conexión disponible");
@@ -54,7 +56,7 @@ public class ProveedorDao implements DAO<Proveedor> {
 
     @Override
     public void modificar(Proveedor proveedor) {
-        String sql = "UPDATE proveedores SET nombre = ?, telefono = ? WHERE id = ?";
+        String sql = "UPDATE proveedores SET nombre = ?, telefono = ? WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al modificar proveedor: no hay conexión disponible");
@@ -74,7 +76,7 @@ public class ProveedorDao implements DAO<Proveedor> {
 
     @Override
     public Proveedor obtener(Long id) {
-        String sql = "SELECT id, nombre, telefono, activo FROM proveedores WHERE id = ?";
+        String sql = SQL_SELECT + " WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener proveedor por ID: no hay conexión disponible");
@@ -86,13 +88,7 @@ public class ProveedorDao implements DAO<Proveedor> {
 
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Proveedor proveedor = new Proveedor();
-
-                    proveedor.setId(rs.getLong("id"));
-                    proveedor.setNombre(rs.getString("nombre"));
-                    proveedor.setTelefono(rs.getString("telefono"));
-                    proveedor.setActivo(rs.getBoolean("activo"));
-                    return proveedor;
+                    return mapearProveedor(rs);
                 }
             }
         } catch (SQLException e) {
@@ -104,11 +100,21 @@ public class ProveedorDao implements DAO<Proveedor> {
 
     @Override
     public List<Proveedor> obtenerTodos() {
+        String sql = SQL_SELECT + " WHERE activo = true ORDER BY nombre ASC";
+        return listar(sql, "Error al listar los proveedores activos: ");
+    }
+
+    @Override
+    public List<Proveedor> obtenerTodosIncluyendoInactivos() {
+        String sql = SQL_SELECT + " ORDER BY activo DESC, nombre ASC";
+        return listar(sql, "Error al listar todos los proveedores: ");
+    }
+
+    private List<Proveedor> listar(String sql, String mensajeError) {
         List<Proveedor> lista = new ArrayList<>();
-        String sql = "SELECT id, nombre, telefono, activo FROM proveedores ORDER BY activo DESC, nombre ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
-            System.err.println("Error al listar proveedores: no hay conexión disponible");
+            System.err.println(mensajeError + "no hay conexión disponible");
             return lista;
         }
 
@@ -116,20 +122,24 @@ public class ProveedorDao implements DAO<Proveedor> {
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Proveedor proveedor = new Proveedor();
-
-                proveedor.setId(rs.getLong("id"));
-                proveedor.setNombre(rs.getString("nombre"));
-                proveedor.setTelefono(rs.getString("telefono"));
-                proveedor.setActivo(rs.getBoolean("activo"));
-
-                lista.add(proveedor);
+                lista.add(mapearProveedor(rs));
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todos los proveedores: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
+    }
+
+    private Proveedor mapearProveedor(ResultSet rs) throws SQLException {
+        Proveedor proveedor = new Proveedor();
+
+        proveedor.setId(rs.getLong("id"));
+        proveedor.setNombre(rs.getString("nombre"));
+        proveedor.setTelefono(rs.getString("telefono"));
+        proveedor.setActivo(rs.getBoolean("activo"));
+
+        return proveedor;
     }
 }

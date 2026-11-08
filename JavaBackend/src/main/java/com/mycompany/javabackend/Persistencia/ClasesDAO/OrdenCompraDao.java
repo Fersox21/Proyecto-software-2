@@ -16,6 +16,10 @@ import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
 public class OrdenCompraDao implements DAO<OrdenCompra> {
 
+    private static final String SQL_SELECT = "SELECT oc.id, oc.fecha, oc.total, oc.activo, oc.proveedor_id, "
+            + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
+            + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ";
+
     private final LoteDao loteDao = new LoteDao();
 
     public OrdenCompraDao() {
@@ -30,7 +34,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
      * Inserta la orden y devuelve el id generado por la base.
      */
     public Long agregarYObtenerId(OrdenCompra ordenCompra) {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (fecha, total, proveedor_id, activo) VALUES (?, ?, ?, true)";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al insertar ordenCompra: no hay conexión disponible");
@@ -77,7 +81,8 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public void modificar(OrdenCompra ordenCompra) {
-        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, proveedor_id = ? WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET fecha = ?, total = ?, proveedor_id = ? "
+                + "WHERE id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al modificar ordenCompra: no hay conexión disponible");
@@ -86,7 +91,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             setParametrosOrden(ps, ordenCompra);
-            ps.setLong(5, ordenCompra.getId());
+            ps.setLong(4, ordenCompra.getId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -96,9 +101,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public OrdenCompra obtener(Long id) {
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
-                + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id WHERE oc.id = ?";
+        String sql = SQL_SELECT + "WHERE oc.id = ? AND oc.activo = true";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
             System.err.println("Error al obtener ordenCompra por ID: no hay conexión disponible");
@@ -122,13 +125,21 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
 
     @Override
     public List<OrdenCompra> obtenerTodos() {
+        String sql = SQL_SELECT + "WHERE oc.activo = true ORDER BY oc.fecha ASC, oc.id ASC";
+        return listar(sql, "Error al listar todas las ordenesCompra activas: ");
+    }
+
+    @Override
+    public List<OrdenCompra> obtenerTodosIncluyendoInactivos() {
+        String sql = SQL_SELECT + "ORDER BY oc.activo DESC, oc.fecha ASC, oc.id ASC";
+        return listar(sql, "Error al listar todas las ordenesCompra: ");
+    }
+
+    private List<OrdenCompra> listar(String sql, String mensajeError) {
         List<OrdenCompra> lista = new ArrayList<>();
-        String sql = "SELECT oc.id, oc.cantidad, oc.total, oc.fecha, oc.activo, oc.proveedor_id, "
-                + "p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono "
-                + "FROM ordenes_compra oc LEFT JOIN proveedores p ON p.id = oc.proveedor_id ORDER BY oc.activo DESC, oc.fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
-            System.err.println("Error al listar ordenesCompra: no hay conexión disponible");
+            System.err.println(mensajeError + "no hay conexión disponible");
             return lista;
         }
 
@@ -140,7 +151,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todas las ordenesCompra: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
@@ -254,7 +265,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     // ------------------------------------------------------------------
 
     private Long insertarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "INSERT INTO ordenes_compra (cantidad, total, fecha, proveedor_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO ordenes_compra (fecha, total, proveedor_id, activo) VALUES (?, ?, ?, true)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             setParametrosOrden(ps, ordenCompra);
@@ -274,11 +285,12 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     }
 
     private void actualizarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
-        String sql = "UPDATE ordenes_compra SET cantidad = ?, total = ?, fecha = ?, proveedor_id = ? WHERE id = ?";
+        String sql = "UPDATE ordenes_compra SET fecha = ?, total = ?, proveedor_id = ? "
+                + "WHERE id = ? AND activo = true";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             setParametrosOrden(ps, ordenCompra);
-            ps.setLong(5, ordenCompra.getId());
+            ps.setLong(4, ordenCompra.getId());
             ps.executeUpdate();
         }
     }
@@ -316,15 +328,13 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
     }
 
     private void setParametrosOrden(PreparedStatement ps, OrdenCompra ordenCompra) throws SQLException {
-        ps.setInt(1, ordenCompra.getCantidad());
+        ps.setDate(1, ordenCompra.getFecha());
         ps.setDouble(2, ordenCompra.getTotal());
-        ps.setDate(3, ordenCompra.getFecha());
-        ps.setBoolean(4, ordenCompra.isActivo());
 
         if (ordenCompra.getProveedor() != null && ordenCompra.getProveedor().getId() != null) {
-            ps.setLong(5, ordenCompra.getProveedor().getId());
+            ps.setLong(3, ordenCompra.getProveedor().getId());
         } else {
-            ps.setNull(5, Types.BIGINT);
+            ps.setNull(3, Types.BIGINT);
         }
     }
 
@@ -332,9 +342,8 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         OrdenCompra ordenCompra = new OrdenCompra();
 
         ordenCompra.setId(rs.getLong("id"));
-        ordenCompra.setCantidad(rs.getInt("cantidad"));
-        ordenCompra.setTotal(rs.getDouble("total"));
         ordenCompra.setFecha(rs.getDate("fecha"));
+        ordenCompra.setTotal(rs.getDouble("total"));
         ordenCompra.setActivo(rs.getBoolean("activo"));
 
         long proveedorId = rs.getLong("proveedor_id");

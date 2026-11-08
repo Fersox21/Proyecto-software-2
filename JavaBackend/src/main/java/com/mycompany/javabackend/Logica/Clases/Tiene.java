@@ -1,7 +1,6 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 public class Tiene {
-    private Long id;
     private int cantidad;
     private double precio;
     private boolean activo;
@@ -11,8 +10,7 @@ public class Tiene {
     public Tiene() {
     }
 
-    public Tiene(Long id, int cantidad, double precio, boolean activo, Producto producto, Pedido pedido) {
-        this.id = id;
+    public Tiene(int cantidad, double precio, boolean activo, Producto producto, Pedido pedido) {
         this.cantidad = cantidad;
         this.precio = precio;
         this.activo = activo;
@@ -67,11 +65,4 @@ public class Tiene {
                 + "]";
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

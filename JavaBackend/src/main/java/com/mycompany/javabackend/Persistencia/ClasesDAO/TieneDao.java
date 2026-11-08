@@ -12,16 +12,23 @@ import com.mycompany.javabackend.Logica.Clases.Producto;
 import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
-public class TieneDao implements DAO<Tiene> {
+/**
+ * DAO de la tabla intermedia {@code tiene}, cuya clave primaria es compuesta:
+ * {@code (pedido_id, producto_id)}.
+ */
+public class TieneDao {
 
     public TieneDao() {
     }
 
-    @Override
     public void agregar(Tiene tiene) {
-        // Inserción en la tabla de asociación con la clave compuesta
-        String sql = "INSERT INTO tiene (producto_id, pedidos_id, cantidad, precio) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO tiene (producto_id, pedido_id, cantidad, precio, activo) "
+                + "VALUES (?, ?, ?, ?, true)";
         Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al insertar detalle del pedido (tiene): no hay conexión disponible");
+            return;
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, tiene.getProducto().getId());
@@ -36,13 +43,69 @@ public class TieneDao implements DAO<Tiene> {
         }
     }
 
-    @Override
-    public void eliminar(Long id) {
-        String sql = "UPDATE tiene SET activo = false WHERE id = ?";
+    public void modificar(Tiene tiene) {
+        String sql = "UPDATE tiene SET cantidad = ?, precio = ? "
+                + "WHERE pedido_id = ? AND producto_id = ? AND activo = true";
         Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al modificar tiene: no hay conexión disponible");
+            return;
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, id);
+            ps.setInt(1, tiene.getCantidad());
+            ps.setDouble(2, tiene.getPrecio());
+            ps.setLong(3, tiene.getPedido().getId());
+            ps.setLong(4, tiene.getProducto().getId());
+            ps.executeUpdate();
+
+        } catch (SQLException e) {
+            System.err.println("Error al modificar tiene: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Obtiene un ítem activo por su clave compuesta.
+     */
+    public Tiene obtener(Long pedidoId, Long productoId) {
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
+                + "FROM tiene WHERE pedido_id = ? AND producto_id = ? AND activo = true";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al obtener tiene: no hay conexión disponible");
+            return null;
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, pedidoId);
+            ps.setLong(2, productoId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapearTiene(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error al obtener tiene: " + e.getMessage());
+        }
+
+        return null;
+    }
+
+    /**
+     * Baja lógica de un ítem por su clave compuesta.
+     */
+    public void eliminar(Long pedidoId, Long productoId) {
+        String sql = "UPDATE tiene SET activo = false WHERE pedido_id = ? AND producto_id = ?";
+        Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al eliminar tiene: no hay conexión disponible");
+            return;
+        }
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, pedidoId);
+            ps.setLong(2, productoId);
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -50,126 +113,117 @@ public class TieneDao implements DAO<Tiene> {
         }
     }
 
-    @Override
-    public void modificar(Tiene tiene) {
-        String sql = "UPDATE tiene SET cantidad = ?, precio = ? WHERE id = ?";
+    /**
+     * Baja lógica de todos los ítems de un pedido. Se usa al eliminar una venta.
+     */
+    public void eliminarPorPedido(Long pedidoId) {
+        String sql = "UPDATE tiene SET activo = false WHERE pedido_id = ?";
         Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println("Error al eliminar los ítems del pedido: no hay conexión disponible");
+            return;
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, tiene.getCantidad());
-            ps.setDouble(2, tiene.getPrecio());
-            ps.setLong(3, tiene.getId());
+            ps.setLong(1, pedidoId);
             ps.executeUpdate();
 
         } catch (SQLException e) {
-            System.err.println("Error al modificar tiene: " + e.getMessage());
+            System.err.println("Error al eliminar los ítems del pedido: " + e.getMessage());
         }
-
     }
 
-    @Override
-    public Tiene obtener(Long id) {
-        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo FROM tiene WHERE pedido_id = ? AND producto_id = ?";
-        Connection conn = Conexion.getInstance().getConnection();
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, id);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Tiene tiene = new Tiene();
-
-                    tiene.setId(rs.getLong("id"));
-                    tiene.setCantidad(rs.getInt("cantidad"));
-                    tiene.setPrecio(rs.getDouble("precio"));
-
-                    Producto producto = new Producto();
-                    producto.setId(rs.getLong("producto_id"));
-                    tiene.setProducto(producto);
-
-                    Pedido pedido = new Pedido();
-                    pedido.setId(rs.getLong("pedidos_id"));
-                    tiene.setPedido(pedido);
-
-                    tiene.setActivo(rs.getBoolean("activo"));
-                    return tiene;
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Error al obtener tiene por ID: " + e.getMessage());
-        }
-
-        return null;
-    }
-
-    @Override
     public List<Tiene> obtenerTodos() {
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
+                + "FROM tiene WHERE activo = true ORDER BY pedido_id ASC, producto_id ASC";
+        return listar(sql, "Error al listar los ítems activos: ");
+    }
+
+    public List<Tiene> obtenerTodosIncluyendoInactivos() {
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
+                + "FROM tiene ORDER BY activo DESC, pedido_id ASC, producto_id ASC";
+        return listar(sql, "Error al listar todos los ítems: ");
+    }
+
+    /**
+     * Ítems activos de un pedido.
+     */
+    public List<Tiene> listarPorPedido(Long pedidoId) {
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
+                + "FROM tiene WHERE pedido_id = ? AND activo = true ORDER BY producto_id ASC";
+        return listarPorPedido(pedidoId, sql, "Error al listar los ítems activos del pedido ");
+    }
+
+    /**
+     * Ítems de un pedido incluyendo los dados de baja lógicamente.
+     */
+    public List<Tiene> listarPorPedidoIncluyendoInactivos(Long pedidoId) {
+        String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
+                + "FROM tiene WHERE pedido_id = ? ORDER BY activo DESC, producto_id ASC";
+        return listarPorPedido(pedidoId, sql, "Error al listar todos los ítems del pedido ");
+    }
+
+    private List<Tiene> listar(String sql, String mensajeError) {
         List<Tiene> lista = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, producto_id, pedidos_id, activo FROM tiene ORDER BY activo DESC";
         Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println(mensajeError + "no hay conexión disponible");
+            return lista;
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql);
                 ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
-                Tiene tiene = new Tiene();
-
-                tiene.setId(rs.getLong("id"));
-                tiene.setCantidad(rs.getInt("cantidad"));
-                tiene.setPrecio(rs.getDouble("precio"));
-
-                Producto producto = new Producto();
-                producto.setId(rs.getLong("producto_id"));
-                tiene.setProducto(producto);
-
-                Pedido pedido = new Pedido();
-                pedido.setId(rs.getLong("pedidos_id"));
-                tiene.setPedido(pedido);
-                tiene.setActivo(rs.getBoolean("activo"));
-
-                lista.add(tiene);
+                lista.add(mapearTiene(rs));
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todos los tiene: " + e.getMessage());
+            System.err.println(mensajeError + e.getMessage());
         }
 
         return lista;
     }
 
-    public List<Tiene> obtenerPorVenta(Long idVenta) {
-        List<Tiene> listaItems = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, activo, producto_id, pedidos_id FROM tiene WHERE pedidos_id = ? ORDER BY id ASC";
+    private List<Tiene> listarPorPedido(Long pedidoId, String sql, String mensajeError) {
+        List<Tiene> lista = new ArrayList<>();
         Connection conn = Conexion.getInstance().getConnection();
+        if (conn == null) {
+            System.err.println(mensajeError + ": no hay conexión disponible");
+            return lista;
+        }
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, idVenta);
-            ResultSet rs = ps.executeQuery();
+            ps.setLong(1, pedidoId);
 
-            while (rs.next()) {
-                Tiene tiene = new Tiene();
-
-                tiene.setId(rs.getLong("id"));
-                tiene.setCantidad(rs.getInt("cantidad"));
-                tiene.setPrecio(rs.getDouble("precio"));
-                tiene.setActivo(rs.getBoolean("activo"));
-
-                Producto producto = new Producto();
-                producto.setId(rs.getLong("producto_id"));
-                tiene.setProducto(producto);
-
-                Pedido pedido = new Pedido();
-                pedido.setId(rs.getLong("pedidos_id"));
-                tiene.setPedido(pedido);
-
-                listaItems.add(tiene);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearTiene(rs));
+                }
             }
 
         } catch (SQLException e) {
-            System.err.println("Error al listar todos los tiene: " + e.getMessage());
+            System.err.println(mensajeError + pedidoId + ": " + e.getMessage());
         }
 
-        return listaItems;
+        return lista;
     }
 
+    private Tiene mapearTiene(ResultSet rs) throws SQLException {
+        Tiene tiene = new Tiene();
+
+        tiene.setCantidad(rs.getInt("cantidad"));
+        tiene.setPrecio(rs.getDouble("precio"));
+        tiene.setActivo(rs.getBoolean("activo"));
+
+        Producto producto = new Producto();
+        producto.setId(rs.getLong("producto_id"));
+        tiene.setProducto(producto);
+
+        Pedido pedido = new Pedido();
+        pedido.setId(rs.getLong("pedido_id"));
+        tiene.setPedido(pedido);
+
+        return tiene;
+    }
 }

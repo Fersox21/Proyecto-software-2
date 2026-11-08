@@ -135,10 +135,6 @@ public class OrdenCompraService {
             throw new IllegalArgumentException("Los datos de la orden de compra son obligatorios");
         }
 
-        if (dto.getCantidad() == null || dto.getCantidad() <= 0) {
-            throw new IllegalArgumentException("La cantidad de la orden de compra debe ser mayor a 0");
-        }
-
         if (dto.getTotal() == null || dto.getTotal() <= 0) {
             throw new IllegalArgumentException("El total de la orden de compra debe ser mayor a 0");
         }
@@ -161,7 +157,6 @@ public class OrdenCompraService {
         }
 
         OrdenCompra ordenCompra = new OrdenCompra();
-        ordenCompra.setCantidad(dto.getCantidad());
         ordenCompra.setTotal(dto.getTotal());
         ordenCompra.setFecha(parsearFecha(dto.getFecha(), "La fecha de la orden de compra"));
         ordenCompra.setProveedor(proveedor);
