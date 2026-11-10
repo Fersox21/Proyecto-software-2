@@ -20,7 +20,7 @@ public class VentaDao implements DAO<Venta> {
 
     @Override
     public void agregar(Venta venta) {
-        String sql = "INSERT INTO ventas (fecha, total, pedido) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO ventas (fecha, total, pedido_id) VALUES (?, ?, ?)";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -44,8 +44,10 @@ public class VentaDao implements DAO<Venta> {
     public void eliminar(Long id) {
         String sql = "UPDATE ventas SET activo = false WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
-        List<Tiene> itemsVenta = new ArrayList<>();
-        itemsVenta = new TieneDao().obtenerPorVenta(id);
+
+        Venta venta = obtener(id);
+        List<Tiene> itemsVenta = new TieneDao().obtenerPorVenta(venta.getPedido().getId());
+       
 
         for (Tiene item : itemsVenta) {
             new TieneDao().eliminar(item.getId());
@@ -62,13 +64,14 @@ public class VentaDao implements DAO<Venta> {
 
     @Override
     public void modificar(Venta venta) {
-        String sql = "UPDATE ventas SET fecha = ?, total = ? WHERE id = ?";
+        String sql = "UPDATE ventas SET fecha = ?, total = ?, activo = ? WHERE id = ?";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setDate(1, venta.getFecha());
             ps.setDouble(2, venta.getTotal());
-            ps.setLong(3, venta.getId());
+            ps.setBoolean(3, venta.isActivo());
+            ps.setLong(4, venta.getId());
             ps.executeUpdate();
 
         } catch (SQLException e) {
@@ -110,7 +113,7 @@ public class VentaDao implements DAO<Venta> {
     @Override
     public List<Venta> obtenerTodos() {
         List<Venta> lista = new ArrayList<>();
-        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas ORDER BY activo DESC, fecha ASC";
+        String sql = "SELECT id, fecha, total, activo, pedido_id FROM ventas WHERE activo = true ORDER BY fecha ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql);

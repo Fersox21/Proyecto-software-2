@@ -139,7 +139,7 @@ public class TieneDao implements DAO<Tiene> {
 
     public List<Tiene> obtenerPorVenta(Long idVenta) {
         List<Tiene> listaItems = new ArrayList<>();
-        String sql = "SELECT id, cantidad, precio, activo, producto_id, pedidos_id FROM tiene WHERE pedidos_id = ? ORDER BY id ASC";
+        String sql = "SELECT id, cantidad, precio, activo, producto_id, pedido_id FROM tiene WHERE pedido_id = ? ORDER BY id ASC";
         Connection conn = Conexion.getInstance().getConnection();
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -159,7 +159,7 @@ public class TieneDao implements DAO<Tiene> {
                 tiene.setProducto(producto);
 
                 Pedido pedido = new Pedido();
-                pedido.setId(rs.getLong("pedidos_id"));
+                pedido.setId(rs.getLong("pedido_id"));
                 tiene.setPedido(pedido);
 
                 listaItems.add(tiene);

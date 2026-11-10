@@ -1,8 +1,7 @@
 package com.mycompany.javabackend.Logica.Clases;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class Venta {
     private Long id;
@@ -10,7 +9,7 @@ public class Venta {
     private double total;
     private boolean activo;
     private Pedido pedido;
-    private List<Producto> productos;
+  
 
     public Venta() {
     }
@@ -21,7 +20,7 @@ public class Venta {
         this.total = total;
         this.activo = activo;
         this.pedido = pedido;
-        this.productos = new ArrayList<>();
+        
     }
 
     public Venta(Long id, Date fecha, double total) {
@@ -29,7 +28,7 @@ public class Venta {
         this.fecha = fecha;
         this.total = total;
         this.activo = true;
-        this.productos = new ArrayList<>();
+        
     }
 
     public Long getId() {
@@ -64,13 +63,9 @@ public class Venta {
         this.pedido = pedido;
     }
 
-    public List<Producto> getProductos() {
-        return productos;
-    }
+   
 
-    public void setProductos(List<Producto> productos) {
-        this.productos = productos;
-    }
+    
 
     public boolean isActivo() {
         return activo;
@@ -83,7 +78,6 @@ public class Venta {
     @Override
     public String toString() {
         return "Venta [id=" + id + ", fecha=" + fecha + ", total=" + total + ", activo=" + activo + ", pedido=" + pedido
-                + ", productos="
-                + productos + "]";
+                +   "]";
     }
 }
