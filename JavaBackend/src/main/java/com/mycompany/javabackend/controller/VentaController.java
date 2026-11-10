@@ -2,7 +2,6 @@ package com.mycompany.javabackend.controller;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.service.VentasService;
 import com.mycompany.javabackend.dto.VentasDTO;
 
@@ -27,17 +26,17 @@ public class VentaController {
     private final VentasService ventasService = new VentasService();
 
     @GetMapping
-     public ResponseEntity<List<VentasDTO>> mostrarVentas() {
+    public ResponseEntity<List<VentasDTO>> mostrarVentas() {
         List<VentasDTO> lista = ventasService.obtenerTodo();
         return ResponseEntity.ok(lista);
     }
 
-    @PostMapping 
+    @PostMapping
     public ResponseEntity<Void> crearVenta(@RequestBody VentasDTO venta) {
-        try{
-        ventasService.crearVenta(venta);
-        return ResponseEntity.status(201).build();
-        }catch(IllegalArgumentException e){
+        try {
+            ventasService.crearVenta(venta);
+            return ResponseEntity.status(201).build();
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -51,21 +50,27 @@ public class VentaController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/{id}/productos")
+    public ResponseEntity<List<Tiene>> obtenerProductosDeVenta(@PathVariable Long id) {
+        List<Tiene> productos = ventasService.obtenerProductosPorVenta(id);
+        return ResponseEntity.ok(productos);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<Void> actualizarVenta(@PathVariable Long id, @RequestBody VentasDTO venta) {
-        try{
-        ventasService.actualizarVenta(id, venta);
-        return ResponseEntity.ok().build();
-        }catch(NoSuchElementException e){
+        try {
+            ventasService.actualizarVenta(id, venta);
+            return ResponseEntity.ok().build();
+        } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarVenta(@PathVariable Long id) {
-         try {
+        try {
             ventasService.eliminarVenta(id);
             return ResponseEntity.noContent().build();
         } catch (NoSuchElementException e) {
