@@ -12,10 +12,7 @@ import com.mycompany.javabackend.Logica.Clases.Producto;
 import com.mycompany.javabackend.Logica.Clases.Tiene;
 import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
-/**
- * DAO de la tabla intermedia {@code tiene}, cuya clave primaria es compuesta:
- * {@code (pedido_id, producto_id)}.
- */
+
 public class TieneDao {
 
     public TieneDao() {
@@ -64,9 +61,7 @@ public class TieneDao {
         }
     }
 
-    /**
-     * Obtiene un ítem activo por su clave compuesta.
-     */
+   
     public Tiene obtener(Long pedidoId, Long productoId) {
         String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
                 + "FROM tiene WHERE pedido_id = ? AND producto_id = ? AND activo = true";
@@ -92,9 +87,7 @@ public class TieneDao {
         return null;
     }
 
-    /**
-     * Baja lógica de un ítem por su clave compuesta.
-     */
+   
     public void eliminar(Long pedidoId, Long productoId) {
         String sql = "UPDATE tiene SET activo = false WHERE pedido_id = ? AND producto_id = ?";
         Connection conn = Conexion.getInstance().getConnection();
@@ -113,9 +106,7 @@ public class TieneDao {
         }
     }
 
-    /**
-     * Baja lógica de todos los ítems de un pedido. Se usa al eliminar una venta.
-     */
+    
     public void eliminarPorPedido(Long pedidoId) {
         String sql = "UPDATE tiene SET activo = false WHERE pedido_id = ?";
         Connection conn = Conexion.getInstance().getConnection();
@@ -145,18 +136,14 @@ public class TieneDao {
         return listar(sql, "Error al listar todos los ítems: ");
     }
 
-    /**
-     * Ítems activos de un pedido.
-     */
+   
     public List<Tiene> listarPorPedido(Long pedidoId) {
         String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
                 + "FROM tiene WHERE pedido_id = ? AND activo = true ORDER BY producto_id ASC";
         return listarPorPedido(pedidoId, sql, "Error al listar los ítems activos del pedido ");
     }
 
-    /**
-     * Ítems de un pedido incluyendo los dados de baja lógicamente.
-     */
+   
     public List<Tiene> listarPorPedidoIncluyendoInactivos(Long pedidoId) {
         String sql = "SELECT cantidad, precio, producto_id, pedido_id, activo "
                 + "FROM tiene WHERE pedido_id = ? ORDER BY activo DESC, producto_id ASC";
