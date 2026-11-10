@@ -27,19 +27,13 @@ public class OrdenCompraService {
     private final ProveedorDao proveedorDao;
     private final LoteDao loteDao;
 
-    /**
-     * Constructor sin argumentos: es el que usa Spring para crear el bean y el
-     * que permite que el controller instancie el service con "new", igual que
-     * ProductoService y PedidoService.
-     */
+
     @Autowired
     public OrdenCompraService() {
         this(new OrdenCompraDao(), new ProveedorDao(), new LoteDao());
     }
 
-    /**
-     * Constructor con DAO inyectables, pensado para los tests.
-     */
+
     public OrdenCompraService(OrdenCompraDao ordenCompraDao, ProveedorDao proveedorDao, LoteDao loteDao) {
         this.ordenCompraDao = ordenCompraDao;
         this.proveedorDao = proveedorDao;
@@ -50,9 +44,7 @@ public class OrdenCompraService {
         return ordenCompraDao.obtenerTodos();
     }
 
-    /**
-     * Devuelve la orden con sus lotes, o null si no existe.
-     */
+
     public OrdenCompra obtenerPorId(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("El id de la orden de compra es obligatorio");
@@ -67,11 +59,7 @@ public class OrdenCompraService {
         return ordenCompra;
     }
 
-    /**
-     * Valida, mapea y guarda la orden junto con sus lotes.
-     *
-     * @return id generado para la orden.
-     */
+  
     public Long crear(OrdenCompraDTO dto) {
         validarOrden(dto);
 
@@ -86,10 +74,6 @@ public class OrdenCompraService {
         return id;
     }
 
-    /**
-     * Actualiza la cabecera de la orden. Si el DTO trae el campo "lotes", el
-     * conjunto de lotes se reemplaza por completo; si no lo trae, se conservan.
-     */
     public void actualizar(Long id, OrdenCompraDTO dto) {
         if (id == null) {
             throw new IllegalArgumentException("El id de la orden de compra es obligatorio");
@@ -111,9 +95,7 @@ public class OrdenCompraService {
         }
     }
 
-    /**
-     * Elimina la orden y sus lotes en cascada.
-     */
+  
     public void eliminar(Long id) {
         if (id == null) {
             throw new IllegalArgumentException("El id de la orden de compra es obligatorio");
@@ -126,9 +108,7 @@ public class OrdenCompraService {
         ordenCompraDao.eliminarConLotes(id);
     }
 
-    // ------------------------------------------------------------------
-    // Validaciones y mapeo
-    // ------------------------------------------------------------------
+
 
     private void validarOrden(OrdenCompraDTO dto) {
         if (dto == null) {

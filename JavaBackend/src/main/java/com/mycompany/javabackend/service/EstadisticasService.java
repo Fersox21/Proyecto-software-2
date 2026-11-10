@@ -23,9 +23,7 @@ public class EstadisticasService {
         this(new EstadisticasDao());
     }
 
-    /**
-     * Constructor con DAO inyectable, pensado para los tests.
-     */
+
     public EstadisticasService(EstadisticasDao estadisticasDao) {
         this.estadisticasDao = estadisticasDao;
     }
@@ -38,10 +36,7 @@ public class EstadisticasService {
         return estadisticasDao.productosVencidos();
     }
 
-    /**
-     * Ranking de más vendidos del mes indicado. Si no se recibe un mes, se usa
-     * el mes anterior.
-     */
+
     public Map<String, Object> obtenerMasVendidos(String mes) {
         String mesConsulta = (mes == null || mes.isBlank()) ? mesAnterior() : mes.trim();
 

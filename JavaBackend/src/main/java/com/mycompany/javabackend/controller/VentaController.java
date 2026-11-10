@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.javabackend.Logica.Clases.Tiene;
-import com.mycompany.javabackend.service.VentasService;
 import com.mycompany.javabackend.dto.VentasDTO;
+import com.mycompany.javabackend.service.VentasService;
 
 @RestController
 @RequestMapping("/api/ventas")
@@ -51,13 +51,18 @@ public class VentaController {
     }
 
     @GetMapping("/{id}/productos")
-    public ResponseEntity<List<Tiene>> obtenerProductosDeVenta(@PathVariable Long id) {
-        List<Tiene> productos = ventasService.obtenerProductosPorVenta(id);
-        return ResponseEntity.ok(productos);
+    public ResponseEntity<List<Tiene>> obtenerProductosDeVenta(@PathVariable("id") Long id) {
+        try {
+           List<Tiene> productos = ventasService.obtenerProductosPorVenta(id);
+        return ResponseEntity.ok(productos); 
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+        
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> actualizarVenta(@PathVariable Long id, @RequestBody VentasDTO venta) {
+    public ResponseEntity<Void> actualizarVenta(@PathVariable("id") Long id, @RequestBody VentasDTO venta) {
         try {
             ventasService.actualizarVenta(id, venta);
             return ResponseEntity.ok().build();
@@ -69,7 +74,7 @@ public class VentaController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarVenta(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminarVenta(@PathVariable("id") Long id) {
         try {
             ventasService.eliminarVenta(id);
             return ResponseEntity.noContent().build();

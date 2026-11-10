@@ -13,12 +13,7 @@ import java.util.Map;
 
 import com.mycompany.javabackend.Persistencia.connection.Conexion;
 
-/**
- * Consultas de solo lectura para el panel de estadísticas.
- *
- * Devuelve mapas con las mismas claves snake_case que expone el backend Node,
- * de forma que el frontend pueda consumir cualquiera de los dos sin cambios.
- */
+
 public class EstadisticasDao {
 
     private static final String SQL_GANANCIAS_MENSUALES = "SELECT "
@@ -74,9 +69,7 @@ public class EstadisticasDao {
     public EstadisticasDao() {
     }
 
-    /**
-     * Ingresos, costos y ganancia agrupados por mes de los últimos 12 meses.
-     */
+
     public List<Map<String, Object>> gananciasMensuales() {
         List<Map<String, Object>> lista = new ArrayList<>();
         Connection conn = obtenerConexion();
@@ -100,9 +93,6 @@ public class EstadisticasDao {
         return lista;
     }
 
-    /**
-     * Lotes con fecha de vencimiento anterior a la fecha actual.
-     */
     public List<Map<String, Object>> productosVencidos() {
         List<Map<String, Object>> lista = new ArrayList<>();
         Connection conn = obtenerConexion();
@@ -129,9 +119,7 @@ public class EstadisticasDao {
         return lista;
     }
 
-    /**
-     * Top 10 de productos más vendidos en el mes indicado (formato YYYY-MM).
-     */
+
     public List<Map<String, Object>> masVendidosPorMes(String mes) {
         List<Map<String, Object>> lista = new ArrayList<>();
         Connection conn = obtenerConexion();
@@ -159,9 +147,7 @@ public class EstadisticasDao {
         return lista;
     }
 
-    /**
-     * Total recaudado y promedio diario de los últimos 30 días.
-     */
+ 
     public Map<String, Object> promedioDiario() {
         Connection conn = obtenerConexion();
 

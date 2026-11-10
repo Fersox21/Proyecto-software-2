@@ -1,24 +1,20 @@
 package com.mycompany.javabackend.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mycompany.javabackend.Logica.Clases.Pedido;
 import com.mycompany.javabackend.Logica.Clases.Producto;
-import com.mycompany.javabackend.service.ProductoService;
 import com.mycompany.javabackend.dto.ProductoAdminDto;
 import com.mycompany.javabackend.dto.ProductoDto;
+import com.mycompany.javabackend.service.ProductoService;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -40,7 +36,7 @@ public class ProductoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Producto> obtenerPorId(@PathVariable Long id) {
+    public ResponseEntity<Producto> obtenerPorId(@PathVariable("id") Long id) {
         Producto producto = productoService.obtenerPorId(id);
         if (producto != null) {
             return ResponseEntity.ok(producto);

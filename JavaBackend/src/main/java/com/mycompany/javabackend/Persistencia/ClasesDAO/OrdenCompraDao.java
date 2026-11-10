@@ -30,9 +30,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         agregarYObtenerId(ordenCompra);
     }
 
-    /**
-     * Inserta la orden y devuelve el id generado por la base.
-     */
+
     public Long agregarYObtenerId(OrdenCompra ordenCompra) {
         String sql = "INSERT INTO ordenes_compra (fecha, total, proveedor_id, activo) VALUES (?, ?, ?, true)";
         Connection conn = Conexion.getInstance().getConnection();
@@ -157,11 +155,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         return lista;
     }
 
-    /**
-     * Inserta la orden junto con sus lotes en una sola transacción.
-     *
-     * @return id generado para la orden.
-     */
+
     public Long crearConLotes(OrdenCompra ordenCompra, List<Lote> lotes) {
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
@@ -193,11 +187,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         }
     }
 
-    /**
-     * Actualiza la orden y reemplaza por completo sus lotes en una sola
-     * transacción. Si la lista es nula, la orden queda sin lotes: quien llama
-     * debe usar modificar() cuando quiera conservarlos.
-     */
+
     public void actualizarConLotes(OrdenCompra ordenCompra, List<Lote> lotes) {
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
@@ -228,9 +218,7 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         }
     }
 
-    /**
-     * Elimina la orden y sus lotes en cascada, dentro de una transacción.
-     */
+
     public void eliminarConLotes(Long id) {
         Connection conn = Conexion.getInstance().getConnection();
         if (conn == null) {
@@ -260,9 +248,6 @@ public class OrdenCompraDao implements DAO<OrdenCompra> {
         }
     }
 
-    // ------------------------------------------------------------------
-    // Helpers de transacción
-    // ------------------------------------------------------------------
 
     private Long insertarOrden(Connection conn, OrdenCompra ordenCompra) throws SQLException {
         String sql = "INSERT INTO ordenes_compra (fecha, total, proveedor_id, activo) VALUES (?, ?, ?, true)";

@@ -36,10 +36,6 @@ public class LoteDao implements DAO<Lote> {
         }
     }
 
-    /**
-     * Inserta un lote sobre una conexión concreta. Propaga SQLException para que
-     * quien abrió la transacción pueda hacer rollback.
-     */
     public void agregar(Connection conn, Lote lote, Long ordenCompraId) throws SQLException {
         String sql = "INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo) "
                 + "VALUES (?, ?, ?, ?, ?, true)";
