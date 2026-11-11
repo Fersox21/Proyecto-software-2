@@ -1,9 +1,9 @@
 package com.mycompany.javabackend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.mycompany.javabackend.Logica.Clases.OrdenCompra;
 import com.mycompany.javabackend.dto.OrdenCompraDTO;
+import com.mycompany.javabackend.dto.OrdenCompraResponseDTO;
 import com.mycompany.javabackend.dto.RespuestaOrdenCompraDTO;
 import com.mycompany.javabackend.service.OrdenCompraService;
 
@@ -28,26 +29,29 @@ public class OrdenCompraController {
     private final OrdenCompraService ordenCompraService;
 
 
-    @Autowired
     public OrdenCompraController(OrdenCompraService ordenCompraService) {
         this.ordenCompraService = ordenCompraService;
     }
 
     @GetMapping
-    public ResponseEntity<List<OrdenCompra>> obtenerTodas() {
+    public ResponseEntity<List<OrdenCompraResponseDTO>> obtenerTodas() {
         try {
-            return ResponseEntity.ok(ordenCompraService.obtenerTodas());
+            List<OrdenCompraResponseDTO> ordenes = new ArrayList<>();
+            for (OrdenCompra ordenCompra : ordenCompraService.obtenerTodas()) {
+                ordenes.add(OrdenCompraResponseDTO.from(ordenCompra));
+            }
+            return ResponseEntity.ok(ordenes);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<OrdenCompra> obtenerPorId(@PathVariable("id") Long id) {
+    public ResponseEntity<OrdenCompraResponseDTO> obtenerPorId(@PathVariable("id") Long id) {
         try {
             OrdenCompra ordenCompra = ordenCompraService.obtenerPorId(id);
             if (ordenCompra != null) {
-                return ResponseEntity.ok(ordenCompra);
+                return ResponseEntity.ok(OrdenCompraResponseDTO.from(ordenCompra, true));
             }
             return ResponseEntity.notFound().build();
         } catch (IllegalArgumentException e) {
