@@ -107,3 +107,21 @@ export const remove = async (id) => {
   const { rowCount } = await pool.query('UPDATE lotes SET activo = false WHERE id = $1', [id]);
   return rowCount;
 };
+
+export const removeSiNoEsElUltimoLote = async (id) => {
+  const { rowCount } = await pool.query(
+    `UPDATE lotes
+    SET activo = false
+    WHERE id = $1
+      AND activo = true
+      AND (
+        orden_compra_id IS NULL
+        OR (
+          SELECT COUNT(*) FROM lotes l2
+          WHERE l2.orden_compra_id = lotes.orden_compra_id AND l2.activo = true
+        ) > 1
+      )`,
+    [id]
+  );
+  return rowCount;
+};

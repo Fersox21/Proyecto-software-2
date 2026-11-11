@@ -178,9 +178,17 @@ export const actualizarLote = async (id, data) => {
 };
 
 export const eliminarLote = async (id) => {
-  const rowCount = await repository.remove(validarId(id));
-  if (rowCount === 0) {
+  const idLote = validarId(id);
+
+  const loteExistente = await repository.findById(idLote);
+  if (!loteExistente) {
     throw crearError('Lote no encontrado', 404);
   }
+
+  const rowCount = await repository.removeSiNoEsElUltimoLote(idLote);
+  if (rowCount === 0) {
+    throw crearError('No se puede eliminar el único lote de la orden de compra', 409);
+  }
+
   return true;
 };

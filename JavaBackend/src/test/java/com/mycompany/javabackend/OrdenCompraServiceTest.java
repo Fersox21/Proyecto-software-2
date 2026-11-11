@@ -164,24 +164,31 @@ class OrdenCompraServiceTest {
     }
 
     @Test
-    void crearSinLotesGuardaUnaListaVacia() {
-        when(ordenCompraDao.crearConLotes(any(OrdenCompra.class), anyList())).thenReturn(7L);
-
+    void crearSinLotesLanzaIllegalArgument() {
         OrdenCompraDTO dto = dtoValido();
         dto.setLotes(null);
 
-        assertEquals(7L, service.crear(dto));
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
 
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<Lote>> lotesCaptor = ArgumentCaptor.forClass(List.class);
+        assertTrue(ex.getMessage().contains("lote"), "Mensaje inesperado: " + ex.getMessage());
+        verify(ordenCompraDao, never()).crearConLotes(any(), anyList());
+    }
 
-        verify(ordenCompraDao).crearConLotes(any(OrdenCompra.class), lotesCaptor.capture());
-        assertTrue(lotesCaptor.getValue().isEmpty());
+    @Test
+    void crearConListaDeLotesVaciaLanzaIllegalArgument() {
+        OrdenCompraDTO dto = dtoValido();
+        dto.setLotes(new ArrayList<>());
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> service.crear(dto));
+
+        assertTrue(ex.getMessage().contains("lote"), "Mensaje inesperado: " + ex.getMessage());
+        verify(ordenCompraDao, never()).crearConLotes(any(), anyList());
     }
 
     @Test
     void actualizarSinCampoLotesConservaLosExistentes() {
         when(ordenCompraDao.obtener(5L)).thenReturn(new OrdenCompra());
+        when(loteDao.listarPorOrdenCompra(5L)).thenReturn(List.of(new Lote()));
 
         OrdenCompraDTO dto = dtoValido();
         dto.setLotes(null);
@@ -189,6 +196,35 @@ class OrdenCompraServiceTest {
         service.actualizar(5L, dto);
 
         verify(ordenCompraDao).modificar(any(OrdenCompra.class));
+        verify(ordenCompraDao, never()).actualizarConLotes(any(), anyList());
+    }
+
+    @Test
+    void actualizarSinCampoLotesRechazaSiLaOrdenNoTieneLotes() {
+        when(ordenCompraDao.obtener(5L)).thenReturn(new OrdenCompra());
+        when(loteDao.listarPorOrdenCompra(5L)).thenReturn(List.of());
+
+        OrdenCompraDTO dto = dtoValido();
+        dto.setLotes(null);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+                () -> service.actualizar(5L, dto));
+
+        assertTrue(ex.getMessage().contains("lote"), "Mensaje inesperado: " + ex.getMessage());
+        verify(ordenCompraDao, never()).modificar(any(OrdenCompra.class));
+        verify(ordenCompraDao, never()).actualizarConLotes(any(), anyList());
+    }
+
+    @Test
+    void actualizarConListaDeLotesVaciaLanzaIllegalArgument() {
+        when(ordenCompraDao.obtener(5L)).thenReturn(new OrdenCompra());
+
+        OrdenCompraDTO dto = dtoValido();
+        dto.setLotes(new ArrayList<>());
+
+        assertThrows(IllegalArgumentException.class, () -> service.actualizar(5L, dto));
+
+        verify(ordenCompraDao, never()).modificar(any(OrdenCompra.class));
         verify(ordenCompraDao, never()).actualizarConLotes(any(), anyList());
     }
 

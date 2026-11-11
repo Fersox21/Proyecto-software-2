@@ -62,6 +62,7 @@ public class OrdenCompraService {
   
     public Long crear(OrdenCompraDTO dto) {
         validarOrden(dto);
+        validarLotesObligatorios(dto.getLotes());
 
         OrdenCompra ordenCompra = mapearOrden(dto);
         List<Lote> lotes = mapearLotes(dto.getLotes());
@@ -84,6 +85,7 @@ public class OrdenCompraService {
         }
 
         validarOrden(dto);
+        validarLotesDeLaActualizacion(id, dto.getLotes());
 
         OrdenCompra ordenCompra = mapearOrden(dto);
         ordenCompra.setId(id);
@@ -142,6 +144,23 @@ public class OrdenCompraService {
         ordenCompra.setProveedor(proveedor);
 
         return ordenCompra;
+    }
+
+    private void validarLotesDeLaActualizacion(Long id, List<LoteDTO> lotes) {
+        if (lotes != null) {
+            validarLotesObligatorios(lotes);
+            return;
+        }
+
+        if (loteDao.listarPorOrdenCompra(id).isEmpty()) {
+            throw new IllegalArgumentException("La orden de compra debe tener al menos un lote");
+        }
+    }
+
+    private void validarLotesObligatorios(List<LoteDTO> lotes) {
+        if (lotes == null || lotes.isEmpty()) {
+            throw new IllegalArgumentException("La orden de compra debe tener al menos un lote");
+        }
     }
 
     private List<Lote> mapearLotes(List<LoteDTO> lotesDto) {

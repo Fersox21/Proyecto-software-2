@@ -52,6 +52,24 @@ function LotesPage() {
     })
   }, [lotes, busqueda])
 
+  const lotesPorOrden = useMemo(() => {
+    const conteo = new Map()
+
+    lotes.forEach((lote) => {
+      const ordenId = lote.ordenCompra?.id
+      if (ordenId == null) return
+      conteo.set(ordenId, (conteo.get(ordenId) ?? 0) + 1)
+    })
+
+    return conteo
+  }, [lotes])
+
+  const esUltimoLoteDeSuOrden = useCallback(
+    (lote) =>
+      lote.ordenCompra?.id != null && lotesPorOrden.get(lote.ordenCompra.id) === 1,
+    [lotesPorOrden],
+  )
+
   const abrirCrear = useCallback(() => {
     setMensaje(null)
     setFormulario({ modo: 'crear', lote: null })
@@ -245,6 +263,12 @@ function LotesPage() {
                             type="button"
                             className="orden-btn orden-btn-chico orden-btn-peligro"
                             onClick={() => pedirEliminar(lote)}
+                            disabled={esUltimoLoteDeSuOrden(lote)}
+                            title={
+                              esUltimoLoteDeSuOrden(lote)
+                                ? 'La orden de compra debe tener al menos un lote'
+                                : undefined
+                            }
                           >
                             Dar de baja
                           </button>

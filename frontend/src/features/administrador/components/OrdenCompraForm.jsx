@@ -34,12 +34,16 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   const [errorCatalogos, setErrorCatalogos] = useState(null)
   const [intentoCatalogos, setIntentoCatalogos] = useState(0)
 
-  const [valores, setValores] = useState(() => ({
-    total: editando ? String(orden.total ?? '') : '',
-    fecha: normalizarFecha(orden?.fecha),
-    proveedorId: orden?.proveedor?.id != null ? String(orden.proveedor.id) : '',
-    lotes: mapearLotes(orden),
-  }))
+  const [valores, setValores] = useState(() => {
+    const lotesExistentes = mapearLotes(orden)
+
+    return {
+      total: editando ? String(orden.total ?? '') : '',
+      fecha: normalizarFecha(orden?.fecha),
+      proveedorId: orden?.proveedor?.id != null ? String(orden.proveedor.id) : '',
+      lotes: lotesExistentes.length > 0 ? lotesExistentes : [nuevoLote()],
+    }
+  })
   const [lotesModificados, setLotesModificados] = useState(!editando)
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState(null)
@@ -98,6 +102,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   function agregarLote() {
     setValores((previos) => ({ ...previos, lotes: [...previos.lotes, nuevoLote()] }))
     setLotesModificados(true)
+    setErrores((previos) => {
+      if (!previos.lotes) return previos
+      const copia = { ...previos }
+      delete copia.lotes
+      return copia
+    })
   }
 
   function quitarLote(indice) {
@@ -122,6 +132,10 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
     if (!valores.proveedorId) {
       nuevosErrores.proveedorId = 'Elegí un proveedor'
+    }
+
+    if (valores.lotes.length === 0) {
+      nuevosErrores.lotes = 'Agregá al menos un lote'
     }
 
     valores.lotes.forEach((lote, indice) => {
@@ -288,7 +302,11 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
           </div>
         </div>
 
-        <section className="orden-lotes" aria-labelledby="orden-lotes-titulo">
+        <section
+          className="orden-lotes"
+          aria-labelledby="orden-lotes-titulo"
+          aria-describedby={errores.lotes ? 'orden-error-lotes' : undefined}
+        >
           <div className="orden-lotes-cabecera">
             <h3 className="orden-lotes-titulo" id="orden-lotes-titulo">
               Lotes
@@ -299,7 +317,14 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
           </div>
 
           {valores.lotes.length === 0 ? (
-            <p className="orden-lotes-vacio">Esta orden no tiene lotes.</p>
+            <>
+              <p className="orden-lotes-vacio">Esta orden no tiene lotes.</p>
+              {errores.lotes && (
+                <p className="orden-campo-error" id="orden-error-lotes" role="alert">
+                  {errores.lotes}
+                </p>
+              )}
+            </>
           ) : (
             valores.lotes.map((lote, indice) => (
               <div
@@ -380,6 +405,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                   type="button"
                   className="orden-btn orden-btn-peligro orden-btn-quitar"
                   onClick={() => quitarLote(indice)}
+                  disabled={valores.lotes.length === 1}
                   aria-label={`Quitar lote ${indice + 1}`}
                 >
                   Quitar
