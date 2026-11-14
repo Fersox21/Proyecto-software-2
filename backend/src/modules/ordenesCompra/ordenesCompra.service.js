@@ -31,10 +31,31 @@ export const crearOrdenCompra = async (data) => {
     throw error;
   }
 
+  const lotes = Array.isArray(data.lotes) ? data.lotes : [];
+  if (lotes.length === 0) {
+    const error = new Error('La orden de compra debe tener al menos un lote');
+    error.status = 400;
+    throw error;
+  }
+
+  for (const lote of lotes) {
+    const prodId = lote.productoId ?? lote.producto;
+    const cantidad = Number(lote.cantidad);
+    const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
+    const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
+
+    if (!prodId || !cantidad || cantidad <= 0 || !fArribo || !fVenci) {
+      const error = new Error('Los datos de los lotes son obligatorios e inválidos');
+      error.status = 400;
+      throw error;
+    }
+  }
+
   return await repository.create({
     total: data.total,
     fecha: data.fecha,
-    proveedor_id: proveedorId
+    proveedor_id: proveedorId,
+    lotes,
   });
 };
 
@@ -62,10 +83,32 @@ export const actualizarOrdenCompra = async (id, data) => {
     }
   }
 
+  if (data.lotes !== undefined) {
+    if (!Array.isArray(data.lotes) || data.lotes.length === 0) {
+      const error = new Error('La orden de compra debe tener al menos un lote');
+      error.status = 400;
+      throw error;
+    }
+
+    for (const lote of data.lotes) {
+      const prodId = lote.productoId ?? lote.producto;
+      const cantidad = Number(lote.cantidad);
+      const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
+      const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
+
+      if (!prodId || !cantidad || cantidad <= 0 || !fArribo || !fVenci) {
+        const error = new Error('Los datos de los lotes son obligatorios e inválidos');
+        error.status = 400;
+        throw error;
+      }
+    }
+  }
+
   const datosActualizar = {
     total: data.total ?? ordenCompraExistente.total,
     fecha: data.fecha ?? ordenCompraExistente.fecha,
-    ...(proveedorId !== undefined && { proveedor_id: proveedorId })
+    ...(proveedorId !== undefined && { proveedor_id: proveedorId }),
+    ...(data.lotes !== undefined && { lotes: data.lotes }),
   };
 
   const ordenCompraActualizado = await repository.update(id, datosActualizar);

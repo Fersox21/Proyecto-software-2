@@ -1,35 +1,25 @@
-
 const URL_BASE = import.meta.env.VITE_API_URL
-async function leerCuerpo(respuesta) {
-  const texto = await respuesta.text()
-  if (!texto) return null
 
+function obtenerToken() {
   try {
-    return JSON.parse(texto)
+    return sessionStorage.getItem('token')
   } catch {
     return null
   }
 }
 
-function mensajeDeError(estado, cuerpo) {
-  if (cuerpo && typeof cuerpo === 'object') {
-    if (typeof cuerpo.mensaje === 'string' && cuerpo.mensaje) return cuerpo.mensaje
-    if (typeof cuerpo.error === 'string' && cuerpo.error) return cuerpo.error
-  }
-
-  if (estado === 400) return 'Los datos de la orden de compra no son válidos'
-  if (estado === 404) return 'La orden de compra no existe'
-  if (estado === 500) return 'El servidor no pudo procesar la solicitud'
-  return 'No se pudo completar la operación'
-}
-
 export async function pedir(url, opciones = {}) {
+  const token = obtenerToken()
   let respuesta
 
   try {
     respuesta = await fetch(url, {
-      headers: { 'Content-Type': 'application/json' },
       ...opciones,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(opciones.headers ?? {}),
+      },
     })
   } catch {
     throw new Error('No se pudo conectar con el servidor')
@@ -37,13 +27,14 @@ export async function pedir(url, opciones = {}) {
 
   if (respuesta.status === 204) return null
 
-  const cuerpo = await leerCuerpo(respuesta)
+  const datos = await respuesta.json().catch(() => null)
 
   if (!respuesta.ok) {
-    throw new Error(mensajeDeError(respuesta.status, cuerpo))
+    const mensaje = datos?.error || datos?.mensaje || 'No se pudo completar la operación'
+    throw new Error(mensaje)
   }
 
-  return cuerpo
+  return datos
 }
 
 export function obtenerOrdenesCompra() {

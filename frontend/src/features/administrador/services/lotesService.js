@@ -1,30 +1,4 @@
-
 const URL_BASE = import.meta.env.VITE_API_URL
-
-async function leerCuerpo(respuesta) {
-  const texto = await respuesta.text()
-  if (!texto) return null
-
-  try {
-    return JSON.parse(texto)
-  } catch {
-    return null
-  }
-}
-
-function mensajeDeError(estado, cuerpo) {
-  if (cuerpo && typeof cuerpo === 'object') {
-    if (typeof cuerpo.error === 'string' && cuerpo.error) return cuerpo.error
-    if (typeof cuerpo.message === 'string' && cuerpo.message) return cuerpo.message
-    if (typeof cuerpo.mensaje === 'string' && cuerpo.mensaje) return cuerpo.mensaje
-  }
-
-  if (estado === 400) return 'Los datos del lote no son válidos'
-  if (estado === 401) return 'No autorizado: iniciá sesión nuevamente'
-  if (estado === 404) return 'El lote no existe'
-  if (estado === 500) return 'El servidor no pudo procesar la solicitud'
-  return 'No se pudo completar la operación'
-}
 
 function obtenerToken() {
   try {
@@ -53,13 +27,14 @@ async function pedir(url, opciones = {}) {
 
   if (respuesta.status === 204) return null
 
-  const cuerpo = await leerCuerpo(respuesta)
+  const datos = await respuesta.json().catch(() => null)
 
   if (!respuesta.ok) {
-    throw new Error(mensajeDeError(respuesta.status, cuerpo))
+    const mensaje = datos?.error || datos?.mensaje || 'No se pudo completar la operación'
+    throw new Error(mensaje)
   }
 
-  return cuerpo
+  return datos
 }
 
 export function obtenerLotes() {

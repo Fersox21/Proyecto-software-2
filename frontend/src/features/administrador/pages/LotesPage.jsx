@@ -1,33 +1,20 @@
 import { useCallback, useMemo, useState } from 'react'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
-import { formatearFecha } from '../../../shared/utils/formato'
 import { useLotes } from '../hooks/useLotes'
 import Modal from '../components/Modal'
 import LoteForm from '../components/LoteForm'
 import ConfirmarEliminacionLote from '../components/ConfirmarEliminacionLote'
+import FiltroBusquedaLotes from '../components/FiltroBusquedaLotes'
+import FilaLote from '../components/FilaLote'
 import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/lotes.css'
-
-function nombreProducto(lote) {
-  if (lote?.producto?.nombre) return lote.producto.nombre
-  if (lote?.producto?.id != null) return `Producto #${lote.producto.id}`
-  return 'Sin producto'
-}
-
-function nombreProveedor(lote) {
-  const proveedor = lote?.ordenCompra?.proveedor
-  if (proveedor?.nombre) return proveedor.nombre
-  if (proveedor?.id != null) return `Proveedor #${proveedor.id}`
-  return 'Sin proveedor'
-}
 
 function LotesPage() {
   const { lotes, cargando, error, recargar, crear, actualizar, eliminar } = useLotes()
 
   const [busqueda, setBusqueda] = useState('')
   const [mensaje, setMensaje] = useState(null)
-
   const [formulario, setFormulario] = useState(null)
   const [loteAEliminar, setLoteAEliminar] = useState(null)
   const [eliminando, setEliminando] = useState(false)
@@ -54,13 +41,11 @@ function LotesPage() {
 
   const lotesPorOrden = useMemo(() => {
     const conteo = new Map()
-
     lotes.forEach((lote) => {
       const ordenId = lote.ordenCompra?.id
       if (ordenId == null) return
       conteo.set(ordenId, (conteo.get(ordenId) ?? 0) + 1)
     })
-
     return conteo
   }, [lotes])
 
@@ -91,7 +76,6 @@ function LotesPage() {
         await crear(datos)
         setMensaje({ tipo: 'exito', texto: 'Lote creado.' })
       }
-
       setFormulario(null)
     },
     [formulario, crear, actualizar],
@@ -106,9 +90,7 @@ function LotesPage() {
 
   const confirmarEliminar = useCallback(async () => {
     if (!loteAEliminar) return
-
     setEliminando(true)
-
     try {
       await eliminar(loteAEliminar.id)
       setMensaje({ tipo: 'exito', texto: `Lote #${loteAEliminar.id} dado de baja.` })
@@ -174,31 +156,13 @@ function LotesPage() {
 
       {!cargando && !error && lotes.length > 0 && (
         <>
-          <section className="lotes-filtros" aria-label="Buscar lotes">
-            <div className="orden-campo lotes-campo-busqueda">
-              <label htmlFor="lotes-busqueda">Buscar</label>
-              <input
-                id="lotes-busqueda"
-                type="search"
-                placeholder="Producto, marca, proveedor, orden o #lote"
-                value={busqueda}
-                onChange={(evento) => setBusqueda(evento.target.value)}
-              />
-            </div>
-
-            <span className="lotes-conteo">
-              Mostrando {visibles.length} de {lotes.length} lotes
-            </span>
-
-            <button
-              type="button"
-              className="orden-btn orden-btn-chico"
-              onClick={limpiarBusqueda}
-              disabled={busqueda === ''}
-            >
-              Limpiar búsqueda
-            </button>
-          </section>
+          <FiltroBusquedaLotes
+            busqueda={busqueda}
+            onBusquedaChange={setBusqueda}
+            onLimpiar={limpiarBusqueda}
+            totalVisibles={visibles.length}
+            totalLotes={lotes.length}
+          />
 
           {visibles.length === 0 ? (
             <MensajeVacio
@@ -233,48 +197,13 @@ function LotesPage() {
                 </thead>
                 <tbody>
                   {visibles.map((lote) => (
-                    <tr key={lote.id}>
-                      <td className="lotes-codigo">#{lote.id}</td>
-                      <td>
-                        {nombreProducto(lote)}
-                        {lote.producto?.marca ? (
-                          <span className="lotes-secundario"> · {lote.producto.marca}</span>
-                        ) : null}
-                      </td>
-                      <td>
-                        {lote.ordenCompra?.id != null ? `#${lote.ordenCompra.id}` : '—'}
-                      </td>
-                      <td>{nombreProveedor(lote)}</td>
-                      <td className="lotes-col-numero lotes-numero">
-                        {lote.cantidad ?? '—'}
-                      </td>
-                      <td>{formatearFecha(lote.fechaArribo)}</td>
-                      <td>{formatearFecha(lote.fechaVencimiento)}</td>
-                      <td className="orden-col-acciones">
-                        <div className="orden-acciones">
-                          <button
-                            type="button"
-                            className="orden-btn orden-btn-chico"
-                            onClick={() => abrirEditar(lote)}
-                          >
-                            Editar
-                          </button>
-                          <button
-                            type="button"
-                            className="orden-btn orden-btn-chico orden-btn-peligro"
-                            onClick={() => pedirEliminar(lote)}
-                            disabled={esUltimoLoteDeSuOrden(lote)}
-                            title={
-                              esUltimoLoteDeSuOrden(lote)
-                                ? 'La orden de compra debe tener al menos un lote'
-                                : undefined
-                            }
-                          >
-                            Dar de baja
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+                    <FilaLote
+                      key={lote.id}
+                      lote={lote}
+                      esUltimoDeSuOrden={esUltimoLoteDeSuOrden(lote)}
+                      onEditar={abrirEditar}
+                      onEliminar={pedirEliminar}
+                    />
                   ))}
                 </tbody>
               </table>

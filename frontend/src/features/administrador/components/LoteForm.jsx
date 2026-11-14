@@ -6,6 +6,7 @@ import {
   obtenerProductos,
   obtenerProveedores,
 } from '../services/lotesService'
+import CampoFormulario from './CampoFormulario'
 
 function LoteForm({ lote, onGuardar, onCerrar }) {
   const editando = Boolean(lote)
@@ -15,7 +16,6 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
   const [proveedores, setProveedores] = useState([])
   const [cargandoCatalogos, setCargandoCatalogos] = useState(!editando)
   const [errorCatalogos, setErrorCatalogos] = useState(null)
-  const [intentoCatalogos, setIntentoCatalogos] = useState(0)
 
   const [valores, setValores] = useState(() => ({
     productoId: lote?.producto?.id != null ? String(lote.producto.id) : '',
@@ -24,15 +24,13 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     fechaArribo: normalizarFecha(lote?.fechaArribo),
     fechaVencimiento: normalizarFecha(lote?.fechaVencimiento),
   }))
+
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState(null)
   const [guardando, setGuardando] = useState(false)
 
   useEffect(() => {
-    // En edición no se necesitan los catálogos: producto y orden se muestran
-    // con los datos que ya trae el lote.
     if (editando) return
-
     let ignorar = false
 
     Promise.all([obtenerProductos(), obtenerOrdenesCompra(), obtenerProveedores()])
@@ -42,8 +40,8 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
         setOrdenesCompra(Array.isArray(listaOrdenes) ? listaOrdenes : [])
         setProveedores(Array.isArray(listaProveedores) ? listaProveedores : [])
       })
-      .catch((nuevoError) => {
-        if (!ignorar) setErrorCatalogos(nuevoError)
+      .catch((err) => {
+        if (!ignorar) setErrorCatalogos(err.message)
       })
       .finally(() => {
         if (!ignorar) setCargandoCatalogos(false)
@@ -52,15 +50,13 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     return () => {
       ignorar = true
     }
-  }, [editando, intentoCatalogos])
+  }, [editando])
 
   const proveedoresPorId = useMemo(() => {
     const mapa = {}
-
-    proveedores.forEach((proveedor) => {
-      mapa[proveedor.id] = proveedor.nombre
+    proveedores.forEach((p) => {
+      mapa[p.id] = p.nombre
     })
-
     return mapa
   }, [proveedores])
 
@@ -69,92 +65,55 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     [ordenesCompra],
   )
 
-  function cambiarCampo(campo, valor) {
-    setValores((previos) => ({ ...previos, [campo]: valor }))
-
-    setErrores((previos) => {
-      if (!previos[campo]) return previos
-      const copia = { ...previos }
-      delete copia[campo]
-      return copia
-    })
-  }
-
-  function etiquetaOrden(orden) {
-    const partes = [`Orden #${orden.id}`, formatearFecha(orden.fecha)]
-    const proveedor = proveedoresPorId[orden.proveedor_id]
-
-    if (proveedor) partes.push(proveedor)
-
-    return partes.join(' · ')
+  function handleChange(e) {
+    const { name, value } = e.target
+    setValores((prev) => ({ ...prev, [name]: value }))
+    if (errores[name]) {
+      setErrores((prev) => ({ ...prev, [name]: null }))
+    }
   }
 
   function validar() {
     const nuevosErrores = {}
-
-    if (!editando && !valores.productoId) {
-      nuevosErrores.productoId = 'Elegí un producto'
-    }
-
-    if (!editando && !valores.ordenCompraId) {
-      nuevosErrores.ordenCompraId = 'Elegí una orden de compra'
-    }
+    if (!editando && !valores.productoId) nuevosErrores.productoId = 'Elegí un producto'
+    if (!editando && !valores.ordenCompraId) nuevosErrores.ordenCompraId = 'Elegí una orden de compra'
 
     const cantidad = Number(valores.cantidad)
-    if (valores.cantidad === '' || !Number.isInteger(cantidad) || cantidad <= 0) {
+    if (!valores.cantidad || !Number.isInteger(cantidad) || cantidad <= 0) {
       nuevosErrores.cantidad = 'La cantidad debe ser un entero mayor a 0'
     }
 
-    if (!valores.fechaArribo) {
-      nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
-    }
+    if (!valores.fechaArribo) nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
+    if (!valores.fechaVencimiento) nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es obligatoria'
 
-    if (!valores.fechaVencimiento) {
-      nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es obligatoria'
-    }
-
-    if (
-      valores.fechaArribo &&
-      valores.fechaVencimiento &&
-      valores.fechaVencimiento < valores.fechaArribo
-    ) {
-      nuevosErrores.fechaVencimiento =
-        'La fecha de vencimiento no puede ser anterior a la de arribo'
+    if (valores.fechaArribo && valores.fechaVencimiento && valores.fechaVencimiento < valores.fechaArribo) {
+      nuevosErrores.fechaVencimiento = 'No puede ser anterior a la de arribo'
     }
 
     setErrores(nuevosErrores)
     return Object.keys(nuevosErrores).length === 0
   }
 
-  function construirDatos() {
+  async function manejarEnvio(e) {
+    e.preventDefault()
+    setErrorServidor(null)
+    if (!validar()) return
+
+    setGuardando(true)
     const datos = {
       cantidad: Number(valores.cantidad),
       fechaArribo: valores.fechaArribo,
       fechaVencimiento: valores.fechaVencimiento,
+      ...(!editando && {
+        producto: Number(valores.productoId),
+        ordenCompra: Number(valores.ordenCompraId),
+      }),
     }
-
-    // El PUT actual solo actualiza cantidad y fechas; producto y orden de
-    // compra se conservan tal como estaban.
-    if (!editando) {
-      datos.producto = Number(valores.productoId)
-      datos.ordenCompra = Number(valores.ordenCompraId)
-    }
-
-    return datos
-  }
-
-  async function manejarEnvio(evento) {
-    evento.preventDefault()
-    setErrorServidor(null)
-
-    if (!validar()) return
-
-    setGuardando(true)
 
     try {
-      await onGuardar(construirDatos())
-    } catch (nuevoError) {
-      setErrorServidor(nuevoError.message)
+      await onGuardar(datos)
+    } catch (err) {
+      setErrorServidor(err.message)
     } finally {
       setGuardando(false)
     }
@@ -163,9 +122,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
   if (cargandoCatalogos) {
     return (
       <div className="orden-modal-cuerpo">
-        <p className="orden-form-cargando" role="status">
-          Cargando productos, órdenes y proveedores...
-        </p>
+        <p className="orden-form-cargando" role="status">Cargando productos, órdenes y proveedores...</p>
       </div>
     )
   }
@@ -174,18 +131,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     return (
       <div className="orden-modal-cuerpo">
         <div className="orden-alerta orden-alerta-error" role="alert">
-          <p>No se pudieron cargar los catálogos: {errorCatalogos.message}</p>
-          <button
-            type="button"
-            className="orden-btn"
-            onClick={() => {
-              setCargandoCatalogos(true)
-              setErrorCatalogos(null)
-              setIntentoCatalogos((numero) => numero + 1)
-            }}
-          >
-            Reintentar
-          </button>
+          <p>No se pudieron cargar los catálogos: {errorCatalogos}</p>
         </div>
       </div>
     )
@@ -203,153 +149,97 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
           </div>
         )}
 
-        {editando ? (
-          <div className="orden-form-grilla">
-            <div className="orden-campo">
-              <label htmlFor="lote-producto">Producto</label>
+        <div className="orden-form-grilla">
+          <CampoFormulario label="Producto" id="lote-producto" error={errores.productoId}>
+            {editando ? (
               <input
                 id="lote-producto"
                 type="text"
-                value={
-                  productoActual
-                    ? `${productoActual.nombre}${
-                        productoActual.marca ? ` · ${productoActual.marca}` : ''
-                      }`
-                    : 'Sin producto'
-                }
+                value={productoActual ? `${productoActual.nombre}${productoActual.marca ? ` · ${productoActual.marca}` : ''}` : 'Sin producto'}
                 readOnly
                 disabled
               />
-            </div>
-
-            <div className="orden-campo">
-              <label htmlFor="lote-orden">Orden de compra</label>
-              <input
-                id="lote-orden"
-                type="text"
-                value={
-                  ordenActual
-                    ? `Orden #${ordenActual.id}${
-                        ordenActual.proveedor?.nombre
-                          ? ` · ${ordenActual.proveedor.nombre}`
-                          : ''
-                      }`
-                    : 'Sin orden de compra'
-                }
-                readOnly
-                disabled
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="orden-form-grilla">
-            <div className="orden-campo">
-              <label htmlFor="lote-producto">Producto</label>
+            ) : (
               <select
                 id="lote-producto"
-                data-autofocus
+                name="productoId"
                 value={valores.productoId}
-                onChange={(evento) => cambiarCampo('productoId', evento.target.value)}
+                onChange={handleChange}
                 aria-invalid={Boolean(errores.productoId)}
-                aria-describedby={errores.productoId ? 'lote-error-producto' : undefined}
               >
                 <option value="">Elegí un producto</option>
-                {productos.map((producto) => (
-                  <option key={producto.id} value={producto.id}>
-                    {producto.nombre}
-                    {producto.marca ? ` · ${producto.marca}` : ''}
+                {productos.map((prod) => (
+                  <option key={prod.id} value={prod.id}>
+                    {prod.nombre}{prod.marca ? ` · ${prod.marca}` : ''}
                   </option>
                 ))}
               </select>
-              {errores.productoId && (
-                <p className="orden-campo-error" id="lote-error-producto">
-                  {errores.productoId}
-                </p>
-              )}
-            </div>
+            )}
+          </CampoFormulario>
 
-            <div className="orden-campo">
-              <label htmlFor="lote-orden">Orden de compra</label>
+          <CampoFormulario label="Orden de compra" id="lote-orden" error={errores.ordenCompraId}>
+            {editando ? (
+              <input
+                id="lote-orden"
+                type="text"
+                value={ordenActual ? `Orden #${ordenActual.id}${ordenActual.proveedor?.nombre ? ` · ${ordenActual.proveedor.nombre}` : ''}` : 'Sin orden'}
+                readOnly
+                disabled
+              />
+            ) : (
               <select
                 id="lote-orden"
+                name="ordenCompraId"
                 value={valores.ordenCompraId}
-                onChange={(evento) => cambiarCampo('ordenCompraId', evento.target.value)}
+                onChange={handleChange}
                 aria-invalid={Boolean(errores.ordenCompraId)}
-                aria-describedby={errores.ordenCompraId ? 'lote-error-orden' : undefined}
               >
                 <option value="">Elegí una orden de compra</option>
                 {ordenesDisponibles.map((orden) => (
                   <option key={orden.id} value={orden.id}>
-                    {etiquetaOrden(orden)}
+                    {`Orden #${orden.id} · ${formatearFecha(orden.fecha)}${proveedoresPorId[orden.proveedor_id] ? ` · ${proveedoresPorId[orden.proveedor_id]}` : ''}`}
                   </option>
                 ))}
               </select>
-              {errores.ordenCompraId && (
-                <p className="orden-campo-error" id="lote-error-orden">
-                  {errores.ordenCompraId}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+            )}
+          </CampoFormulario>
+        </div>
 
         <div className="orden-form-grilla">
-          <div className="orden-campo">
-            <label htmlFor="lote-cantidad">Cantidad</label>
+          <CampoFormulario label="Cantidad" id="lote-cantidad" error={errores.cantidad}>
             <input
               id="lote-cantidad"
+              name="cantidad"
               type="number"
               min="1"
               step="1"
-              inputMode="numeric"
-              data-autofocus={editando ? true : undefined}
               value={valores.cantidad}
-              onChange={(evento) => cambiarCampo('cantidad', evento.target.value)}
+              onChange={handleChange}
               aria-invalid={Boolean(errores.cantidad)}
-              aria-describedby={errores.cantidad ? 'lote-error-cantidad' : undefined}
             />
-            {errores.cantidad && (
-              <p className="orden-campo-error" id="lote-error-cantidad">
-                {errores.cantidad}
-              </p>
-            )}
-          </div>
+          </CampoFormulario>
 
-          <div className="orden-campo">
-            <label htmlFor="lote-arribo">Fecha de arribo</label>
+          <CampoFormulario label="Fecha de arribo" id="lote-arribo" error={errores.fechaArribo}>
             <input
               id="lote-arribo"
+              name="fechaArribo"
               type="date"
               value={valores.fechaArribo}
-              onChange={(evento) => cambiarCampo('fechaArribo', evento.target.value)}
+              onChange={handleChange}
               aria-invalid={Boolean(errores.fechaArribo)}
-              aria-describedby={errores.fechaArribo ? 'lote-error-arribo' : undefined}
             />
-            {errores.fechaArribo && (
-              <p className="orden-campo-error" id="lote-error-arribo">
-                {errores.fechaArribo}
-              </p>
-            )}
-          </div>
+          </CampoFormulario>
 
-          <div className="orden-campo">
-            <label htmlFor="lote-vencimiento">Fecha de vencimiento</label>
+          <CampoFormulario label="Fecha de vencimiento" id="lote-vencimiento" error={errores.fechaVencimiento}>
             <input
               id="lote-vencimiento"
+              name="fechaVencimiento"
               type="date"
               value={valores.fechaVencimiento}
-              onChange={(evento) => cambiarCampo('fechaVencimiento', evento.target.value)}
+              onChange={handleChange}
               aria-invalid={Boolean(errores.fechaVencimiento)}
-              aria-describedby={
-                errores.fechaVencimiento ? 'lote-error-vencimiento' : undefined
-              }
             />
-            {errores.fechaVencimiento && (
-              <p className="orden-campo-error" id="lote-error-vencimiento">
-                {errores.fechaVencimiento}
-              </p>
-            )}
-          </div>
+          </CampoFormulario>
         </div>
       </div>
 
