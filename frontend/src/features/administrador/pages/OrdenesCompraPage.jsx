@@ -77,8 +77,8 @@ function OrdenesCompraPage() {
     [formulario, crear, actualizar],
   )
 
-  const alternarDetalle = useCallback(
-    async (orden) => {
+const alternarDetalle = useCallback(
+  async (orden) => {
       if (detalle?.id === orden.id) {
         setDetalle(null)
         return

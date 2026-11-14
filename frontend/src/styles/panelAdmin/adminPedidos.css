@@ -1,0 +1,134 @@
+/* Estilos complementarios para Gestión de Pedidos */
+
+/* Texto plano para estado (sin colores/badges llamativos) */
+.estado-texto-plano {
+  font-weight: 500;
+  color: var(--admin-texto, #2d3748);
+  text-transform: capitalize;
+}
+
+/* Acciones de la tabla de pedidos: tres columnas fijas
+   (Aceptar | Ver Detalle | Cancelar). Los huecos invisibles mantienen
+   la alineación cuando un pedido no admite aceptar/cancelar. */
+.pedido-acciones {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(92px, 1fr));
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 300px;
+}
+
+.pedido-acciones .orden-btn {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.pedido-acciones .pedido-accion-hueco {
+  display: block;
+}
+
+/* Modal Detalle */
+.detalle-pedido-modal-contenido {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.detalle-pedido-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.detalle-subtitulo {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--admin-texto, #2d3748);
+  border-bottom: 2px solid var(--admin-borde, #edf2f7);
+  padding-bottom: 0.4rem;
+}
+
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.detalle-campo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.detalle-campo-alerta {
+  grid-column: 1 / -1;
+  background-color: var(--admin-fondo, #f8fafc);
+  border-left: 3px solid var(--admin-borde, #cbd5e1);
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+.motivo-texto {
+  color: var(--admin-texto, #2d3748);
+  font-style: italic;
+}
+
+.detalle-etiqueta {
+  font-size: 0.85rem;
+  color: var(--admin-texto-secundario, #718096);
+  font-weight: 500;
+}
+
+.detalle-valor {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--admin-texto, #1a202c);
+}
+
+/* Tabla Items Pedido */
+.tabla-detalle-contenedor {
+  overflow-x: auto;
+  border: 1px solid var(--admin-borde, #e2e8f0);
+  border-radius: 6px;
+}
+
+.tabla-items-pedido {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-items-pedido th,
+.tabla-items-pedido td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--admin-borde, #e2e8f0);
+}
+
+.tabla-items-pedido th {
+  background-color: var(--admin-fondo, #f7fafc);
+  color: var(--admin-texto-secundario, #4a5568);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.tabla-items-pedido tfoot td {
+  background-color: var(--admin-superficie, #edf2f7);
+}
+
+.detalle-vacio {
+  font-style: italic;
+  color: var(--admin-texto-secundario, #718096);
+}
+
+/* Acciones Footer Modal */
+.modal-acciones-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mensaje-confirmacion {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--admin-texto, #2d3748);
+}
