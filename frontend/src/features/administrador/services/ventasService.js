@@ -1,4 +1,4 @@
-const URL_BASE = 'http://localhost:8081' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
+const URL_BASE = import.meta.env.VITE_API_URL
 
 function headers() {
   const token = sessionStorage.getItem('token')
@@ -9,7 +9,7 @@ function headers() {
 }
 
 export async function obtenerVentas() {
-  const respuesta = await fetch(`${URL_BASE}/api/ventas`, {
+  const respuesta = await fetch(`${URL_BASE}/ventas`, {
     headers: headers()
   })
   if (!respuesta.ok) {
@@ -21,8 +21,9 @@ export async function obtenerVentas() {
   return respuesta.json()
 }
 
+
 export async function obtenerVentasUltimoMes() {
-  const respuesta = await fetch(`${URL_BASE}/api/ventas?periodo=ultimo-mes`, {
+  const respuesta = await fetch(`${URL_BASE}/ventas?periodo=ultimo-mes`, {
     headers: headers()
   })
   if (!respuesta.ok) {
@@ -35,7 +36,7 @@ export async function obtenerVentasUltimoMes() {
 }
 
 export async function obtenerProductosVenta(id) {
-  const respuesta = await fetch(`${URL_BASE}/api/ventas/${id}/productos`, {
+  const respuesta = await fetch(`${URL_BASE}/ventas/${id}/productos`, {
     headers: headers()
   })
   if (!respuesta.ok) {
@@ -45,7 +46,7 @@ export async function obtenerProductosVenta(id) {
 }
 
 export async function actualizarVenta(id, datos) {
-  const respuesta = await fetch(`${URL_BASE}/api/ventas/${id}`, {
+  const respuesta = await fetch(`${URL_BASE}/ventas/${id}`, {
     method: 'PUT',
     headers: headers(),
     body: JSON.stringify(datos)
@@ -56,7 +57,7 @@ export async function actualizarVenta(id, datos) {
 }
 
 export async function eliminarVenta(id) {
-  const respuesta = await fetch(`${URL_BASE}/api/ventas/${id}`, {
+  const respuesta = await fetch(`${URL_BASE}/ventas/${id}`, {
     method: 'DELETE',
     headers: headers()
   })

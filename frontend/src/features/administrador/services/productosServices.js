@@ -1,9 +1,6 @@
-const URL_BASE = 'http://localhost:3000' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
-const URL_NODE = `${URL_BASE}/api/productos`
-const URL_JAVA = `${URL_BASE}/api/productos/admin`
-
+const URL_BASE = import.meta.env.VITE_API_URL
 export async function obtenerProductos() {
-  const respuesta = await fetch(URL_NODE)
+  const respuesta = await fetch(`${URL_BASE}/productos`)
   
   if (!respuesta.ok) {
     throw new Error('No se pudieron obtener los productos')

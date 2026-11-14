@@ -1,12 +1,5 @@
-// Lotes: backend Node (puerto 3000). El módulo ya expone el CRUD completo y
-// permite dar de baja de forma lógica (activo = false).
-// Productos, órdenes de compra y proveedores también se piden a Node para
-// resolver los selects del formulario.
 
-const URL_LOTES = 'http://localhost:3000/api/lotes'
-const URL_PRODUCTOS = 'http://localhost:3000/api/productos'
-const URL_ORDENES = 'http://localhost:3000/api/ordenesCompra'
-const URL_PROVEEDORES = 'http://localhost:3000/api/proveedores'
+const URL_BASE = import.meta.env.VITE_API_URL
 
 async function leerCuerpo(respuesta) {
   const texto = await respuesta.text()
@@ -70,45 +63,43 @@ async function pedir(url, opciones = {}) {
 }
 
 export function obtenerLotes() {
-  return pedir(URL_LOTES)
+  return pedir(`${URL_BASE}/lotes`)
 }
 
 export function obtenerLotePorId(id) {
-  return pedir(`${URL_LOTES}/${id}`)
+  return pedir(`${URL_BASE}/lotes/${id}`)
 }
 
 export function crearLote(datos) {
-  return pedir(URL_LOTES, {
+  return pedir(`${URL_BASE}/lotes`, {
     method: 'POST',
     body: JSON.stringify(datos),
   })
 }
 
 export function actualizarLote(id, datos) {
-  return pedir(`${URL_LOTES}/${id}`, {
+  return pedir(`${URL_BASE}/lotes/${id}`, {
     method: 'PUT',
     body: JSON.stringify(datos),
   })
 }
 
 export function eliminarLote(id) {
-  return pedir(`${URL_LOTES}/${id}`, { method: 'DELETE' })
+  return pedir(`${URL_BASE}/lotes/${id}`, { method: 'DELETE' })
 }
 
 export function obtenerProductos() {
-  return pedir(URL_PRODUCTOS)
+  return pedir(`${URL_BASE}/productos`)
 }
 
 export function obtenerOrdenesCompra() {
-  return pedir(URL_ORDENES)
+  return pedir(`${URL_BASE}/ordenesCompra`)
 }
 
 export function obtenerProveedores() {
-  return pedir(URL_PROVEEDORES)
+  return pedir(`${URL_BASE}/proveedores`)
 }
 
-// pg serializa las columnas DATE como ISO completo; los <input type="date">
-// solo aceptan los primeros 10 caracteres (YYYY-MM-DD).
 export function normalizarFecha(valor) {
   return String(valor ?? '').slice(0, 10)
 }

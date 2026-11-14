@@ -1,9 +1,8 @@
-const URL_BASE = 'http://localhost:8081' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
-const URL_NODE = `${URL_BASE}/api/productos`
-const URL_JAVA = `${URL_BASE}/api/productos/catalogo`
+const API_URL = 'http://localhost:3000/api' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
+
 
 export async function obtenerProductos() {
-  const respuesta = await fetch(URL_JAVA)
+  const respuesta = await fetch(`${API_URL}/productos`)
   if (!respuesta.ok) {
     throw new Error('No se pudieron obtener los productos')
   }

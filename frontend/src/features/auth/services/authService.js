@@ -1,10 +1,10 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = 'http://localhost:3000' 
+const URL_BASE = import.meta.env.VITE_API_URL
 
 export async function iniciarSesion({ email, password }) {
 
-  const respuesta = await fetch(`${URL_BASE}/api/auth/login`, {
+  const respuesta = await fetch(`${URL_BASE}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -28,7 +28,7 @@ export async function obtenerUsuario() {
   const token = obtenerSesion()
   if (!token) return null
 
-  const respuesta = await fetch(`${URL_BASE}/api/auth/usuario`, {
+  const respuesta = await fetch(`${URL_BASE}/auth/usuario`, {
     method: 'GET',
     headers: {
       'Authorization': `Bearer ${token}`,

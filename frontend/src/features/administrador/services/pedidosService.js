@@ -1,9 +1,8 @@
-const URL_BASE = 'http://localhost:3000' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
-
+const URL_BASE = import.meta.env.VITE_API_URL
 export async function obtenerPedidos() {
   const token = sessionStorage.getItem('token') // Ajusta la clave según tu app
 
-  const respuesta = await fetch(`${URL_BASE}/api/pedidos`, {
+  const respuesta = await fetch(`${URL_BASE}/pedidos`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
