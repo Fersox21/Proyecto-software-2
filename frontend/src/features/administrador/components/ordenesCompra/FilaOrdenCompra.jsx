@@ -1,5 +1,5 @@
 import { Fragment } from 'react'
-import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 import DetalleOrdenLotes from './DetalleOrdenLotes'
 
 function nombreProveedor(orden) {

@@ -9,7 +9,7 @@ import { useFetch } from '../../../shared/hooks/useFetch';
 import { formatearFecha } from '../../../shared/utils/formato';
 import Spinner from '../../../shared/components/Spinner';
 import MensajeVacio from '../../../shared/components/MensajeVacio';
-import Modal from '../components/Modal';
+import Modal from '../components/comunes/Modal';
 import '../../../styles/panelAdmin/adminVentas.css';
 import '../../../styles/panelAdmin/ordenesCompra.css';
 

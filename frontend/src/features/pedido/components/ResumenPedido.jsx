@@ -3,7 +3,7 @@ import { formatearPrecio } from '../../../shared/utils/formato'
 import { Link } from 'react-router'
 import { BsShieldCheck } from 'react-icons/bs';
 
-function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro, esEnvio, faltaParaEnvioGratis }) {
+function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esEnvio, faltaParaEnvioGratis, enviando = false }) {
     return (
         <div className="card rounded-5 p-4 border-0 shadow-sm sticky-top" style={{ top: '2rem' }}>
             <div className="d-flex justify-content-between">
@@ -53,8 +53,9 @@ function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esRetiro,
             <button 
                 type="submit" 
                 className="btn btn-dark w-100 py-3 rounded-3 fw-bold mt-4 mb-3"
+                disabled={enviando}
             >
-                Finalizar pedido
+                {enviando ? 'Procesando pedido...' : 'Finalizar pedido'}
             </button>
 
             <div className="d-flex align-items-center justify-content-center gap-2 text-body-secondary">

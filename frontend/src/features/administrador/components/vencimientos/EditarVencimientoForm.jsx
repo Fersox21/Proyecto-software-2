@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { formatearFecha } from '../../../shared/utils/formato'
-import { hoyISO, soloFecha } from '../utils/vencimientos'
+import { formatearFecha } from '../../../../shared/utils/formato'
+import { hoyISO, soloFecha } from '../../utils/vencimientos'
 
 function EditarVencimientoForm({ lote, onGuardar, onCerrar }) {
   const fechaActual = soloFecha(lote.fechaVencimiento)

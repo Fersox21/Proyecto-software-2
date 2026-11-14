@@ -1,6 +1,6 @@
 import { Fragment } from 'react'
-import { formatearFecha } from '../../../shared/utils/formato'
-import { textoDias } from '../utils/vencimientos'
+import { formatearFecha } from '../../../../shared/utils/formato'
+import { textoDias } from '../../utils/vencimientos'
 import DetalleLote from './DetalleLote'
 
 function FilaVencimiento({ fila, abierta, onAlternarDetalle, onEditar }) {

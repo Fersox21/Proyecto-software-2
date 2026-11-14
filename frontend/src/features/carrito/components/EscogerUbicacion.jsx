@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState } from 'react'
 
-function EscogerUbicacion() {
-    const [direccion, setDireccion] = useState('Av. Juan Gilberto Funes 460, D5702 San Luis');
-    const [busquedaMapa, setBusquedaMapa] = useState('Av. Juan Gilberto Funes 460, D5702 San Luis');
+const UBICACION_POR_DEFECTO = 'Av. Juan Gilberto Funes 460, D5702 San Luis'
+
+function EscogerUbicacion({ direccion, onDireccionChange }) {
+    const [busquedaMapa, setBusquedaMapa] = useState(UBICACION_POR_DEFECTO);
 
     function actualizarMapa() {
         if (direccion.trim()) {
@@ -15,7 +16,7 @@ function EscogerUbicacion() {
     return (
         <div className="card p-3 rounded-4 border shadow-sm">
             <h5 className="card-title mb-3">Punto de entrega</h5>
-            
+
             <div className="mb-3">
                 <label htmlFor="direccionInput" className="form-label small text-body-secondary">
                     Ingresá tu dirección:
@@ -27,7 +28,7 @@ function EscogerUbicacion() {
                         className="form-control"
                         placeholder="Ej: Rivadavia 500, San Luis"
                         value={direccion}
-                        onChange={(e) => setDireccion(e.target.value)}
+                        onChange={(e) => onDireccionChange(e.target.value)}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter') {
                                 e.preventDefault();

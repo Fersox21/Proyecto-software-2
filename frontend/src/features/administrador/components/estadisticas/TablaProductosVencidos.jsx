@@ -1,5 +1,5 @@
-import Spinner from '../../../shared/components/Spinner'
-import MensajeVacio from '../../../shared/components/MensajeVacio'
+import Spinner from '../../../../shared/components/Spinner'
+import MensajeVacio from '../../../../shared/components/MensajeVacio'
 
 const etiquetaFecha = (fecha) => {
   if (!fecha) return '-'

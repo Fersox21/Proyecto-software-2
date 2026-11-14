@@ -7,11 +7,10 @@ types.setTypeParser(1700, (val) => parseFloat(val));
 
 // Pool de conexiones
 export const pool = new Pool({
-  host: env.PGHOST,
-  port: env.PGPORT,
-  user: env.PGUSER,
-  password: env.PGPASSWORD,
-  database: env.PGDATABASE,
+  connectionString: env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, 
+  },
   max: 20, // cantidad máxima de clientes (conexiones) simultáneas en el pool
   min: 0, // cantidad mínima de clientes que se mantienen abiertos en el pool
   idleTimeoutMillis: 30000, // ms que una conexión inactiva puede quedar abierta antes de cerrarse

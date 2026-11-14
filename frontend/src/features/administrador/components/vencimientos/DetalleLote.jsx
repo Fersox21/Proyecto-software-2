@@ -1,5 +1,5 @@
-import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato'
-import { textoDias } from '../utils/vencimientos'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
+import { textoDias } from '../../utils/vencimientos'
 
 function Dato({ etiqueta, children }) {
   return (
