@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
-import { formatearFecha } from '../../../shared/utils/formato'
+import { formatearFecha } from '../../../../shared/utils/formato'
 import {
   normalizarFecha,
   obtenerOrdenesCompra,
   obtenerProductos,
   obtenerProveedores,
-} from '../services/lotesService'
-import CampoFormulario from './CampoFormulario'
+} from '../../services/lotesService'
+import CampoFormulario from '../comunes/CampoFormulario'
 
 function LoteForm({ lote, onGuardar, onCerrar }) {
   const editando = Boolean(lote)

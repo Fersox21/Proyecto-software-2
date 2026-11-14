@@ -1,7 +1,7 @@
-import Modal from './Modal'
+import Modal from '../comunes/Modal'
 import DetallePedidoInfo from './DetallePedidoInfo'
 import DetallePedidoItems from './DetallePedidoItems'
-import Spinner from '../../../shared/components/Spinner'
+import Spinner from '../../../../shared/components/Spinner'
 
 function DetallePedidoModal({ pedido, cargando, error, onCerrar, onIniciarAceptar, onIniciarCancelar }) {
   if (!pedido && !cargando && !error) return null

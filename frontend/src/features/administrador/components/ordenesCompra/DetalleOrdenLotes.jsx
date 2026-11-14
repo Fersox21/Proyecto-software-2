@@ -1,4 +1,4 @@
-import { formatearFecha } from '../../../shared/utils/formato'
+import { formatearFecha } from '../../../../shared/utils/formato'
 
 function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
   if (detalle.cargando) {

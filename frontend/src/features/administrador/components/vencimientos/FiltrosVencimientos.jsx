@@ -1,4 +1,4 @@
-import { UMBRALES_AVISO } from '../utils/vencimientos'
+import { UMBRALES_AVISO } from '../../utils/vencimientos'
 
 const TODOS = 'todos'
 const ESTADOS = [

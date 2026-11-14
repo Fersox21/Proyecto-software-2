@@ -1,4 +1,4 @@
-import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function DetallePedidoInfo({ pedido }) {
   if (!pedido) return null

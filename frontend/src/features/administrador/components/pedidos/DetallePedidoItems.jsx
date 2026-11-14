@@ -1,4 +1,4 @@
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { formatearPrecio } from '../../../../shared/utils/formato'
 
 function DetallePedidoItems({ items = [], total = 0 }) {
   return (

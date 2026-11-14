@@ -1,4 +1,4 @@
-import Modal from './Modal'
+import Modal from '../comunes/Modal'
 
 function nombreProducto(lote) {
   if (lote?.producto?.nombre) return lote.producto.nombre

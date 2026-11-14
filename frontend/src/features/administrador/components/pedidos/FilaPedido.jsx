@@ -1,4 +1,4 @@
-import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function FilaPedido({ pedido, onVerDetalle, onIniciarAceptar, onIniciarCancelar }) {
   const estadoNormalizado = (pedido.estado || '').toLowerCase()

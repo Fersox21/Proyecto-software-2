@@ -3,9 +3,9 @@ import {
   normalizarFecha,
   obtenerProductos,
   obtenerProveedores,
-} from '../services/ordenesCompraService'
+} from '../../services/ordenesCompraService'
 import ItemLoteForm from './ItemLoteForm'
-import CampoFormulario from './CampoFormulario'
+import CampoFormulario from '../comunes/CampoFormulario'
 
 function crearLoteVacio() {
   return {

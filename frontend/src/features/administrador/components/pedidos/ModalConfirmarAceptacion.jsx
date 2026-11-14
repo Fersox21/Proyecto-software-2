@@ -1,5 +1,5 @@
-import Modal from './Modal'
-import { formatearPrecio } from '../../../shared/utils/formato'
+import Modal from '../comunes/Modal'
+import { formatearPrecio } from '../../../../shared/utils/formato'
 
 function ModalConfirmarAceptacion({ pedido, visible, cargando, onConfirmar, onCerrar }) {
   if (!visible || !pedido) return null

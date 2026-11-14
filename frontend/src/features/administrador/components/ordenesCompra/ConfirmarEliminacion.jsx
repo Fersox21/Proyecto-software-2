@@ -1,4 +1,4 @@
-import Modal from './Modal'
+import Modal from '../comunes/Modal'
 
 function ConfirmarEliminacion({ orden, eliminando, onConfirmar, onCancelar }) {
   return (

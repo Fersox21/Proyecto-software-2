@@ -13,11 +13,11 @@ import {
   nombreProveedor,
   soloFecha,
 } from '../utils/vencimientos'
-import EditarVencimientoForm from '../components/EditarVencimientoForm'
-import Modal from '../components/Modal'
-import ResumenVencimientos from '../components/ResumenVencimientos'
-import FiltrosVencimientos from '../components/FiltrosVencimientos'
-import FilaVencimiento from '../components/FilaVencimiento'
+import EditarVencimientoForm from '../components/vencimientos/EditarVencimientoForm'
+import Modal from '../components/comunes/Modal'
+import ResumenVencimientos from '../components/vencimientos/ResumenVencimientos'
+import FiltrosVencimientos from '../components/vencimientos/FiltrosVencimientos'
+import FilaVencimiento from '../components/vencimientos/FilaVencimiento'
 import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/vencimientos.css'
 
