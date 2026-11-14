@@ -5,5 +5,4 @@ node_modules/
 .codegraph
 opencode.json
 .opencode
-.gitignore
 .opencodeignore
