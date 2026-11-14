@@ -7,9 +7,24 @@ function DetallePedidoItems({ items = [], total = 0 }) {
       {items.length === 0 ? (
         <p className="detalle-vacio">No hay productos registrados en este pedido.</p>
       ) : (
-        <div className="tabla-detalle-contenedor">
-          <table className="tabla-items-pedido">
-            <thead>
+        <div
+          className="tabla-detalle-contenedor"
+          style={{
+            maxHeight: '280px',
+            overflowY: 'auto',
+            border: '1px solid #e5e7eb',
+            borderRadius: '6px',
+          }}
+        >
+          <table className="tabla-items-pedido" style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead
+              style={{
+                position: 'sticky',
+                top: 0,
+                backgroundColor: '#f9fafb',
+                zIndex: 1,
+              }}
+            >
               <tr>
                 <th>Producto</th>
                 <th>Marca</th>
@@ -37,7 +52,15 @@ function DetallePedidoItems({ items = [], total = 0 }) {
                 )
               })}
             </tbody>
-            <tfoot>
+            <tfoot
+              style={{
+                position: 'sticky',
+                bottom: 0,
+                backgroundColor: '#f9fafb',
+                zIndex: 1,
+                borderTop: '2px solid #e5e7eb',
+              }}
+            >
               <tr>
                 <td colSpan="4" style={{ textAlign: 'right', fontWeight: 'bold' }}>
                   Total del Pedido:

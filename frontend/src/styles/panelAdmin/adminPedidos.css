@@ -68,6 +68,13 @@
   border-radius: 4px;
 }
 
+.detalle-campo-ancho {
+  grid-column: 1 / -1;
+  background-color: var(--admin-fondo, #f8fafc);
+  border-radius: 4px;
+  padding: 0.75rem;
+}
+
 .motivo-texto {
   color: var(--admin-texto, #2d3748);
   font-style: italic;
