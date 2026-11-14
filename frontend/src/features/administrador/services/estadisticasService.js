@@ -1,23 +1,26 @@
 const URL_BASE = import.meta.env.VITE_API_URL
+
+function obtenerToken() {
+  try {
+    return sessionStorage.getItem('token')
+  } catch {
+    return null
+  }
+}
+
 async function get(path) {
-  const token = sessionStorage.getItem('token')
+  const token = obtenerToken()
   const respuesta = await fetch(`${URL_BASE}/estadisticas${path}`, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
   })
 
   if (!respuesta.ok) {
-    if (respuesta.status === 401) {
-      throw new Error('No autorizado: Token inválido o expirado')
-    }
-    if (respuesta.status === 400) {
-      const cuerpo = await respuesta.json().catch(() => null)
-      throw new Error(cuerpo?.error || 'Parámetros inválidos')
-    }
-    throw new Error('No se pudieron obtener las estadísticas')
+    const cuerpo = await respuesta.json().catch(() => null)
+    throw new Error(cuerpo?.error || cuerpo?.mensaje || 'No se pudieron obtener las estadísticas')
   }
 
   return respuesta.json()

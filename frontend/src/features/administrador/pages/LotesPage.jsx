@@ -49,61 +49,51 @@ function LotesPage() {
     return conteo
   }, [lotes])
 
-  const esUltimoLoteDeSuOrden = useCallback(
-    (lote) =>
-      lote.ordenCompra?.id != null && lotesPorOrden.get(lote.ordenCompra.id) === 1,
-    [lotesPorOrden],
-  )
-
-  const abrirCrear = useCallback(() => {
-    setMensaje(null)
-    setFormulario({ modo: 'crear', lote: null })
-  }, [])
-
   const abrirEditar = useCallback((lote) => {
     setMensaje(null)
     setFormulario({ modo: 'editar', lote })
   }, [])
-
-  const cerrarFormulario = useCallback(() => setFormulario(null), [])
-
-  const guardar = useCallback(
-    async (datos) => {
-      if (formulario?.modo === 'editar') {
-        await actualizar(formulario.lote.id, datos)
-        setMensaje({ tipo: 'exito', texto: `Lote #${formulario.lote.id} actualizado.` })
-      } else {
-        await crear(datos)
-        setMensaje({ tipo: 'exito', texto: 'Lote creado.' })
-      }
-      setFormulario(null)
-    },
-    [formulario, crear, actualizar],
-  )
 
   const pedirEliminar = useCallback((lote) => {
     setMensaje(null)
     setLoteAEliminar(lote)
   }, [])
 
-  const cancelarEliminar = useCallback(() => setLoteAEliminar(null), [])
+  const limpiarBusqueda = useCallback(() => setBusqueda(''), [])
 
-  const confirmarEliminar = useCallback(async () => {
+  const abrirCrear = () => {
+    setMensaje(null)
+    setFormulario({ modo: 'crear', lote: null })
+  }
+
+  const cerrarFormulario = () => setFormulario(null)
+
+  const guardar = async (datos) => {
+    if (formulario?.modo === 'editar') {
+      await actualizar(formulario.lote.id, datos)
+      setMensaje({ tipo: 'exito', texto: `Lote #${formulario.lote.id} actualizado.` })
+    } else {
+      await crear(datos)
+      setMensaje({ tipo: 'exito', texto: 'Lote creado.' })
+    }
+    setFormulario(null)
+  }
+
+  const cancelarEliminar = () => setLoteAEliminar(null)
+
+  const confirmarEliminar = async () => {
     if (!loteAEliminar) return
     setEliminando(true)
     try {
       await eliminar(loteAEliminar.id)
       setMensaje({ tipo: 'exito', texto: `Lote #${loteAEliminar.id} dado de baja.` })
-      setLoteAEliminar(null)
     } catch (nuevoError) {
       setMensaje({ tipo: 'error', texto: nuevoError.message })
-      setLoteAEliminar(null)
     } finally {
+      setLoteAEliminar(null)
       setEliminando(false)
     }
-  }, [loteAEliminar, eliminar])
-
-  const limpiarBusqueda = useCallback(() => setBusqueda(''), [])
+  }
 
   return (
     <section className="main-admin" id="main-lotes">
@@ -200,7 +190,10 @@ function LotesPage() {
                     <FilaLote
                       key={lote.id}
                       lote={lote}
-                      esUltimoDeSuOrden={esUltimoLoteDeSuOrden(lote)}
+                      esUltimoDeSuOrden={
+                        lote.ordenCompra?.id != null &&
+                        lotesPorOrden.get(lote.ordenCompra.id) === 1
+                      }
                       onEditar={abrirEditar}
                       onEliminar={pedirEliminar}
                     />

@@ -1,7 +1,6 @@
-
 import { pedir } from './ordenesCompraService'
 
-const URL_BASE = import.meta.env.API_URL
+const URL_BASE = import.meta.env.VITE_API_URL
 
 export function obtenerLotes() {
   return pedir(`${URL_BASE}/lotes`)
