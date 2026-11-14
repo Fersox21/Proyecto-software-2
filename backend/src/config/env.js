@@ -6,13 +6,13 @@ try {
 }
 
 export const env = {
-  PORT: process.env.PORT ?? 3000,
-  CORS_ORIGIN: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
-  PGHOST: process.env.PGHOST ?? '127.0.0.1',
-  PGPORT: process.env.PGPORT ?? 5432,
-  PGUSER: process.env.PGUSER ?? 'postgres',
-  PGPASSWORD: process.env.PGPASSWORD ?? 'admin',
-  PGDATABASE: process.env.PGDATABASE ?? 'distribuidora',
+  PORT: process.env.PORT,
+  CORS_ORIGIN: process.env.CORS_ORIGIN,
+  PGHOST: process.env.PGHOST,
+  PGPORT: process.env.PGPORT,
+  PGUSER: process.env.PGUSER,
+  PGPASSWORD: process.env.PGPASSWORD,
+  PGDATABASE: process.env.PGDATABASE,
 
   JWT_SECRET: process.env.JWT_SECRET,
   JWT_EXPIRES_IN: process.env.JWT_EXPIRES_IN,
