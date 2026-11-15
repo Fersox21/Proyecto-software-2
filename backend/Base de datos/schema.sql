@@ -1,11 +1,13 @@
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
-GRANT ALL ON SCHEMA public TO postgres; -- O tu usuario actual
-GRANT ALL ON SCHEMA public TO public;
+
 -- Crea la base y la tabla de productos.
 -- Ejecutar con: psql -U postgres -f database/schema.sql
 CREATE DATABASE distribuidora;
 \ c "distribuidora" --
+
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres; -- O tu usuario actual
+GRANT ALL ON SCHEMA public TO public;
 -- 1. Tabla Proveedores
 CREATE TABLE proveedores (
     id SERIAL PRIMARY KEY,
@@ -25,15 +27,15 @@ CREATE TABLE usuarios (
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
+    marca VARCHAR(25),
+    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
     precio_costo DECIMAL(10, 2) NOT NULL CHECK (precio_costo > 0),
     precio_venta DECIMAL(10, 2) NOT NULL CHECK (precio_venta > 0),
-    marca VARCHAR(25),
-    en_promocion BOOLEAN,
+    en_promocion BOOLEAN NOT NULL DEFAULT false,
     precio_promo DECIMAL(10, 2) CHECK (precio_promo IS NULL OR precio_promo > 0),
-    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
+    peso DECIMAL(10, 2) NOT NULL CHECK (peso > 0),
     categoria VARCHAR(20) NOT NULL,
-    peso VARCHAR(20) NOT NULL,
-    destacado BOOLEAN,
+    destacado BOOLEAN NOT NULL DEFAULT false,
     activo BOOLEAN NOT NULL DEFAULT true
 );
 -- Tabla 4: Órdenes de Compra (Depende de Proveedores)
@@ -47,16 +49,22 @@ CREATE TABLE ordenes_compra (
 -- Tabla 5: Pedidos (Depende de Roles)
 CREATE TABLE pedidos (
     id SERIAL PRIMARY KEY,
-    fecha DATE NOT NULL,
+    fecha DATE NOT NULL DEFAULT CURRENT_DATE,
+    subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0 CHECK (subtotal >= 0),
+    envio DECIMAL(10, 2) NOT NULL DEFAULT 0 CHECK (envio >= 0),
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     metodo_pago VARCHAR(30) NOT NULL,
-    comercio VARCHAR(40) NOT NULL,
-    modalidad_entrega VARCHAR(10) NOT NULL,
-    direccion VARCHAR(60),
+    telefono VARCHAR(40) NOT NULL,
+    comercio VARCHAR(100) NOT NULL,
+    persona_contacto VARCHAR(100),
+    modalidad_entrega VARCHAR(20) NOT NULL,
+    direccion VARCHAR(150),
+    descripcion_direccion VARCHAR(255),
+    observaciones TEXT,
     estado VARCHAR(15) NOT NULL,
-    motivo_rechazo VARCHAR(80),
+    motivo_rechazo VARCHAR(500),
     activo BOOLEAN NOT NULL DEFAULT true,
-    rol_id INTEGER NOT NULL REFERENCES usuarios(id)
+    usuario_id INTEGER NOT NULL REFERENCES usuarios(id)
 );
 -- Tabla 6: Lotes (Depende de OrdenesCompra y Productos)
 CREATE TABLE lotes (

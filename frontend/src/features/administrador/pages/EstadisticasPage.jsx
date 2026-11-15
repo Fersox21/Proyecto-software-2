@@ -8,11 +8,11 @@ import {
   obtenerPromedioDiario,
 } from '../services/estadisticasService'
 import { obtenerVentasUltimoMes } from '../services/ventasService'
-import KpisEstadisticas from '../components/KpisEstadisticas'
-import GraficoVentasMes from '../components/GraficoVentasMes'
-import GraficoGananciasMes from '../components/GraficoGananciasMes'
-import RankingMasVendidos from '../components/RankingMasVendidos'
-import TablaProductosVencidos from '../components/TablaProductosVencidos'
+import KpisEstadisticas from '../components/estadisticas/KpisEstadisticas'
+import GraficoVentasMes from '../components/estadisticas/GraficoVentasMes'
+import GraficoGananciasMes from '../components/estadisticas/GraficoGananciasMes'
+import RankingMasVendidos from '../components/estadisticas/RankingMasVendidos'
+import TablaProductosVencidos from '../components/estadisticas/TablaProductosVencidos'
 import '../../../styles/panelAdmin/adminVentas.css'
 import '../../../styles/panelAdmin/estadisticas.css'
 

@@ -1,4 +1,4 @@
-import { formatearFecha } from '../../../shared/utils/formato'
+import { formatearFecha } from '../../../../shared/utils/formato'
 
 function nombreProducto(lote) {
   if (lote?.producto?.nombre) return lote.producto.nombre

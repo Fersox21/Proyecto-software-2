@@ -1,21 +1,82 @@
-import { obtenerPedidos } from '../services/pedidosService'
-import { useFetch } from '../../../shared/hooks/useFetch'
+import { useState } from 'react'
+import { usePedidosAdmin } from '../hooks/usePedidosAdmin'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
+import FilaPedido from '../components/pedidos/FilaPedido'
+import DetallePedidoModal from '../components/pedidos/DetallePedidoModal'
+import ModalConfirmarCancelacion from '../components/pedidos/ModalConfirmarCancelacion'
+import ModalConfirmarAceptacion from '../components/pedidos/ModalConfirmarAceptacion'
+import '../../../styles/panelAdmin/ordenesCompra.css'
+import '../../../styles/panelAdmin/adminPedidos.css'
 
-function PedidosPage(){
+function PedidosPage() {
+  const {
+    pedidos,
+    cargando,
+    error,
+    pedidoDetalle,
+    cargandoDetalle,
+    errorDetalle,
+    procesandoAccion,
+    cargarDetallePedido,
+    cerrarDetalle,
+    aceptarPedido,
+    cancelarPedido
+  } = usePedidosAdmin()
 
-    const { datos: pedidos, cargando, error } = useFetch(obtenerPedidos)
+  const [pedidoParaAceptar, setPedidoParaAceptar] = useState(null)
+  const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null)
+  const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false)
 
-     if (cargando) return <Spinner texto="Cargando pedidos..." />
-     if (error) return <MensajeVacio titulo="No pudimos cargar los pedidos" texto={error.message} />
+  const handleVerDetalle = async (id) => {
+    setModalDetalleAbierto(true)
+    try {
+      await cargarDetallePedido(id)
+    } catch {
+      // Manejado internamente por el hook
+    }
+  }
 
-     const totalPedidos = pedidos ? pedidos.length : 0
+  const handleCerrarDetalle = () => {
+    setModalDetalleAbierto(false)
+    cerrarDetalle()
+  }
 
-    return(
-        <section className="main-admin" id="main-pedidos">
+  const handleIniciarAceptar = (pedido) => {
+    setPedidoParaAceptar(pedido)
+  }
+
+  const handleConfirmarAceptar = async (id) => {
+    try {
+      await aceptarPedido(id)
+      setPedidoParaAceptar(null)
+    } catch (err) {
+      alert(`Error al aceptar pedido: ${err.message}`)
+    }
+  }
+
+  const handleIniciarCancelar = (pedido) => {
+    setPedidoParaCancelar(pedido)
+  }
+
+  const handleConfirmarCancelar = async (id, motivoRechazo) => {
+    try {
+      await cancelarPedido(id, motivoRechazo)
+      setPedidoParaCancelar(null)
+    } catch (err) {
+      alert(`Error al cancelar pedido: ${err.message}`)
+    }
+  }
+
+  if (cargando) return <Spinner texto="Cargando pedidos..." />
+  if (error) return <MensajeVacio titulo="No pudimos cargar los pedidos" texto={error.message} />
+
+  const totalPedidos = pedidos ? pedidos.length : 0
+
+  return (
+    <section className="main-admin" id="main-pedidos">
       <header className="header-admin">
-        <h1 className="h1-admin">Pedidos</h1>
+        <h1 className="h1-admin">Gestión de Pedidos</h1>
       </header>
 
       <section className="sec-prod-admin" aria-live="polite">
@@ -27,24 +88,20 @@ function PedidosPage(){
               <th>Fecha</th>
               <th>Total</th>
               <th>Estado</th>
-              <th>Acciones</th>
+              <th style={{ textAlign: 'center' }}>Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             {totalPedidos > 0 ? (
               pedidos.map((pedido) => (
-                <tr key={pedido.id}>
-                  <td className="col-admin">#{pedido.id}</td>
-                  {/* Cambiado a pedido.comercio para coincidir con la entidad del backend */}
-                  <td className="col-admin">{pedido.comercio || 'N/A'}</td> 
-                  <td className="col-admin">{pedido.fecha}</td>
-                  <td className="col-admin">${pedido.total ? pedido.total.toFixed(2) : '0.00'}</td>
-                  <td className="col-admin">{pedido.estado}</td>
-                  <td className="col-admin col-acciones">
-                    <button type="button">Ver Detalle</button>
-                  </td>
-                </tr>
+                <FilaPedido
+                  key={pedido.id}
+                  pedido={pedido}
+                  onVerDetalle={handleVerDetalle}
+                  onIniciarAceptar={handleIniciarAceptar}
+                  onIniciarCancelar={handleIniciarCancelar}
+                />
               ))
             ) : (
               <tr>
@@ -67,8 +124,42 @@ function PedidosPage(){
           </div>
         </div>
       </section>
+
+      {/* Modal de Detalle */}
+      {modalDetalleAbierto && (
+        <DetallePedidoModal
+          pedido={pedidoDetalle}
+          cargando={cargandoDetalle}
+          error={errorDetalle}
+          onCerrar={handleCerrarDetalle}
+          onIniciarAceptar={(ped) => {
+            setPedidoParaAceptar(ped)
+          }}
+          onIniciarCancelar={(ped) => {
+            setPedidoParaCancelar(ped)
+          }}
+        />
+      )}
+
+      {/* Modal de Confirmación para Aceptar (Venta) */}
+      <ModalConfirmarAceptacion
+        pedido={pedidoParaAceptar}
+        visible={Boolean(pedidoParaAceptar)}
+        cargando={procesandoAccion}
+        onConfirmar={handleConfirmarAceptar}
+        onCerrar={() => setPedidoParaAceptar(null)}
+      />
+
+      {/* Modal de Confirmación para Cancelar */}
+      <ModalConfirmarCancelacion
+        pedido={pedidoParaCancelar}
+        visible={Boolean(pedidoParaCancelar)}
+        cargando={procesandoAccion}
+        onConfirmar={handleConfirmarCancelar}
+        onCerrar={() => setPedidoParaCancelar(null)}
+      />
     </section>
-    )
+  )
 }
 
-export default PedidosPage;
+export default PedidosPage
