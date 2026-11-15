@@ -6,7 +6,8 @@ cd frontend
 luego tendran que ejecutar el programa con el comando,
 npm run dev
 
-si desea ingresar a la parte del administrador la contraseña es,
-admin123
+si desea ingresar a la parte del administrador: 
+mail: admin@lafedistribuidora.com
+Contraseña: admin123
 
 gracias
