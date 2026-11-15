@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:3000/api' /* Poner puerto 3000 para backend node y puerto 8081 para springboot */
+const API_URL = import.meta.env.VITE_API_URL 
 
 
 export async function obtenerProductos() {
