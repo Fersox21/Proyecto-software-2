@@ -1,4 +1,4 @@
-const URL_BASE = import.meta.env.VITE_API_URL
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 function obtenerEncabezados() {
   const token = sessionStorage.getItem('token')
