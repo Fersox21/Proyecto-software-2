@@ -1,4 +1,64 @@
 import { pool } from '../../config/db.js';
+import * as categoriasRepo from '../categorias/categorias.repository.js';
+import * as tiposPromocionRepo from '../tiposPromocion/tiposPromocion.repository.js';
+import * as productosRepo from '../productos/productos.repository.js';
+import * as proveedoresRepo from '../proveedores/proveedores.repository.js';
+
+const resolverProductoEnTransaccion = async (lote, client) => {
+  if (!lote.productoNuevo) {
+    return lote.productoId ?? lote.producto;
+  }
+
+  const nuevo = lote.productoNuevo;
+
+  let categoria = null;
+  if (nuevo.categoriaNuevaNombre) {
+    categoria = await categoriasRepo.findByNombreInsensitive(nuevo.categoriaNuevaNombre, client);
+    if (!categoria) {
+      categoria = await categoriasRepo.create(nuevo.categoriaNuevaNombre, client);
+    }
+  } else if (nuevo.categoriaId) {
+    categoria = await categoriasRepo.findById(nuevo.categoriaId, client);
+  }
+
+  if (!categoria) {
+    const error = new Error('No se pudo resolver la categoría del producto nuevo');
+    error.status = 400;
+    throw error;
+  }
+
+  let tipoPromocionId = null;
+  if (nuevo.tipoPromocionNuevaNombre) {
+    let tipo = await tiposPromocionRepo.findByNombreInsensitive(nuevo.tipoPromocionNuevaNombre, client);
+    if (!tipo) {
+      tipo = await tiposPromocionRepo.create(nuevo.tipoPromocionNuevaNombre, client);
+    }
+    tipoPromocionId = tipo.id;
+  } else if (nuevo.tipoPromocionId != null) {
+    tipoPromocionId = nuevo.tipoPromocionId;
+  }
+
+  const productoCreado = await productosRepo.create(
+    {
+      nombre: nuevo.nombre,
+      marca: nuevo.marca ?? null,
+      descripcion: nuevo.descripcion ?? null,
+      precioCosto: nuevo.precioCosto,
+      precioVenta: nuevo.precioVenta,
+      enPromocion: false,
+      precioPromo: null,
+      stock: 0,
+      categoria: categoria.nombre,
+      categoriaId: categoria.id,
+      tipoPromocionId,
+      peso: nuevo.peso ?? 1,
+      destacado: Boolean(nuevo.destacado)
+    },
+    client
+  );
+
+  return productoCreado.id;
+};
 
 export const findAll = async () => {
   const { rows } = await pool.query(`
@@ -39,7 +99,7 @@ export const findById = async (id) => {
   const row = ordenRows[0];
 
   const { rows: lotesRows } = await pool.query(
-    `SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+    `SELECT l.id, l.cantidad, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
             prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca
      FROM lotes l
      LEFT JOIN productos prod ON prod.id = l.producto_id
@@ -51,6 +111,7 @@ export const findById = async (id) => {
   const lotes = lotesRows.map((l) => ({
     id: l.id,
     cantidad: l.cantidad,
+    total: l.total != null ? Number(l.total) : null,
     fechaArribo: l.fecha_arribo,
     fechaVencimiento: l.fecha_vencimiento,
     activo: l.activo,
@@ -78,30 +139,36 @@ export const findById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { total, fecha, proveedor_id, lotes = [] } = data;
+  const { total, fecha, proveedor_id, proveedorNuevo, lotes = [] } = data;
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
+    let proveedorIdFinal = proveedor_id;
+    if (proveedorNuevo) {
+      const nuevoProveedor = await proveedoresRepo.create(proveedorNuevo, client);
+      proveedorIdFinal = nuevoProveedor.id;
+    }
+
     const { rows } = await client.query(
       `INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id)
        VALUES ($1, $2, true, $3)
        RETURNING *`,
-      [fecha, total, proveedor_id]
+      [fecha, total, proveedorIdFinal]
     );
 
     const nuevaOrden = rows[0];
 
     for (const lote of lotes) {
-      const prodId = lote.productoId ?? lote.producto;
+      const prodId = await resolverProductoEnTransaccion(lote, client);
       const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
       const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
       await client.query(
-        `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
-         VALUES ($1, $2, $3, $4, $5, true)`,
-        [lote.cantidad, fArribo, fVenci, nuevaOrden.id, prodId]
+        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
+         VALUES ($1, $2, $3, $4, $5, true, $6)`,
+        [fArribo, fVenci, lote.cantidad, nuevaOrden.id, prodId, lote.total]
       );
     }
 
@@ -116,18 +183,24 @@ export const create = async (data) => {
 };
 
 export const update = async (id, data) => {
-  const { total, fecha, proveedor_id, lotes } = data;
+  const { total, fecha, proveedor_id, proveedorNuevo, lotes } = data;
   const client = await pool.connect();
 
   try {
     await client.query('BEGIN');
 
-    if (proveedor_id !== undefined) {
+    let proveedorIdFinal = proveedor_id;
+    if (proveedorNuevo) {
+      const nuevoProveedor = await proveedoresRepo.create(proveedorNuevo, client);
+      proveedorIdFinal = nuevoProveedor.id;
+    }
+
+    if (proveedorIdFinal !== undefined) {
       await client.query(
         `UPDATE ordenes_compra
          SET total = $1, fecha = $2, proveedor_id = $3
          WHERE id = $4`,
-        [total, fecha, proveedor_id, id]
+        [total, fecha, proveedorIdFinal, id]
       );
     } else {
       await client.query(
@@ -147,14 +220,14 @@ export const update = async (id, data) => {
 
       // Insertamos los lotes actualizados
       for (const lote of lotes) {
-        const prodId = lote.productoId ?? lote.producto;
+        const prodId = await resolverProductoEnTransaccion(lote, client);
         const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
         const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
         await client.query(
-          `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
-           VALUES ($1, $2, $3, $4, $5, true)`,
-          [lote.cantidad, fArribo, fVenci, id, prodId]
+          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
+           VALUES ($1, $2, $3, $4, $5, true, $6)`,
+          [fArribo, fVenci, lote.cantidad, id, prodId, lote.total]
         );
       }
     }

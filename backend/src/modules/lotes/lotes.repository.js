@@ -4,7 +4,7 @@ import { normalizarProducto } from '../productos/productos.precio.js';
 // Consulta base: cada lote con su producto, su orden de compra y el proveedor
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
 const SQL_DETALLE = `
-  SELECT l.id, l.cantidad, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+  SELECT l.id, l.cantidad, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
          p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca,
          p.categoria AS producto_categoria, p.peso AS producto_peso, p.stock AS producto_stock,
          p.precio_costo AS producto_precio_costo, p.precio_venta AS producto_precio_venta,
@@ -40,6 +40,7 @@ const mapearLoteConDetalle = (row) => {
   return {
     id: row.id,
     cantidad: row.cantidad,
+    total: row.total != null ? Number(row.total) : null,
     fechaArribo: row.fecha_arribo,
     fechaVencimiento: row.fecha_vencimiento,
     activo: row.activo,
@@ -73,23 +74,23 @@ export const findById = async (id) => {
 };
 
 export const create = async (data) => {
-  const { cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
+  const { cantidad, total, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
   const { rows } = await pool.query(
-    `INSERT INTO lotes (cantidad, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
-    VALUES ($1, $2, $3, $4, $5, true)
+    `INSERT INTO lotes (cantidad, total, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
+    VALUES ($1, $2, $3, $4, $5, $6, true)
     RETURNING id`,
-    [cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto]
+    [cantidad, total, fechaArribo, fechaVencimiento, ordenCompra, producto]
   );
   return await findById(rows[0].id);
 };
 
 export const update = async (id, data) => {
-  const { cantidad, fechaArribo, fechaVencimiento } = data;
+  const { cantidad, total, fechaArribo, fechaVencimiento } = data;
   await pool.query(
     `UPDATE lotes
-    SET cantidad = $1, fecha_arribo = $2, fecha_vencimiento = $3
-    WHERE id = $4`,
-    [cantidad, fechaArribo, fechaVencimiento, id]
+    SET cantidad = $1, total = $2, fecha_arribo = $3, fecha_vencimiento = $4
+    WHERE id = $5`,
+    [cantidad, total, fechaArribo, fechaVencimiento, id]
   );
   return await findById(id);
 };

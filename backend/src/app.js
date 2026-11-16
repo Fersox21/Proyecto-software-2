@@ -13,8 +13,10 @@ import proveedoresRoutes from './modules/proveedores/proveedores.routes.js';
 import rolesRoutes from './modules/roles/roles.routes.js';
 import tieneRoutes from './modules/tiene/tiene.routes.js';
 import ventasRoutes from './modules/ventas/ventas.routes.js';
-import authRoutes from './modules/auth/auth.routes.js'
-import estadisticasRoutes from './modules/estadisticas/estadisticas.routes.js'
+import authRoutes from './modules/auth/auth.routes.js';
+import estadisticasRoutes from './modules/estadisticas/estadisticas.routes.js';
+import categoriasRoutes from './modules/categorias/categorias.routes.js';
+import tiposPromocionRoutes from './modules/tiposPromocion/tiposPromocion.routes.js';
 
 const app = express();
 
@@ -36,6 +38,8 @@ app.use('/api/roles', rolesRoutes);
 app.use('/api/items', tieneRoutes);
 app.use('/api/ventas', ventasRoutes);
 app.use('/api/estadisticas', estadisticasRoutes);
+app.use('/api/categorias', categoriasRoutes);
+app.use('/api/tipos-promocion', tiposPromocionRoutes);
 app.use(notFound);
 app.use(errorHandler);
 

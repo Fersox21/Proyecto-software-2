@@ -23,18 +23,33 @@ CREATE TABLE usuarios (
     activo BOOLEAN NOT NULL DEFAULT true,
     password VARCHAR(255) NOT NULL
 );
+-- Tabla 3: Categorías
+CREATE TABLE categorias (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    activo BOOLEAN NOT NULL DEFAULT true
+);
+-- Tabla 4: Tipos de Promoción
+CREATE TABLE tipos_promocion (
+    id SERIAL PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL UNIQUE,
+    activo BOOLEAN NOT NULL DEFAULT true
+);
 -- 5. Tabla Productos
 CREATE TABLE productos (
     id SERIAL PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     marca VARCHAR(25),
+    descripcion TEXT,
     stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0),
     precio_costo DECIMAL(10, 2) NOT NULL CHECK (precio_costo > 0),
     precio_venta DECIMAL(10, 2) NOT NULL CHECK (precio_venta > 0),
     en_promocion BOOLEAN NOT NULL DEFAULT false,
     precio_promo DECIMAL(10, 2) CHECK (precio_promo IS NULL OR precio_promo > 0),
     peso DECIMAL(10, 2) NOT NULL CHECK (peso > 0),
-    categoria VARCHAR(20) NOT NULL,
+    categoria VARCHAR(100) NOT NULL,
+    categoria_id INTEGER NOT NULL REFERENCES categorias(id),
+    tipo_promocion_id INTEGER REFERENCES tipos_promocion(id),
     imagen VARCHAR(255),
     destacado BOOLEAN NOT NULL DEFAULT false,
     activo BOOLEAN NOT NULL DEFAULT true,
@@ -77,9 +92,11 @@ CREATE TABLE lotes (
     fecha_arribo DATE NOT NULL,
     fecha_vencimiento DATE NOT NULL,
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     activo BOOLEAN NOT NULL,
     orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
-    producto_id INTEGER NOT NULL REFERENCES productos(id)
+    producto_id INTEGER NOT NULL REFERENCES productos(id),
+    CONSTRAINT chk_lotes_fechas CHECK (fecha_vencimiento >= fecha_arribo)
 );
 -- Tabla 7: Ventas (Depende de Pedidos)
 CREATE TABLE ventas (

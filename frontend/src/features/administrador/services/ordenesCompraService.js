@@ -61,12 +61,45 @@ export function eliminarOrdenCompra(id) {
   return pedir(`${URL_BASE}/ordenesCompra/${id}`, { method: 'DELETE' })
 }
 
+function filtrarActivos(datos) {
+  return Array.isArray(datos) ? datos.filter((item) => item?.activo !== false) : []
+}
+
 export function obtenerProveedores() {
-  return pedir(`${URL_BASE}/proveedores`)
+  return pedir(`${URL_BASE}/proveedores`).then(filtrarActivos)
+}
+
+export function crearProveedor({ nombre, telefono }) {
+  return pedir(`${URL_BASE}/proveedores`, {
+    method: 'POST',
+    body: JSON.stringify({ nombre, telefono }),
+  })
 }
 
 export function obtenerProductos() {
-  return pedir(`${URL_BASE}/productos`)
+  return pedir(`${URL_BASE}/productos`).then(filtrarActivos)
+}
+
+export function obtenerCategorias() {
+  return pedir(`${URL_BASE}/categorias`).then(filtrarActivos)
+}
+
+export function crearCategoria(nombre) {
+  return pedir(`${URL_BASE}/categorias`, {
+    method: 'POST',
+    body: JSON.stringify({ nombre }),
+  })
+}
+
+export function obtenerTiposPromocion() {
+  return pedir(`${URL_BASE}/tipos-promocion`).then(filtrarActivos)
+}
+
+export function crearTipoPromocion(nombre) {
+  return pedir(`${URL_BASE}/tipos-promocion`, {
+    method: 'POST',
+    body: JSON.stringify({ nombre }),
+  })
 }
 
 export function normalizarFecha(valor) {

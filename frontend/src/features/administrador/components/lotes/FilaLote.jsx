@@ -1,4 +1,4 @@
-import { formatearFecha } from '../../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function nombreProducto(lote) {
   if (lote?.producto?.nombre) return lote.producto.nombre
@@ -14,6 +14,8 @@ function nombreProveedor(lote) {
 }
 
 function FilaLote({ lote, esUltimoDeSuOrden, onEditar, onEliminar }) {
+  const totalLote = lote.total ?? lote.precioTotal
+
   return (
     <tr>
       <td className="lotes-codigo">#{lote.id}</td>
@@ -29,6 +31,9 @@ function FilaLote({ lote, esUltimoDeSuOrden, onEditar, onEliminar }) {
       <td>{nombreProveedor(lote)}</td>
       <td className="lotes-col-numero lotes-numero">
         {lote.cantidad ?? '—'}
+      </td>
+      <td className="lotes-col-numero lotes-numero">
+        {totalLote != null ? formatearPrecio(totalLote) : '—'}
       </td>
       <td>{formatearFecha(lote.fechaArribo)}</td>
       <td>{formatearFecha(lote.fechaVencimiento)}</td>

@@ -1,4 +1,4 @@
-import { formatearFecha } from '../../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
   if (detalle.cargando) {
@@ -28,6 +28,7 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
         <tr>
           <th scope="col">Producto</th>
           <th scope="col">Cantidad</th>
+          <th scope="col">Total lote</th>
           <th scope="col">Fecha de arribo</th>
           <th scope="col">Fecha de vencimiento</th>
         </tr>
@@ -46,6 +47,11 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
                     : 'Sin producto')}
               </td>
               <td>{lote.cantidad} Unidades</td>
+              <td className="orden-col-monto">
+                {(lote.total ?? lote.precioTotal) != null
+                  ? formatearPrecio(lote.total ?? lote.precioTotal)
+                  : '—'}
+              </td>
               <td>{formatearFecha(lote.fechaArribo)}</td>
               <td>{formatearFecha(lote.fechaVencimiento)}</td>
             </tr>

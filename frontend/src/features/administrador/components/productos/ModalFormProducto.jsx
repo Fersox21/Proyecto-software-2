@@ -1,6 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Modal from '../comunes/Modal'
 import CampoFormulario from '../comunes/CampoFormulario'
+import {
+  obtenerCategorias,
+  obtenerTiposPromocion,
+} from '../../services/productosServices'
 
 const CATEGORIAS_DISPONIBLES = [
   'Almacén',
@@ -12,27 +16,80 @@ const CATEGORIAS_DISPONIBLES = [
   'Harinas',
   'Pastas',
   'Granos',
-  'Limpieza'
+  'Limpieza',
 ]
+
+function obtenerCategoriaInicialId(producto) {
+  if (producto?.categoriaId != null) return String(producto.categoriaId)
+  if (producto?.categoria?.id != null) return String(producto.categoria.id)
+  return ''
+}
+
+function obtenerTipoPromocionInicialId(producto) {
+  if (producto?.tipoPromocionId != null) return String(producto.tipoPromocionId)
+  if (producto?.tipoPromocion?.id != null) return String(producto.tipoPromocion.id)
+  return ''
+}
 
 function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }) {
   const editando = Boolean(producto)
 
+  const [categorias, setCategorias] = useState([])
+  const [tiposPromocion, setTiposPromocion] = useState([])
+
   const [valores, setValores] = useState({
     nombre: producto?.nombre ?? '',
     marca: producto?.marca ?? '',
+    descripcion: producto?.descripcion ?? '',
     peso: producto?.peso !== undefined && producto?.peso !== null ? String(producto.peso) : '',
-    categoria: producto?.categoria ?? CATEGORIAS_DISPONIBLES[0],
+    categoriaId: obtenerCategoriaInicialId(producto),
+    categoria: typeof producto?.categoria === 'string'
+      ? producto.categoria
+      : producto?.categoria?.nombre ?? CATEGORIAS_DISPONIBLES[0],
+    tipoPromocionId: obtenerTipoPromocionInicialId(producto),
     precioVenta: producto?.precioVenta !== undefined && producto?.precioVenta !== null ? String(producto.precioVenta) : '',
     precioCosto: producto?.precioCosto !== undefined && producto?.precioCosto !== null ? String(producto.precioCosto) : '',
     stock: producto?.stock !== undefined && producto?.stock !== null ? String(producto.stock) : '0',
     enPromocion: Boolean(producto?.enPromocion),
     precioPromo: producto?.precioPromo !== undefined && producto?.precioPromo !== null ? String(producto.precioPromo) : '',
-    destacado: Boolean(producto?.destacado)
+    destacado: Boolean(producto?.destacado),
   })
 
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState(null)
+
+  useEffect(() => {
+    if (!visible) return
+    let ignorar = false
+
+    Promise.all([obtenerCategorias(), obtenerTiposPromocion()])
+      .then(([listaCats, listaPromos]) => {
+        if (ignorar) return
+        const cats = Array.isArray(listaCats) ? listaCats : []
+        const promos = Array.isArray(listaPromos) ? listaPromos : []
+        setCategorias(cats)
+        setTiposPromocion(promos)
+
+        setValores((prev) => {
+          if (prev.categoriaId || cats.length === 0) return prev
+          const nombreCat = typeof producto?.categoria === 'string'
+            ? producto.categoria
+            : producto?.categoria?.nombre
+          const encontrada = cats.find((c) => c.nombre === nombreCat)
+          return {
+            ...prev,
+            categoriaId: encontrada ? String(encontrada.id) : String(cats[0].id),
+          }
+        })
+      })
+      .catch(() => {
+        // Fallback silencioso a categorías locales si falla la carga
+      })
+
+    return () => {
+      ignorar = true
+    }
+  }, [visible, producto])
 
   if (!visible) return null
 
@@ -47,8 +104,12 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
     const nuevosErrores = {}
     if (!valores.nombre.trim()) nuevosErrores.nombre = 'El nombre es obligatorio'
     if (!valores.marca.trim()) nuevosErrores.marca = 'La marca es obligatoria'
-    if (!valores.categoria) nuevosErrores.categoria = 'Debes seleccionar una categoría'
-    
+    if (categorias.length > 0 && !valores.categoriaId) {
+      nuevosErrores.categoria = 'Debes seleccionar una categoría'
+    } else if (categorias.length === 0 && !valores.categoria) {
+      nuevosErrores.categoria = 'Debes seleccionar una categoría'
+    }
+
     const pesoNum = Number(valores.peso)
     if (valores.peso === '' || isNaN(pesoNum) || pesoNum <= 0) {
       nuevosErrores.peso = 'El peso debe ser un número mayor a 0 (ej. 500 para gramos o 1.5)'
@@ -89,14 +150,21 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
     const payload = {
       nombre: valores.nombre.trim(),
       marca: valores.marca.trim(),
+      descripcion: valores.descripcion.trim(),
       peso: Number(valores.peso),
-      categoria: valores.categoria,
       precioVenta: Number(valores.precioVenta),
       precioCosto: Number(valores.precioCosto),
       stock: Number(valores.stock),
       enPromocion: valores.enPromocion,
       precioPromo: valores.enPromocion ? Number(valores.precioPromo) : null,
-      destacado: valores.destacado
+      tipoPromocionId: valores.tipoPromocionId ? Number(valores.tipoPromocionId) : null,
+      destacado: valores.destacado,
+    }
+
+    if (categorias.length > 0 && valores.categoriaId) {
+      payload.categoriaId = Number(valores.categoriaId)
+    } else {
+      payload.categoria = valores.categoria
     }
 
     try {
@@ -146,28 +214,48 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
           </CampoFormulario>
 
           <CampoFormulario label="Categoría *" id="prod-categoria" error={errores.categoria}>
-            <select
-              id="prod-categoria"
-              value={valores.categoria}
-              onChange={(e) => actualizarCampo('categoria', e.target.value)}
-              disabled={guardando}
-              style={{
-                width: '100%',
-                padding: '0.55rem 0.75rem',
-                borderRadius: '8px',
-                border: '1px solid var(--admin-borde, #d1d5db)',
-                backgroundColor: 'var(--admin-superficie, #fff)',
-                color: 'var(--admin-texto, #1f2937)',
-                fontSize: '0.95rem'
-              }}
-            >
-              {CATEGORIAS_DISPONIBLES.map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
-                </option>
-              ))}
-            </select>
+            {categorias.length > 0 ? (
+              <select
+                id="prod-categoria"
+                value={valores.categoriaId}
+                onChange={(e) => actualizarCampo('categoriaId', e.target.value)}
+                disabled={guardando}
+              >
+                <option value="">Elegí una categoría</option>
+                {categorias.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.nombre}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <select
+                id="prod-categoria"
+                value={valores.categoria}
+                onChange={(e) => actualizarCampo('categoria', e.target.value)}
+                disabled={guardando}
+              >
+                {CATEGORIAS_DISPONIBLES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
+            )}
           </CampoFormulario>
+
+          <div style={{ gridColumn: 'span 2' }}>
+            <CampoFormulario label="Descripción" id="prod-descripcion" error={errores.descripcion}>
+              <textarea
+                id="prod-descripcion"
+                rows={2}
+                placeholder="Descripción del producto"
+                value={valores.descripcion}
+                onChange={(e) => actualizarCampo('descripcion', e.target.value)}
+                disabled={guardando}
+              />
+            </CampoFormulario>
+          </div>
 
           <CampoFormulario label="Peso / Tamaño (número > 0) *" id="prod-peso" error={errores.peso}>
             <input
@@ -216,6 +304,24 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
               disabled={guardando}
             />
           </CampoFormulario>
+
+          <div style={{ gridColumn: 'span 2' }}>
+            <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
+              <select
+                id="prod-tipo-promo"
+                value={valores.tipoPromocionId}
+                onChange={(e) => actualizarCampo('tipoPromocionId', e.target.value)}
+                disabled={guardando}
+              >
+                <option value="">Ninguna</option>
+                {tiposPromocion.map((tp) => (
+                  <option key={tp.id} value={tp.id}>
+                    {tp.nombre}
+                  </option>
+                ))}
+              </select>
+            </CampoFormulario>
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>

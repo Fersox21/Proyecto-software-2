@@ -123,8 +123,11 @@ export const crearLote = async (data) => {
 
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
 
+  const total = Number((Number(productoExistente.precioCosto) * cantidad).toFixed(2));
+
   return await repository.create({
     cantidad,
+    total,
     fechaArribo,
     fechaVencimiento,
     ordenCompra: ordenCompraId,
@@ -174,7 +177,12 @@ export const actualizarLote = async (id, data) => {
 
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
 
-  return await repository.update(idLote, { cantidad, fechaArribo, fechaVencimiento });
+  const total =
+    data?.cantidad !== undefined && loteExistente.producto?.precioCosto != null
+      ? Number((Number(loteExistente.producto.precioCosto) * cantidad).toFixed(2))
+      : loteExistente.total;
+
+  return await repository.update(idLote, { cantidad, total, fechaArribo, fechaVencimiento });
 };
 
 export const eliminarLote = async (id) => {

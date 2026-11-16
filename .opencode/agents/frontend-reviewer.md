@@ -1,7 +1,7 @@
 ---
 description: Revisa, optimiza y refactoriza componentes de interfaz y estilos (HTML, CSS, React/Vite) asegurando accesibilidad, semántica y diseño responsive. Usalo cuando se pida auditar el frontend.
 mode: subagent
-model: google/gemini-2.5-flash
+model: google/gemini-3.1-pro-preview
 steps: 15
 permissions:
   - action: edit

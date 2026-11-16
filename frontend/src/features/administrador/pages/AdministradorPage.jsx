@@ -13,7 +13,6 @@ function AdministradorPage() {
     cargando,
     error,
     procesandoAccion,
-    crearProducto,
     actualizarProducto,
     eliminarProducto
   } = useProductosAdmin()
@@ -28,11 +27,6 @@ function AdministradorPage() {
     setTimeout(() => setAlerta(null), 4000)
   }
 
-  const handleAbrirCrear = () => {
-    setProductoSeleccionado(null)
-    setModalFormAbierto(true)
-  }
-
   const handleAbrirEditar = (producto) => {
     setProductoSeleccionado(producto)
     setModalFormAbierto(true)
@@ -44,13 +38,9 @@ function AdministradorPage() {
   }
 
   const handleGuardarProducto = async (datos) => {
-    if (productoSeleccionado) {
-      await actualizarProducto(productoSeleccionado.id, datos)
-      mostrarMensaje(`Producto "${datos.nombre}" actualizado con éxito`)
-    } else {
-      await crearProducto(datos)
-      mostrarMensaje(`Producto "${datos.nombre}" creado con éxito`)
-    }
+    if (!productoSeleccionado) return
+    await actualizarProducto(productoSeleccionado.id, datos)
+    mostrarMensaje(`Producto "${datos.nombre}" actualizado con éxito`)
     handleCerrarForm()
   }
 
@@ -83,13 +73,6 @@ function AdministradorPage() {
       <section className="main-admin" id="main-admin">
         <header className="header-admin">
           <h1 className="h1-admin">Gestión de Productos</h1>
-          <button
-            type="button"
-            className="orden-btn orden-btn-primario agregar-prod"
-            onClick={handleAbrirCrear}
-          >
-            + Agregar producto
-          </button>
         </header>
 
         {alerta && (

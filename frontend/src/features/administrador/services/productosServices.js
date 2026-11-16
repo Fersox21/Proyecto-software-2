@@ -82,3 +82,29 @@ export async function obtenerDestacados() {
   const productos = await obtenerProductos()
   return productos.filter((p) => p.destacado)
 }
+
+export async function obtenerCategorias() {
+  const respuesta = await fetch(`${URL_BASE}/categorias`, {
+    headers: headers()
+  })
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}))
+    throw new Error(errorData.error || 'No se pudieron obtener las categorías')
+  }
+
+  return respuesta.json()
+}
+
+export async function obtenerTiposPromocion() {
+  const respuesta = await fetch(`${URL_BASE}/tipos-promocion`, {
+    headers: headers()
+  })
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}))
+    throw new Error(errorData.error || 'No se pudieron obtener los tipos de promoción')
+  }
+
+  return respuesta.json()
+}

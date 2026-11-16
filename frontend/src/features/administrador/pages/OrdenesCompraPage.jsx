@@ -20,13 +20,10 @@ function OrdenesCompraPage() {
   const [detalle, setDetalle] = useState(null)
   const [productosPorId, setProductosPorId] = useState({})
 
-  // Catálogo de productos para resolver nombres en los lotes
-  useEffect(() => {
-    let ignorar = false
-
-    obtenerProductos()
+  const cargarProductos = useCallback(() => {
+    return obtenerProductos()
       .then((productos) => {
-        if (ignorar || !Array.isArray(productos)) return
+        if (!Array.isArray(productos)) return
         const mapa = {}
         productos.forEach((p) => {
           mapa[p.id] = p.nombre
@@ -34,13 +31,14 @@ function OrdenesCompraPage() {
         setProductosPorId(mapa)
       })
       .catch(() => {
-        if (!ignorar) setProductosPorId({})
+        setProductosPorId({})
       })
-
-    return () => {
-      ignorar = true
-    }
   }, [])
+
+  // Catálogo de productos para resolver nombres en los lotes
+  useEffect(() => {
+    cargarProductos()
+  }, [cargarProductos])
 
   const abrirCrear = useCallback(() => {
     setMensaje(null)
@@ -71,10 +69,11 @@ function OrdenesCompraPage() {
         await crear(datos)
         setMensaje({ tipo: 'exito', texto: 'Orden de compra creada.' })
       }
+      await cargarProductos()
       setFormulario(null)
       setDetalle(null)
     },
-    [formulario, crear, actualizar],
+    [formulario, crear, actualizar, cargarProductos],
   )
 
 const alternarDetalle = useCallback(

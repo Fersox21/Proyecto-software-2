@@ -11,7 +11,7 @@ import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/lotes.css'
 
 function LotesPage() {
-  const { lotes, cargando, error, recargar, crear, actualizar, eliminar } = useLotes()
+  const { lotes, cargando, error, recargar, actualizar, eliminar } = useLotes()
 
   const [busqueda, setBusqueda] = useState('')
   const [mensaje, setMensaje] = useState(null)
@@ -61,21 +61,12 @@ function LotesPage() {
 
   const limpiarBusqueda = useCallback(() => setBusqueda(''), [])
 
-  const abrirCrear = () => {
-    setMensaje(null)
-    setFormulario({ modo: 'crear', lote: null })
-  }
-
   const cerrarFormulario = () => setFormulario(null)
 
   const guardar = async (datos) => {
-    if (formulario?.modo === 'editar') {
-      await actualizar(formulario.lote.id, datos)
-      setMensaje({ tipo: 'exito', texto: `Lote #${formulario.lote.id} actualizado.` })
-    } else {
-      await crear(datos)
-      setMensaje({ tipo: 'exito', texto: 'Lote creado.' })
-    }
+    if (!formulario?.lote) return
+    await actualizar(formulario.lote.id, datos)
+    setMensaje({ tipo: 'exito', texto: `Lote #${formulario.lote.id} actualizado.` })
     setFormulario(null)
   }
 
@@ -99,9 +90,6 @@ function LotesPage() {
     <section className="main-admin" id="main-lotes">
       <header className="header-admin">
         <h1 className="orden-h1">Lotes</h1>
-        <button type="button" className="agregar-prod" onClick={abrirCrear}>
-          + Nuevo lote
-        </button>
       </header>
 
       {mensaje && (
@@ -136,12 +124,8 @@ function LotesPage() {
       {!cargando && !error && lotes.length === 0 && (
         <MensajeVacio
           titulo="Todavía no hay lotes registrados"
-          texto="Creá el primer lote para empezar a gestionar el stock."
-        >
-          <button type="button" className="orden-btn orden-btn-primario" onClick={abrirCrear}>
-            Crear el primer lote
-          </button>
-        </MensajeVacio>
+          texto="Los lotes se generan automáticamente al crear una orden de compra."
+        />
       )}
 
       {!cargando && !error && lotes.length > 0 && (
@@ -178,6 +162,9 @@ function LotesPage() {
                     <th scope="col" className="lotes-col-numero">
                       Cantidad
                     </th>
+                    <th scope="col" className="lotes-col-numero">
+                      Total
+                    </th>
                     <th scope="col">Fecha de arribo</th>
                     <th scope="col">Fecha de vencimiento</th>
                     <th scope="col" className="orden-col-acciones">
@@ -207,11 +194,7 @@ function LotesPage() {
 
       {formulario && (
         <Modal
-          titulo={
-            formulario.modo === 'editar'
-              ? `Editar lote #${formulario.lote.id}`
-              : 'Nuevo lote'
-          }
+          titulo={`Editar lote #${formulario.lote.id}`}
           onCerrar={cerrarFormulario}
         >
           <LoteForm

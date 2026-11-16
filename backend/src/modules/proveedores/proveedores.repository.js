@@ -1,7 +1,7 @@
 import { pool } from '../../config/db.js';
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM proveedores ORDER BY activo DESC, nombre ASC');
+  const { rows } = await pool.query('SELECT * FROM proveedores WHERE activo = true ORDER BY nombre ASC');
   return rows;
 };
 
@@ -10,9 +10,9 @@ export const findById = async (id) => {
   return rows[0];
 };
 
-export const create = async (data) => {
+export const create = async (data, client = pool) => {
   const { nombre, telefono } = data;
-  const { rows } = await pool.query(
+  const { rows } = await client.query(
     `INSERT INTO proveedores (nombre, telefono)
     VALUES ($1, $2)
     RETURNING *`,
