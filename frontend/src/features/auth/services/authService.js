@@ -1,6 +1,6 @@
 import { redirect } from 'react-router'
 
-const URL_BASE = import.meta.env.VITE_API_URL
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 export async function iniciarSesion({ email, password }) {
 
