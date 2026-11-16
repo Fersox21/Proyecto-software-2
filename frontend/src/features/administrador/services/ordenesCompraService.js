@@ -1,21 +1,25 @@
 const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function headers() {
+function headers(conJson = true) {
   const token = sessionStorage.getItem('token')
-  return {
-    'Content-Type': 'application/json',
+  const base = {
     'Authorization': `Bearer ${token}`
   }
+  if (conJson) {
+    base['Content-Type'] = 'application/json'
+  }
+  return base
 }
 
 export async function pedir(url, opciones = {}) {
+  const esFormData = opciones.body instanceof FormData
   let respuesta
 
   try {
     respuesta = await fetch(url, {
       ...opciones,
       headers: {
-        ...headers(),
+        ...headers(!esFormData),
         ...(opciones.headers ?? {}),
       },
     })
@@ -43,17 +47,24 @@ export function obtenerOrdenCompraPorId(id) {
   return pedir(`${URL_BASE}/ordenesCompra/${id}`)
 }
 
+function asegurarFormData(datos) {
+  if (datos instanceof FormData) return datos
+  const formData = new FormData()
+  formData.append('datos', JSON.stringify(datos))
+  return formData
+}
+
 export function crearOrdenCompra(datos) {
   return pedir(`${URL_BASE}/ordenesCompra`, {
     method: 'POST',
-    body: JSON.stringify(datos),
+    body: asegurarFormData(datos),
   })
 }
 
 export function actualizarOrdenCompra(id, datos) {
   return pedir(`${URL_BASE}/ordenesCompra/${id}`, {
     method: 'PUT',
-    body: JSON.stringify(datos),
+    body: asegurarFormData(datos),
   })
 }
 

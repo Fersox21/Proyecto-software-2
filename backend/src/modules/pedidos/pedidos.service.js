@@ -28,6 +28,49 @@ const crearError = (mensaje, status) => {
   return error;
 };
 
+const validarEnteroPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isInteger(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isSafeInteger(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
+const validarDecimal = (valor, { min = 0, exclusivo = false }, mensaje) => {
+  let numero;
+  if (typeof valor === 'number') {
+    numero = valor;
+  } else if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+(\.\d+)?$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    numero = Number(limpio);
+  } else {
+    throw crearError(mensaje, 400);
+  }
+
+  if (!Number.isFinite(numero) || (exclusivo ? numero <= min : numero < min)) {
+    throw crearError(mensaje, 400);
+  }
+  return numero;
+};
+
 const normalizarEstado = (valor) => {
   if (!valor) return null;
   const estado = String(valor).trim().toLowerCase();
@@ -61,15 +104,15 @@ const normalizarItems = async (items) => {
 
   for (const item of items) {
     const productoId = Number(item.productoId ?? item.producto_id);
-    const cantidad = Number(item.cantidad);
 
     if (!Number.isInteger(productoId) || productoId <= 0) {
       throw crearError('Cada ítem debe indicar un producto válido', 400);
     }
 
-    if (!Number.isInteger(cantidad) || cantidad <= 0) {
-      throw crearError('La cantidad de cada producto debe ser un entero mayor a 0', 400);
-    }
+    const cantidad = validarEnteroPositivo(
+      item.cantidad,
+      'La cantidad de cada producto debe ser un entero mayor a 0'
+    );
 
     const producto = await repositoryProducto.findById(productoId);
     if (!producto) {
@@ -149,10 +192,9 @@ export const crearPedido = async (data) => {
 
   const items = await normalizarItems(data.items);
 
-  const envio = data.envio === undefined ? 0 : Number(data.envio);
-  if (!Number.isFinite(envio) || envio < 0) {
-    throw crearError('El costo de envío no es válido', 400);
-  }
+  const envio = data.envio === undefined
+    ? 0
+    : validarDecimal(data.envio, { min: 0, exclusivo: false }, 'El costo de envío no es válido');
 
   const subtotal = items.reduce((total, item) => total + item.precio * item.cantidad, 0);
   const total = subtotal + envio;
@@ -217,6 +259,10 @@ export const actualizarPedido = async (id, data) => {
     }
   }
 
+  const totalActualizado = data.total !== undefined
+    ? validarDecimal(data.total, { min: 0, exclusivo: true }, 'El total del pedido debe ser mayor a 0')
+    : undefined;
+
   const pedidoActualizado = {
     ...pedidoExistente,
     ...(estadoSolicitado ? { estado: estadoSolicitado } : {}),
@@ -224,12 +270,8 @@ export const actualizarPedido = async (id, data) => {
     ...(data.direccion !== undefined ? { direccion: data.direccion } : {}),
     ...(data.metodoPago !== undefined ? { metodoPago: data.metodoPago } : {}),
     ...(data.telefono !== undefined ? { telefono: data.telefono } : {}),
-    ...(data.total !== undefined ? { total: Number(data.total) } : {})
+    ...(totalActualizado !== undefined ? { total: totalActualizado } : {})
   };
-
-  if (pedidoActualizado.total !== undefined && pedidoActualizado.total <= 0) {
-    throw crearError('El total del pedido debe ser mayor a 0', 400);
-  }
 
   return await repository.update(id, pedidoActualizado);
 };

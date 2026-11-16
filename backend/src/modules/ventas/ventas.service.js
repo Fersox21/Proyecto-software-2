@@ -2,6 +2,35 @@ import * as ventasRepository from './ventas.repository.js';
 import * as repositoryPedidos from '../pedidos/pedidos.repository.js';
 
 
+const crearError = (mensaje, status) => {
+  const error = new Error(mensaje);
+  error.status = status;
+  return error;
+};
+
+const validarDecimalPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+(\.\d+)?$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isFinite(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
 export const listarVentas = async (periodo) => {
   if (periodo === 'ultimo-mes') {
     return await ventasUltimoMes();
@@ -43,20 +72,13 @@ export const crearVenta = async (data) => {
     throw error;
   }
 
-  if (!data.fecha || !data.total) {
-    const error = new Error('Faltan datos obligatorios para crear venta');
-    error.status = 400;
-    throw error;
+  if (!data.fecha || data.total === undefined || data.total === null) {
+    throw crearError('Faltan datos obligatorios para crear venta', 400);
   }
 
+  const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
 
-  if (data.total <= 0) {
-    const error = new Error('El total de tiene debe ser mayor a 0');
-    error.status = 400;
-    throw error;
-  }
-
-  return await ventasRepository.create(data);
+  return await ventasRepository.create({ ...data, total });
 };
 
 export const update = async (id,data) => {
@@ -68,20 +90,13 @@ export const update = async (id,data) => {
     throw error;
   }
 
-  if (!data.fecha || !data.total) {
-    const error = new Error('Faltan datos obligatorios para actualizar venta');
-    error.status = 400;
-    throw error;
+  if (!data.fecha || data.total === undefined || data.total === null) {
+    throw crearError('Faltan datos obligatorios para actualizar venta', 400);
   }
 
+  const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
 
-  if (data.total <= 0) {
-    const error = new Error('El total de tiene debe ser mayor a 0');
-    error.status = 400;
-    throw error;
-  }
-
-  return await ventasRepository.update(id,data);
+  return await ventasRepository.update(id, { ...data, total });
 };
 
 export const remove = async (id) => {

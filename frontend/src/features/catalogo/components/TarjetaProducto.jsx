@@ -1,17 +1,15 @@
 import { Link } from 'react-router'
-import { obtenerPreciosProducto, formatearPrecio } from '../../../shared/utils/formato'
+import {
+  obtenerPreciosProducto,
+  formatearPrecio,
+  obtenerUrlImagenProducto,
+  manejarErrorImagenProducto,
+} from '../../../shared/utils/formato'
 import { useState, useRef } from 'react'
 import '../../../styles/tarjetaProducto.css'
 
 function TarjetaProducto({ producto, onAgregar }) {
-  const nombreImagen = producto?.nombre
-    ?.toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
-
-  const imagenUrl = `/images/${nombreImagen}.webp`
-  const imagendefault = '/images/harina.webp'
+  const imagenUrl = obtenerUrlImagenProducto(producto?.imagen)
 
   const sinStock = producto?.stock === 0
 
@@ -32,11 +30,6 @@ function TarjetaProducto({ producto, onAgregar }) {
     temporizador.current = setTimeout(() => {
       setMostrarNotificacion(false)
     }, 2500)
-  }
-
-  const manejarErrorImagen = (e) => {
-    e.target.onerror = null // Previene bucle infinito si harina.webp tampoco existiera
-    e.target.src = imagendefault
   }
 
   return (
@@ -60,7 +53,7 @@ function TarjetaProducto({ producto, onAgregar }) {
           <Link to={`/catalogo/${producto?.id}`}>
             <img 
               src={imagenUrl}
-              onError={manejarErrorImagen}
+              onError={manejarErrorImagenProducto}
               className="tarjeta-imagen" 
               alt={producto?.nombre || 'Producto'} 
             />
@@ -73,7 +66,9 @@ function TarjetaProducto({ producto, onAgregar }) {
               {producto?.nombre}
             </Link>
           </h3>
-          <p className="tarjeta-peso">{producto?.peso}</p>
+          {producto?.descripcion && (
+            <p className="tarjeta-descripcion">{producto.descripcion}</p>
+          )}
           
           <div className="mt-auto d-flex justify-content-between align-items-center gap-2">
             {enPromocion ? (

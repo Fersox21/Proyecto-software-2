@@ -41,7 +41,10 @@ const almacenamiento = multer.diskStorage({
   destination: (req, file, cb) => cb(null, CARPETA_UPLOADS),
   filename: (req, file, cb) => {
     const extension = EXTENSIONES[file.mimetype] || '.jpg';
-    cb(null, `producto-${req.params.id}-${Date.now()}${extension}`);
+    cb(
+      null,
+      `producto-${req.params.id || 'nuevo'}-${Date.now()}-${Math.round(Math.random() * 1e6)}${extension}`
+    );
   }
 });
 
@@ -56,10 +59,8 @@ const upload = multer({
   }
 });
 
-// Envuelve multer.single para normalizar sus errores al contrato de la API
-// (siempre con status 400 y un mensaje claro).
-export const recibirImagen = (req, res, next) => {
-  upload.single('imagen')(req, res, (err) => {
+const manejarMiddlewareUpload = (middleware) => (req, res, next) => {
+  middleware(req, res, (err) => {
     if (!err) return next();
 
     if (err instanceof multer.MulterError) {
@@ -77,16 +78,30 @@ export const recibirImagen = (req, res, next) => {
   });
 };
 
+// Envuelve multer.single para normalizar sus errores al contrato de la API
+// (siempre con status 400 y un mensaje claro).
+export const recibirImagen = manejarMiddlewareUpload(upload.single('imagen'));
+
+export const recibirImagenesOrden = manejarMiddlewareUpload(upload.any());
+
 // Elimina el archivo físico asociado a una ruta pública. Solo actúa sobre rutas
 // que pertenecen a nuestra carpeta de uploads y usa basename para evitar que
 // una ruta maliciosa intente salir del directorio. Si el archivo no existe, no
 // hace nada.
 export const eliminarImagenFisica = (url) => {
-  if (typeof url !== 'string' || !url.startsWith(`${URL_BASE_IMAGENES}/`)) {
+  if (typeof url !== 'string') return;
+
+  const limpio = url.trim();
+  if (!limpio || /^https?:\/\//i.test(limpio)) return;
+  if (limpio.includes('/') && !limpio.startsWith(`${URL_BASE_IMAGENES}/`)) {
     return;
   }
 
-  const nombreArchivo = path.basename(url);
+  const nombreArchivo = path.basename(limpio);
+  if (!nombreArchivo || nombreArchivo === '.' || nombreArchivo === '..') {
+    return;
+  }
+
   const ruta = path.join(CARPETA_UPLOADS, nombreArchivo);
 
   try {

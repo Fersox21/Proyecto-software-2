@@ -4,6 +4,7 @@ import { validarNombreProveedor, validarTelefonoProveedor } from '../proveedores
 import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryCategoria from '../categorias/categorias.repository.js';
 import * as repositoryTipoPromocion from '../tiposPromocion/tiposPromocion.repository.js';
+import { eliminarImagenFisica } from '../productos/productos.imagen.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
 
@@ -11,6 +12,72 @@ const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
   error.status = status;
   return error;
+};
+
+const limpiarArchivos = (archivos = []) => {
+  if (!Array.isArray(archivos)) return;
+  for (const archivo of archivos) {
+    if (archivo?.filename) {
+      eliminarImagenFisica(archivo.filename);
+    }
+  }
+};
+
+const mapearArchivosPorCampo = (archivos = []) => {
+  const mapa = new Map();
+  if (!Array.isArray(archivos)) return mapa;
+  for (const archivo of archivos) {
+    if (archivo?.fieldname && !mapa.has(archivo.fieldname)) {
+      mapa.set(archivo.fieldname, archivo);
+    }
+  }
+  return mapa;
+};
+
+const validarEnteroPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isInteger(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isSafeInteger(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
+const validarDecimalPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+(\.\d+)?$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isFinite(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
 };
 
 const validarFecha = (valor, campo) => {
@@ -34,7 +101,7 @@ const validarFecha = (valor, campo) => {
   return fecha;
 };
 
-const validarProductoNuevo = async (productoNuevo) => {
+const validarProductoNuevo = async (productoNuevo, imagen) => {
   if (!productoNuevo || typeof productoNuevo !== 'object' || Array.isArray(productoNuevo)) {
     throw crearError('Los datos del producto nuevo no son válidos', 400);
   }
@@ -44,24 +111,14 @@ const validarProductoNuevo = async (productoNuevo) => {
     throw crearError('El nombre del producto nuevo es obligatorio', 400);
   }
 
-  const precioCosto = Number(productoNuevo.precioCosto);
-  const precioVenta = Number(productoNuevo.precioVenta);
-
-  if (!Number.isFinite(precioCosto) || precioCosto <= 0) {
-    throw crearError('El precio de costo del producto nuevo debe ser mayor a 0', 400);
-  }
-
-  if (!Number.isFinite(precioVenta) || precioVenta <= 0) {
-    throw crearError('El precio de venta del producto nuevo debe ser mayor a 0', 400);
-  }
-
-  const peso = productoNuevo.peso !== undefined && productoNuevo.peso !== null && productoNuevo.peso !== ''
-    ? Number(productoNuevo.peso)
-    : 1;
-
-  if (!Number.isFinite(peso) || peso <= 0) {
-    throw crearError('El peso del producto nuevo debe ser mayor a 0', 400);
-  }
+  const precioCosto = validarDecimalPositivo(
+    productoNuevo.precioCosto,
+    'El precio de costo del producto nuevo debe ser mayor a 0'
+  );
+  const precioVenta = validarDecimalPositivo(
+    productoNuevo.precioVenta,
+    'El precio de venta del producto nuevo debe ser mayor a 0'
+  );
 
   let categoriaId = null;
   let categoriaNuevaNombre = null;
@@ -145,12 +202,12 @@ const validarProductoNuevo = async (productoNuevo) => {
     descripcion,
     precioCosto,
     precioVenta,
-    peso,
     destacado: Boolean(productoNuevo.destacado),
     categoriaId,
     categoriaNuevaNombre,
     tipoPromocionId,
-    tipoPromocionNuevaNombre
+    tipoPromocionNuevaNombre,
+    imagen
   };
 };
 
@@ -159,8 +216,11 @@ const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
   const rawTotal = lote.total ?? lote.precioTotal;
 
   if (rawTotal !== undefined && rawTotal !== null && rawTotal !== '') {
-    const enviado = Number(rawTotal);
-    if (!Number.isFinite(enviado) || Math.abs(enviado - calculado) > 0.01) {
+    const enviado = validarDecimalPositivo(
+      rawTotal,
+      'El total del lote debe ser un número mayor a 0'
+    );
+    if (Math.abs(enviado - calculado) > 0.01) {
       throw crearError('El total del lote no coincide con el precio de costo por cantidad', 400);
     }
   }
@@ -168,22 +228,15 @@ const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
   return calculado;
 };
 
-const validarLote = async (lote) => {
+const validarLote = async (lote, indice, archivosPorCampo) => {
   if (!lote || typeof lote !== 'object') {
     throw crearError('Los datos del lote no son válidos', 400);
   }
 
-  const cantidadRaw = lote.cantidad;
-  const cantidad = Number(cantidadRaw);
-  if (
-    cantidadRaw === undefined ||
-    cantidadRaw === null ||
-    cantidadRaw === '' ||
-    !Number.isInteger(cantidad) ||
-    cantidad <= 0
-  ) {
-    throw crearError('La cantidad del lote debe ser un entero mayor a 0', 400);
-  }
+  const cantidad = validarEnteroPositivo(
+    lote.cantidad,
+    'La cantidad del lote debe ser un entero mayor a 0'
+  );
 
   const fArriboRaw = lote.fechaArribo ?? lote.fecha_arribo;
   const fVenciRaw = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
@@ -200,7 +253,11 @@ const validarLote = async (lote) => {
   }
 
   if (lote.productoNuevo) {
-    const productoNuevo = await validarProductoNuevo(lote.productoNuevo);
+    const archivoImagen = archivosPorCampo.get(`imagenProducto_${indice}`);
+    const productoNuevo = await validarProductoNuevo(
+      lote.productoNuevo,
+      archivoImagen?.filename ?? null
+    );
     const totalLote = calcularYValidarTotalLote(lote, productoNuevo.precioCosto, cantidad);
     return {
       cantidad,
@@ -248,131 +305,143 @@ export const obtenerOrdenCompraPorId = async (id) => {
   return ordenCompra;
 };
 
-export const crearOrdenCompra = async (data) => {
-  let proveedorId = null;
-  let proveedorNuevo = null;
+export const crearOrdenCompra = async (data, archivos = []) => {
+  try {
+    let proveedorId = null;
+    let proveedorNuevo = null;
 
-  if (data?.proveedorNuevo) {
-    if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
-      throw crearError('Los datos del proveedor nuevo no son válidos', 400);
+    if (data?.proveedorNuevo) {
+      if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
+        throw crearError('Los datos del proveedor nuevo no son válidos', 400);
+      }
+      proveedorNuevo = {
+        nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
+        telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
+      };
+    } else {
+      const proveedorIdRaw = data?.proveedor_id ?? data?.proveedorId ?? data?.proveedor;
+      const parsedId = Number(proveedorIdRaw);
+
+      if (!proveedorIdRaw || !Number.isInteger(parsedId) || parsedId <= 0) {
+        throw crearError('Debe indicar un proveedor válido para la orden de compra', 400);
+      }
+
+      const proveedorExistente = await repositoryProveedor.findById(parsedId);
+      if (!proveedorExistente) {
+        throw crearError('Proveedor no encontrado', 404);
+      }
+      if (proveedorExistente.activo === false) {
+        throw crearError('El proveedor indicado está inactivo', 400);
+      }
+      proveedorId = parsedId;
     }
-    proveedorNuevo = {
-      nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
-      telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
-    };
-  } else {
-    const proveedorIdRaw = data?.proveedor_id ?? data?.proveedorId ?? data?.proveedor;
-    const parsedId = Number(proveedorIdRaw);
 
-    if (!proveedorIdRaw || !Number.isInteger(parsedId) || parsedId <= 0) {
-      throw crearError('Debe indicar un proveedor válido para la orden de compra', 400);
+    const total = validarDecimalPositivo(
+      data?.total,
+      'El total de la orden de compra debe ser mayor a 0'
+    );
+
+    if (!data?.fecha) {
+      throw crearError('La fecha de la orden de compra es obligatoria', 400);
     }
+    const fecha = validarFecha(data.fecha, 'La fecha de la orden de compra');
 
-    const proveedorExistente = await repositoryProveedor.findById(parsedId);
-    if (!proveedorExistente) {
-      throw crearError('Proveedor no encontrado', 404);
-    }
-    if (proveedorExistente.activo === false) {
-      throw crearError('El proveedor indicado está inactivo', 400);
-    }
-    proveedorId = parsedId;
-  }
-
-  const total = Number(data?.total);
-  if (!Number.isFinite(total) || total <= 0) {
-    throw crearError('El total de la orden de compra debe ser mayor a 0', 400);
-  }
-
-  if (!data?.fecha) {
-    throw crearError('La fecha de la orden de compra es obligatoria', 400);
-  }
-  const fecha = validarFecha(data.fecha, 'La fecha de la orden de compra');
-
-  const lotes = Array.isArray(data.lotes) ? data.lotes : [];
-  if (lotes.length === 0) {
-    throw crearError('La orden de compra debe tener al menos un lote', 400);
-  }
-
-  const lotesValidados = [];
-  for (const lote of lotes) {
-    lotesValidados.push(await validarLote(lote));
-  }
-
-  return await repository.create({
-    total,
-    fecha,
-    ...(proveedorId !== null && { proveedor_id: proveedorId }),
-    ...(proveedorNuevo !== null && { proveedorNuevo }),
-    lotes: lotesValidados
-  });
-};
-
-export const actualizarOrdenCompra = async (id, data) => {
-  const ordenCompraExistente = await repository.findById(id);
-  if (!ordenCompraExistente) {
-    throw crearError('Orden de compra no encontrada', 404);
-  }
-
-  let total = ordenCompraExistente.total;
-  if (data.total !== undefined) {
-    total = Number(data.total);
-    if (!Number.isFinite(total) || total <= 0) {
-      throw crearError('El total de la orden de compra debe ser mayor a 0', 400);
-    }
-  }
-
-  let fecha = ordenCompraExistente.fecha;
-  if (data.fecha !== undefined) {
-    fecha = validarFecha(data.fecha, 'La fecha de la orden de compra');
-  }
-
-  const proveedorIdRaw = data.proveedor_id ?? data.proveedorId ?? data.proveedor;
-  let proveedorId;
-  let proveedorNuevo;
-
-  if (data?.proveedorNuevo) {
-    if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
-      throw crearError('Los datos del proveedor nuevo no son válidos', 400);
-    }
-    proveedorNuevo = {
-      nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
-      telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
-    };
-  } else if (proveedorIdRaw !== undefined) {
-    proveedorId = Number(proveedorIdRaw);
-    if (!Number.isInteger(proveedorId) || proveedorId <= 0) {
-      throw crearError('El proveedor indicado no es válido', 400);
-    }
-    const proveedorExistente = await repositoryProveedor.findById(proveedorId);
-    if (!proveedorExistente) {
-      throw crearError('Proveedor no encontrado', 404);
-    }
-    if (proveedorExistente.activo === false) {
-      throw crearError('El proveedor indicado está inactivo', 400);
-    }
-  }
-
-  let lotesValidados;
-  if (data.lotes !== undefined) {
-    if (!Array.isArray(data.lotes) || data.lotes.length === 0) {
+    const lotes = Array.isArray(data.lotes) ? data.lotes : [];
+    if (lotes.length === 0) {
       throw crearError('La orden de compra debe tener al menos un lote', 400);
     }
 
-    lotesValidados = [];
-    for (const lote of data.lotes) {
-      lotesValidados.push(await validarLote(lote));
+    const archivosPorCampo = mapearArchivosPorCampo(archivos);
+    const lotesValidados = [];
+    for (let i = 0; i < lotes.length; i += 1) {
+      lotesValidados.push(await validarLote(lotes[i], i, archivosPorCampo));
     }
+
+    return await repository.create({
+      total,
+      fecha,
+      ...(proveedorId !== null && { proveedor_id: proveedorId }),
+      ...(proveedorNuevo !== null && { proveedorNuevo }),
+      lotes: lotesValidados
+    });
+  } catch (err) {
+    limpiarArchivos(archivos);
+    throw err;
   }
+};
 
-  const datosActualizar = {
-    total,
-    fecha,
-    ...(proveedorId !== undefined && { proveedor_id: proveedorId }),
-    ...(proveedorNuevo !== undefined && { proveedorNuevo }),
-    ...(lotesValidados !== undefined && { lotes: lotesValidados })
-  };
+export const actualizarOrdenCompra = async (id, data, archivos = []) => {
+  try {
+    const ordenCompraExistente = await repository.findById(id);
+    if (!ordenCompraExistente) {
+      throw crearError('Orden de compra no encontrada', 404);
+    }
 
-  return await repository.update(id, datosActualizar);
+    let total = ordenCompraExistente.total;
+    if (data.total !== undefined) {
+      total = validarDecimalPositivo(
+        data.total,
+        'El total de la orden de compra debe ser mayor a 0'
+      );
+    }
+
+    let fecha = ordenCompraExistente.fecha;
+    if (data.fecha !== undefined) {
+      fecha = validarFecha(data.fecha, 'La fecha de la orden de compra');
+    }
+
+    const proveedorIdRaw = data.proveedor_id ?? data.proveedorId ?? data.proveedor;
+    let proveedorId;
+    let proveedorNuevo;
+
+    if (data?.proveedorNuevo) {
+      if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
+        throw crearError('Los datos del proveedor nuevo no son válidos', 400);
+      }
+      proveedorNuevo = {
+        nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
+        telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
+      };
+    } else if (proveedorIdRaw !== undefined) {
+      proveedorId = Number(proveedorIdRaw);
+      if (!Number.isInteger(proveedorId) || proveedorId <= 0) {
+        throw crearError('El proveedor indicado no es válido', 400);
+      }
+      const proveedorExistente = await repositoryProveedor.findById(proveedorId);
+      if (!proveedorExistente) {
+        throw crearError('Proveedor no encontrado', 404);
+      }
+      if (proveedorExistente.activo === false) {
+        throw crearError('El proveedor indicado está inactivo', 400);
+      }
+    }
+
+    let lotesValidados;
+    if (data.lotes !== undefined) {
+      if (!Array.isArray(data.lotes) || data.lotes.length === 0) {
+        throw crearError('La orden de compra debe tener al menos un lote', 400);
+      }
+
+      const archivosPorCampo = mapearArchivosPorCampo(archivos);
+      lotesValidados = [];
+      for (let i = 0; i < data.lotes.length; i += 1) {
+        lotesValidados.push(await validarLote(data.lotes[i], i, archivosPorCampo));
+      }
+    }
+
+    const datosActualizar = {
+      total,
+      fecha,
+      ...(proveedorId !== undefined && { proveedor_id: proveedorId }),
+      ...(proveedorNuevo !== undefined && { proveedorNuevo }),
+      ...(lotesValidados !== undefined && { lotes: lotesValidados })
+    };
+
+    return await repository.update(id, datosActualizar);
+  } catch (err) {
+    limpiarArchivos(archivos);
+    throw err;
+  }
 };
 
 export const eliminarOrdenCompra = async (id) => {

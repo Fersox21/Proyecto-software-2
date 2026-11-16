@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { precioVigente } from '../../../shared/utils/formato'
+import { obtenerProductos } from '../../catalogo/services/catalogoService'
 
 const CLAVE_STORAGE = 'distribuidora-lafe:carrito'
 
@@ -30,8 +31,9 @@ function instantaneaProducto(producto) {
     enPromocion: producto.enPromocion,
     precioPromo: producto.precioPromo,
     stock: producto.stock,
-    peso: producto.peso,
+    descripcion: producto.descripcion,
     categoria: producto.categoria,
+    imagen: producto.imagen ?? null,
   }
 }
 
@@ -41,6 +43,36 @@ export function useCarrito() {
   useEffect(() => {
     localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items))
   }, [items]);
+
+  useEffect(() => {
+    const faltaImagen = items.some((item) => item.imagen == null)
+    if (!faltaImagen) return
+
+    let activo = true
+    obtenerProductos()
+      .then((productos) => {
+        if (!activo) return
+        const imagenesPorId = new Map(
+          productos.map((producto) => [producto.id, producto.imagen ?? null]),
+        )
+        setItems((prev) => {
+          let huboCambios = false
+          const actualizados = prev.map((item) => {
+            if (item.imagen != null || !imagenesPorId.has(item.id)) return item
+            const imagen = imagenesPorId.get(item.id)
+            if (imagen == null) return item
+            huboCambios = true
+            return { ...item, imagen }
+          })
+          return huboCambios ? actualizados : prev
+        })
+      })
+      .catch(() => {})
+
+    return () => {
+      activo = false
+    }
+  }, []);
 
   function agregarProducto(producto, cantidad = 1) {
     setItems((prev) => {

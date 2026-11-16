@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   crearCategoria,
   crearTipoPromocion,
 } from '../../services/ordenesCompraService'
+import {
+  bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
+} from '../../../../shared/utils/validaciones'
 
 function NuevoProductoInlineForm({
   indice,
@@ -19,6 +23,17 @@ function NuevoProductoInlineForm({
 
   const [creandoPromo, setCreandoPromo] = useState(false)
   const [errorPromoRapida, setErrorPromoRapida] = useState(null)
+  const [vistaPrevia, setVistaPrevia] = useState('')
+
+  useEffect(() => {
+    if (!producto.imagenArchivo) {
+      setVistaPrevia('')
+      return
+    }
+    const objectUrl = URL.createObjectURL(producto.imagenArchivo)
+    setVistaPrevia(objectUrl)
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [producto.imagenArchivo])
 
   const categoriasActivas = categorias.filter((cat) => cat?.activo !== false)
   const tiposPromocionActivos = tiposPromocion.filter((tp) => tp?.activo !== false)
@@ -224,9 +239,11 @@ function NuevoProductoInlineForm({
             type="number"
             min="0.01"
             step="0.01"
+            inputMode="decimal"
             placeholder="0.00"
             value={producto.precioCosto}
-            onChange={(e) => onCambiarCampo(indice, 'precioCosto', e.target.value)}
+            onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+            onChange={(e) => onCambiarCampo(indice, 'precioCosto', sanitizarDecimalPositivo(e.target.value))}
             aria-invalid={Boolean(errorCampo('precioCosto'))}
           />
           {errorCampo('precioCosto') && (
@@ -241,30 +258,15 @@ function NuevoProductoInlineForm({
             type="number"
             min="0.01"
             step="0.01"
+            inputMode="decimal"
             placeholder="0.00"
             value={producto.precioVenta}
-            onChange={(e) => onCambiarCampo(indice, 'precioVenta', e.target.value)}
+            onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+            onChange={(e) => onCambiarCampo(indice, 'precioVenta', sanitizarDecimalPositivo(e.target.value))}
             aria-invalid={Boolean(errorCampo('precioVenta'))}
           />
           {errorCampo('precioVenta') && (
             <p className="orden-campo-error">{errorCampo('precioVenta')}</p>
-          )}
-        </div>
-
-        <div className="orden-campo">
-          <label htmlFor={`orden-lote-${indice}-prod-peso`}>Peso / Tamaño</label>
-          <input
-            id={`orden-lote-${indice}-prod-peso`}
-            type="number"
-            min="0.01"
-            step="any"
-            placeholder="Ej. 500"
-            value={producto.peso}
-            onChange={(e) => onCambiarCampo(indice, 'peso', e.target.value)}
-            aria-invalid={Boolean(errorCampo('peso'))}
-          />
-          {errorCampo('peso') && (
-            <p className="orden-campo-error">{errorCampo('peso')}</p>
           )}
         </div>
 
@@ -278,6 +280,38 @@ function NuevoProductoInlineForm({
             />
             Destacado en el home
           </label>
+        </div>
+
+        <div className="orden-campo orden-producto-inline-full">
+          <label htmlFor={`orden-lote-${indice}-prod-imagen`}>Imagen del producto (opcional)</label>
+          <input
+            id={`orden-lote-${indice}-prod-imagen`}
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const archivo = e.target.files?.[0] || null
+              onCambiarCampo(indice, 'imagenArchivo', archivo)
+            }}
+            aria-invalid={Boolean(errorCampo('imagenArchivo'))}
+          />
+          {errorCampo('imagenArchivo') && (
+            <p className="orden-campo-error">{errorCampo('imagenArchivo')}</p>
+          )}
+          {vistaPrevia && (
+            <div style={{ marginTop: '0.5rem' }}>
+              <img
+                src={vistaPrevia}
+                alt="Vista previa del nuevo producto"
+                style={{
+                  width: '80px',
+                  height: '80px',
+                  objectFit: 'cover',
+                  borderRadius: '8px',
+                  border: '1px solid #dee2e6',
+                }}
+              />
+            </div>
+          )}
         </div>
 
         <div className="orden-campo orden-producto-inline-full">

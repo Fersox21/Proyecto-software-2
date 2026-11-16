@@ -1,4 +1,34 @@
 import * as service from './ordenesCompra.service.js';
+import { eliminarImagenFisica } from '../productos/productos.imagen.js';
+
+const parsearPayloadOrden = (req) => {
+  if (typeof req.body?.datos === 'string') {
+    let parsed;
+    try {
+      parsed = JSON.parse(req.body.datos);
+    } catch {
+      const error = new Error('El campo datos debe contener un JSON válido');
+      error.status = 400;
+      throw error;
+    }
+    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      const error = new Error('El campo datos debe ser un objeto JSON válido');
+      error.status = 400;
+      throw error;
+    }
+    return parsed;
+  }
+  return req.body;
+};
+
+const limpiarImagenesSubidas = (archivos = []) => {
+  if (!Array.isArray(archivos)) return;
+  for (const archivo of archivos) {
+    if (archivo?.filename) {
+      eliminarImagenFisica(archivo.filename);
+    }
+  }
+};
 
 export const listar = async (req, res, next) => {
   try {
@@ -20,18 +50,22 @@ export const obtener = async (req, res, next) => {
 
 export const crear = async (req, res, next) => {
   try {
-    const nuevaOrdenCompra = await service.crearOrdenCompra(req.body);
+    const datos = parsearPayloadOrden(req);
+    const nuevaOrdenCompra = await service.crearOrdenCompra(datos, req.files);
     res.status(201).json(nuevaOrdenCompra);
   } catch (err) {
+    limpiarImagenesSubidas(req.files);
     next(err);
   }
 };
 
 export const actualizar = async (req, res, next) => {
   try {
-    const ordenCompraActualizada = await service.actualizarOrdenCompra(req.params.id, req.body);
+    const datos = parsearPayloadOrden(req);
+    const ordenCompraActualizada = await service.actualizarOrdenCompra(req.params.id, datos, req.files);
     res.json(ordenCompraActualizada);
   } catch (err) {
+    limpiarImagenesSubidas(req.files);
     next(err);
   }
 };

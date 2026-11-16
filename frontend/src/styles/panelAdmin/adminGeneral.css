@@ -79,6 +79,15 @@
   background-color: var(--admin-hover);
 }
 
+.tabla-prod-miniatura {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--admin-borde);
+  display: block;
+}
+
 
 .tabla-admin-pie {
   display: flex;

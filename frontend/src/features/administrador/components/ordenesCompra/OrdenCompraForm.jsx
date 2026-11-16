@@ -7,6 +7,10 @@ import {
   obtenerTiposPromocion,
 } from '../../services/ordenesCompraService'
 import { formatearPrecio } from '../../../../shared/utils/formato'
+import {
+  bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
+} from '../../../../shared/utils/validaciones'
 import ItemLoteForm from './ItemLoteForm'
 import NuevoProveedorInlineForm from './NuevoProveedorInlineForm'
 import CampoFormulario from '../comunes/CampoFormulario'
@@ -23,7 +27,7 @@ function crearProductoNuevoVacio() {
     tipoPromocionId: '',
     tipoPromocionNuevaNombre: '',
     destacado: false,
-    peso: '',
+    imagenArchivo: null,
   }
 }
 
@@ -126,7 +130,8 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
   function handleChange(e) {
     const { name, value } = e.target
-    setValores((prev) => ({ ...prev, [name]: value }))
+    const valorFinal = name === 'total' ? sanitizarDecimalPositivo(value) : value
+    setValores((prev) => ({ ...prev, [name]: valorFinal }))
     if (errores[name]) {
       setErrores((prev) => ({ ...prev, [name]: null }))
     }
@@ -261,12 +266,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
         if (prod.precioVenta === '' || Number.isNaN(precioVenta) || precioVenta <= 0) {
           nuevosErrores[`lote-${indice}-prod-precioVenta`] = 'El precio de venta debe ser mayor a 0'
         }
-        if (prod.peso !== '' && prod.peso != null) {
-          const peso = Number(prod.peso)
-          if (Number.isNaN(peso) || peso <= 0) {
-            nuevosErrores[`lote-${indice}-prod-peso`] = 'El peso debe ser mayor a 0'
-          }
-        }
       } else if (!lote.productoId) {
         nuevosErrores[`lote-${indice}-producto`] = 'Elegí un producto'
       }
@@ -316,10 +315,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       destacado: Boolean(prod.destacado),
     }
 
-    if (prod.peso !== '' && prod.peso != null) {
-      productoNuevo.peso = Number(prod.peso)
-    }
-
     if (prod.categoriaId === '__nueva__') {
       productoNuevo.categoriaNuevaNombre = prod.categoriaNuevaNombre.trim()
     } else {
@@ -357,8 +352,18 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       delete datos.lotes
     }
 
+    const formData = new FormData()
+    formData.append('datos', JSON.stringify(datos))
+    if (Array.isArray(datos.lotes)) {
+      valores.lotes.forEach((lote, indice) => {
+        if (lote.productoId === '__nuevo__' && lote.productoNuevo?.imagenArchivo) {
+          formData.append(`imagenProducto_${indice}`, lote.productoNuevo.imagenArchivo)
+        }
+      })
+    }
+
     try {
-      await onGuardar(datos)
+      await onGuardar(formData)
     } catch (err) {
       setErrorServidor(err.message)
     } finally {
@@ -439,7 +444,9 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
               type="number"
               min="0.01"
               step="0.01"
+              inputMode="decimal"
               value={valores.total}
+              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
               onChange={handleChange}
               aria-invalid={Boolean(errores.total)}
             />

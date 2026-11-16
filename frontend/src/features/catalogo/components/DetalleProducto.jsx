@@ -1,16 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import Boton from '../../../shared/components/Boton'
-import { obtenerPreciosProducto, formatearPrecio } from '../../../shared/utils/formato'
+import {
+  obtenerPreciosProducto,
+  formatearPrecio,
+  obtenerUrlImagenProducto,
+  manejarErrorImagenProducto,
+} from '../../../shared/utils/formato'
 import '../../../styles/catalogo.css'
 function DetalleProducto({ producto, onAgregar }) {
-  const nombreImagen = producto.nombre
-    ?.toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
-
-  const imagenUrl = `/images/${nombreImagen}.webp`
+  const imagenUrl = obtenerUrlImagenProducto(producto?.imagen)
 
   const [cantidad, setCantidad] = useState(1)
   const [agregado, setAgregado] = useState(false)
@@ -60,6 +59,7 @@ function DetalleProducto({ producto, onAgregar }) {
           <div className="imagen-detalle-contenedor">
             <img 
               src={imagenUrl} 
+              onError={manejarErrorImagenProducto}
               alt={producto.nombre} 
               className="img-fluid imagen-detalle-fit" 
             />
@@ -94,8 +94,8 @@ function DetalleProducto({ producto, onAgregar }) {
               </p>
             </div>
             
-            {producto.peso && (
-              <p className="descripcion-producto text-secondary mb-4">{producto.peso}</p>
+            {producto.descripcion && (
+              <p className="descripcion-producto text-secondary mb-4">{producto.descripcion}</p>
             )}
 
             <hr className="perforacion my-4" />

@@ -39,7 +39,7 @@ function DetalleLote({ lote }) {
           <Dato etiqueta="Nombre">{producto.nombre}</Dato>
           <Dato etiqueta="Marca">{producto.marca}</Dato>
           <Dato etiqueta="Categoría">{producto.categoria}</Dato>
-          <Dato etiqueta="Presentación">{producto.peso}</Dato>
+          <Dato etiqueta="Descripción">{producto.descripcion || '—'}</Dato>
           <Dato etiqueta="Stock actual">{producto.stock ?? '—'}</Dato>
         </dl>
       </section>

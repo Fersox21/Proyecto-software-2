@@ -1,3 +1,8 @@
+import {
+  manejarErrorImagenProducto,
+  obtenerUrlImagenProducto,
+} from '../../../../shared/utils/formato'
+
 function FilaProducto({ producto, onEditar, onEliminar }) {
   const calcularEstado = (stock) => {
     if (stock < 10) return 'Stock bajo'
@@ -7,9 +12,17 @@ function FilaProducto({ producto, onEditar, onEliminar }) {
 
   return (
     <tr>
+      <td className="col-admin col-imagen">
+        <img
+          src={obtenerUrlImagenProducto(producto.imagen)}
+          alt={producto.nombre || 'Producto'}
+          onError={manejarErrorImagenProducto}
+          className="tabla-prod-miniatura"
+        />
+      </td>
       <td className="col-admin col-nombre">{producto.nombre}</td>
       <td className="col-admin">{producto.marca}</td>
-      <td className="col-admin col-descripcion">{producto.peso || '—'}</td>
+      <td className="col-admin col-descripcion">{producto.descripcion || '—'}</td>
       <td className="col-admin col-categoria">{producto.categoria || '—'}</td>
       <td className="col-admin col-precio">${producto.precioVenta}</td>
       <td className="col-admin col-precio">${producto.precioCosto}</td>
@@ -18,6 +31,7 @@ function FilaProducto({ producto, onEditar, onEliminar }) {
       <td className="col-admin">${producto.precioPromo ?? '—'}</td>
       <td className="col-admin">{calcularEstado(producto.stock)}</td>
       <td className="col-admin">{producto.destacado ? 'Sí' : 'No'}</td>
+      <td className="col-admin">{producto.visibleCatalogo ? 'Sí' : 'No'}</td>
       <td className="col-admin col-acciones">
         <div style={{ display: 'flex', gap: '0.4rem', justifyContent: 'center' }}>
           <button

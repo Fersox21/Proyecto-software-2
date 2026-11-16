@@ -19,11 +19,53 @@ const validarId = (id) => {
 };
 
 const validarCantidad = (cantidad) => {
-  const numero = Number(cantidad);
-  if (!Number.isInteger(numero) || numero <= 0) {
-    throw crearError('La cantidad del lote debe ser un entero mayor a 0', 400);
+  const mensaje = 'La cantidad del lote debe ser un entero mayor a 0';
+
+  if (typeof cantidad === 'number') {
+    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return cantidad;
   }
-  return numero;
+
+  if (typeof cantidad === 'string') {
+    const limpio = cantidad.trim();
+    if (!/^\d+$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isSafeInteger(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
+const validarTotal = (total) => {
+  const mensaje = 'El total del lote debe ser un número mayor a 0';
+
+  if (typeof total === 'number') {
+    if (!Number.isFinite(total) || total <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return Number(total.toFixed(2));
+  }
+
+  if (typeof total === 'string') {
+    const limpio = total.trim();
+    if (!/^\d+(\.\d+)?$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isFinite(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return Number(numero.toFixed(2));
+  }
+
+  throw crearError(mensaje, 400);
 };
 
 // Valida string YYYY-MM-DD y que la fecha exista (rechaza 2026-02-31).
@@ -178,9 +220,11 @@ export const actualizarLote = async (id, data) => {
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
 
   const total =
-    data?.cantidad !== undefined && loteExistente.producto?.precioCosto != null
-      ? Number((Number(loteExistente.producto.precioCosto) * cantidad).toFixed(2))
-      : loteExistente.total;
+    data?.total !== undefined
+      ? validarTotal(data.total)
+      : data?.cantidad !== undefined && loteExistente.producto?.precioCosto != null
+        ? Number((Number(loteExistente.producto.precioCosto) * cantidad).toFixed(2))
+        : loteExistente.total;
 
   return await repository.update(idLote, { cantidad, total, fechaArribo, fechaVencimiento });
 };

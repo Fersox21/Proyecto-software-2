@@ -36,13 +36,13 @@ INSERT INTO tipos_promocion (nombre) VALUES
 ('Liquidación por vencimiento'),
 ('2x1');
 
--- 5. Productos (peso en gramos / mililitros como INTEGER)
-INSERT INTO productos (nombre, descripcion, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, categoria_id, tipo_promocion_id, peso, imagen, destacado, activo) VALUES
-('Harina 0000 1kg', 'Harina de trigo refinada tipo 0000', 450.00, 750.00, 'Favorita', false, NULL, 120, 'Almacén', 1, NULL, 1000, 'harina.webp', true, true),
-('Leche Entera 1L', 'Leche entera larga vida', 600.00, 950.00, 'La Serenísima', true, 845.50, 50, 'Lácteos', 2, 1, 1000, NULL, true, true),
-('Aceite Girasol 1.5L', 'Aceite de girasol puro', 1200.00, 1850.00, 'Natura', false, NULL, 80, 'Almacén', 1, NULL, 1500, NULL, false, true),
-('Mozzarella 500g', 'Queso mozzarella en barra', 2100.00, 3100.00, 'Barraza', true, 2790.00, 30, 'Frescos', 3, 1, 500, NULL, true, true),
-('Puré Tomate 520g', 'Puré de tomate en tetra brik', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', 4, NULL, 520, NULL, false, true);
+-- 5. Productos
+INSERT INTO productos (nombre, descripcion, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, categoria_id, tipo_promocion_id, imagen, destacado, visible_catalogo, activo) VALUES
+('Harina 0000 1kg', 'Harina de trigo refinada tipo 0000', 450.00, 750.00, 'Favorita', false, NULL, 120, 'Almacén', 1, NULL, NULL, true, false, true),
+('Leche Entera 1L', 'Leche entera larga vida', 600.00, 950.00, 'La Serenísima', true, 845.50, 50, 'Lácteos', 2, 1, NULL, true, false, true),
+('Aceite Girasol 1.5L', 'Aceite de girasol puro', 1200.00, 1850.00, 'Natura', false, NULL, 80, 'Almacén', 1, NULL, NULL, false, false, true),
+('Mozzarella 500g', 'Queso mozzarella en barra', 2100.00, 3100.00, 'Barraza', true, 2790.00, 30, 'Frescos', 3, 1, NULL, true, false, true),
+('Puré Tomate 520g', 'Puré de tomate en tetra brik', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', 4, NULL, NULL, false, false, true);
 
 -- 6. Órdenes de Compra (Asociadas al Proveedor)
 INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id) VALUES

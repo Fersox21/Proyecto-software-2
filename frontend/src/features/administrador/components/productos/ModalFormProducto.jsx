@@ -5,6 +5,15 @@ import {
   obtenerCategorias,
   obtenerTiposPromocion,
 } from '../../services/productosServices'
+import {
+  bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
+  sanitizarEnteroPositivo,
+} from '../../../../shared/utils/validaciones'
+import {
+  manejarErrorImagenProducto,
+  obtenerUrlImagenProducto,
+} from '../../../../shared/utils/formato'
 
 const CATEGORIAS_DISPONIBLES = [
   'Almacén',
@@ -33,6 +42,7 @@ function obtenerTipoPromocionInicialId(producto) {
 
 function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }) {
   const editando = Boolean(producto)
+  const sinLotesVigentes = editando && producto?.tieneLoteVigente === false
 
   const [categorias, setCategorias] = useState([])
   const [tiposPromocion, setTiposPromocion] = useState([])
@@ -41,7 +51,6 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
     nombre: producto?.nombre ?? '',
     marca: producto?.marca ?? '',
     descripcion: producto?.descripcion ?? '',
-    peso: producto?.peso !== undefined && producto?.peso !== null ? String(producto.peso) : '',
     categoriaId: obtenerCategoriaInicialId(producto),
     categoria: typeof producto?.categoria === 'string'
       ? producto.categoria
@@ -53,10 +62,25 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
     enPromocion: Boolean(producto?.enPromocion),
     precioPromo: producto?.precioPromo !== undefined && producto?.precioPromo !== null ? String(producto.precioPromo) : '',
     destacado: Boolean(producto?.destacado),
+    visibleCatalogo: Boolean(producto?.visibleCatalogo),
   })
 
+  const [imagenArchivo, setImagenArchivo] = useState(null)
+  const [vistaPrevia, setVistaPrevia] = useState(() =>
+    producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '',
+  )
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState(null)
+
+  useEffect(() => {
+    if (!imagenArchivo) {
+      setVistaPrevia(producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '')
+      return
+    }
+    const objectUrl = URL.createObjectURL(imagenArchivo)
+    setVistaPrevia(objectUrl)
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [imagenArchivo, producto])
 
   useEffect(() => {
     if (!visible) return
@@ -110,11 +134,6 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
       nuevosErrores.categoria = 'Debes seleccionar una categoría'
     }
 
-    const pesoNum = Number(valores.peso)
-    if (valores.peso === '' || isNaN(pesoNum) || pesoNum <= 0) {
-      nuevosErrores.peso = 'El peso debe ser un número mayor a 0 (ej. 500 para gramos o 1.5)'
-    }
-
     const precioVentaNum = Number(valores.precioVenta)
     if (valores.precioVenta === '' || isNaN(precioVentaNum) || precioVentaNum <= 0) {
       nuevosErrores.precioVenta = 'El precio de venta debe ser mayor a 0'
@@ -126,7 +145,7 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
     }
 
     const stockNum = Number(valores.stock)
-    if (valores.stock === '' || isNaN(stockNum) || stockNum < 0) {
+    if (valores.stock === '' || isNaN(stockNum) || !Number.isInteger(stockNum) || stockNum < 0) {
       nuevosErrores.stock = 'El stock debe ser un número entero mayor o igual a 0'
     }
 
@@ -135,6 +154,12 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
       if (valores.precioPromo === '' || isNaN(precioPromoNum) || precioPromoNum <= 0) {
         nuevosErrores.precioPromo = 'Ingresa un precio promocional mayor a 0'
       }
+    }
+
+    if (valores.visibleCatalogo && !producto?.imagen && !imagenArchivo) {
+      const msg = 'Debe cargar una imagen para publicar el producto en el catálogo'
+      nuevosErrores.imagen = msg
+      nuevosErrores.visibleCatalogo = msg
     }
 
     setErrores(nuevosErrores)
@@ -147,28 +172,35 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
 
     if (!validar()) return
 
-    const payload = {
-      nombre: valores.nombre.trim(),
-      marca: valores.marca.trim(),
-      descripcion: valores.descripcion.trim(),
-      peso: Number(valores.peso),
-      precioVenta: Number(valores.precioVenta),
-      precioCosto: Number(valores.precioCosto),
-      stock: Number(valores.stock),
-      enPromocion: valores.enPromocion,
-      precioPromo: valores.enPromocion ? Number(valores.precioPromo) : null,
-      tipoPromocionId: valores.tipoPromocionId ? Number(valores.tipoPromocionId) : null,
-      destacado: valores.destacado,
+    const formData = new FormData()
+    formData.append('nombre', valores.nombre.trim())
+    formData.append('marca', valores.marca.trim())
+    formData.append('descripcion', valores.descripcion.trim())
+    formData.append('precioVenta', String(Number(valores.precioVenta)))
+    formData.append('precioCosto', String(Number(valores.precioCosto)))
+    formData.append('stock', String(Number(valores.stock)))
+    formData.append('enPromocion', String(valores.enPromocion))
+    if (valores.enPromocion) {
+      formData.append('precioPromo', String(Number(valores.precioPromo)))
     }
+    if (valores.tipoPromocionId) {
+      formData.append('tipoPromocionId', String(Number(valores.tipoPromocionId)))
+    }
+    formData.append('destacado', String(valores.destacado))
+    formData.append('visibleCatalogo', String(Boolean(valores.visibleCatalogo)))
 
     if (categorias.length > 0 && valores.categoriaId) {
-      payload.categoriaId = Number(valores.categoriaId)
+      formData.append('categoriaId', String(Number(valores.categoriaId)))
     } else {
-      payload.categoria = valores.categoria
+      formData.append('categoria', valores.categoria)
+    }
+
+    if (imagenArchivo) {
+      formData.append('imagen', imagenArchivo)
     }
 
     try {
-      await onGuardar(payload)
+      await onGuardar(formData)
     } catch (err) {
       setErrorServidor(err.message || 'Error al guardar el producto')
     }
@@ -257,29 +289,21 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
             </CampoFormulario>
           </div>
 
-          <CampoFormulario label="Peso / Tamaño (número > 0) *" id="prod-peso" error={errores.peso}>
-            <input
-              id="prod-peso"
-              type="number"
-              min="0.01"
-              step="any"
-              placeholder="Ej. 1000 (para 1kg) o 500"
-              value={valores.peso}
-              onChange={(e) => actualizarCampo('peso', e.target.value)}
-              disabled={guardando}
-            />
-          </CampoFormulario>
-
-          <CampoFormulario label="Stock actual *" id="prod-stock" error={errores.stock}>
-            <input
-              id="prod-stock"
-              type="number"
-              min="0"
-              value={valores.stock}
-              onChange={(e) => actualizarCampo('stock', e.target.value)}
-              disabled={guardando}
-            />
-          </CampoFormulario>
+          <div style={{ gridColumn: 'span 2' }}>
+            <CampoFormulario label="Stock actual *" id="prod-stock" error={errores.stock}>
+              <input
+                id="prod-stock"
+                type="number"
+                min="0"
+                step="1"
+                inputMode="numeric"
+                value={valores.stock}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
+                onChange={(e) => actualizarCampo('stock', sanitizarEnteroPositivo(e.target.value))}
+                disabled={guardando}
+              />
+            </CampoFormulario>
+          </div>
 
           <CampoFormulario label="Precio Costo ($) *" id="prod-costo" error={errores.precioCosto}>
             <input
@@ -287,8 +311,10 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
               type="number"
               min="0.01"
               step="0.01"
+              inputMode="decimal"
               value={valores.precioCosto}
-              onChange={(e) => actualizarCampo('precioCosto', e.target.value)}
+              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+              onChange={(e) => actualizarCampo('precioCosto', sanitizarDecimalPositivo(e.target.value))}
               disabled={guardando}
             />
           </CampoFormulario>
@@ -299,11 +325,52 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
               type="number"
               min="0.01"
               step="0.01"
+              inputMode="decimal"
               value={valores.precioVenta}
-              onChange={(e) => actualizarCampo('precioVenta', e.target.value)}
+              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+              onChange={(e) => actualizarCampo('precioVenta', sanitizarDecimalPositivo(e.target.value))}
               disabled={guardando}
             />
           </CampoFormulario>
+
+          <div style={{ gridColumn: 'span 2' }}>
+            <CampoFormulario
+              label={valores.visibleCatalogo && !producto?.imagen ? 'Imagen del producto *' : 'Imagen del producto (opcional)'}
+              id="prod-imagen"
+              error={errores.imagen}
+            >
+              <input
+                id="prod-imagen"
+                type="file"
+                accept="image/*"
+                required={valores.visibleCatalogo && !producto?.imagen}
+                onChange={(e) => {
+                  const archivo = e.target.files?.[0] || null
+                  setImagenArchivo(archivo)
+                  if (errores.imagen || errores.visibleCatalogo) {
+                    setErrores((prev) => ({ ...prev, imagen: null, visibleCatalogo: null }))
+                  }
+                }}
+                disabled={guardando}
+              />
+              {vistaPrevia && (
+                <div style={{ marginTop: '0.5rem' }}>
+                  <img
+                    src={vistaPrevia}
+                    alt="Vista previa del producto"
+                    onError={manejarErrorImagenProducto}
+                    style={{
+                      width: '96px',
+                      height: '96px',
+                      objectFit: 'cover',
+                      borderRadius: '8px',
+                      border: '1px solid #dee2e6',
+                    }}
+                  />
+                </div>
+              )}
+            </CampoFormulario>
+          </div>
 
           <div style={{ gridColumn: 'span 2' }}>
             <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
@@ -353,6 +420,51 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
             </label>
           </div>
 
+          <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.25rem' }}>
+            <label
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                cursor: sinLotesVigentes ? 'not-allowed' : 'pointer',
+                opacity: sinLotesVigentes ? 0.65 : 1,
+              }}
+            >
+              <input
+                type="checkbox"
+                checked={valores.visibleCatalogo}
+                onChange={(e) => {
+                  const check = e.target.checked
+                  if (check && !producto?.imagen && !imagenArchivo) {
+                    const msg = 'Debe cargar una imagen para publicar el producto en el catálogo'
+                    setErrores((prev) => ({
+                      ...prev,
+                      visibleCatalogo: msg,
+                      imagen: msg,
+                    }))
+                    return
+                  }
+                  actualizarCampo('visibleCatalogo', check)
+                  if (!check && errores.imagen === 'Debe cargar una imagen para publicar el producto en el catálogo') {
+                    setErrores((prev) => ({ ...prev, imagen: null }))
+                  }
+                }}
+                disabled={guardando || sinLotesVigentes}
+              />
+              Mostrar en Catálogo Público
+            </label>
+            {sinLotesVigentes && (
+              <p className="orden-campo-error" style={{ margin: 0 }}>
+                No hay lotes vigentes
+              </p>
+            )}
+            {errores.visibleCatalogo && (
+              <p className="orden-campo-error" role="alert" style={{ margin: 0 }}>
+                {errores.visibleCatalogo}
+              </p>
+            )}
+          </div>
+
           {valores.enPromocion && (
             <div style={{ gridColumn: 'span 2' }}>
               <CampoFormulario label="Precio Promocional ($) *" id="prod-promo" error={errores.precioPromo}>
@@ -361,9 +473,11 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
                   type="number"
                   min="0.01"
                   step="0.01"
+                  inputMode="decimal"
                   placeholder="Precio con descuento"
                   value={valores.precioPromo}
-                  onChange={(e) => actualizarCampo('precioPromo', e.target.value)}
+                  onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                  onChange={(e) => actualizarCampo('precioPromo', sanitizarDecimalPositivo(e.target.value))}
                   disabled={guardando}
                 />
               </CampoFormulario>

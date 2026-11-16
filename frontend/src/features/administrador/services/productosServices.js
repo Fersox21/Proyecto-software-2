@@ -1,11 +1,14 @@
 const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function headers() {
+function headers(conJson = true) {
   const token = sessionStorage.getItem('token')
-  return {
-    'Content-Type': 'application/json',
+  const base = {
     'Authorization': `Bearer ${token}`
   }
+  if (conJson) {
+    base['Content-Type'] = 'application/json'
+  }
+  return base
 }
 
 export async function obtenerProductos() {
@@ -35,10 +38,11 @@ export async function obtenerProductoPorId(id) {
 }
 
 export async function crearProducto(datos) {
+  const esFormData = datos instanceof FormData
   const respuesta = await fetch(`${URL_BASE}/productos`, {
     method: 'POST',
-    headers: headers(),
-    body: JSON.stringify(datos)
+    headers: headers(!esFormData),
+    body: esFormData ? datos : JSON.stringify(datos)
   })
 
   if (!respuesta.ok) {
@@ -50,10 +54,11 @@ export async function crearProducto(datos) {
 }
 
 export async function actualizarProducto(id, datos) {
+  const esFormData = datos instanceof FormData
   const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
     method: 'PUT',
-    headers: headers(),
-    body: JSON.stringify(datos)
+    headers: headers(!esFormData),
+    body: esFormData ? datos : JSON.stringify(datos)
   })
 
   if (!respuesta.ok) {

@@ -1,15 +1,15 @@
-import { formatearPrecio, obtenerPreciosProducto, redondear2 } from '../../../shared/utils/formato'
+import {
+  formatearPrecio,
+  obtenerPreciosProducto,
+  redondear2,
+  obtenerUrlImagenProducto,
+  manejarErrorImagenProducto,
+} from '../../../shared/utils/formato'
 import { BsTrash } from 'react-icons/bs'
 import '../../../styles/carrito.css'
 
 function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
-  const nombreImagen = item.nombre
-    ?.toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
-
-  const imagenUrl = `/images/${nombreImagen}.webp`
+  const imagenUrl = obtenerUrlImagenProducto(item?.imagen)
 
   const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(item)
 
@@ -19,6 +19,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-12 col-md-5 d-flex align-items-center gap-3">
           <img
             src={imagenUrl}
+            onError={manejarErrorImagenProducto}
             alt={item.nombre}
             className="rounded-4 object-fit-cover flex-shrink-0"
             style={{ width: '100px', height: '100px' }}
@@ -41,9 +42,9 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
                 <span className="visually-hidden"> de descuento</span>
               </span>
             )}
-            {item.peso && (
+            {item.descripcion && (
               <p className="mb-1 text-body-secondary small">
-                {item.peso}
+                {item.descripcion}
               </p>
             )}
           </div>

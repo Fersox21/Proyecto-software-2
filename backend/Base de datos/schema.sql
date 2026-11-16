@@ -46,12 +46,12 @@ CREATE TABLE productos (
     precio_venta DECIMAL(10, 2) NOT NULL CHECK (precio_venta > 0),
     en_promocion BOOLEAN NOT NULL DEFAULT false,
     precio_promo DECIMAL(10, 2) CHECK (precio_promo IS NULL OR precio_promo > 0),
-    peso DECIMAL(10, 2) NOT NULL CHECK (peso > 0),
     categoria VARCHAR(100) NOT NULL,
     categoria_id INTEGER NOT NULL REFERENCES categorias(id),
     tipo_promocion_id INTEGER REFERENCES tipos_promocion(id),
     imagen VARCHAR(255),
     destacado BOOLEAN NOT NULL DEFAULT false,
+    visible_catalogo BOOLEAN NOT NULL DEFAULT false,
     activo BOOLEAN NOT NULL DEFAULT true,
     CONSTRAINT chk_promo_activa CHECK (
         NOT en_promocion

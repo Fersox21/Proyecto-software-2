@@ -40,7 +40,8 @@ function AdministradorPage() {
   const handleGuardarProducto = async (datos) => {
     if (!productoSeleccionado) return
     await actualizarProducto(productoSeleccionado.id, datos)
-    mostrarMensaje(`Producto "${datos.nombre}" actualizado con éxito`)
+    const nombreProducto = datos instanceof FormData ? datos.get('nombre') : datos.nombre
+    mostrarMensaje(`Producto "${nombreProducto}" actualizado con éxito`)
     handleCerrarForm()
   }
 
@@ -90,6 +91,7 @@ function AdministradorPage() {
           <table className="tabla-prod-admin">
             <thead>
               <tr>
+                <th>Imagen</th>
                 <th>Producto</th>
                 <th>Marca</th>
                 <th>Descripción</th>
@@ -101,6 +103,7 @@ function AdministradorPage() {
                 <th>Precio con promo</th>
                 <th>Estado</th>
                 <th>Destacado</th>
+                <th>En catálogo</th>
                 <th style={{ textAlign: 'center' }}>Acciones</th>
               </tr>
             </thead>
@@ -117,7 +120,7 @@ function AdministradorPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="12" style={{ textAlign: 'center', padding: '2rem' }}>
+                  <td colSpan="14" style={{ textAlign: 'center', padding: '2rem' }}>
                     No hay productos registrados en el sistema.
                   </td>
                 </tr>

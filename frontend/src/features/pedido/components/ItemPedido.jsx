@@ -1,13 +1,13 @@
-import { formatearPrecio, obtenerPreciosProducto, redondear2 } from '../../../shared/utils/formato'
+import {
+  formatearPrecio,
+  obtenerPreciosProducto,
+  redondear2,
+  obtenerUrlImagenProducto,
+  manejarErrorImagenProducto,
+} from '../../../shared/utils/formato'
 
 function ItemPedido({ item }){
-    const nombreImagen = item.nombre
-    ?.toLowerCase()
-    .trim()
-    .replace(/\s+/g, '-')
-    .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
-
-    const imagenUrl = `/images/${nombreImagen}.webp`
+    const imagenUrl = obtenerUrlImagenProducto(item?.imagen)
 
     const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(item)
 
@@ -18,6 +18,7 @@ function ItemPedido({ item }){
                     <div className="position-relative flex-shrink-0" style={{ width: '80px', height: '80px' }}>
                         <img
                             src={imagenUrl}
+                            onError={manejarErrorImagenProducto}
                             alt={item.nombre}
                             className="border border-dark border-opacity-25 rounded-4 object-fit-cover w-100 h-100"
                         />
@@ -38,11 +39,9 @@ function ItemPedido({ item }){
                         <h6 className="mb-1 fs-5 lh-sm fuente-titulos fw-medium">
                         {item.nombre}
                         </h6>
-                        {item.peso && (
                         <p className="mb-1 text-body-secondary small" style={{ fontSize: '0.7rem'}}>
-                            {item.peso} · {item.cantidad} unidades
+                            {item.descripcion ? `${item.descripcion} · ` : ''}{item.cantidad} unidades
                         </p>
-                        )}
                         <div className="d-flex align-items-center gap-2 flex-wrap">
                             {enPromocion && (
                                 <del className="pedido-precio-anterior">

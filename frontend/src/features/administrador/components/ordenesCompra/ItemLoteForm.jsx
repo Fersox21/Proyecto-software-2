@@ -1,4 +1,8 @@
 import { formatearPrecio } from '../../../../shared/utils/formato'
+import {
+  bloquearTeclasNoNumericas,
+  sanitizarEnteroPositivo,
+} from '../../../../shared/utils/validaciones'
 import NuevoProductoInlineForm from './NuevoProductoInlineForm'
 
 function ItemLoteForm({
@@ -70,7 +74,8 @@ function ItemLoteForm({
             step="1"
             inputMode="numeric"
             value={lote.cantidad}
-            onChange={(e) => onCambiar(indice, 'cantidad', e.target.value)}
+            onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
+            onChange={(e) => onCambiar(indice, 'cantidad', sanitizarEnteroPositivo(e.target.value))}
             aria-invalid={Boolean(errores[`lote-${indice}-cantidad`])}
           />
           {errores[`lote-${indice}-cantidad`] && (

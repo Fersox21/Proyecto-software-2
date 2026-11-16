@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatearFecha } from '../../../../shared/utils/formato'
 import {
+  bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
+  sanitizarEnteroPositivo,
+} from '../../../../shared/utils/validaciones'
+import {
   normalizarFecha,
   obtenerOrdenesCompra,
   obtenerProductos,
@@ -21,6 +26,12 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     productoId: lote?.producto?.id != null ? String(lote.producto.id) : '',
     ordenCompraId: lote?.ordenCompra?.id != null ? String(lote.ordenCompra.id) : '',
     cantidad: lote?.cantidad != null ? String(lote.cantidad) : '',
+    total:
+      lote?.total != null
+        ? String(lote.total)
+        : lote?.precioTotal != null
+          ? String(lote.precioTotal)
+          : '',
     fechaArribo: normalizarFecha(lote?.fechaArribo),
     fechaVencimiento: normalizarFecha(lote?.fechaVencimiento),
   }))
@@ -67,9 +78,19 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
 
   function handleChange(e) {
     const { name, value } = e.target
-    setValores((prev) => ({ ...prev, [name]: value }))
-    if (errores[name]) {
-      setErrores((prev) => ({ ...prev, [name]: null }))
+    let valorFinal = value
+    if (name === 'cantidad') {
+      valorFinal = sanitizarEnteroPositivo(value)
+    } else if (name === 'total') {
+      valorFinal = sanitizarDecimalPositivo(value)
+    }
+    setValores((prev) => ({ ...prev, [name]: valorFinal }))
+    if (errores[name] || (name === 'fechaArribo' && errores.fechaVencimiento)) {
+      setErrores((prev) => ({
+        ...prev,
+        [name]: null,
+        ...(name === 'fechaArribo' ? { fechaVencimiento: null } : {}),
+      }))
     }
   }
 
@@ -83,11 +104,18 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
       nuevosErrores.cantidad = 'La cantidad debe ser un entero mayor a 0'
     }
 
-    if (!valores.fechaArribo) nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
-    if (!valores.fechaVencimiento) nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es obligatoria'
+    if (editando) {
+      const total = Number(valores.total)
+      if (!valores.total || Number.isNaN(total) || total <= 0) {
+        nuevosErrores.total = 'El total debe ser mayor a 0'
+      }
+    }
 
-    if (valores.fechaArribo && valores.fechaVencimiento && valores.fechaVencimiento < valores.fechaArribo) {
-      nuevosErrores.fechaVencimiento = 'No puede ser anterior a la de arribo'
+    if (!valores.fechaArribo) nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
+    if (!valores.fechaVencimiento) {
+      nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es obligatoria'
+    } else if (valores.fechaArribo && valores.fechaVencimiento < valores.fechaArribo) {
+      nuevosErrores.fechaVencimiento = 'La fecha de vencimiento no puede ser anterior a la fecha de arribo'
     }
 
     setErrores(nuevosErrores)
@@ -104,6 +132,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
       cantidad: Number(valores.cantidad),
       fechaArribo: valores.fechaArribo,
       fechaVencimiento: valores.fechaVencimiento,
+      ...(editando && { total: Number(valores.total) }),
       ...(!editando && {
         producto: Number(valores.productoId),
         ordenCompra: Number(valores.ordenCompraId),
@@ -139,6 +168,13 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
 
   const productoActual = lote?.producto
   const ordenActual = lote?.ordenCompra
+  const fechasInvalidas =
+    Boolean(valores.fechaArribo) &&
+    Boolean(valores.fechaVencimiento) &&
+    valores.fechaVencimiento < valores.fechaArribo
+  const errorFechaVencimiento =
+    errores.fechaVencimiento ||
+    (fechasInvalidas ? 'La fecha de vencimiento no puede ser anterior a la fecha de arribo' : null)
 
   return (
     <form className="orden-form" onSubmit={manejarEnvio} noValidate>
@@ -213,11 +249,30 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               type="number"
               min="1"
               step="1"
+              inputMode="numeric"
               value={valores.cantidad}
+              onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
               onChange={handleChange}
               aria-invalid={Boolean(errores.cantidad)}
             />
           </CampoFormulario>
+
+          {editando && (
+            <CampoFormulario label="Total" id="lote-total" error={errores.total}>
+              <input
+                id="lote-total"
+                name="total"
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                value={valores.total}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onChange={handleChange}
+                aria-invalid={Boolean(errores.total)}
+              />
+            </CampoFormulario>
+          )}
 
           <CampoFormulario label="Fecha de arribo" id="lote-arribo" error={errores.fechaArribo}>
             <input
@@ -230,14 +285,15 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
             />
           </CampoFormulario>
 
-          <CampoFormulario label="Fecha de vencimiento" id="lote-vencimiento" error={errores.fechaVencimiento}>
+          <CampoFormulario label="Fecha de vencimiento" id="lote-vencimiento" error={errorFechaVencimiento}>
             <input
               id="lote-vencimiento"
               name="fechaVencimiento"
               type="date"
+              min={valores.fechaArribo || undefined}
               value={valores.fechaVencimiento}
               onChange={handleChange}
-              aria-invalid={Boolean(errores.fechaVencimiento)}
+              aria-invalid={Boolean(errorFechaVencimiento)}
             />
           </CampoFormulario>
         </div>

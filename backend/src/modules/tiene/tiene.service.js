@@ -3,6 +3,58 @@ import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryVenta from '../ventas/ventas.repository.js';
 import * as repositoryPedido from '../pedidos/pedidos.repository.js'
 
+const crearError = (mensaje, status) => {
+  const error = new Error(mensaje);
+  error.status = status;
+  return error;
+};
+
+const validarEnteroPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isInteger(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isSafeInteger(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
+const validarDecimalPositivo = (valor, mensaje) => {
+  if (typeof valor === 'number') {
+    if (!Number.isFinite(valor) || valor <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return valor;
+  }
+
+  if (typeof valor === 'string') {
+    const limpio = valor.trim();
+    if (!/^\d+(\.\d+)?$/.test(limpio)) {
+      throw crearError(mensaje, 400);
+    }
+    const numero = Number(limpio);
+    if (!Number.isFinite(numero) || numero <= 0) {
+      throw crearError(mensaje, 400);
+    }
+    return numero;
+  }
+
+  throw crearError(mensaje, 400);
+};
+
 export const listarTiene = async () => {
   return await repository.findAll();
 };
@@ -30,26 +82,14 @@ export const crearTiene = async (data) => {
     throw error;
   }
 
-  if (!data.cantidad || !data.precio || !productoExistente || !pedidoExistente) {
-    const error = new Error('Faltan datos obligatorios para crear item');
-    error.status = 400;
-    throw error;
+  if (data.cantidad === undefined || data.cantidad === null || data.precio === undefined || data.precio === null || !productoExistente || !pedidoExistente) {
+    throw crearError('Faltan datos obligatorios para crear item', 400);
   }
 
-  if (data.cantidad <= 0) {
-    const error = new Error('La cantidad de item debe ser mayor a 0');
-    error.status = 400;
-    throw error;
-  }
+  const cantidad = validarEnteroPositivo(data.cantidad, 'La cantidad de item debe ser un entero mayor a 0');
+  const precio = validarDecimalPositivo(data.precio, 'El precio de item debe ser mayor a 0');
 
-  if (data.precio <= 0) {
-    const error = new Error('El precio de item debe ser mayor a 0');
-    error.status = 400;
-    throw error;
-  }
-
-
-  return await repository.create(data);
+  return await repository.create({ ...data, cantidad, precio });
 };
 
 export const actualizarTiene = async (data) => {
@@ -69,19 +109,19 @@ export const actualizarTiene = async (data) => {
       throw error;
     }
   
-  if (data.cantidad !== undefined && data.cantidad <= 0) {
-      const error = new Error('La cantidad de item debe ser mayor a 0');
-      error.status = 400;
-      throw error;
-    }
+  const cantidadValidada = data.cantidad !== undefined
+    ? validarEnteroPositivo(data.cantidad, 'La cantidad de item debe ser un entero mayor a 0')
+    : undefined;
 
-  if (data.precio !== undefined && data.precio <= 0) {
-      const error = new Error('El precio de item debe ser mayor a 0');
-      error.status = 400;
-      throw error;
-    }
+  const precioValidado = data.precio !== undefined
+    ? validarDecimalPositivo(data.precio, 'El precio de item debe ser mayor a 0')
+    : undefined;
 
-  const tieneActualizado = await repository.update(data);
+  const tieneActualizado = await repository.update({
+    ...data,
+    ...(cantidadValidada !== undefined && { cantidad: cantidadValidada }),
+    ...(precioValidado !== undefined && { precio: precioValidado })
+  });
   return tieneActualizado;
 };
 

@@ -7,6 +7,10 @@ import {
 import { Fragment, useState } from 'react';
 import { useFetch } from '../../../shared/hooks/useFetch';
 import { formatearFecha } from '../../../shared/utils/formato';
+import {
+  bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
+} from '../../../shared/utils/validaciones';
 import Spinner from '../../../shared/components/Spinner';
 import MensajeVacio from '../../../shared/components/MensajeVacio';
 import Modal from '../components/comunes/Modal';
@@ -240,9 +244,12 @@ function VentasPage() {
                   <input
                     id="venta-total"
                     type="number"
+                    min="0.01"
                     step="0.01"
+                    inputMode="decimal"
                     value={totalEditado}
-                    onChange={(e) => setTotalEditado(e.target.value)}
+                    onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                    onChange={(e) => setTotalEditado(sanitizarDecimalPositivo(e.target.value))}
                   />
                 </div>
               </div>
