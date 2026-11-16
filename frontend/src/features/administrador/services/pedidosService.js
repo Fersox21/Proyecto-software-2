@@ -1,10 +1,10 @@
-const URL_BASE = import.meta.env.VITE_API_URL
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function obtenerEncabezados() {
+function headers() {
   const token = sessionStorage.getItem('token')
   return {
     'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
+    'Authorization': `Bearer ${token}`
   }
 }
 
@@ -28,7 +28,7 @@ async function procesarRespuesta(respuesta, mensajeErrorPorDefecto) {
 export async function obtenerPedidos() {
   const respuesta = await fetch(`${URL_BASE}/pedidos`, {
     method: 'GET',
-    headers: obtenerEncabezados()
+    headers: headers()
   })
 
   return procesarRespuesta(respuesta, 'No se pudieron obtener los pedidos')
@@ -37,7 +37,7 @@ export async function obtenerPedidos() {
 export async function obtenerPedidoPorId(id) {
   const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
     method: 'GET',
-    headers: obtenerEncabezados()
+    headers: headers()
   })
 
   return procesarRespuesta(respuesta, `No se pudo obtener el detalle del pedido #${id}`)
@@ -46,7 +46,7 @@ export async function obtenerPedidoPorId(id) {
 export async function cancelarPedido(id, motivoRechazo) {
   const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
     method: 'PUT',
-    headers: obtenerEncabezados(),
+    headers: headers(),
     body: JSON.stringify({
       estado: 'cancelado',
       motivoRechazo
@@ -59,7 +59,7 @@ export async function cancelarPedido(id, motivoRechazo) {
 export async function aceptarPedido(id) {
   const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
     method: 'PUT',
-    headers: obtenerEncabezados(),
+    headers: headers(),
     body: JSON.stringify({
       estado: 'aceptado'
     })

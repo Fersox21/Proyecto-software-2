@@ -42,6 +42,12 @@ export const update = async (id, { fecha, total, pedido_id }) => {
 };
 
 export const obtenerVentasMes = async () => {
-  const { rows } = await pool.query('SELECT id, fecha, total, pedido_id FROM ventas WHERE fecha >= DATE_TRUNC(\'month\', CURRENT_DATE - INTERVAL \'1 month\') AND fecha < DATE_TRUNC(\'month\', CURRENT_DATE) ORDER BY fecha DESC;')
+  const query = `
+    SELECT *
+    FROM ventas
+    WHERE fecha >= NOW() - INTERVAL '1 month'
+    ORDER BY fecha DESC
+  `;
+  const { rows } = await pool.query(query);
   return rows;
-}
+};

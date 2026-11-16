@@ -1,0 +1,41 @@
+/* Proveedores — panel de administración.
+   Reutiliza los estilos base y variables de ordenesCompra.css y lotes.css */
+
+.proveedores-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1rem;
+  background-color: var(--admin-superficie);
+  border: 1px solid var(--admin-borde);
+  border-radius: 12px;
+  box-shadow: var(--admin-sombra);
+}
+
+.proveedores-campo-busqueda {
+  flex: 1 1 320px;
+  max-width: 520px;
+}
+
+.proveedores-conteo {
+  margin-left: auto;
+  color: var(--admin-texto-secundario);
+  font-size: 0.85rem;
+  line-height: 2.4;
+}
+
+.proveedores-tabla {
+  min-width: 650px;
+}
+
+.proveedores-nombre {
+  font-weight: 600;
+  color: var(--admin-texto);
+}
+
+.proveedores-telefono {
+  font-variant-numeric: tabular-nums;
+  color: var(--admin-texto-secundario);
+}

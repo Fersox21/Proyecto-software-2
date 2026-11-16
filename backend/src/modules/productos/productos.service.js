@@ -37,85 +37,114 @@ export const obtenerProductoPorId = async (id) => {
 };
 
 export const crearProducto = async (data) => {
-  if (!data.nombre || !data.precioCosto || !data.precioVenta || !data.marca || data.enPromocion === undefined || !data.stock || !data.categoria || !data.peso || data.destacado === undefined) {
+  if (
+    !data.nombre ||
+    data.precioCosto === undefined ||
+    data.precioVenta === undefined ||
+    !data.marca ||
+    data.stock === undefined ||
+    !data.categoria ||
+    data.peso === undefined
+  ) {
     const error = new Error('Faltan datos obligatorios para crear el producto');
     error.status = 400;
     throw error;
   }
 
-  if (data.precioCosto <= 0) {
+  if (Number(data.precioCosto) <= 0) {
     const error = new Error('El precio al costo del producto debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  if (data.precioVenta <= 0) {
+  if (Number(data.precioVenta) <= 0) {
     const error = new Error('El precio de venta del producto debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  if (data.precioPromo !== undefined && data.precioPromo !== null && data.precioPromo !== '' && !(Number(data.precioPromo) > 0)) {
-    const error = new Error('El precio del producto en promocion debe ser mayor a 0');
+  if (data.enPromocion && (data.precioPromo === undefined || data.precioPromo === null || Number(data.precioPromo) <= 0)) {
+    const error = new Error('El precio del producto en promoción debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  validarPromocion(data.precioVenta, data.precioPromo, data.enPromocion);
-
-  if (data.stock <= 0) {
-    const error = new Error('El stock del producto debe ser mayor a 0');
+  if (Number(data.stock) < 0) {
+    const error = new Error('El stock del producto no puede ser negativo');
     error.status = 400;
     throw error;
   }
 
-  return await repository.create(normalizarProducto(data));
+  if (Number(data.peso) <= 0) {
+    const error = new Error('El peso del producto debe ser mayor a 0');
+    error.status = 400;
+    throw error;
+  }
+
+  return await repository.create({
+    ...data,
+    enPromocion: Boolean(data.enPromocion),
+    destacado: Boolean(data.destacado),
+    precioPromo: data.enPromocion ? Number(data.precioPromo) : null,
+    stock: Number(data.stock),
+    precioCosto: Number(data.precioCosto),
+    precioVenta: Number(data.precioVenta),
+    peso: Number(data.peso)
+  });
 };
 
 export const actualizarProducto = async (id, data) => {
   const productoExistente = await repository.findById(id);
-    if (!productoExistente) {
-      const error = new Error('Producto no encontrado');
-      error.status = 404;
-      throw error;
-    }
+  if (!productoExistente) {
+    const error = new Error('Producto no encontrado');
+    error.status = 404;
+    throw error;
+  }
 
-  if (data.precioCosto !== undefined && data.precioCosto <= 0) {
+  if (data.precioCosto !== undefined && Number(data.precioCosto) <= 0) {
     const error = new Error('El precio al costo del producto debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  if (data.precioVenta !== undefined && data.precioVenta <= 0) {
+  if (data.precioVenta !== undefined && Number(data.precioVenta) <= 0) {
     const error = new Error('El precio de venta del producto debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  if (data.precioPromo !== undefined && data.precioPromo !== null && data.precioPromo !== '' && !(Number(data.precioPromo) > 0)) {
-    const error = new Error('El precio del producto en promocion debe ser mayor a 0');
+  if (data.enPromocion && (data.precioPromo === undefined || data.precioPromo === null || Number(data.precioPromo) <= 0)) {
+    const error = new Error('El precio del producto en promoción debe ser mayor a 0');
     error.status = 400;
     throw error;
   }
 
-  // Se mergea con el estado actual para que una actualización parcial no
-  // sobrescriba con NULL las columnas que no vinieron en el body ni pierda la
-  // promoción vigente.
-  const fusionado = { ...productoExistente, ...data };
-
-  // Se valida la promo contra el estado final del producto, no solo contra el
-  // body, porque la actualización puede ser parcial.
-  validarPromocion(fusionado.precioVenta, fusionado.precioPromo, fusionado.enPromocion);
-
-  if (data.stock !== undefined && data.stock <= 0) {
-    const error = new Error('El stock del producto debe ser mayor a 0');
+  if (data.stock !== undefined && Number(data.stock) < 0) {
+    const error = new Error('El stock del producto no puede ser negativo');
     error.status = 400;
     throw error;
   }
 
-  // Se normaliza el precio promocional al porcentaje entero de descuento para
-  // que el porcentaje mostrado y el precio cobrado concuerden.
-  const productoActualizado = await repository.update(id, normalizarProducto(fusionado));
+  if (data.peso !== undefined && Number(data.peso) <= 0) {
+    const error = new Error('El peso del producto debe ser mayor a 0');
+    error.status = 400;
+    throw error;
+  }
+
+  const datosActualizar = {
+    nombre: data.nombre ?? productoExistente.nombre,
+    precioCosto: data.precioCosto !== undefined ? Number(data.precioCosto) : productoExistente.precioCosto,
+    precioVenta: data.precioVenta !== undefined ? Number(data.precioVenta) : productoExistente.precioVenta,
+    marca: data.marca ?? productoExistente.marca,
+    enPromocion: data.enPromocion !== undefined ? Boolean(data.enPromocion) : productoExistente.enPromocion,
+    precioPromo: data.enPromocion ? (data.precioPromo !== undefined ? Number(data.precioPromo) : productoExistente.precioPromo) : null,
+    stock: data.stock !== undefined ? Number(data.stock) : productoExistente.stock,
+    categoria: data.categoria ?? productoExistente.categoria,
+    peso: data.peso !== undefined ? Number(data.peso) : productoExistente.peso,
+    destacado: data.destacado !== undefined ? Boolean(data.destacado) : productoExistente.destacado
+  };
+
+  const productoActualizado = await repository.update(id, datosActualizar);
   return productoActualizado;
 };
 
@@ -127,57 +156,4 @@ export const eliminarProducto = async (id) => {
     throw error;
   }
   return true;
-};
-
-// Guarda la imagen subida y actualiza la ruta del producto. Si la persistencia
-// falla, se elimina el archivo recién escrito para no dejar basura en disco.
-export const subirImagenProducto = async (id, archivo) => {
-  const productoExistente = await repository.findById(id);
-  if (!productoExistente) {
-    throw crearError('Producto no encontrado', 404);
-  }
-
-  if (!archivo) {
-    throw crearError('No se recibió ninguna imagen', 400);
-  }
-
-  const imagenAnterior = productoExistente.imagen;
-  const nuevaImagen = `${URL_BASE_IMAGENES}/${archivo.filename}`;
-
-  let productoActualizado;
-  try {
-    productoActualizado = await repository.updateImagen(id, nuevaImagen);
-  } catch (error) {
-    eliminarImagenFisica(nuevaImagen);
-    throw error;
-  }
-
-  // La imagen anterior solo se borra si era un archivo nuestro; si era una URL
-  // externa o un nombre legacy, la base ya quedó actualizada y no hay nada que
-  // eliminar del disco.
-  try {
-    eliminarImagenFisica(imagenAnterior);
-  } catch {
-    // No se interrumpe la subida por no poder borrar el archivo viejo.
-  }
-
-  return productoActualizado;
-};
-
-export const quitarImagenProducto = async (id) => {
-  const productoExistente = await repository.findById(id);
-  if (!productoExistente) {
-    throw crearError('Producto no encontrado', 404);
-  }
-
-  const imagenAnterior = productoExistente.imagen;
-  const productoActualizado = await repository.updateImagen(id, null);
-
-  try {
-    eliminarImagenFisica(imagenAnterior);
-  } catch {
-    // Idem: el cambio en la base ya se aplicó.
-  }
-
-  return productoActualizado;
 };

@@ -53,3 +53,17 @@ export const eliminar = async (req, res, next) => {
     next(err);
   }
 };
+
+
+export async function getVentasUltimoMes(req, res) {
+  try {
+    const { periodo } = req.query
+    const ventas = await ventasService.listarVentas(periodo)
+    return res.status(200).json(ventas)
+  } catch (error) {
+    const status = error.statusCode || 500
+    return res.status(status).json({
+      error: error.message || 'Error interno al obtener las ventas'
+    })
+  }
+}

@@ -1,6 +1,6 @@
 import { pedir } from './ordenesCompraService'
 
-const URL_BASE = import.meta.env.VITE_API_URL
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 function headers() {
   const token = sessionStorage.getItem('token')

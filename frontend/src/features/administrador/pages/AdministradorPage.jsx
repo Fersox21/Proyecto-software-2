@@ -1,86 +1,175 @@
-
-import { obtenerProductos } from "../services/productosServices";
-import { useFetch } from '../../../shared/hooks/useFetch';
-import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato';
-import Spinner from '../../../shared/components/Spinner';
-import MensajeVacio from '../../../shared/components/MensajeVacio';
-
+import { useState } from 'react'
+import { useProductosAdmin } from '../hooks/useProductosAdmin'
+import Spinner from '../../../shared/components/Spinner'
+import MensajeVacio from '../../../shared/components/MensajeVacio'
+import FilaProducto from '../components/productos/FilaProducto'
+import ModalFormProducto from '../components/productos/ModalFormProducto'
+import ModalConfirmarEliminar from '../components/productos/ModalConfirmarEliminar'
+import '../../../styles/panelAdmin/ordenesCompra.css'
 
 function AdministradorPage() {
+  const {
+    productos,
+    cargando,
+    error,
+    procesandoAccion,
+    crearProducto,
+    actualizarProducto,
+    eliminarProducto
+  } = useProductosAdmin()
 
-    const { datos: productos, cargando, error } = useFetch(obtenerProductos)
+  const [modalFormAbierto, setModalFormAbierto] = useState(false)
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null)
+  const [productoParaEliminar, setProductoParaEliminar] = useState(null)
+  const [alerta, setAlerta] = useState(null)
 
-    function calcularEstado(stock) {
-        if (stock < 10) return "Stock bajo"
-        if (stock >= 10 && stock <= 20) return "Stock suficiente"
-        return "Stock alto"
+  const mostrarMensaje = (texto, tipo = 'exito') => {
+    setAlerta({ texto, tipo })
+    setTimeout(() => setAlerta(null), 4000)
+  }
+
+  const handleAbrirCrear = () => {
+    setProductoSeleccionado(null)
+    setModalFormAbierto(true)
+  }
+
+  const handleAbrirEditar = (producto) => {
+    setProductoSeleccionado(producto)
+    setModalFormAbierto(true)
+  }
+
+  const handleCerrarForm = () => {
+    setProductoSeleccionado(null)
+    setModalFormAbierto(false)
+  }
+
+  const handleGuardarProducto = async (datos) => {
+    if (productoSeleccionado) {
+      await actualizarProducto(productoSeleccionado.id, datos)
+      mostrarMensaje(`Producto "${datos.nombre}" actualizado con éxito`)
+    } else {
+      await crearProducto(datos)
+      mostrarMensaje(`Producto "${datos.nombre}" creado con éxito`)
     }
+    handleCerrarForm()
+  }
 
-    if (cargando) return <Spinner texto="Cargando productos..." />
-    if (error) return <MensajeVacio titulo="No pudimos cargar los productos" texto={error.message} />
+  const handleAbrirEliminar = (producto) => {
+    setProductoParaEliminar(producto)
+  }
 
-return(<>
-    <section className="main-admin" id="main-admin">
+  const handleCerrarEliminar = () => {
+    setProductoParaEliminar(null)
+  }
+
+  const handleConfirmarEliminar = async () => {
+    if (!productoParaEliminar) return
+    try {
+      await eliminarProducto(productoParaEliminar.id)
+      mostrarMensaje(`Producto "${productoParaEliminar.nombre}" eliminado`, 'exito')
+      setProductoParaEliminar(null)
+    } catch (err) {
+      mostrarMensaje(`Error al eliminar: ${err.message}`, 'error')
+    }
+  }
+
+  if (cargando) return <Spinner texto="Cargando productos..." />
+  if (error) return <MensajeVacio titulo="No pudimos cargar los productos" texto={error.message} />
+
+  const totalProductos = productos ? productos.length : 0
+
+  return (
+    <>
+      <section className="main-admin" id="main-admin">
         <header className="header-admin">
-            <h1 className="h1-admin">Productos</h1>
-            <button className="agregar-prod">+ Agregar producto</button>
+          <h1 className="h1-admin">Gestión de Productos</h1>
+          <button
+            type="button"
+            className="orden-btn orden-btn-primario agregar-prod"
+            onClick={handleAbrirCrear}
+          >
+            + Agregar producto
+          </button>
         </header>
-        <section id="sec-prod-admin" className="sec-prod-admin" aria-live="polite">
-            <table className="tabla-prod-admin">
-                <thead>
-                    <tr>
-                        <th>Producto</th>
-                        <th>Marca</th>
-                        <th>Descripción</th>
-                        <th>Categoría</th>
-                        <th>Precio venta</th>
-                        <th>Precio costo</th>
-                        <th>Stock</th>
-                        <th>En promocion</th>
-                        <th>Descuento</th>
-                        <th>Precio con promo</th>
-                        <th>Estado</th>
-                        <th>Destacado</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
 
-                <tbody id="tabla-admin-body">
-                    {productos.map((prod)=> {
-                        const { enPromocion, descuento, precioVigente } = obtenerPreciosProducto(prod)
-                        return (
-                        <tr key={prod.id}>
-                                <td className="col-admin col-nombre">{prod.nombre}</td>
-                                <td className="col-admin">{prod.marca}</td>
-                                <td className="col-admin col-descripcion">{prod.peso}</td>
-                                <td className="col-admin col-categoria">{prod.categoria}</td>
-                                <td className="col-admin col-precio">{formatearPrecio(prod.precioVenta)}</td>
-                                <td className="col-admin col-precio">{formatearPrecio(prod.precioCosto)}</td>
-                                <td className="col-admin col-stock">{prod.stock}</td>
-                                <td className="col-admin">{enPromocion ? 'Si' : 'No' }</td>
-                                <td className="col-admin">{enPromocion ? `-${descuento}%` : '—'}</td>
-                                <td className="col-admin">{enPromocion ? formatearPrecio(precioVigente) : '—'}</td>
-                                <td className="col-admin">{calcularEstado(prod.stock)}</td>
-                                <td className="col-admin">{prod.destacado ? 'Si' : 'No' }</td>
-                                <td className="col-admin col-acciones">
-                                    <button>Editar</button>
-                                </td>
-                        </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
-            <div className="tabla-admin-pie">
-                <span id="info-pag">Mostrando 0–0 de 0</span>
-                <div className="control-pag">
-                    <button type="button" id="anterior-pag">‹</button>
-                    <span id="nums-pag"></span>
-                    <button type="button" id="siguiente-pag">›</button>
-                </div>
-            </div>
+        {alerta && (
+          <div
+            className={`orden-alerta ${
+              alerta.tipo === 'error' ? 'orden-alerta-error' : 'orden-alerta-exito'
+            }`}
+            style={{ marginBottom: '1rem' }}
+          >
+            {alerta.texto}
+          </div>
+        )}
+
+        <section id="sec-prod-admin" className="sec-prod-admin" aria-live="polite">
+          <table className="tabla-prod-admin">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th>Descripción</th>
+                <th>Categoría</th>
+                <th>Precio venta</th>
+                <th>Precio costo</th>
+                <th>Stock</th>
+                <th>En promoción</th>
+                <th>Precio con promo</th>
+                <th>Estado</th>
+                <th>Destacado</th>
+                <th style={{ textAlign: 'center' }}>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody id="tabla-admin-body">
+              {totalProductos > 0 ? (
+                productos.map((prod) => (
+                  <FilaProducto
+                    key={prod.id}
+                    producto={prod}
+                    onEditar={handleAbrirEditar}
+                    onEliminar={handleAbrirEliminar}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="12" style={{ textAlign: 'center', padding: '2rem' }}>
+                    No hay productos registrados en el sistema.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+          <div className="tabla-admin-pie">
+            <span id="info-pag">Total: {totalProductos} producto(s)</span>
+          </div>
         </section>
-    </section>
-</>)
+      </section>
+
+      {/* Modal Crear / Editar */}
+      {modalFormAbierto && (
+        <ModalFormProducto
+          producto={productoSeleccionado}
+          visible={modalFormAbierto}
+          guardando={procesandoAccion}
+          onGuardar={handleGuardarProducto}
+          onCerrar={handleCerrarForm}
+        />
+      )}
+
+      {/* Modal Confirmar Eliminación */}
+      {Boolean(productoParaEliminar) && (
+        <ModalConfirmarEliminar
+          producto={productoParaEliminar}
+          visible={Boolean(productoParaEliminar)}
+          eliminando={procesandoAccion}
+          onConfirmar={handleConfirmarEliminar}
+          onCerrar={handleCerrarEliminar}
+        />
+      )}
+    </>
+  )
 }
 
-export default AdministradorPage;
+export default AdministradorPage

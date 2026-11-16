@@ -1,23 +1,21 @@
-const URL_BASE = import.meta.env.VITE_API_URL
+const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function obtenerToken() {
-  try {
-    return sessionStorage.getItem('token')
-  } catch {
-    return null
+function headers() {
+  const token = sessionStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
   }
 }
 
 async function pedir(url, opciones = {}) {
-  const token = obtenerToken()
   let respuesta
 
   try {
     respuesta = await fetch(url, {
       ...opciones,
       headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers(),
         ...(opciones.headers ?? {}),
       },
     })

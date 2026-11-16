@@ -19,7 +19,6 @@ export const pool = new Pool({
   connectionTimeoutMillis: 5000, // ms de espera para establecer una conexión antes de fallar
   query_timeout: 10000, // ms máximo de espera por la respuesta de una query (lado cliente)
   statement_timeout: 10000, // ms máximo que el servidor Postgres deja correr una sentencia SQL
-
   allowExitOnIdle: false, // si está en true, permite que el proceso de Node termine cuando el pool queda vacío e inactivo
 });
 
