@@ -2,13 +2,23 @@ import * as ventasRepository from './ventas.repository.js';
 import * as repositoryPedidos from '../pedidos/pedidos.repository.js';
 
 
-export const listarVentas = async () => {
+export const listarVentas = async (periodo) => {
+  if (periodo === 'ultimo-mes') {
+    return await ventasUltimoMes();
+  }
+
+  if (periodo) {
+    const error = new Error(`El parámetro periodo '${periodo}' no es válido`);
+    error.status = 400;
+    throw error;
+  }
+
   const rows = await ventasRepository.listar();
-    if (rows.length === 0) {
-      const error = new Error(`No hay ventas cargadas`);
-      error.status = 404;
-      throw error;
-    }
+  if (rows.length === 0) {
+    const error = new Error(`No hay ventas cargadas`);
+    error.status = 404;
+    throw error;
+  }
   return rows;
 };
 
@@ -92,5 +102,4 @@ export const ventasUltimoMes = async () => {
     throw error;
   }
   return rows;
-
-}
+};
