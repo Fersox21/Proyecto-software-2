@@ -31,8 +31,44 @@
 
 .tarjeta-precio {
     font-weight: 800;
-    font-size: 1.8rem;
+    font-size: clamp(1.25rem, 1rem + 0.9vw, 1.8rem);
     color: var(--color-texto-general);
+    margin: 0;
+}
+
+/* Precios en promoción: precio tachado arriba y precio de promo destacado abajo */
+.tarjeta-precios {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.tarjeta-precio-anterior {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-precio-anterior);
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: rgba(135, 43, 56, 0.6);
+    line-height: 1.2;
+}
+
+.tarjeta-precio-promo {
+    color: var(--color-precio-promo);
+    line-height: 1.15;
+}
+
+/* Badge de oferta sobre la imagen de la tarjeta */
+.tarjeta-etiqueta-promo {
+    background-color: var(--color-promo-fondo);
+    color: var(--color-promo-texto);
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    padding: 0.4rem 0.65rem;
+    border-radius: 999px;
+    box-shadow: 0 4px 10px rgba(135, 43, 56, 0.28);
 }
 
 .tarjeta-nombre {

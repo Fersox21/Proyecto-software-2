@@ -11,6 +11,29 @@
   z-index: 2;
 }
 
+/* Precio en promoción en el resumen del checkout */
+.pedido-precio-anterior {
+  color: var(--color-precio-anterior);
+  text-decoration: line-through;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(135, 43, 56, 0.6);
+}
+
+.pedido-precio-promo {
+  color: var(--color-precio-promo);
+  font-weight: 700;
+}
+
+.pedido-etiqueta-promo {
+  background-color: var(--color-promo-fondo);
+  color: var(--color-promo-texto);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+}
+
 .input-form:focus {
   outline: none;
   border-color: #2ff;

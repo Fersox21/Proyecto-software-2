@@ -1,4 +1,4 @@
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato'
 import { BsTrash } from 'react-icons/bs'
 import '../../../styles/carrito.css'
 
@@ -10,6 +10,8 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
     .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
 
   const imagenUrl = `/images/${nombreImagen}.webp`
+
+  const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(item)
 
   return (
     <li className="list-group-item py-4 border-0 border-dark border-top bg-transparent rounded-0">
@@ -33,6 +35,12 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
             <h6 className="mb-1 fs-5 text-dark lh-sm fuente-titulos">
               {item.nombre}
             </h6>
+            {enPromocion && (
+              <span className="badge carrito-etiqueta-promo align-self-start mb-1">
+                -{descuento}%
+                <span className="visually-hidden"> de descuento</span>
+              </span>
+            )}
             {item.peso && (
               <p className="mb-1 text-body-secondary small">
                 {item.peso}
@@ -41,14 +49,20 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
           </div>
         </div>
 
-        <div className="col-4 col-md-2 text-md-center">
+        <div className="col-6 col-md-2 text-md-center">
           <small className="text-body-secondary d-block mb-1">Precio unitario</small>
-          <span className="text-dark fs-6 fuente-titulos">
-            {formatearPrecio(item.precioVenta)}
+          {enPromocion && (
+            <del className="carrito-precio-anterior d-block">
+              <span className="visually-hidden">Precio anterior: </span>
+              {formatearPrecio(precioNormal)}
+            </del>
+          )}
+          <span className={`fs-6 fuente-titulos ${enPromocion ? 'carrito-precio-promo' : 'text-dark'}`}>
+            {formatearPrecio(precioVigente)}
           </span>
         </div>
 
-        <div className="col-4 col-md-2 text-md-center">
+        <div className="col-6 col-md-2 text-md-center">
           <small className="text-body-secondary d-block mb-1">Cantidad</small>
           <div className="input-group input-group-sm rounded-pill border border-secondary-subtle py-0 d-inline-flex align-items-center justify-content-between" style={{ maxWidth: '110px' }}>
             <button
@@ -72,14 +86,14 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
           </div>
         </div>
 
-        <div className="col-3 col-md-2 text-end text-md-center">
+        <div className="col-10 col-md-2 text-end text-md-center">
           <small className="text-body-secondary d-block mb-1">Total</small>
-          <span className="text-dark fs-5 fuente-titulos">
-            {formatearPrecio(item.precioVenta * item.cantidad)}
+          <span className="text-dark carrito-total fuente-titulos">
+            {formatearPrecio(precioVigente * item.cantidad)}
           </span>
         </div>
 
-        <div className="col-1 col-md-1 text-end">
+        <div className="col-2 col-md-1 text-end">
           <button
             type="button"
             className="btn p-2 border-0 rounded-circle btn-eliminar"

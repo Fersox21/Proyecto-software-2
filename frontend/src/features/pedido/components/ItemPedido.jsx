@@ -1,4 +1,4 @@
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato'
 
 function ItemPedido({ item }){
     const nombreImagen = item.nombre
@@ -8,6 +8,8 @@ function ItemPedido({ item }){
     .normalize("NFD").replace(/[\u0300-\u036f]/g, '')
 
     const imagenUrl = `/images/${nombreImagen}.webp`
+
+    const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(item)
 
     return (
         <li className="list-group-item py-2">
@@ -38,15 +40,31 @@ function ItemPedido({ item }){
                         </h6>
                         {item.peso && (
                         <p className="mb-1 text-body-secondary small" style={{ fontSize: '0.7rem'}}>
-                            {item.peso} · {item.cantidad} x {formatearPrecio(item.precioVenta)}
+                            {item.peso} · {item.cantidad} unidades
                         </p>
                         )}
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                            {enPromocion && (
+                                <del className="pedido-precio-anterior">
+                                    <span className="visually-hidden">Precio anterior: </span>
+                                    {formatearPrecio(precioNormal)}
+                                </del>
+                            )}
+                            <span className={`fuente-titulos ${enPromocion ? 'pedido-precio-promo fs-6' : 'text-body-secondary small'}`}>
+                                {formatearPrecio(precioVigente)}
+                            </span>
+                            {enPromocion && (
+                                <span className="badge pedido-etiqueta-promo">
+                                    -{descuento}%<span className="visually-hidden"> de descuento</span>
+                                </span>
+                            )}
+                        </div>
                     </div>
                 </div>
         
-                <div className="col-4 col-md-5 text-end text-end">
+                <div className="col-4 col-md-5 text-end">
                     <span className="text-dark fs-5 fuente-titulos">
-                        {formatearPrecio(item.precioVenta * item.cantidad)}
+                        {formatearPrecio(precioVigente * item.cantidad)}
                     </span>
                 </div>
             </div>

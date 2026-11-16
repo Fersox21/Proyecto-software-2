@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { obtenerPreciosProducto, formatearPrecio } from '../../../shared/utils/formato'
 import { useState, useRef } from 'react'
 import '../../../styles/tarjetaProducto.css'
 
@@ -14,6 +14,10 @@ function TarjetaProducto({ producto, onAgregar }) {
   const imagendefault = '/images/harina.webp'
 
   const sinStock = producto?.stock === 0
+
+  // precioPromo llega como string desde PostgreSQL (DECIMAL); el helper lo normaliza.
+  const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(producto)
+
   const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
   const temporizador = useRef(null)
 
@@ -39,10 +43,20 @@ function TarjetaProducto({ producto, onAgregar }) {
     <>
       <article className="card h-100 shadow-sm tarjeta-borde">
         <div className="position-relative p-3 pb-0 text-center tarjeta-imagen-contenedor">
-          <span className="badge position-absolute top-0 m-3 z-1 text-uppercase tarjeta-categoria">
+          <span className="badge position-absolute top-0 start-0 m-3 z-1 text-uppercase tarjeta-categoria">
             {producto?.categoria}
           </span>
-          
+
+          {enPromocion && (
+            <span
+              className="badge position-absolute top-0 end-0 m-3 z-1 tarjeta-etiqueta-promo"
+              title={`${descuento}% de descuento`}
+            >
+              -{descuento}%
+              <span className="visually-hidden"> de descuento</span>
+            </span>
+          )}
+
           <Link to={`/catalogo/${producto?.id}`}>
             <img 
               src={imagenUrl}
@@ -61,8 +75,20 @@ function TarjetaProducto({ producto, onAgregar }) {
           </h3>
           <p className="tarjeta-peso">{producto?.peso}</p>
           
-          <div className="mt-auto d-flex justify-content-between align-items-center">
-            <p className="precio-fraunces tarjeta-precio">{formatearPrecio(producto?.precioVenta)}</p>
+          <div className="mt-auto d-flex justify-content-between align-items-center gap-2">
+            {enPromocion ? (
+              <div className="tarjeta-precios">
+                <del className="tarjeta-precio-anterior">
+                  <span className="visually-hidden">Precio anterior: </span>
+                  {formatearPrecio(precioNormal)}
+                </del>
+                <p className="tarjeta-precio tarjeta-precio-promo mb-0">
+                  {formatearPrecio(precioVigente)}
+                </p>
+              </div>
+            ) : (
+              <p className="tarjeta-precio mb-0">{formatearPrecio(precioVigente)}</p>
+            )}
 
             <div>
               {sinStock ? (

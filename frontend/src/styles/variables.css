@@ -74,6 +74,10 @@
     --color-boton-card-borde: #b07d1e;
     --color-prec-card: black;
     --colo-desc-card: #888;
+    --color-promo-fondo: #872b38;
+    --color-promo-texto: #ffffff;
+    --color-precio-promo: #872b38;
+    --color-precio-anterior: #6f6a62;
 
     /* adminProductos */
     --color-fondo: #f8f9fa;

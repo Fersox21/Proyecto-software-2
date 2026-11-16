@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import Boton from '../../../shared/components/Boton'
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { obtenerPreciosProducto, formatearPrecio } from '../../../shared/utils/formato'
 import '../../../styles/catalogo.css'
 function DetalleProducto({ producto, onAgregar }) {
   const nombreImagen = producto.nombre
@@ -16,6 +16,8 @@ function DetalleProducto({ producto, onAgregar }) {
   const [agregado, setAgregado] = useState(false)
 
   const sinStock = producto.stock === 0
+
+  const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(producto)
 
   function sumar() {
     setCantidad((c) => Math.min(c + 1, producto.stock))
@@ -67,10 +69,27 @@ function DetalleProducto({ producto, onAgregar }) {
         {/* columna con los detalles */}
         <div className="col-md-7">
           <div className="info-producto-panel">
-            <span className="categoria-chip-detalle mb-2">{producto.categoria}</span>
+            <div className="d-flex align-items-center gap-2 flex-wrap mb-2">
+              <span className="categoria-chip-detalle">{producto.categoria}</span>
+              {enPromocion && (
+                <span className="oferta-chip-detalle">
+                  -{descuento}%<span className="visually-hidden"> de descuento</span>
+                </span>
+              )}
+            </div>
             <h1 className="titulo-producto-detalle mb-2">{producto.nombre}</h1>
-            
-            <p className="precio-tag-detalle mb-3">{formatearPrecio(producto.precioVenta)}</p>
+
+            <div className="d-flex align-items-baseline gap-2 flex-wrap mb-3">
+              {enPromocion && (
+                <del className="precio-tag-detalle-anterior">
+                  <span className="visually-hidden">Precio anterior: </span>
+                  {formatearPrecio(precioNormal)}
+                </del>
+              )}
+              <p className={`precio-tag-detalle mb-0 ${enPromocion ? 'precio-tag-detalle-promo' : ''}`}>
+                {formatearPrecio(precioVigente)}
+              </p>
+            </div>
             
             {producto.peso && (
               <p className="descripcion-producto text-secondary mb-4">{producto.peso}</p>
@@ -79,23 +98,27 @@ function DetalleProducto({ producto, onAgregar }) {
             <hr className="perforacion my-4" />
 
             {/* controles de Cantidad */}
-            <div className="mb-4">
-              <label className="rotulo-filtro d-block mb-2">Cantidad</label>
+            <div className="mb-4" role="group" aria-labelledby="cantidad-label">
+              <span id="cantidad-label" className="rotulo-filtro d-block mb-2">Cantidad</span>
               <div className="selector-cantidad d-inline-flex align-items-center">
                 <button 
                   type="button" 
                   className="btn-cantidad" 
                   onClick={restar} 
                   disabled={sinStock || cantidad === 1}
+                  aria-label="Restar una unidad"
                 >
                   −
                 </button>
-                <span className="valor-cantidad">{cantidad}</span>
+                <span className="valor-cantidad" aria-live="polite" aria-atomic="true">
+                  {cantidad}
+                </span>
                 <button 
                   type="button" 
                   className="btn-cantidad" 
                   onClick={sumar} 
                   disabled={sinStock || cantidad === producto.stock}
+                  aria-label={`Sumar una unidad de ${producto.nombre}`}
                 >
                   +
                 </button>
@@ -121,7 +144,11 @@ function DetalleProducto({ producto, onAgregar }) {
 
             {/* alerta de producto agregado */}
             {agregado && (
-              <div className="alerta-exito mt-3 d-flex justify-content-between align-items-center">
+              <div
+                className="alerta-exito mt-3 d-flex justify-content-between align-items-center"
+                role="status"
+                aria-live="polite"
+              >
                 <span>¡Producto agregado al carrito!</span>
                 <Link to="/carrito" className="btn-ir-carrito">
                   Ver carrito →

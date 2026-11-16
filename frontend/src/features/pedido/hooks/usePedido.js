@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { crearPedido } from '../services/pedidoService'
+import { precioVigente } from '../../../shared/utils/formato'
 import { COSTO_ENVIO, ENVIO_GRATIS_DESDE } from '../constants'
 
 const DATOS_INICIALES = {
@@ -51,7 +52,7 @@ export function usePedido({ items = [], subtotal = 0, vaciarCarrito }) {
       items: items.map((item) => ({
         productoId: item.id,
         cantidad: item.cantidad,
-        precioUnitario: item.precioVenta
+        precioUnitario: precioVigente(item)
       })),
       subtotal,
       envio,
