@@ -1,6 +1,17 @@
 const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+
+function headers() {
+  const token = sessionStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
+  }
+}
+
 export async function obtenerProductos() {
-  const respuesta = await fetch(`${URL_BASE}/productos`)
+  const respuesta = await fetch(`${URL_BASE}/productos`, {
+    headers: headers()
+  })
   
   if (!respuesta.ok) {
     throw new Error('No se pudieron obtener los productos')

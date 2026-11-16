@@ -1,21 +1,17 @@
 const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
-function obtenerToken() {
-  try {
-    return sessionStorage.getItem('token')
-  } catch {
-    return null
+function headers() {
+  const token = sessionStorage.getItem('token')
+  return {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${token}`
   }
 }
 
 async function get(path) {
-  const token = obtenerToken()
   const respuesta = await fetch(`${URL_BASE}/estadisticas${path}`, {
     method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
+    headers: headers(),
   })
 
   if (!respuesta.ok) {
