@@ -16,7 +16,7 @@ function TarjetaProducto({ producto, onAgregar }) {
   const sinStock = producto?.stock === 0
 
   // precioPromo llega como string desde PostgreSQL (DECIMAL); el helper lo normaliza.
-  const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(producto)
+  const { precioNormal, enPromocion, descuento, ahorro, precioVigente } = obtenerPreciosProducto(producto)
 
   const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
   const temporizador = useRef(null)
@@ -50,7 +50,7 @@ function TarjetaProducto({ producto, onAgregar }) {
           {enPromocion && (
             <span
               className="badge position-absolute top-0 end-0 m-3 z-1 tarjeta-etiqueta-promo"
-              title={`${descuento}% de descuento`}
+              title={`${descuento}% de descuento (ahorrás ${formatearPrecio(ahorro)})`}
             >
               -{descuento}%
               <span className="visually-hidden"> de descuento</span>

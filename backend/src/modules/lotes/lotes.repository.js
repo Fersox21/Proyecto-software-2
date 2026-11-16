@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import { normalizarProducto } from '../productos/productos.precio.js';
 
 // Consulta base: cada lote con su producto, su orden de compra y el proveedor
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
@@ -42,7 +43,7 @@ const mapearLoteConDetalle = (row) => {
     fechaArribo: row.fecha_arribo,
     fechaVencimiento: row.fecha_vencimiento,
     activo: row.activo,
-    producto: {
+    producto: normalizarProducto({
       id: row.producto_id,
       nombre: row.producto_nombre,
       marca: row.producto_marca,
@@ -54,7 +55,7 @@ const mapearLoteConDetalle = (row) => {
       enPromocion: row.producto_en_promocion,
       precioPromo: row.producto_precio_promo,
       destacado: row.producto_destacado
-    },
+    }),
     ordenCompra
   };
 };

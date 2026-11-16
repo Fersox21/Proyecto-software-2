@@ -5,12 +5,14 @@ const { Pool, types } = pkg;
 
 types.setTypeParser(1700, (val) => parseFloat(val));
 
+// SSL opcional: PostgreSQL local no lo soporta, así que queda desactivado por
+// defecto. Para una base remota que lo exija, definir PGSSL=true en el entorno.
+const usarSSL = process.env.PGSSL === 'true';
+
 // Pool de conexiones
 export const pool = new Pool({
   connectionString: env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false, 
-  },
+  ssl: usarSSL ? { rejectUnauthorized: false } : false,
   max: 20, // cantidad máxima de clientes (conexiones) simultáneas en el pool
   min: 0, // cantidad mínima de clientes que se mantienen abiertos en el pool
   idleTimeoutMillis: 30000, // ms que una conexión inactiva puede quedar abierta antes de cerrarse

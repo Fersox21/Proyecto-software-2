@@ -1,5 +1,7 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { corsOptions } from './config/cors.js';
 import { notFound } from './middlewares/notFound.js';
 import { errorHandler } from './middlewares/errorHandler.js';
@@ -18,6 +20,11 @@ const app = express();
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+// Imágenes subidas desde el panel de administración. Se sirven como archivos
+// estáticos, sin autenticación, porque las consume el catálogo público.
+const DIRECTORIO_APP = path.dirname(fileURLToPath(import.meta.url));
+app.use('/uploads', express.static(path.resolve(DIRECTORIO_APP, '../uploads')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/lotes', lotesRoutes);

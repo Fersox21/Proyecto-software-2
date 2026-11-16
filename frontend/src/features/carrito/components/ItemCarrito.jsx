@@ -1,4 +1,4 @@
-import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato'
+import { formatearPrecio, obtenerPreciosProducto, redondear2 } from '../../../shared/utils/formato'
 import { BsTrash } from 'react-icons/bs'
 import '../../../styles/carrito.css'
 
@@ -89,7 +89,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
         <div className="col-10 col-md-2 text-end text-md-center">
           <small className="text-body-secondary d-block mb-1">Total</small>
           <span className="text-dark carrito-total fuente-titulos">
-            {formatearPrecio(precioVigente * item.cantidad)}
+            {formatearPrecio(redondear2(precioVigente * item.cantidad))}
           </span>
         </div>
 

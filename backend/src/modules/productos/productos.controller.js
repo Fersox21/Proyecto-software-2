@@ -44,3 +44,21 @@ export const eliminar = async (req, res, next) => {
     next(err);
   }
 };
+
+export const subirImagen = async (req, res, next) => {
+  try {
+    const productoActualizado = await service.subirImagenProducto(req.params.id, req.file);
+    res.json(productoActualizado);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const quitarImagen = async (req, res, next) => {
+  try {
+    const productoActualizado = await service.quitarImagenProducto(req.params.id);
+    res.json(productoActualizado);
+  } catch (err) {
+    next(err);
+  }
+};

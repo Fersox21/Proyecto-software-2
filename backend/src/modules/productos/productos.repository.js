@@ -1,8 +1,9 @@
 import { pool } from '../../config/db.js';
+import { normalizarProducto } from './productos.precio.js';
 
 const mapearProducto = (row) => {
   if (!row) return null;
-  return {
+  return normalizarProducto({
     id: row.id,
     nombre: row.nombre,
     precioCosto: row.precio_costo,
@@ -13,8 +14,9 @@ const mapearProducto = (row) => {
     stock: row.stock,
     categoria: row.categoria,
     peso: row.peso,
-    destacado: row.destacado
-  };
+    destacado: row.destacado,
+    imagen: row.imagen
+  });
 };
 
 export const findAll = async () => {
@@ -54,4 +56,13 @@ export const update = async (id, data) => {
 export const remove = async (id) => {
   const { rowCount } = await pool.query('UPDATE productos SET activo = false WHERE id = $1', [id]);
   return rowCount;
+};
+
+// Actualiza únicamente la ruta de la imagen del producto.
+export const updateImagen = async (id, imagen) => {
+  const { rows } = await pool.query(
+    'UPDATE productos SET imagen = $1 WHERE id = $2 RETURNING *',
+    [imagen, id]
+  );
+  return mapearProducto(rows[0]);
 };

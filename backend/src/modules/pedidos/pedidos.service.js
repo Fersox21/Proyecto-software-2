@@ -2,6 +2,7 @@ import * as repository from './pedidos.repository.js';
 import * as repositoryRol from '../roles/roles.repository.js';
 import * as repositoryTiene from '../tiene/tiene.repository.js';
 import * as repositoryProducto from '../productos/productos.repository.js';
+import { precioVigente } from '../productos/productos.precio.js';
 
 // Usuario con el que se registran los pedidos anónimos del checkout.
 // En el seed corresponde a cliente1@gmail.com.
@@ -75,7 +76,7 @@ const normalizarItems = async (items) => {
       throw crearError(`El producto #${productoId} no existe`, 404);
     }
 
-    const precio = Number(producto.precioVenta);
+    const precio = precioVigente(producto);
     if (!Number.isFinite(precio) || precio <= 0) {
       throw crearError(`El producto #${productoId} no tiene un precio de venta válido`, 400);
     }

@@ -17,7 +17,7 @@ function DetalleProducto({ producto, onAgregar }) {
 
   const sinStock = producto.stock === 0
 
-  const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(producto)
+  const { precioNormal, enPromocion, descuento, ahorro, precioVigente } = obtenerPreciosProducto(producto)
 
   function sumar() {
     setCantidad((c) => Math.min(c + 1, producto.stock))
@@ -72,7 +72,10 @@ function DetalleProducto({ producto, onAgregar }) {
             <div className="d-flex align-items-center gap-2 flex-wrap mb-2">
               <span className="categoria-chip-detalle">{producto.categoria}</span>
               {enPromocion && (
-                <span className="oferta-chip-detalle">
+                <span
+                  className="oferta-chip-detalle"
+                  title={`${descuento}% de descuento (ahorrás ${formatearPrecio(ahorro)})`}
+                >
                   -{descuento}%<span className="visually-hidden"> de descuento</span>
                 </span>
               )}

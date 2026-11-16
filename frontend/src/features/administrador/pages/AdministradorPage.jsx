@@ -1,6 +1,7 @@
 
 import { obtenerProductos } from "../services/productosServices";
 import { useFetch } from '../../../shared/hooks/useFetch';
+import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato';
 import Spinner from '../../../shared/components/Spinner';
 import MensajeVacio from '../../../shared/components/MensajeVacio';
 
@@ -36,6 +37,7 @@ return(<>
                         <th>Precio costo</th>
                         <th>Stock</th>
                         <th>En promocion</th>
+                        <th>Descuento</th>
                         <th>Precio con promo</th>
                         <th>Estado</th>
                         <th>Destacado</th>
@@ -44,24 +46,28 @@ return(<>
                 </thead>
 
                 <tbody id="tabla-admin-body">
-                    {productos.map((prod)=> (
+                    {productos.map((prod)=> {
+                        const { enPromocion, descuento, precioVigente } = obtenerPreciosProducto(prod)
+                        return (
                         <tr key={prod.id}>
                                 <td className="col-admin col-nombre">{prod.nombre}</td>
                                 <td className="col-admin">{prod.marca}</td>
                                 <td className="col-admin col-descripcion">{prod.peso}</td>
                                 <td className="col-admin col-categoria">{prod.categoria}</td>
-                                <td className="col-admin col-precio">${prod.precioVenta}</td>
-                                <td className="col-admin col-precio">${prod.precioCosto}</td>
+                                <td className="col-admin col-precio">{formatearPrecio(prod.precioVenta)}</td>
+                                <td className="col-admin col-precio">{formatearPrecio(prod.precioCosto)}</td>
                                 <td className="col-admin col-stock">{prod.stock}</td>
-                                <td className="col-admin">{prod.enPromocion ? 'Si' : 'No' }</td>
-                                <td className="col-admin">${prod.precioPromo}</td>
+                                <td className="col-admin">{enPromocion ? 'Si' : 'No' }</td>
+                                <td className="col-admin">{enPromocion ? `-${descuento}%` : '—'}</td>
+                                <td className="col-admin">{enPromocion ? formatearPrecio(precioVigente) : '—'}</td>
                                 <td className="col-admin">{calcularEstado(prod.stock)}</td>
                                 <td className="col-admin">{prod.destacado ? 'Si' : 'No' }</td>
                                 <td className="col-admin col-acciones">
                                     <button>Editar</button>
                                 </td>
                         </tr>
-                    ))}
+                        )
+                    })}
                 </tbody>
             </table>
             <div className="tabla-admin-pie">

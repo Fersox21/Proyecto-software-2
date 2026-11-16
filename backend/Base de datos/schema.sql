@@ -35,8 +35,13 @@ CREATE TABLE productos (
     precio_promo DECIMAL(10, 2) CHECK (precio_promo IS NULL OR precio_promo > 0),
     peso DECIMAL(10, 2) NOT NULL CHECK (peso > 0),
     categoria VARCHAR(20) NOT NULL,
+    imagen VARCHAR(255),
     destacado BOOLEAN NOT NULL DEFAULT false,
-    activo BOOLEAN NOT NULL DEFAULT true
+    activo BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT chk_promo_activa CHECK (
+        NOT en_promocion
+        OR (precio_promo IS NOT NULL AND precio_promo > 0 AND precio_promo < precio_venta)
+    )
 );
 -- Tabla 4: Órdenes de Compra (Depende de Proveedores)
 CREATE TABLE ordenes_compra (

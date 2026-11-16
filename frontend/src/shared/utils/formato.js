@@ -1,62 +1,98 @@
 // Funciones puras: reciben un valor y devuelven otro, sin estado ni marcado.
 
-export function formatearPrecio(valor) {
-  return new Intl.NumberFormat('es-AR', {
-    style: 'currency',
-    currency: 'ARS',
-    maximumFractionDigits: 0,
-  }).format(valor)
+// Redondea a dos decimales evitando los errores de coma flotante.
+export function redondear2(valor) {
+  const numero = Number(valor)
+  if (!Number.isFinite(numero)) return NaN
+  return Math.round((numero + Number.EPSILON) * 100) / 100
 }
 
-// Una promo es válida solo si el flag está activo y el precio promocional es
-// numérico, mayor a 0 y menor al precio de venta. Misma regla que el backend
-// (backend/src/modules/productos/productos.precio.js), sin redondeos.
+// El descuento se expresa como un porcentaje entero (1% a 99%). El porcentaje se
+// obtiene del precio de venta y del precio promocional guardado, y el precio se
+// normaliza a centavos para que ambos números concuerden.
+// Ejemplo: venta $900 y promo $800 => 11% => precio promocional $801.
+export function porcentajeDescuento(precioVenta, precioPromo) {
+  const normal = Number(precioVenta)
+  const promo = Number(precioPromo)
+
+  if (!Number.isFinite(normal) || !Number.isFinite(promo)) return null
+  if (normal <= 0 || promo <= 0 || promo >= normal) return null
+
+  const porcentaje = Math.round(((normal - promo) / normal) * 100)
+
+  if (porcentaje < 1 || porcentaje > 99) return null
+
+  return porcentaje
+}
+
+// Precio promocional exacto para un porcentaje entero de descuento.
+export function precioConDescuento(precioVenta, porcentaje) {
+  const normal = Number(precioVenta)
+  const pct = Number(porcentaje)
+
+  if (!Number.isFinite(normal) || !Number.isFinite(pct)) return NaN
+
+  return redondear2(normal * (1 - pct / 100))
+}
+
+// Una promo es válida solo si el flag está activo y los precios representan un
+// descuento entero de entre 1% y 99%.
 export function esPromoValida(precioVenta, precioPromo, enPromocion) {
   if (!enPromocion) return false
-
-  const normal = Number(precioVenta)
-  const promo = Number(precioPromo)
-
-  if (!Number.isFinite(normal) || !Number.isFinite(promo)) return false
-
-  return normal > 0 && promo > 0 && promo < normal
+  return porcentajeDescuento(precioVenta, precioPromo) !== null
 }
 
-// Porcentaje entero de descuento para mostrar en el badge (entre 1 y 99).
+// Porcentaje entero de descuento (1 a 99) o null si la promo no es válida.
 export function calcularDescuento(precioVenta, precioPromo) {
-  if (!esPromoValida(precioVenta, precioPromo, true)) return 0
-
-  const normal = Number(precioVenta)
-  const promo = Number(precioPromo)
-  const porcentaje = ((normal - promo) / normal) * 100
-
-  return Math.min(99, Math.max(1, Math.round(porcentaje)))
+  return porcentajeDescuento(precioVenta, precioPromo)
 }
 
-// Precio unitario vigente de un producto (promoción incluida).
+// Precio unitario vigente de un producto (promoción incluida y normalizada).
 export function precioVigente(producto = {}) {
-  const normal = Number(producto?.precioVenta)
-  const promo = Number(producto?.precioPromo)
-
-  if (esPromoValida(normal, promo, producto?.enPromocion)) return promo
-
-  return Number.isFinite(normal) ? normal : 0
+  return obtenerPreciosProducto(producto).precioVigente
 }
 
 // Datos de precio listos para renderizar: una única fuente de verdad para
 // tarjeta, detalle, carrito y checkout.
 export function obtenerPreciosProducto(producto = {}) {
   const precioNormal = Number(producto?.precioVenta)
-  const precioPromo = Number(producto?.precioPromo)
-  const enPromocion = esPromoValida(precioNormal, precioPromo, producto?.enPromocion)
+  const precioPromoGuardado = Number(producto?.precioPromo)
+
+  const descuento = esPromoValida(precioNormal, precioPromoGuardado, producto?.enPromocion)
+    ? porcentajeDescuento(precioNormal, precioPromoGuardado)
+    : null
+
+  const precioPromo = descuento !== null
+    ? precioConDescuento(precioNormal, descuento)
+    : (Number.isFinite(precioPromoGuardado) ? precioPromoGuardado : null)
+
+  const precioVigente = descuento !== null
+    ? precioPromo
+    : (Number.isFinite(precioNormal) ? precioNormal : 0)
 
   return {
     precioNormal,
     precioPromo,
-    enPromocion,
-    descuento: enPromocion ? calcularDescuento(precioNormal, precioPromo) : 0,
-    precioVigente: enPromocion ? precioPromo : (Number.isFinite(precioNormal) ? precioNormal : 0),
+    enPromocion: descuento !== null,
+    descuento,
+    ahorro: descuento !== null ? redondear2(precioNormal - precioPromo) : null,
+    precioVigente,
   }
+}
+
+export function formatearPrecio(valor) {
+  const numero = Number(valor)
+  const precio = Number.isFinite(numero) ? numero : 0
+  // Si el precio tiene centavos se muestran los dos decimales; si es entero se
+  // mantiene el formato corto ("$900" en lugar de "$900,00").
+  const tieneCentavos = Math.round(precio * 100) % 100 !== 0
+
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: tieneCentavos ? 2 : 0,
+    maximumFractionDigits: 2,
+  }).format(precio)
 }
 
 export function formatearFecha(fechaISO) {

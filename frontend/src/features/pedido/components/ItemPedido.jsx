@@ -1,4 +1,4 @@
-import { formatearPrecio, obtenerPreciosProducto } from '../../../shared/utils/formato'
+import { formatearPrecio, obtenerPreciosProducto, redondear2 } from '../../../shared/utils/formato'
 
 function ItemPedido({ item }){
     const nombreImagen = item.nombre
@@ -64,7 +64,7 @@ function ItemPedido({ item }){
         
                 <div className="col-4 col-md-5 text-end">
                     <span className="text-dark fs-5 fuente-titulos">
-                        {formatearPrecio(precioVigente * item.cantidad)}
+                        {formatearPrecio(redondear2(precioVigente * item.cantidad))}
                     </span>
                 </div>
             </div>

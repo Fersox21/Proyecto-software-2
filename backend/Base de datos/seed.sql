@@ -25,12 +25,12 @@ INSERT INTO usuarios (correo, rol, activo, password) VALUES
 ('cliente2@gmail.com', 'cliente', true, '$2b$10$z99a1t.5y6U4tI0g9h8i7f6e5d4c3b2a1o0p9q8r7s6t5u4v3w2');
 
 -- 3. Productos (peso en gramos / mililitros como INTEGER)
-INSERT INTO productos (nombre, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, peso, destacado, activo) VALUES
-('Harina 0000 1kg', 450.00, 750.00, 'Favorita', false, NULL, 120, 'Almacén', 1000, true, true),
-('Leche Entera 1L', 600.00, 950.00, 'La Serenísima', true, 850.00, 50, 'Lácteos', 1000, true, true),
-('Aceite Girasol 1.5L', 1200.00, 1850.00, 'Natura', false, NULL, 80, 'Almacén', 1500, false, true),
-('Mozzarella 500g', 2100.00, 3100.00, 'Barraza', true, 2800.00, 30, 'Frescos', 500, true, true),
-('Puré Tomate 520g', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', 520, false, true);
+INSERT INTO productos (nombre, precio_costo, precio_venta, marca, en_promocion, precio_promo, stock, categoria, peso, imagen, destacado, activo) VALUES
+('Harina 0000 1kg', 450.00, 750.00, 'Favorita', false, NULL, 120, 'Almacén', 1000, 'harina.webp', true, true),
+('Leche Entera 1L', 600.00, 950.00, 'La Serenísima', true, 845.50, 50, 'Lácteos', 1000, NULL, true, true),
+('Aceite Girasol 1.5L', 1200.00, 1850.00, 'Natura', false, NULL, 80, 'Almacén', 1500, NULL, false, true),
+('Mozzarella 500g', 2100.00, 3100.00, 'Barraza', true, 2790.00, 30, 'Frescos', 500, NULL, true, true),
+('Puré Tomate 520g', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', 520, NULL, false, true);
 
 -- 4. Órdenes de Compra (Asociadas al Proveedor)
 INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id) VALUES
