@@ -88,8 +88,61 @@ export const findByIdConItems = async (id) => {
   return { ...pedido, items };
 };
 
+const crearError = (mensaje, status) => {
+  const error = new Error(mensaje);
+  error.status = status;
+  return error;
+};
+
+const validarDisponibilidadItem = async (cliente, item) => {
+  const { rows: productoRows } = await cliente.query(
+    `SELECT id, nombre, stock, activo, visible_catalogo
+     FROM productos
+     WHERE id = $1
+     FOR UPDATE`,
+    [item.productoId]
+  );
+
+  const producto = productoRows[0];
+  const nombreProducto = producto?.nombre ?? `#${item.productoId}`;
+
+  if (
+    !producto ||
+    producto.activo !== true ||
+    producto.visible_catalogo !== true ||
+    Number(producto.stock ?? 0) < item.cantidad
+  ) {
+    throw crearError(
+      `El producto ${nombreProducto} ya no se encuentra disponible o no tiene stock suficiente.`,
+      400
+    );
+  }
+
+  const { rows: loteRows } = await cliente.query(
+    `SELECT COALESCE(SUM(cantidad), 0) AS stock_vigente
+     FROM lotes
+     WHERE producto_id = $1
+       AND activo = true
+       AND cantidad > 0
+       AND fecha_vencimiento >= CURRENT_DATE`,
+    [item.productoId]
+  );
+
+  const stockVigente = Number(loteRows[0]?.stock_vigente ?? 0);
+  if (!Number.isFinite(stockVigente) || stockVigente < item.cantidad) {
+    throw crearError(
+      `El producto ${nombreProducto} ya no se encuentra disponible o no tiene stock suficiente.`,
+      400
+    );
+  }
+};
+
 export const createConItems = async (pedido, items) => {
   return conTransaccion(async (cliente) => {
+    for (const item of items) {
+      await validarDisponibilidadItem(cliente, item);
+    }
+
     const {
       fecha,
       subtotal,

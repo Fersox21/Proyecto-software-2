@@ -1,3 +1,4 @@
+import { LuPackageOpen } from 'react-icons/lu'
 import Spinner from '../../../../shared/components/Spinner'
 import MensajeVacio from '../../../../shared/components/MensajeVacio'
 
@@ -16,7 +17,10 @@ function TablaProductosVencidos({ vencidos, listaVencidos }) {
       ) : vencidos.error ? (
         <MensajeVacio titulo="No pudimos cargar los vencidos" texto={vencidos.error.message} />
       ) : listaVencidos.length === 0 ? (
-        <p className="estadistica-vacio">No hay lotes vencidos. ¡Todo al día!</p>
+        <div className="estadistica-vacio">
+          <LuPackageOpen className="estadistica-vacio-icono" size={48} aria-hidden="true" />
+          <p className="estadistica-vacio-texto">No hay lotes vencidos. ¡Todo al día!</p>
+        </div>
       ) : (
         <div className="estadistica-tabla-contenedor">
           <table className="tabla-admin estadistica-tabla">
@@ -30,11 +34,11 @@ function TablaProductosVencidos({ vencidos, listaVencidos }) {
               </tr>
             </thead>
             <tbody>
-              {listaVencidos.map((item) => (
+              {listaVencidos.map((item, index) => (
                 <tr key={item.lote_id}>
                   <td className="col-id">{item.nombre}</td>
                   <td>{item.marca || '-'}</td>
-                  <td>#{item.lote_id}</td>
+                  <td>#{index + 1}</td>
                   <td>{etiquetaFecha(item.fecha_vencimiento)}</td>
                   <td>
                     <span className="badge-estado estado-cancelado">{item.dias_vencido} días</span>

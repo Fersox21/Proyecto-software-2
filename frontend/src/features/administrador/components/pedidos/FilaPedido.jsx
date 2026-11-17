@@ -1,32 +1,47 @@
+import { LuCheck, LuEye, LuX } from 'react-icons/lu'
 import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
-function FilaPedido({ pedido, onVerDetalle, onIniciarAceptar, onIniciarCancelar }) {
+function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onIniciarCancelar }) {
   const estadoNormalizado = (pedido.estado || '').toLowerCase()
-  const esPendiente = estadoNormalizado === 'pendiente' || estadoNormalizado === 'en_proceso'
+  const esPendiente = ['pendiente', 'nuevo', 'en_proceso'].includes(estadoNormalizado)
+  const esAlertaEstado = estadoNormalizado === 'pendiente' || estadoNormalizado === 'nuevo'
 
   return (
     <tr>
-      <td className="col-admin">#{pedido.id}</td>
-      <td className="col-admin">{pedido.comercio || 'N/A'}</td>
+      <td className="col-admin">
+        <div className="pedido-cliente-celda">
+          <span className="pedido-comercio-nombre">{pedido.comercio || 'N/A'}</span>
+          <span className="pedido-id-subtitulo">Pedido #{numeroFila}</span>
+        </div>
+      </td>
       <td className="col-admin">{pedido.fecha ? formatearFecha(pedido.fecha) : 'N/A'}</td>
       <td className="col-admin">
         {pedido.totalModificado != null ? (
-          <div>
-            <span>
-              Total: {formatearPrecio(pedido.total || 0)} (Modificado a: {formatearPrecio(pedido.totalModificado)})
+          <div className="pedido-total-modificado">
+            <span className="pedido-total-destacado">
+              {formatearPrecio(pedido.totalModificado)}
+            </span>
+            <span className="pedido-total-original">
+              Original: {formatearPrecio(pedido.total || 0)}
             </span>
             {pedido.motivoModificacion && (
-              <div className="detalle-etiqueta" style={{ marginTop: '0.2rem' }}>
+              <span className="detalle-etiqueta">
                 Motivo: {pedido.motivoModificacion}
-              </div>
+              </span>
             )}
           </div>
         ) : (
-          pedido.total != null ? formatearPrecio(pedido.total) : '$0.00'
+          <span className="pedido-total-destacado">
+            {pedido.total != null ? formatearPrecio(pedido.total) : '$0.00'}
+          </span>
         )}
       </td>
       <td className="col-admin">
-        <span className="estado-texto-plano">
+        <span
+          className={`pedido-estado-chip ${
+            esAlertaEstado ? 'pedido-estado-pendiente' : 'pedido-estado-neutro'
+          }`}
+        >
           {pedido.estado || 'Desconocido'}
         </span>
       </td>
@@ -35,10 +50,12 @@ function FilaPedido({ pedido, onVerDetalle, onIniciarAceptar, onIniciarCancelar 
           {esPendiente ? (
             <button
               type="button"
-              className="orden-btn orden-btn-chico orden-btn-primario"
+              className="pedido-btn-icono pedido-btn-aceptar"
               onClick={() => onIniciarAceptar(pedido)}
+              aria-label={`Aceptar pedido #${pedido.id}`}
+              title="Aceptar pedido"
             >
-              Aceptar
+              <LuCheck size={17} aria-hidden="true" />
             </button>
           ) : (
             <span className="pedido-accion-hueco" aria-hidden="true" />
@@ -46,19 +63,23 @@ function FilaPedido({ pedido, onVerDetalle, onIniciarAceptar, onIniciarCancelar 
 
           <button
             type="button"
-            className="orden-btn orden-btn-chico"
+            className="pedido-btn-icono pedido-btn-detalle"
             onClick={() => onVerDetalle(pedido.id)}
+            aria-label={`Ver detalle del pedido #${pedido.id}`}
+            title="Ver detalle"
           >
-            Ver Detalle
+            <LuEye size={17} aria-hidden="true" />
           </button>
 
           {esPendiente ? (
             <button
               type="button"
-              className="orden-btn orden-btn-chico orden-btn-peligro"
+              className="pedido-btn-icono pedido-btn-cancelar"
               onClick={() => onIniciarCancelar(pedido)}
+              aria-label={`Cancelar pedido #${pedido.id}`}
+              title="Cancelar pedido"
             >
-              Cancelar
+              <LuX size={17} aria-hidden="true" />
             </button>
           ) : (
             <span className="pedido-accion-hueco" aria-hidden="true" />

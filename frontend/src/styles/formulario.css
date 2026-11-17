@@ -1,3 +1,38 @@
+/* Checkout y formularios de pedido — identidad LaFe */
+
+.card.rounded-5 {
+  background-color: var(--color-tarjeta, #FFFFFF);
+  border: 1px solid var(--color-superficie, #EFEBE2) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--sombra-suave) !important;
+  font-family: var(--fuente-base);
+}
+
+.card.rounded-5 h5,
+.card.rounded-5 h4 {
+  font-family: var(--fuente-titulos);
+  color: var(--color-primario-oscuro, #0A1331);
+}
+
+.card.rounded-5 .form-label {
+  color: var(--color-primario-oscuro, #0A1331);
+  font-family: var(--fuente-base);
+}
+
+.card.rounded-5 .btn-dark {
+  background-color: var(--color-primario, #102055);
+  border-color: var(--color-primario, #102055);
+  border-radius: 12px;
+  font-family: var(--fuente-base);
+  font-weight: 600;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.card.rounded-5 .btn-dark:hover {
+  background-color: var(--color-primario-medio, #1b2c61);
+  border-color: var(--color-primario-medio, #1b2c61);
+}
+
 .badge-cantidad-pedido {
   width: 24px;
   height: 24px;
@@ -34,7 +69,26 @@
   border-radius: 999px;
 }
 
-.input-form:focus {
-  outline: none;
-  border-color: #2ff;
+.input-form {
+  border-radius: 12px !important;
+  border: 1px solid #D5CEC2;
+  background-color: var(--color-tarjeta, #FFFFFF);
+  color: var(--color-primario-oscuro, #0A1331);
+  font-family: var(--fuente-base);
+  padding: 0.6rem 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.input-form:focus,
+.input-form:focus-visible {
+  outline: 2px solid var(--color-primario, #102055);
+  outline-offset: 1px;
+  border-color: var(--color-primario, #102055);
+  box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .card.rounded-5 {
+    padding: 1.25rem !important;
+  }
 }

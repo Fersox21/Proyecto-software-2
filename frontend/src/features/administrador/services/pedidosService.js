@@ -40,7 +40,7 @@ export async function obtenerPedidoPorId(id) {
     headers: headers()
   })
 
-  return procesarRespuesta(respuesta, `No se pudo obtener el detalle del pedido #${id}`)
+  return procesarRespuesta(respuesta, 'No se pudo obtener el detalle del pedido')
 }
 
 export async function cancelarPedido(id, motivoRechazo) {
@@ -53,7 +53,7 @@ export async function cancelarPedido(id, motivoRechazo) {
     })
   })
 
-  return procesarRespuesta(respuesta, `No se pudo cancelar el pedido #${id}`)
+  return procesarRespuesta(respuesta, 'No se pudo cancelar el pedido')
 }
 
 export async function modificarTotalPedido(id, { totalModificado, motivoModificacion }) {
@@ -66,7 +66,7 @@ export async function modificarTotalPedido(id, { totalModificado, motivoModifica
     })
   })
 
-  return procesarRespuesta(respuesta, `No se pudo modificar el total del pedido #${id}`)
+  return procesarRespuesta(respuesta, 'No se pudo modificar el total del pedido')
 }
 
 export async function aceptarPedido(id, datosModificacion = null) {
@@ -85,5 +85,5 @@ export async function aceptarPedido(id, datosModificacion = null) {
     body: JSON.stringify(payload)
   })
 
-  return procesarRespuesta(respuesta, `No se pudo aceptar el pedido #${id}`)
+  return procesarRespuesta(respuesta, 'No se pudo aceptar el pedido')
 }

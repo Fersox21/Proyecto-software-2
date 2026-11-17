@@ -7,6 +7,7 @@ import {
 } from '../services/ventasService';
 import { obtenerPedidoPorId } from '../services/pedidosService';
 import { useState } from 'react';
+import { LuEye, LuPencil, LuTrash2 } from 'react-icons/lu';
 import { useFetch } from '../../../shared/hooks/useFetch';
 import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato';
 import {
@@ -29,6 +30,7 @@ function VentasPage() {
   const [ventaDetalle, setVentaDetalle] = useState(null);
   const [cargandoDetalle, setCargandoDetalle] = useState(false);
   const [errorDetalle, setErrorDetalle] = useState('');
+  const [mensaje, setMensaje] = useState(null);
 
   const [ventaAEditar, setVentaAEditar] = useState(null);
   const [fechaEditada, setFechaEditada] = useState('');
@@ -142,6 +144,7 @@ function VentasPage() {
       });
       setVentaAEditar(null);
       setRecarga(recarga + 1);
+      setMensaje({ tipo: 'exito', texto: 'Venta actualizada exitosamente.' });
     } catch (err) {
       setErrorModal(err.message);
     }
@@ -155,8 +158,10 @@ function VentasPage() {
       }
       setVentaAEliminar(null);
       setRecarga(recarga + 1);
+      setMensaje({ tipo: 'exito', texto: 'Venta eliminada exitosamente.' });
     } catch (err) {
-      alert(err.message);
+      setVentaAEliminar(null);
+      setMensaje({ tipo: 'error', texto: err.message });
     }
   };
 
@@ -166,68 +171,99 @@ function VentasPage() {
         <h1 className="h1-admin">Ventas</h1>
       </header>
 
-      <section className="sec-tabla-admin" aria-live="polite">
-        <table className="tabla-admin">
+      {mensaje && (
+        <div
+          className={`orden-alerta ${
+            mensaje.tipo === 'error' ? 'orden-alerta-error' : 'orden-alerta-exito'
+          }`}
+          role="alert"
+        >
+          <span>{mensaje.texto}</span>
+          <button
+            type="button"
+            className="orden-alerta-cerrar"
+            onClick={() => setMensaje(null)}
+            aria-label="Cerrar mensaje"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      <section className="sec-tabla-admin sec-tabla-ventas" aria-live="polite">
+        <table className="tabla-admin tabla-ventas">
           <thead>
             <tr>
-              <th># Venta</th>
-              <th>Fecha</th>
-              <th>Total</th>
-              <th className="orden-col-acciones">Acciones</th>
+              <th>Venta y Fecha</th>
+              <th>Total y Auditoría</th>
+              <th className="col-acciones">Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             {totalVentas > 0 ? (
-              listaVentas.map((venta) => {
+              listaVentas.map((venta, index) => {
                 const totalModificado = venta.totalModificado ?? venta.total_modificado;
                 const motivoModificacion = venta.motivoModificacion ?? venta.motivo_modificacion;
                 const totalOriginal = venta.monto ?? venta.total ?? 0;
+                const tieneModificacion = totalModificado != null;
+                const precioFinal = tieneModificacion ? totalModificado : totalOriginal;
 
                 return (
                   <tr key={venta.id}>
-                    <td className="col-admin col-id">#{venta.id}</td>
-                    <td className="col-admin col-fecha">
-                      {venta.fecha ? formatearFecha(venta.fecha) : '-'}
+                    <td className="col-admin">
+                      <div className="venta-id-fecha">
+                        <span className="venta-id">#{index + 1}</span>
+                        <span className="venta-fecha">
+                          {venta.fecha ? formatearFecha(venta.fecha) : '-'}
+                        </span>
+                      </div>
                     </td>
                     <td className="col-admin col-monto">
-                      {totalModificado != null ? (
-                        <div style={{ whiteSpace: 'normal' }}>
-                          <span>
-                            Total: {formatearPrecio(totalOriginal)} (Modificado a: {formatearPrecio(totalModificado)})
+                      <div className="venta-total-bloque">
+                        <div className="venta-total-linea">
+                          <span className="venta-total-final">
+                            {formatearPrecio(precioFinal)}
                           </span>
-                          {motivoModificacion && (
-                            <div className="detalle-etiqueta" style={{ marginTop: '0.2rem', fontWeight: 400 }}>
-                              Motivo: {motivoModificacion}
-                            </div>
+                          {tieneModificacion && (
+                            <span className="venta-total-original">
+                              {formatearPrecio(totalOriginal)}
+                            </span>
                           )}
                         </div>
-                      ) : (
-                        formatearPrecio(totalOriginal)
-                      )}
+                        {motivoModificacion && (
+                          <div className="venta-total-motivo">{motivoModificacion}</div>
+                        )}
+                      </div>
                     </td>
                     <td className="col-admin col-acciones">
-                      <div className="orden-acciones">
+                      <div className="venta-acciones">
                         <button
                           type="button"
-                          className="orden-btn orden-btn-chico"
+                          className="venta-btn-icono venta-btn-ver"
+                          aria-label="Ver detalle"
+                          title="Ver detalle"
                           onClick={() => verDetalle(venta.id)}
                         >
-                          Ver detalle
+                          <LuEye size={16} aria-hidden="true" />
                         </button>
                         <button
                           type="button"
-                          className="orden-btn orden-btn-chico"
+                          className="venta-btn-icono venta-btn-editar"
+                          aria-label="Editar venta"
+                          title="Editar"
                           onClick={() => handleEditar(venta)}
                         >
-                          Editar
+                          <LuPencil size={16} aria-hidden="true" />
                         </button>
                         <button
                           type="button"
-                          className="orden-btn orden-btn-chico orden-btn-peligro"
+                          className="venta-btn-icono venta-btn-eliminar"
+                          aria-label="Eliminar venta"
+                          title="Eliminar"
                           onClick={() => setVentaAEliminar(venta)}
                         >
-                          Eliminar
+                          <LuTrash2 size={16} aria-hidden="true" />
                         </button>
                       </div>
                     </td>
@@ -236,7 +272,7 @@ function VentasPage() {
               })
             ) : (
               <tr>
-                <td colSpan="4" className="col-vacia">
+                <td colSpan="3" className="col-vacia">
                   No hay ventas registradas.
                 </td>
               </tr>
@@ -356,7 +392,7 @@ function VentasPage() {
         <Modal titulo="Eliminar venta" onCerrar={() => setVentaAEliminar(null)} tamanio="chico">
           <div className="orden-modal-cuerpo">
             <p className="orden-confirmar-texto">
-              ¿Seguro que querés eliminar la venta <strong>#{ventaAEliminar.id}</strong>?
+              ¿Seguro que querés eliminar esta venta?
             </p>
           </div>
 

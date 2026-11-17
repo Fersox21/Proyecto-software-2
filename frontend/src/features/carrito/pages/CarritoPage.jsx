@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useOutletContext } from 'react-router';
 import { MdArrowBack } from 'react-icons/md';
 import ItemCarrito from '../components/ItemCarrito'
 import ResumenCarrito from '../components/ResumenCarrito'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
+import '../../../styles/carrito.css'
 
 function CarritoPage() {
   const {
@@ -12,10 +13,15 @@ function CarritoPage() {
     subtotal,
     subtotalOriginal,
     descuentosAplicados,
+    verificarDisponibilidad,
     cambiarCantidad,
     quitarProducto,
     vaciarCarrito,
   } = useOutletContext();
+
+  useEffect(() => {
+    verificarDisponibilidad?.();
+  }, [verificarDisponibilidad]);
 
   if (items.length === 0) {
     return (

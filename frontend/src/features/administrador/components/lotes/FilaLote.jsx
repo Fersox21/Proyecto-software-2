@@ -1,3 +1,4 @@
+import { LuPencil, LuTrash2 } from 'react-icons/lu'
 import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function nombreProducto(lote) {
@@ -13,51 +14,94 @@ function nombreProveedor(lote) {
   return 'Sin proveedor'
 }
 
-function FilaLote({ lote, esUltimoDeSuOrden, onEditar, onEliminar }) {
+function calcularDiasRestantes(fechaISO) {
+  const soloFecha = String(fechaISO ?? '').slice(0, 10)
+  if (!soloFecha) return null
+  const vencimiento = new Date(`${soloFecha}T00:00:00`)
+  if (Number.isNaN(vencimiento.getTime())) return null
+
+  const ahora = new Date()
+  const hoy = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate())
+  return Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24))
+}
+
+function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar }) {
   const totalLote = lote.total ?? lote.precioTotal
+  const proveedor = nombreProveedor(lote)
+  const diasRestantes = calcularDiasRestantes(lote.fechaVencimiento)
+  const vencimientoCritico = diasRestantes !== null && diasRestantes < 30
+  const vencimientoNormal = diasRestantes !== null && diasRestantes >= 30
+
+  let claseVencimiento = 'lotes-vencimiento'
+  if (vencimientoCritico) {
+    claseVencimiento = 'lotes-vencimiento-critico'
+  } else if (vencimientoNormal) {
+    claseVencimiento = 'lotes-vencimiento-ok'
+  }
 
   return (
     <tr>
-      <td className="lotes-codigo">#{lote.id}</td>
       <td>
-        {nombreProducto(lote)}
-        {lote.producto?.marca ? (
-          <span className="lotes-secundario"> · {lote.producto.marca}</span>
-        ) : null}
+        <div className="lotes-celda-doble">
+          <span className="lotes-codigo">#{numeroFila}</span>
+          <span className="lotes-subtexto">
+            {lote.ordenCompra?.id != null ? `Orden: #${lote.ordenCompra.id}` : 'Sin orden'}
+          </span>
+        </div>
       </td>
       <td>
-        {lote.ordenCompra?.id != null ? `#${lote.ordenCompra.id}` : '—'}
+        <div className="lotes-celda-doble">
+          <span className="lotes-principal">{nombreProducto(lote)}</span>
+          {lote.producto?.marca ? (
+            <span className="lotes-subtexto">{lote.producto.marca}</span>
+          ) : null}
+        </div>
       </td>
-      <td>{nombreProveedor(lote)}</td>
+      <td>
+        <span className="lotes-proveedor" title={proveedor}>
+          {proveedor}
+        </span>
+      </td>
       <td className="lotes-col-numero lotes-numero">
         {lote.cantidad ?? '—'}
       </td>
-      <td className="lotes-col-numero lotes-numero">
+      <td className="lotes-col-numero lotes-numero lotes-total">
         {totalLote != null ? formatearPrecio(totalLote) : '—'}
       </td>
-      <td>{formatearFecha(lote.fechaArribo)}</td>
-      <td>{formatearFecha(lote.fechaVencimiento)}</td>
+      <td>
+        <div className="lotes-celda-doble">
+          <span className="lotes-subtexto">
+            Ingreso: {formatearFecha(lote.fechaArribo)}
+          </span>
+          <span className={claseVencimiento}>
+            Vence: {formatearFecha(lote.fechaVencimiento)}
+          </span>
+        </div>
+      </td>
       <td className="orden-col-acciones">
-        <div className="orden-acciones">
+        <div className="lotes-acciones">
           <button
             type="button"
-            className="orden-btn orden-btn-chico"
+            className="lotes-btn-icono lotes-btn-editar"
             onClick={() => onEditar(lote)}
+            aria-label={`Editar lote #${lote.id}`}
+            title="Editar lote"
           >
-            Editar
+            <LuPencil size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            className="orden-btn orden-btn-chico orden-btn-peligro"
+            className="lotes-btn-icono lotes-btn-eliminar"
             onClick={() => onEliminar(lote)}
             disabled={esUltimoDeSuOrden}
+            aria-label={`Dar de baja lote #${lote.id}`}
             title={
               esUltimoDeSuOrden
                 ? 'La orden de compra debe tener al menos un lote'
-                : undefined
+                : 'Dar de baja lote'
             }
           >
-            Dar de baja
+            <LuTrash2 size={16} aria-hidden="true" />
           </button>
         </div>
       </td>

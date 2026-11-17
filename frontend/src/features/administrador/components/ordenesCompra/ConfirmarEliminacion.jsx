@@ -5,11 +5,11 @@ function ConfirmarEliminacion({ orden, eliminando, onConfirmar, onCancelar }) {
     <Modal titulo="Eliminar orden de compra" onCerrar={onCancelar} tamanio="chico">
       <div className="orden-modal-cuerpo">
         <p className="orden-confirmar-texto">
-          ¿Seguro que querés eliminar la orden <strong>#{orden.id}</strong>? También se van a eliminar
+          ¿Seguro que querés eliminar esta orden de compra? También se van a eliminar
           todos sus lotes.
         </p>
         <p className="orden-confirmar-detalle">
-          Proveedor: {orden.proveedor?.nombre || `#${orden.proveedor?.id ?? 'sin datos'}`}
+          Proveedor: {orden.proveedor?.nombre || 'Sin datos'}
         </p>
       </div>
 

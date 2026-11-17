@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { obtenerPreciosProducto, precioVigente, redondear2 } from '../../../shared/utils/formato'
 import { obtenerProductos } from '../../catalogo/services/catalogoService'
 
@@ -39,39 +39,76 @@ function instantaneaProducto(producto) {
 
 export function useCarrito() {
   const [items, setItems] = useState(leerCarritoGuardado);
+  const [avisoProductosRemovidos, setAvisoProductosRemovidos] = useState(false);
+  const itemsRef = useRef(items);
+  const verificandoRef = useRef(false);
+
+  itemsRef.current = items;
 
   useEffect(() => {
     localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items))
   }, [items]);
 
-  useEffect(() => {
-    const faltaImagen = items.some((item) => item.imagen == null)
-    if (!faltaImagen) return
+  const verificarDisponibilidad = useCallback(async () => {
+    if (itemsRef.current.length === 0 || verificandoRef.current) return;
+    verificandoRef.current = true;
 
-    let activo = true
-    obtenerProductos()
-      .then((productos) => {
-        if (!activo) return
-        const imagenesPorId = new Map(
-          productos.map((producto) => [producto.id, producto.imagen ?? null]),
-        )
-        setItems((prev) => {
-          let huboCambios = false
-          const actualizados = prev.map((item) => {
-            if (item.imagen != null || !imagenesPorId.has(item.id)) return item
-            const imagen = imagenesPorId.get(item.id)
-            if (imagen == null) return item
-            huboCambios = true
-            return { ...item, imagen }
-          })
-          return huboCambios ? actualizados : prev
-        })
-      })
-      .catch(() => {})
+    try {
+      const productos = await obtenerProductos();
+      const productosPorId = new Map(productos.map((producto) => [producto.id, producto]));
 
-    return () => {
-      activo = false
+      const hayNoDisponibles = itemsRef.current.some((item) => {
+        const productoActual = productosPorId.get(item.id);
+        return !productoActual || Number(productoActual.stock) <= 0;
+      });
+
+      setItems((prev) => {
+        if (prev.length === 0) return prev;
+        let huboCambios = false;
+        const actualizados = [];
+
+        for (const item of prev) {
+          const productoActual = productosPorId.get(item.id);
+          if (!productoActual || Number(productoActual.stock) <= 0) {
+            huboCambios = true;
+            continue;
+          }
+
+          if (item.imagen == null && productoActual.imagen != null) {
+            huboCambios = true;
+            actualizados.push({ ...item, imagen: productoActual.imagen });
+          } else {
+            actualizados.push(item);
+          }
+        }
+
+        return huboCambios ? actualizados : prev;
+      });
+
+      if (hayNoDisponibles) {
+        setAvisoProductosRemovidos(true);
+      }
+    } catch {
+      // Si falla la consulta al catálogo, se conserva el carrito actual.
+    } finally {
+      verificandoRef.current = false;
     }
+  }, []);
+
+  useEffect(() => {
+    verificarDisponibilidad();
+  }, [verificarDisponibilidad]);
+
+  useEffect(() => {
+    if (!avisoProductosRemovidos) return;
+    const timer = setTimeout(() => {
+      setAvisoProductosRemovidos(false);
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [avisoProductosRemovidos]);
+
+  const cerrarAvisoRemovidos = useCallback(() => {
+    setAvisoProductosRemovidos(false);
   }, []);
 
   function agregarProducto(producto, cantidad = 1) {
@@ -147,6 +184,9 @@ export function useCarrito() {
     subtotal,
     subtotalOriginal,
     descuentosAplicados,
+    avisoProductosRemovidos,
+    cerrarAvisoRemovidos,
+    verificarDisponibilidad,
     agregarProducto,
     cambiarCantidad,
     quitarProducto,

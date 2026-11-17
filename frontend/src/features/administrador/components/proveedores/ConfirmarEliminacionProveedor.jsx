@@ -11,7 +11,7 @@ function ConfirmarEliminacionProveedor({
       <div className="orden-modal-cuerpo">
         <p className="orden-confirmar-texto">
           ¿Seguro que querés eliminar al proveedor{' '}
-          <strong>{proveedor.nombre}</strong> (ID #{proveedor.id})?
+          <strong>{proveedor.nombre}</strong>?
         </p>
         <p className="orden-confirmar-detalle">
           Teléfono: {proveedor.telefono || 'Sin teléfono'}

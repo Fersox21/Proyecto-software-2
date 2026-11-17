@@ -66,7 +66,7 @@ function LotesPage() {
   const guardar = async (datos) => {
     if (!formulario?.lote) return
     await actualizar(formulario.lote.id, datos)
-    setMensaje({ tipo: 'exito', texto: `Lote #${formulario.lote.id} actualizado.` })
+    setMensaje({ tipo: 'exito', texto: 'Lote actualizado exitosamente.' })
     setFormulario(null)
   }
 
@@ -77,7 +77,7 @@ function LotesPage() {
     setEliminando(true)
     try {
       await eliminar(loteAEliminar.id)
-      setMensaje({ tipo: 'exito', texto: `Lote #${loteAEliminar.id} dado de baja.` })
+      setMensaje({ tipo: 'exito', texto: 'Lote dado de baja exitosamente.' })
     } catch (nuevoError) {
       setMensaje({ tipo: 'error', texto: nuevoError.message })
     } finally {
@@ -148,35 +148,42 @@ function LotesPage() {
               </button>
             </MensajeVacio>
           ) : (
-            <section className="sec-prod-admin" aria-live="polite">
+            <section className="sec-prod-admin lotes-tabla-contenedor" aria-live="polite">
               <table className="tabla-prod-admin lotes-tabla">
                 <caption className="orden-visually-hidden">
                   Lotes registrados con su producto, orden de compra y proveedor
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Lote</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col">Orden de compra</th>
-                    <th scope="col">Proveedor</th>
-                    <th scope="col" className="lotes-col-numero">
+                    <th scope="col" className="lotes-col-referencia">
+                      Referencia
+                    </th>
+                    <th scope="col" className="lotes-col-producto">
+                      Producto
+                    </th>
+                    <th scope="col" className="lotes-col-proveedor">
+                      Proveedor
+                    </th>
+                    <th scope="col" className="lotes-col-numero lotes-col-cantidad">
                       Cantidad
                     </th>
-                    <th scope="col" className="lotes-col-numero">
+                    <th scope="col" className="lotes-col-numero lotes-col-total">
                       Total
                     </th>
-                    <th scope="col">Fecha de arribo</th>
-                    <th scope="col">Fecha de vencimiento</th>
-                    <th scope="col" className="orden-col-acciones">
+                    <th scope="col" className="lotes-col-fechas">
+                      Fechas
+                    </th>
+                    <th scope="col" className="orden-col-acciones lotes-col-acciones">
                       Acciones
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {visibles.map((lote) => (
+                  {visibles.map((lote, index) => (
                     <FilaLote
                       key={lote.id}
                       lote={lote}
+                      numeroFila={index + 1}
                       esUltimoDeSuOrden={
                         lote.ordenCompra?.id != null &&
                         lotesPorOrden.get(lote.ordenCompra.id) === 1
@@ -194,7 +201,7 @@ function LotesPage() {
 
       {formulario && (
         <Modal
-          titulo={`Editar lote #${formulario.lote.id}`}
+          titulo="Editar lote"
           onCerrar={cerrarFormulario}
         >
           <LoteForm

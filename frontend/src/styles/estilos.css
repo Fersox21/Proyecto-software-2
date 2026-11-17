@@ -11,6 +11,13 @@ html, body {
 
 body {
     font-family: var(--fuente-base);
+    background-color: var(--color-body);
+    color: var(--color-primario-oscuro);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-primario);
+    outline-offset: 2px;
 }
 
 #root {
@@ -53,7 +60,7 @@ h1 {
 #titulo-inicio {
     text-align: center;     
     font-size: 2.5rem;      
-    color: #4a3628;          
+    color: var(--color-primario);          
     margin-bottom: 50px;     
     font-family: var(--fuente-titulos); 
 }
@@ -87,7 +94,7 @@ h1 {
 .ruleta-imagenes-titulo h2{
     text-align: center;     
     font-size: 2.5rem;       
-    color: #4a3628;         
+    color: var(--color-primario);         
     margin-bottom: 50px;    
     font-family: var(--fuente-titulos); 
 }
@@ -103,7 +110,7 @@ h1 {
 #nuestras-marcas-titulo {
     text-align: center;      
     font-size: 2.5rem;       
-    color: #4a3628;
+    color: var(--color-primario);
     margin-bottom: 2rem;
     width: 100%;
 }
@@ -151,8 +158,8 @@ h1 {
 }
 
 .btn-carrusel {
-    background-color: #000000;
-    color: #fcf9f2; 
+    background-color: var(--color-primario);
+    color: var(--color-body); 
     border: none;
     border-radius: 50%;
     width: 40px;
@@ -164,7 +171,7 @@ h1 {
 }
 
 .btn-carrusel:hover {
-    background-color: #4a3628; /* Se oscurece al pasar el mouse */
+    background-color: var(--color-acento-bordo);
 }
 
 /* Seccion preguntas */
@@ -304,6 +311,10 @@ h1 {
 h1, h2, .fuente-titulos {
     font-family: var(--fuente-titulos);
     font-weight: 500;
+}
+
+h3, h4 {
+    font-family: var(--fuente-titulos);
 }
 
 .etiqueta-categoria {

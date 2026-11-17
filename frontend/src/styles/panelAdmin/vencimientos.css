@@ -1,13 +1,10 @@
-/* Vencimientos — panel de administración.
-   Se apoyan los tokens --admin-* y se reutilizan clases de ordenesCompra.css
-   (tabla base, botones, modal y alertas), que la vista importa antes que este
-   archivo. Acá sólo viven los estilos propios de la pantalla. */
+/* Vencimientos — panel de administración. */
 
 /* Resumen */
 
 .venc-resumen {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -15,12 +12,12 @@
 .venc-tarjeta {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  padding: 1rem 1.15rem;
-  border: 1px solid var(--admin-borde);
+  gap: 0.6rem;
+  padding: 1.15rem 1.25rem;
+  border: 1px solid var(--admin-borde-suave);
   border-left-width: 4px;
-  border-radius: 12px;
-  background-color: var(--admin-superficie);
+  border-radius: 16px;
+  background-color: var(--admin-superficie, #ffffff);
   color: var(--admin-texto);
   font-family: inherit;
   text-align: left;
@@ -44,30 +41,69 @@
   outline-offset: 1px;
 }
 
+.venc-tarjeta-cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.venc-tarjeta-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
 .venc-tarjeta-vencido {
-  border-left-color: var(--admin-badge-error-texto);
+  border-left-color: #b91c1c;
+}
+
+.venc-tarjeta-vencido .venc-tarjeta-icono {
+  background-color: #fef2f2;
+  color: #b91c1c;
 }
 
 .venc-tarjeta-proximo {
-  border-left-color: var(--admin-badge-warn-texto);
+  border-left-color: #c2410c;
+}
+
+.venc-tarjeta-proximo .venc-tarjeta-icono {
+  background-color: #fff7ed;
+  color: #c2410c;
 }
 
 .venc-tarjeta-ok {
-  border-left-color: var(--admin-badge-ok-texto);
+  border-left-color: #15803d;
+}
+
+.venc-tarjeta-ok .venc-tarjeta-icono {
+  background-color: #f0fdf4;
+  color: #15803d;
 }
 
 .venc-tarjeta-total {
-  border-left-color: var(--admin-acento);
+  border-left-color: #102055;
   cursor: default;
 }
 
+.venc-tarjeta-total .venc-tarjeta-icono {
+  background-color: #f1f5f9;
+  color: #102055;
+}
+
 .venc-tarjeta-total:hover {
-  background-color: var(--admin-superficie);
+  background-color: var(--admin-superficie, #ffffff);
   transform: none;
 }
 
 .venc-tarjeta-valor {
-  font-size: 1.65rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.75rem;
   font-weight: 700;
   line-height: 1.1;
   font-variant-numeric: tabular-nums;
@@ -84,14 +120,15 @@
 /* Filtros */
 
 .venc-filtros {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 1rem;
-  padding: 1.25rem;
+  padding: 1.35rem 1.5rem;
   margin-bottom: 1.5rem;
-  border: 1px solid var(--admin-borde);
-  border-radius: 12px;
-  background-color: var(--admin-superficie);
+  border: 1px solid var(--admin-borde-suave);
+  border-radius: 16px;
+  background-color: var(--admin-superficie, #ffffff);
   box-shadow: var(--admin-sombra);
 }
 
@@ -122,8 +159,16 @@
 
 /* Tabla */
 
+#main-vencimientos .sec-prod-admin {
+  width: 100%;
+  border-radius: 16px;
+  background-color: var(--admin-superficie, #ffffff);
+  box-shadow: var(--admin-sombra);
+}
+
 .venc-tabla {
-  min-width: 1080px;
+  width: 100%;
+  min-width: 0;
 }
 
 .venc-ordenar {
@@ -150,39 +195,103 @@
   border-radius: 4px;
 }
 
-.venc-codigo {
+.venc-prod-celda,
+.venc-fecha-celda,
+.venc-cantidades-celda {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.venc-prod-nombre {
   font-weight: 700;
-  color: var(--admin-acento);
-  white-space: nowrap;
+  color: #0f172a;
+  line-height: 1.3;
 }
 
-.venc-fecha,
+.venc-prod-meta {
+  font-size: 0.8rem;
+  color: #64748b;
+  line-height: 1.3;
+}
+
+.venc-fecha {
+  font-weight: 500;
+  color: var(--admin-texto);
+}
+
 .venc-dias {
-  white-space: nowrap;
+  font-size: 0.8rem;
+  color: #64748b;
 }
 
-.venc-dias {
-  color: var(--admin-texto-secundario);
-  font-size: 0.85rem;
-}
-
-.venc-secundario {
-  color: var(--admin-texto-secundario);
-  font-weight: 400;
-}
-
-.venc-tabla .venc-col-numero {
-  text-align: right;
-}
-
-.venc-numero {
-  font-variant-numeric: tabular-nums;
+.venc-dias-proximo {
+  color: #c2410c;
   font-weight: 600;
-  white-space: nowrap;
+}
+
+.venc-dias-vencido {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.venc-cant-lote {
+  font-size: 0.85rem;
+  color: var(--admin-texto);
+  font-variant-numeric: tabular-nums;
+}
+
+.venc-cant-total {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
 }
 
 .venc-tabla .orden-col-acciones {
   text-align: right;
+}
+
+.venc-acciones {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.venc-btn-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.venc-btn-icono:focus-visible {
+  outline: 2px solid var(--admin-acento);
+  outline-offset: 2px;
+}
+
+.venc-btn-ver {
+  color: #334155;
+}
+
+.venc-btn-ver:hover,
+.venc-btn-ver.activo {
+  background-color: #f1f5f9;
+}
+
+.venc-btn-editar {
+  color: #1d4ed8;
+}
+
+.venc-btn-editar:hover {
+  background-color: #eff6ff;
 }
 
 /* Badges de estado */

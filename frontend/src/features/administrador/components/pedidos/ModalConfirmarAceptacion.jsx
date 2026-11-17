@@ -7,10 +7,10 @@ function ModalConfirmarAceptacion({ pedido, datosModificacion, visible, cargando
   const totalFinal = datosModificacion?.totalModificado ?? pedido.totalModificado ?? pedido.total ?? 0
 
   return (
-    <Modal titulo={`Aceptar Pedido #${pedido.id}`} onCerrar={onCerrar} tamanio="normal">
+    <Modal titulo="Aceptar Pedido" onCerrar={onCerrar} tamanio="normal">
       <div className="form-confirmacion-accion">
         <p className="mensaje-confirmacion">
-          ¿Deseas aceptar el pedido <strong>#{pedido.id}</strong> del comercio{' '}
+          ¿Deseas aceptar el pedido del comercio{' '}
           <strong>{pedido.comercio || 'N/A'}</strong>?
         </p>
         <p style={{ marginTop: '0.75rem', fontSize: '0.95rem', color: 'var(--admin-texto-secundario, #555)' }}>

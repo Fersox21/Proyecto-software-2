@@ -4,7 +4,6 @@ import MensajeVacio from '../../../shared/components/MensajeVacio'
 import { useVencimientos } from '../hooks/useVencimientos'
 import {
   DIAS_AVISO_POR_DEFECTO,
-  compararPorProveedor,
   compararPorVencimiento,
   diasHasta,
   estadoVencimiento,
@@ -105,10 +104,9 @@ function VencimientosPage() {
       return true
     })
 
-    const comparar = orden.campo === 'proveedor' ? compararPorProveedor : compararPorVencimiento
     const signo = orden.direccion === 'desc' ? -1 : 1
 
-    return filtradas.sort((a, b) => comparar(a, b) * signo)
+    return filtradas.sort((a, b) => compararPorVencimiento(a, b) * signo)
   }, [filas, busqueda, proveedorId, estado, desde, hasta, orden])
 
   const limpiarFiltros = useCallback(() => {
@@ -140,7 +138,7 @@ function VencimientosPage() {
       const id = loteAEditar?.id
       await cambiarVencimiento(id, fecha)
       setLoteAEditar(null)
-      setMensaje({ tipo: 'exito', texto: `Vencimiento del lote #${id} actualizado.` })
+      setMensaje({ tipo: 'exito', texto: 'Fecha de vencimiento actualizada exitosamente.' })
     },
     [loteAEditar, cambiarVencimiento],
   )
@@ -252,7 +250,7 @@ function VencimientosPage() {
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Lote</th>
+                    <th scope="col">Producto</th>
                     <th scope="col" aria-sort={ariaSort('fecha')}>
                       <button
                         type="button"
@@ -263,24 +261,7 @@ function VencimientosPage() {
                         <span aria-hidden="true">{indicadorOrden(orden, 'fecha')}</span>
                       </button>
                     </th>
-                    <th scope="col">Días</th>
-                    <th scope="col">Producto</th>
-                    <th scope="col" aria-sort={ariaSort('proveedor')}>
-                      <button
-                        type="button"
-                        className="venc-ordenar"
-                        onClick={() => alternarOrden('proveedor')}
-                      >
-                        Proveedor
-                        <span aria-hidden="true">{indicadorOrden(orden, 'proveedor')}</span>
-                      </button>
-                    </th>
-                    <th scope="col" className="venc-col-numero">
-                      Cantidad
-                    </th>
-                    <th scope="col" className="venc-col-numero">
-                      Stock producto
-                    </th>
+                    <th scope="col">Cantidades</th>
                     <th scope="col">Estado</th>
                     <th scope="col" className="orden-col-acciones">
                       Acciones
@@ -288,10 +269,11 @@ function VencimientosPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visibles.map((fila) => (
+                  {visibles.map((fila, index) => (
                     <FilaVencimiento
                       key={fila.id}
                       fila={fila}
+                      numeroFila={index + 1}
                       abierta={detalleId === fila.id}
                       onAlternarDetalle={alternarDetalle}
                       onEditar={abrirEdicion}
@@ -306,7 +288,7 @@ function VencimientosPage() {
 
       {loteAEditar && (
         <Modal
-          titulo={`Editar vencimiento — Lote #${loteAEditar.id}`}
+          titulo="Editar vencimiento del lote"
           onCerrar={() => setLoteAEditar(null)}
           tamanio="chico"
         >

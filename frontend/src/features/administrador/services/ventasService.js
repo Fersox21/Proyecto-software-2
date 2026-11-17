@@ -57,7 +57,7 @@ export async function obtenerVentaPorId(id) {
   const respuesta = await fetch(`${URL_BASE}/ventas/${id}`, {
     headers: headers()
   })
-  return procesarRespuesta(respuesta, `No se pudo obtener el detalle de la venta #${id}`)
+  return procesarRespuesta(respuesta, 'No se pudo obtener el detalle de la venta')
 }
 
 export async function obtenerProductosVenta(id) {

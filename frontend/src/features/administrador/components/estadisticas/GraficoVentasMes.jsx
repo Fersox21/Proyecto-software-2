@@ -1,3 +1,4 @@
+import { LuChartColumn } from 'react-icons/lu'
 import Spinner from '../../../../shared/components/Spinner'
 import MensajeVacio from '../../../../shared/components/MensajeVacio'
 import { formatearPrecio } from '../../../../shared/utils/formato'
@@ -17,7 +18,10 @@ function GraficoVentasMes({ ventas, diasConVentas, maxDia }) {
       ) : ventas.error ? (
         <MensajeVacio titulo="Sin ventas" texto={ventas.error.message} />
       ) : diasConVentas.length === 0 ? (
-        <p className="estadistica-vacio">No hubo ventas registradas en el período.</p>
+        <div className="estadistica-vacio">
+          <LuChartColumn className="estadistica-vacio-icono" size={48} aria-hidden="true" />
+          <p className="estadistica-vacio-texto">No hubo ventas registradas en el período.</p>
+        </div>
       ) : (
         <div className="estadistica-barras" role="img" aria-label="Ventas por día">
           {diasConVentas.map(([dia, total]) => (

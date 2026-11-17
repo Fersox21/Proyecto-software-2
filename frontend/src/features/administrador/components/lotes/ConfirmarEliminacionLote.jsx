@@ -2,7 +2,6 @@ import Modal from '../comunes/Modal'
 
 function nombreProducto(lote) {
   if (lote?.producto?.nombre) return lote.producto.nombre
-  if (lote?.producto?.id != null) return `Producto #${lote.producto.id}`
   return 'Sin producto'
 }
 
@@ -11,12 +10,9 @@ function ConfirmarEliminacionLote({ lote, eliminando, onConfirmar, onCancelar })
     <Modal titulo="Dar de baja el lote" onCerrar={onCancelar} tamanio="chico">
       <div className="orden-modal-cuerpo">
         <p className="orden-confirmar-texto">
-          ¿Seguro que querés dar de baja el lote <strong>#{lote.id}</strong>?
+          ¿Seguro que querés dar de baja este lote?
         </p>
         <p className="orden-confirmar-detalle">Producto: {nombreProducto(lote)}</p>
-        <p className="orden-confirmar-detalle">
-          Orden de compra: {lote.ordenCompra?.id != null ? `#${lote.ordenCompra.id}` : '—'}
-        </p>
         <p className="orden-confirmar-detalle">
           El lote dejará de estar disponible en el sistema.
         </p>

@@ -1,3 +1,4 @@
+import { LuAward } from 'react-icons/lu'
 import Spinner from '../../../../shared/components/Spinner'
 import MensajeVacio from '../../../../shared/components/MensajeVacio'
 import { formatearPrecio } from '../../../../shared/utils/formato'
@@ -31,7 +32,12 @@ function RankingMasVendidos({ masVendidos, listaMasVendidos, maxUnidades, mes, o
       ) : masVendidos.error ? (
         <MensajeVacio titulo="No pudimos cargar el ranking" texto={masVendidos.error.message} />
       ) : listaMasVendidos.length === 0 ? (
-        <p className="estadistica-vacio">No hubo ventas registradas en {nombreMes(mes)}.</p>
+        <div className="estadistica-vacio">
+          <LuAward className="estadistica-vacio-icono" size={48} aria-hidden="true" />
+          <p className="estadistica-vacio-texto">
+            No hubo ventas registradas en {nombreMes(mes)}.
+          </p>
+        </div>
       ) : (
         <ol className="estadistica-ranking">
           {listaMasVendidos.map((item, indice) => (

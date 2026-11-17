@@ -1,17 +1,18 @@
 /* TarjetaProducto */
 .tarjeta-categoria {
-    background-color: white;
-    color: var(--color-texto-general);
-    box-shadow: 0 0 2px rgb(75, 74, 74);
+    background-color: var(--color-tarjeta, #FFFFFF);
+    color: var(--color-primario-oscuro, #0A1331);
+    border: 1px solid var(--color-superficie, #EFEBE2);
+    box-shadow: var(--sombra-suave);
     border-radius: 16px;
 }
 
 .tarjeta-agregar-a-carrito {
     width: 45px;
     height: 45px;
-    border-radius: 55%;
-    background-color: var(--color-texto-general);
-    color: #fbf9f5;
+    border-radius: 50%;
+    background-color: var(--color-primario, #102055);
+    color: #F9F6F2;
     border: none;
     display: flex;
     justify-content: center;
@@ -24,15 +25,21 @@
 }
 
 .tarjeta-agregar-a-carrito:hover {
-    background-color: #1b2a4a;
-    color: #fbf9f5;
+    background-color: var(--color-acento-bordo, #872b38);
+    color: #FFFFFF;
     transform: scale(1.05);
 }
 
+.tarjeta-agregar-a-carrito:focus-visible {
+    outline: 2px solid var(--color-primario, #102055);
+    outline-offset: 2px;
+}
+
 .tarjeta-precio {
+    font-family: var(--fuente-titulos);
     font-weight: 800;
     font-size: clamp(1.25rem, 1rem + 0.9vw, 1.8rem);
-    color: var(--color-texto-general);
+    color: var(--color-primario, #102055);
     margin: 0;
 }
 
@@ -72,20 +79,30 @@
 }
 
 .tarjeta-nombre {
+    font-family: var(--fuente-titulos);
     font-weight: 600;
-    color: black;
+    color: var(--color-primario-oscuro, #0A1331);
 }
 
 .tarjeta-descripcion {
-    font-weight: 300;
-    color: #635d55;
+    font-family: var(--fuente-base);
+    font-weight: 400;
+    color: #5A5F72;
 }
 
 .tarjeta-borde {
-    border-radius: 18px;
+    border-radius: 16px;
     height: 500px;
     display: flex;
     flex-direction: column;
+    border: 1px solid var(--color-superficie, #EFEBE2);
+    box-shadow: var(--sombra-suave);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tarjeta-borde:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--sombra-tarjeta);
 }
 
 .tarjeta-imagen {
@@ -97,4 +114,64 @@
 .tarjeta-imagen-contenedor {
     width: 100%;
     height: 100%;
+}
+
+@media (max-width: 768px) {
+    .tarjeta-borde {
+        height: auto;
+        min-height: 400px;
+    }
+}
+
+.toast-carrito {
+    position: fixed;
+    bottom: 1.25rem;
+    right: 1.25rem;
+    z-index: 1050;
+    background-color: #ffffff;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    border: 1px solid #f3f4f6;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    max-width: calc(100vw - 2.5rem);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(0.75rem);
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.toast-carrito--visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.toast-carrito-icono {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border-radius: 9999px;
+    width: 1.5rem;
+    height: 1.5rem;
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-carrito-texto {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #334155;
+    font-weight: 500;
+    margin: 0;
+}
+
+.toast-carrito-nombre {
+    font-weight: 700;
+    color: #0f172a;
 }

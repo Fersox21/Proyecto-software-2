@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { LuPencil, LuPlus, LuTrash2 } from 'react-icons/lu'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
 import Modal from '../components/comunes/Modal'
@@ -10,7 +11,7 @@ import {
   obtenerCategorias,
 } from '../services/categoriasService'
 import '../../../styles/panelAdmin/ordenesCompra.css'
-import '../../../styles/panelAdmin/proveedores.css'
+import '../../../styles/panelAdmin/categorias.css'
 
 function CategoriasPage() {
   const [categorias, setCategorias] = useState([])
@@ -134,9 +135,6 @@ function CategoriasPage() {
     <section className="main-admin" id="main-categorias">
       <header className="header-admin">
         <h1 className="orden-h1">Categorías</h1>
-        <button type="button" className="agregar-prod" onClick={abrirCrear}>
-          + Nueva categoría
-        </button>
       </header>
 
       {mensaje && (
@@ -159,27 +157,37 @@ function CategoriasPage() {
       )}
 
       {!cargando && !error && activas.length > 0 && (
-        <section className="proveedores-filtros" aria-label="Buscar categorías">
-          <div className="orden-campo proveedores-campo-busqueda">
-            <label htmlFor="filtro-categorias-busqueda">Buscar categoría</label>
-            <input
-              id="filtro-categorias-busqueda"
-              type="search"
-              placeholder="Buscar por nombre o #id..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
+        <section className="categorias-toolbar" aria-label="Herramientas de categorías">
+          <div className="categorias-busqueda-grupo">
+            <div className="orden-campo categorias-campo-busqueda">
+              <label htmlFor="filtro-categorias-busqueda" className="orden-visually-hidden">
+                Buscar categoría
+              </label>
+              <input
+                id="filtro-categorias-busqueda"
+                type="search"
+                placeholder="Buscar por nombre o #id..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+
+            {busqueda.trim() !== '' && (
+              <button type="button" className="orden-btn" onClick={limpiarBusqueda}>
+                Limpiar
+              </button>
+            )}
           </div>
 
-          {busqueda.trim() !== '' && (
-            <button type="button" className="orden-btn" onClick={limpiarBusqueda}>
-              Limpiar
+          <div className="categorias-toolbar-acciones">
+            <span className="categorias-conteo">
+              {visibles.length} de {activas.length} categoría{activas.length === 1 ? '' : 's'}
+            </span>
+            <button type="button" className="categorias-btn-nueva" onClick={abrirCrear}>
+              <LuPlus size={18} aria-hidden="true" />
+              <span>Nueva categoría</span>
             </button>
-          )}
-
-          <span className="proveedores-conteo">
-            {visibles.length} de {activas.length} categoría{activas.length === 1 ? '' : 's'}
-          </span>
+          </div>
         </section>
       )}
 
@@ -231,8 +239,8 @@ function CategoriasPage() {
       )}
 
       {!cargando && !error && visibles.length > 0 && (
-        <section className="sec-prod-admin" aria-live="polite">
-          <table className="tabla-prod-admin orden-tabla proveedores-tabla">
+        <section className="sec-prod-admin categorias-tabla-contenedor" aria-live="polite">
+          <table className="tabla-prod-admin orden-tabla categorias-tabla">
             <caption className="orden-visually-hidden">
               Lista de categorías registradas
             </caption>
@@ -246,25 +254,29 @@ function CategoriasPage() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((categoria) => (
+              {visibles.map((categoria, index) => (
                 <tr key={categoria.id}>
-                  <td className="orden-col-id">#{categoria.id}</td>
-                  <td className="proveedores-nombre">{categoria.nombre}</td>
+                  <td className="categorias-col-id">#{index + 1}</td>
+                  <td className="categorias-nombre">{categoria.nombre}</td>
                   <td className="orden-col-acciones">
                     <div className="orden-acciones">
                       <button
                         type="button"
-                        className="orden-btn orden-btn-chico"
+                        className="categorias-btn-icono categorias-btn-editar"
                         onClick={() => abrirEditar(categoria)}
+                        aria-label={`Editar categoría ${categoria.nombre}`}
+                        title="Editar"
                       >
-                        Editar
+                        <LuPencil size={16} aria-hidden="true" />
                       </button>
                       <button
                         type="button"
-                        className="orden-btn orden-btn-chico orden-btn-peligro"
+                        className="categorias-btn-icono categorias-btn-baja"
                         onClick={() => pedirBaja(categoria)}
+                        aria-label={`Dar de baja categoría ${categoria.nombre}`}
+                        title="Dar de baja"
                       >
-                        Dar de baja
+                        <LuTrash2 size={16} aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -292,7 +304,7 @@ function CategoriasPage() {
           <div className="orden-modal-cuerpo">
             <p className="orden-confirmar-texto">
               ¿Seguro que querés dar de baja la categoría{' '}
-              <strong>{categoriaABajar.nombre}</strong> (ID #{categoriaABajar.id})?
+              <strong>{categoriaABajar.nombre}</strong>?
             </p>
             <p className="orden-confirmar-detalle">
               Dejará de aparecer en los selectores al crear o editar productos.

@@ -93,7 +93,7 @@ function DetallePedidoModal({
   }
 
   return (
-    <Modal titulo={pedido ? `Detalle de Pedido #${pedido.id}` : 'Cargando Pedido'} onCerrar={onCerrar} tamanio="grande">
+    <Modal titulo={pedido ? 'Detalle de Pedido' : 'Cargando Pedido'} onCerrar={onCerrar} tamanio="grande">
       {cargando ? (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
           <Spinner texto="Cargando detalles del pedido..." />
@@ -138,6 +138,7 @@ function DetallePedidoModal({
                   <label htmlFor="modificar-precio-final">Modificar Precio Final</label>
                   <input
                     id="modificar-precio-final"
+                    className="detalle-input-precio"
                     type="number"
                     min="0.01"
                     step="0.01"
@@ -157,6 +158,7 @@ function DetallePedidoModal({
                     <label htmlFor="motivo-modificacion-precio">Motivo de la modificación</label>
                     <input
                       id="motivo-modificacion-precio"
+                      className="detalle-input-motivo"
                       type="text"
                       placeholder="Explicá el motivo del ajuste..."
                       value={motivoModificacion}
@@ -173,7 +175,7 @@ function DetallePedidoModal({
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     type="button"
-                    className="orden-btn"
+                    className="orden-btn detalle-btn-neutral"
                     disabled={procesandoAccion}
                     onClick={handleGuardar}
                   >
@@ -189,7 +191,7 @@ function DetallePedidoModal({
               <>
                 <button
                   type="button"
-                  className="orden-btn orden-btn-primario"
+                  className="orden-btn orden-btn-primario detalle-btn-primario"
                   disabled={procesandoAccion}
                   onClick={handleAceptar}
                 >
@@ -197,7 +199,7 @@ function DetallePedidoModal({
                 </button>
                 <button
                   type="button"
-                  className="orden-btn orden-btn-peligro"
+                  className="orden-btn orden-btn-peligro detalle-btn-peligro"
                   disabled={procesandoAccion}
                   onClick={() => onIniciarCancelar(pedido)}
                 >
@@ -205,7 +207,7 @@ function DetallePedidoModal({
                 </button>
               </>
             )}
-            <button type="button" className="orden-btn" onClick={onCerrar}>
+            <button type="button" className="orden-btn detalle-btn-neutral" onClick={onCerrar}>
               Cerrar
             </button>
           </div>

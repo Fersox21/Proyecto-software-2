@@ -1,22 +1,86 @@
+/* Carrito de compras — identidad LaFe */
+
+.container .h1,
+.container h4 {
+  font-family: var(--fuente-titulos);
+  color: var(--color-primario-oscuro, #0A1331);
+}
+
+.list-group .list-group-item {
+  background-color: var(--color-tarjeta, #FFFFFF);
+  border: 1px solid var(--color-superficie, #EFEBE2);
+  border-radius: 16px;
+  margin-bottom: 0.75rem;
+  box-shadow: var(--sombra-suave);
+  padding: 1rem 1.25rem;
+}
+
+.card.rounded-4 {
+  background-color: var(--color-tarjeta, #FFFFFF);
+  border: 1px solid var(--color-superficie, #EFEBE2);
+  border-radius: 16px !important;
+  box-shadow: var(--sombra-suave) !important;
+}
+
+.card.rounded-4 .btn-dark {
+  background-color: var(--color-primario, #102055);
+  border-color: var(--color-primario, #102055);
+  border-radius: 12px;
+  font-family: var(--fuente-base);
+  font-weight: 600;
+  padding: 0.7rem 1.25rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.card.rounded-4 .btn-dark:hover {
+  background-color: var(--color-primario-medio, #1b2c61);
+  border-color: var(--color-primario-medio, #1b2c61);
+}
+
+.card.rounded-4 .btn-outline-secondary {
+  border-radius: 12px;
+  font-family: var(--fuente-base);
+  font-weight: 600;
+  border-color: #D5CEC2;
+  color: var(--color-primario-oscuro, #0A1331);
+}
+
+.card.rounded-4 .btn-outline-secondary:hover {
+  background-color: var(--color-superficie, #EFEBE2);
+  border-color: #D5CEC2;
+  color: var(--color-primario-oscuro, #0A1331);
+}
+
 /* Botones de + y - */
 .btn-cantidad {
-  width: 26px;
-  height: 26px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  border-radius: 8px;
+  color: var(--color-primario, #102055);
   transition: background-color 0.2s ease;
 }
 
 .btn-cantidad:hover:not(:disabled) {
-  background-color: #e9ecef;
+  background-color: var(--color-superficie, #EFEBE2);
+}
+
+.btn-cantidad:focus-visible,
+.btn-eliminar:focus-visible {
+  outline: 2px solid var(--color-primario, #102055);
+  outline-offset: 2px;
 }
 
 .carrito-input-cantidad {
   width: 42px;
   min-width: 0;
   box-shadow: none !important;
+  font-family: var(--fuente-base);
+  font-weight: 600;
+  color: var(--color-primario-oscuro, #0A1331);
   -moz-appearance: textfield;
 }
 
@@ -43,7 +107,9 @@
 }
 
 .carrito-total {
-  font-size: clamp(1rem, 0.85rem + 0.5vw, 1.25rem);
+  font-family: var(--fuente-titulos);
+  font-size: clamp(1.05rem, 0.9rem + 0.5vw, 1.3rem);
+  color: var(--color-primario, #102055);
   white-space: nowrap;
 }
 
@@ -59,9 +125,10 @@
 
 /* Botón del tacho de basura */
 .btn-eliminar {
-  color: #6c757d;
+  color: #5A5F72;
   width: 36px;
   height: 36px;
+  border-radius: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -69,6 +136,87 @@
 }
 
 .btn-eliminar:hover {
-  background-color: #f8d7da;
-  color: #dc3545;
+  background-color: #FDE8E8;
+  color: var(--color-acento-bordo, #872b38);
+}
+
+@media (max-width: 991px) {
+  .card.rounded-4.ms-4 {
+    margin-left: 0 !important;
+  }
+}
+
+.toast-carrito-alerta {
+  position: fixed;
+  bottom: 1.25rem;
+  right: 1.25rem;
+  z-index: 1060;
+  background-color: var(--color-tarjeta, #FFFFFF);
+  border: 1px solid #F5C2C7;
+  border-left: 4px solid var(--color-acento-bordo, #872b38);
+  border-radius: var(--radio-suave, 12px);
+  box-shadow: var(--sombra-tarjeta, 0 8px 24px rgba(10, 19, 49, 0.08));
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: min(420px, calc(100vw - 2.5rem));
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.75rem);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease;
+}
+
+.toast-carrito-alerta--visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.toast-carrito-alerta-icono {
+  background-color: #FDE8E8;
+  color: var(--color-acento-bordo, #872b38);
+  border-radius: 9999px;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-carrito-alerta-texto {
+  font-family: var(--fuente-base);
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--color-primario-oscuro, #0A1331);
+  font-weight: 500;
+  margin: 0;
+}
+
+.toast-carrito-alerta-cerrar {
+  background: transparent;
+  border: none;
+  color: #5A5F72;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.toast-carrito-alerta-cerrar:hover {
+  background-color: #FDE8E8;
+  color: var(--color-acento-bordo, #872b38);
+}
+
+.toast-carrito-alerta-cerrar:focus-visible {
+  outline: var(--foco-outline, 2px solid #102055);
+  outline-offset: 2px;
 }

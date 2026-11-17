@@ -5,7 +5,7 @@ import {
   obtenerUrlImagenProducto,
   manejarErrorImagenProducto,
 } from '../../../shared/utils/formato'
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import '../../../styles/tarjetaProducto.css'
 
 function TarjetaProducto({ producto, onAgregar }) {
@@ -18,6 +18,10 @@ function TarjetaProducto({ producto, onAgregar }) {
 
   const [mostrarNotificacion, setMostrarNotificacion] = useState(false)
   const temporizador = useRef(null)
+
+  useEffect(() => {
+    return () => clearTimeout(temporizador.current)
+  }, [])
 
   const manejarAgregar = () => {
     onAgregar(producto)
@@ -105,21 +109,31 @@ function TarjetaProducto({ producto, onAgregar }) {
         </div>
       </article>
 
-      {mostrarNotificacion && (
-        <div 
-          className="toast show align-items-center text-bg-success border-0 position-fixed bottom-0 end-0 m-auto shadow-lg" 
-          style={{ zIndex: 1050 }}
-          role="alert" 
-          aria-live="assertive" 
-          aria-atomic="true"
-        >
-          <div className="d-flex">
-            <div className="toast-body fs-6">
-              Agregaste <strong>{producto?.nombre}</strong> al carrito
-            </div>
-          </div>
-        </div>
-      )}
+      <div
+        className={`toast-carrito ${mostrarNotificacion ? 'toast-carrito--visible' : ''}`}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        aria-hidden={!mostrarNotificacion}
+      >
+        <span className="toast-carrito-icono" aria-hidden="true">
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        </span>
+        <p className="toast-carrito-texto">
+          Agregaste <span className="toast-carrito-nombre">{producto?.nombre}</span> al carrito
+        </p>
+      </div>
     </>
   )
 }

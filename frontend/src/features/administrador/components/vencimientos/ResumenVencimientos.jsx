@@ -1,3 +1,5 @@
+import { LuCircleAlert, LuCircleCheck, LuClock, LuLayers } from 'react-icons/lu'
+
 function ResumenVencimientos({ resumen, totalFilas, estado, umbral, onEstadoChange }) {
   return (
     <section className="venc-resumen" aria-label="Resumen de vencimientos">
@@ -7,8 +9,13 @@ function ResumenVencimientos({ resumen, totalFilas, estado, umbral, onEstadoChan
         onClick={() => onEstadoChange(estado === 'vencido' ? 'todos' : 'vencido')}
         aria-pressed={estado === 'vencido'}
       >
+        <div className="venc-tarjeta-cabecera">
+          <span className="venc-tarjeta-etiqueta">Vencidos</span>
+          <span className="venc-tarjeta-icono" aria-hidden="true">
+            <LuCircleAlert size={18} />
+          </span>
+        </div>
         <span className="venc-tarjeta-valor">{resumen.vencido}</span>
-        <span className="venc-tarjeta-etiqueta">Vencidos</span>
       </button>
 
       <button
@@ -17,8 +24,13 @@ function ResumenVencimientos({ resumen, totalFilas, estado, umbral, onEstadoChan
         onClick={() => onEstadoChange(estado === 'proximo' ? 'todos' : 'proximo')}
         aria-pressed={estado === 'proximo'}
       >
+        <div className="venc-tarjeta-cabecera">
+          <span className="venc-tarjeta-etiqueta">Próximos ({umbral} días)</span>
+          <span className="venc-tarjeta-icono" aria-hidden="true">
+            <LuClock size={18} />
+          </span>
+        </div>
         <span className="venc-tarjeta-valor">{resumen.proximo}</span>
-        <span className="venc-tarjeta-etiqueta">Próximos ({umbral} días)</span>
       </button>
 
       <button
@@ -27,13 +39,23 @@ function ResumenVencimientos({ resumen, totalFilas, estado, umbral, onEstadoChan
         onClick={() => onEstadoChange(estado === 'en-regla' ? 'todos' : 'en-regla')}
         aria-pressed={estado === 'en-regla'}
       >
+        <div className="venc-tarjeta-cabecera">
+          <span className="venc-tarjeta-etiqueta">En regla</span>
+          <span className="venc-tarjeta-icono" aria-hidden="true">
+            <LuCircleCheck size={18} />
+          </span>
+        </div>
         <span className="venc-tarjeta-valor">{resumen['en-regla']}</span>
-        <span className="venc-tarjeta-etiqueta">En regla</span>
       </button>
 
       <div className="venc-tarjeta venc-tarjeta-total">
+        <div className="venc-tarjeta-cabecera">
+          <span className="venc-tarjeta-etiqueta">Lotes totales</span>
+          <span className="venc-tarjeta-icono" aria-hidden="true">
+            <LuLayers size={18} />
+          </span>
+        </div>
         <span className="venc-tarjeta-valor">{totalFilas}</span>
-        <span className="venc-tarjeta-etiqueta">Lotes totales</span>
       </div>
     </section>
   )

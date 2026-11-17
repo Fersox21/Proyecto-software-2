@@ -8,6 +8,17 @@
 
     /* MAIN */
     --color-body: #F9F6F2;
+    --color-superficie: #EFEBE2;
+    --color-tarjeta: #FFFFFF;
+    --color-primario: #102055;
+    --color-primario-oscuro: #0A1331;
+    --color-primario-medio: #1b2c61;
+    --color-acento-bordo: #872b38;
+    --radio-suave: 12px;
+    --radio-tarjeta: 16px;
+    --sombra-suave: 0 4px 16px rgba(10, 19, 49, 0.05);
+    --sombra-tarjeta: 0 8px 24px rgba(10, 19, 49, 0.08);
+    --foco-outline: 2px solid #102055;
 
     /* HEADER */
     --color-header-home: #F9F6F2;   /* fondo del header */
@@ -80,17 +91,17 @@
     --color-precio-anterior: #6f6a62;
 
     /* adminProductos */
-    --color-fondo: #f8f9fa;
-    --color-texto: #212529;
-    --color-primario: #0d6efd;
-    --fuente-principal: system-ui, -apple-system, sans-serif;
+    --color-fondo: #F9F6F2;
+    --color-texto: #0A1331;
+    --color-primario-admin: #102055;
+    --fuente-principal: var(--fuente-base);
 
     /* NavBarAdmin */
-    --color-header-admin: #2A2A2A;
-    --color-a-nav-admin: #bbb;
-    --color-li-nav-hover-admin: #bbbf;
-    --color-Fe-h1-admin: #3b4cce;
-    --color-p-nav-admin: #5F5F5F;
+    --color-header-admin: #FFFFFF;
+    --color-a-nav-admin: #102055;
+    --color-li-nav-hover-admin: #872b38;
+    --color-Fe-h1-admin: #872b38;
+    --color-p-nav-admin: #334155;
 }
 
 /* =========================================================
@@ -100,42 +111,48 @@
    sitio público no se ve afectado por el tema oscuro.
    ========================================================= */
 :root {
-    /* Tema claro (defecto) */
-    --admin-fondo: #F6F6F6;
+    /* Tema claro (defecto) - Identidad LaFe */
+    --admin-fondo: #F9F6F2;
     --admin-superficie: #FFFFFF;
-    --admin-borde: #E5E5E5;
-    --admin-borde-suave: #F3F4F6;
-    --admin-borde-btn: #D1D5DB;
-    --admin-hover: #F9FAFB;
-    --admin-hover-btn: #F3F4F6;
-    --admin-texto: #212121;
-    --admin-texto-secundario: #6B7280;
-    --admin-texto-terciario: #9CA3AF;
-    --admin-texto-nav: #4B5563;
-    --admin-texto-btn: #374151;
-    --admin-acento: #113269;
-    --admin-acento-hover: #0E2C5B;
-    --admin-primario: #113269;
-    --admin-primario-hover: #164085;
-    --admin-primario-claro: #C7D2E6;
-    --admin-nav-hover: rgba(17, 50, 105, 0.05);
-    --admin-li-borde: #4B5563;
-    --admin-peligro: #8D1D3A;
-    --admin-peligro-hover: #8D1D3A;
+    --admin-superficie-alt: #EFEBE2;
+    --admin-borde: #E5DFD5;
+    --admin-borde-suave: #EFEBE2;
+    --admin-borde-btn: #D5CEC2;
+    --admin-hover: #F5F1EA;
+    --admin-hover-btn: #EFEBE2;
+    --admin-texto: #0A1331;
+    --admin-texto-secundario: #5A5F72;
+    --admin-texto-terciario: #848999;
+    --admin-texto-nav: #1b2c61;
+    --admin-texto-btn: #102055;
+    --admin-acento: #102055;
+    --admin-acento-hover: #1b2c61;
+    --admin-primario: #102055;
+    --admin-primario-hover: #1b2c61;
+    --admin-primario-claro: #C7D0E4;
+    --admin-nav-hover: rgba(16, 32, 85, 0.06);
+    --admin-li-borde: rgba(249, 246, 242, 0.14);
+    --admin-peligro: #872b38;
+    --admin-peligro-hover: #6E212C;
     --admin-oro: #B07D1E;
-    --admin-sombra: 0 2px 8px rgba(0, 0, 0, 0.02);
+    --admin-sombra: 0 4px 16px rgba(10, 19, 49, 0.05);
+    --admin-radio: 12px;
+    --admin-radio-tarjeta: 16px;
+    --admin-foco: #102055;
     --admin-badge-ok-fondo: #DEF7EC;
     --admin-badge-ok-texto: #03543F;
     --admin-badge-warn-fondo: #FEF3C7;
     --admin-badge-warn-texto: #92400E;
     --admin-badge-error-fondo: #FDE8E8;
-    --admin-badge-error-texto: #9B1C1C;
+    --admin-badge-error-texto: #872b38;
 
-    /* NavBarAdmin: fondo propio para separarlo del fondo de pantalla, de las
-       tarjetas y de los botones. Los valores oscuros se aplican con
-       html[data-tema="oscuro"] en navbarAdmin.css. */
+    /* NavBarAdmin */
     --admin-barra-fondo: #FFFFFF;
-    --admin-barra-borde: #E5E5E5;
+    --admin-barra-borde: #E5DFD5;
+    --admin-barra-texto: #102055;
+    --admin-barra-texto-secundario: #334155;
+    --admin-barra-hover: #EFEBE2;
+    --admin-barra-activo: #872b38;
     --admin-barra-fondo-oscuro: #1B2233;
     --admin-barra-borde-oscuro: #2F3A52;
 }
@@ -147,6 +164,9 @@ html[data-tema="oscuro"]:has(.layout-admin-contenedor) {
     --admin-superficie: #1C1F26;
     --admin-barra-fondo: #1B2233;
     --admin-barra-borde: #2F3A52;
+    --admin-barra-texto: #E5E7EB;
+    --admin-barra-texto-secundario: #9CA3AF;
+    --admin-barra-hover: #232833;
     --admin-borde: #2C313B;
     --admin-borde-suave: #242933;
     --admin-borde-btn: #3E4652;

@@ -1,41 +1,154 @@
-/* Proveedores — panel de administración.
-   Reutiliza los estilos base y variables de ordenesCompra.css y lotes.css */
-
-.proveedores-filtros {
+.proveedores-toolbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  justify-content: space-between;
+  align-items: center;
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
   background-color: var(--admin-superficie);
-  border: 1px solid var(--admin-borde);
-  border-radius: 12px;
+  border: 1px solid var(--admin-borde-suave);
+  border-radius: 16px;
   box-shadow: var(--admin-sombra);
 }
 
-.proveedores-campo-busqueda {
+.proveedores-busqueda-grupo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   flex: 1 1 320px;
-  max-width: 520px;
+  max-width: 560px;
+  flex-wrap: wrap;
+}
+
+.proveedores-campo-busqueda {
+  flex: 1 1 240px;
+}
+
+.proveedores-toolbar-acciones {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-left: auto;
 }
 
 .proveedores-conteo {
-  margin-left: auto;
   color: var(--admin-texto-secundario);
   font-size: 0.85rem;
-  line-height: 2.4;
+  white-space: nowrap;
+}
+
+.proveedores-btn-nuevo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.1rem;
+  background-color: var(--admin-primario, #102055);
+  color: #ffffff;
+  border: 1px solid var(--admin-primario, #102055);
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.proveedores-btn-nuevo:hover {
+  background-color: var(--admin-primario-hover, #1b2c61);
+  border-color: var(--admin-primario-hover, #1b2c61);
+}
+
+.proveedores-btn-nuevo:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
+.proveedores-tabla-contenedor {
+  background-color: var(--admin-superficie, #ffffff);
+  border-radius: 16px;
+  box-shadow: var(--admin-sombra);
 }
 
 .proveedores-tabla {
   min-width: 650px;
 }
 
+.proveedores-col-id {
+  font-weight: 500;
+  color: var(--admin-texto-secundario, #64748b);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 .proveedores-nombre {
-  font-weight: 600;
-  color: var(--admin-texto);
+  font-weight: 700;
+  color: #0f172a;
 }
 
 .proveedores-telefono {
   font-variant-numeric: tabular-nums;
   color: var(--admin-texto-secundario);
+}
+
+.proveedores-btn-icono {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.proveedores-btn-icono:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
+.proveedores-btn-editar {
+  color: #334155;
+}
+
+.proveedores-btn-editar:hover {
+  background-color: #f1f5f9;
+}
+
+.proveedores-btn-eliminar {
+  color: #872b38;
+}
+
+.proveedores-btn-eliminar:hover {
+  background-color: #fef2f2;
+  color: #dc2626;
+}
+
+html[data-tema="oscuro"] .proveedores-nombre {
+  color: var(--admin-texto);
+}
+
+html[data-tema="oscuro"] .proveedores-btn-editar {
+  color: var(--admin-texto-secundario);
+}
+
+html[data-tema="oscuro"] .proveedores-btn-editar:hover {
+  background-color: var(--admin-hover-btn);
+  color: var(--admin-texto);
+}
+
+html[data-tema="oscuro"] .proveedores-btn-eliminar {
+  color: var(--admin-peligro);
+}
+
+html[data-tema="oscuro"] .proveedores-btn-eliminar:hover {
+  background-color: var(--admin-badge-error-fondo);
+  color: var(--admin-badge-error-texto);
 }

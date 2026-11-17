@@ -8,7 +8,7 @@ function ModalConfirmarEliminar({ producto, visible, eliminando, onConfirmar, on
       <div className="orden-modal-cuerpo">
         <p className="orden-confirmar-texto">
           ¿Estás seguro de que deseás eliminar el producto{' '}
-          <strong>{producto.nombre}</strong> (ID #{producto.id})?
+          <strong>{producto.nombre}</strong>?
         </p>
         <p className="orden-confirmar-detalle" style={{ marginTop: '0.5rem', color: 'var(--admin-texto-secundario)' }}>
           Marca: {producto.marca} | Stock: {producto.stock}

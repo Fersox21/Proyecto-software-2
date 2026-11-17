@@ -106,9 +106,6 @@ function ProveedoresPage() {
     <section className="main-admin" id="main-proveedores">
       <header className="header-admin">
         <h1 className="orden-h1">Proveedores</h1>
-        <button type="button" className="agregar-prod" onClick={abrirCrear}>
-          + Nuevo proveedor
-        </button>
       </header>
 
       {mensaje && (
@@ -130,12 +127,12 @@ function ProveedoresPage() {
         </div>
       )}
 
-      {/* Buscador de proveedores activos */}
       {!cargando && !error && activos.length > 0 && (
         <FiltroBusquedaProveedores
           busqueda={busqueda}
           onBusquedaChange={setBusqueda}
           onLimpiar={limpiarBusqueda}
+          onNuevo={abrirCrear}
           totalVisibles={visibles.length}
           totalProveedores={activos.length}
         />
@@ -189,7 +186,7 @@ function ProveedoresPage() {
       )}
 
       {!cargando && !error && visibles.length > 0 && (
-        <section className="sec-prod-admin" aria-live="polite">
+        <section className="sec-prod-admin proveedores-tabla-contenedor" aria-live="polite">
           <table className="tabla-prod-admin orden-tabla proveedores-tabla">
             <caption className="orden-visually-hidden">
               Lista de proveedores registrados
@@ -205,10 +202,11 @@ function ProveedoresPage() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((proveedor) => (
+              {visibles.map((proveedor, index) => (
                 <FilaProveedor
                   key={proveedor.id}
                   proveedor={proveedor}
+                  numeroFila={index + 1}
                   onEditar={abrirEditar}
                   onEliminar={pedirEliminar}
                 />

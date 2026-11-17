@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { LuPencil, LuPlus, LuTrash2 } from 'react-icons/lu'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
 import Modal from '../components/comunes/Modal'
@@ -10,7 +11,7 @@ import {
   obtenerTiposPromocion,
 } from '../services/tiposPromocionService'
 import '../../../styles/panelAdmin/ordenesCompra.css'
-import '../../../styles/panelAdmin/proveedores.css'
+import '../../../styles/panelAdmin/promociones.css'
 
 function PromocionesPage() {
   const [promociones, setPromociones] = useState([])
@@ -134,9 +135,6 @@ function PromocionesPage() {
     <section className="main-admin" id="main-promociones">
       <header className="header-admin">
         <h1 className="orden-h1">Promociones</h1>
-        <button type="button" className="agregar-prod" onClick={abrirCrear}>
-          + Nueva promoción
-        </button>
       </header>
 
       {mensaje && (
@@ -159,27 +157,37 @@ function PromocionesPage() {
       )}
 
       {!cargando && !error && activas.length > 0 && (
-        <section className="proveedores-filtros" aria-label="Buscar promociones">
-          <div className="orden-campo proveedores-campo-busqueda">
-            <label htmlFor="filtro-promociones-busqueda">Buscar promoción</label>
-            <input
-              id="filtro-promociones-busqueda"
-              type="search"
-              placeholder="Buscar por nombre o #id..."
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-            />
+        <section className="promociones-toolbar" aria-label="Herramientas de promociones">
+          <div className="promociones-busqueda-grupo">
+            <div className="orden-campo promociones-campo-busqueda">
+              <label htmlFor="filtro-promociones-busqueda" className="orden-visually-hidden">
+                Buscar promoción
+              </label>
+              <input
+                id="filtro-promociones-busqueda"
+                type="search"
+                placeholder="Buscar por nombre o #id..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+
+            {busqueda.trim() !== '' && (
+              <button type="button" className="orden-btn" onClick={limpiarBusqueda}>
+                Limpiar
+              </button>
+            )}
           </div>
 
-          {busqueda.trim() !== '' && (
-            <button type="button" className="orden-btn" onClick={limpiarBusqueda}>
-              Limpiar
+          <div className="promociones-toolbar-acciones">
+            <span className="promociones-conteo">
+              {visibles.length} de {activas.length} promoción{activas.length === 1 ? '' : 'es'}
+            </span>
+            <button type="button" className="promociones-btn-nueva" onClick={abrirCrear}>
+              <LuPlus size={18} aria-hidden="true" />
+              <span>Nueva promoción</span>
             </button>
-          )}
-
-          <span className="proveedores-conteo">
-            {visibles.length} de {activas.length} promoción{activas.length === 1 ? '' : 'es'}
-          </span>
+          </div>
         </section>
       )}
 
@@ -231,8 +239,8 @@ function PromocionesPage() {
       )}
 
       {!cargando && !error && visibles.length > 0 && (
-        <section className="sec-prod-admin" aria-live="polite">
-          <table className="tabla-prod-admin orden-tabla proveedores-tabla">
+        <section className="sec-prod-admin promociones-tabla-contenedor" aria-live="polite">
+          <table className="tabla-prod-admin orden-tabla promociones-tabla">
             <caption className="orden-visually-hidden">
               Lista de tipos de promoción registrados
             </caption>
@@ -246,25 +254,29 @@ function PromocionesPage() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((promocion) => (
+              {visibles.map((promocion, index) => (
                 <tr key={promocion.id}>
-                  <td className="orden-col-id">#{promocion.id}</td>
-                  <td className="proveedores-nombre">{promocion.nombre}</td>
+                  <td className="promociones-col-id">#{index + 1}</td>
+                  <td className="promociones-nombre">{promocion.nombre}</td>
                   <td className="orden-col-acciones">
                     <div className="orden-acciones">
                       <button
                         type="button"
-                        className="orden-btn orden-btn-chico"
+                        className="promociones-btn-icono promociones-btn-editar"
                         onClick={() => abrirEditar(promocion)}
+                        aria-label={`Editar promoción ${promocion.nombre}`}
+                        title="Editar"
                       >
-                        Editar
+                        <LuPencil size={16} aria-hidden="true" />
                       </button>
                       <button
                         type="button"
-                        className="orden-btn orden-btn-chico orden-btn-peligro"
+                        className="promociones-btn-icono promociones-btn-baja"
                         onClick={() => pedirBaja(promocion)}
+                        aria-label={`Dar de baja promoción ${promocion.nombre}`}
+                        title="Dar de baja"
                       >
-                        Dar de baja
+                        <LuTrash2 size={16} aria-hidden="true" />
                       </button>
                     </div>
                   </td>
@@ -292,7 +304,7 @@ function PromocionesPage() {
           <div className="orden-modal-cuerpo">
             <p className="orden-confirmar-texto">
               ¿Seguro que querés dar de baja la promoción{' '}
-              <strong>{promocionABajar.nombre}</strong> (ID #{promocionABajar.id})?
+              <strong>{promocionABajar.nombre}</strong>?
             </p>
             <p className="orden-confirmar-detalle">
               Dejará de aparecer en los selectores al crear o editar productos.

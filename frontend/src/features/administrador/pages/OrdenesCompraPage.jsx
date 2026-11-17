@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { LuPlus, LuSearch, LuX } from 'react-icons/lu'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
 import { useOrdenesCompra } from '../hooks/useOrdenesCompra'
 import { obtenerOrdenCompraPorId, obtenerProductos } from '../services/ordenesCompraService'
+import { formatearFecha } from '../../../shared/utils/formato'
 import Modal from '../components/comunes/Modal'
 import OrdenCompraForm from '../components/ordenesCompra/OrdenCompraForm'
 import ConfirmarEliminacion from '../components/ordenesCompra/ConfirmarEliminacion'
@@ -12,6 +14,7 @@ import '../../../styles/panelAdmin/ordenesCompra.css'
 function OrdenesCompraPage() {
   const { ordenes, cargando, error, recargar, crear, actualizar, eliminar } = useOrdenesCompra()
 
+  const [busqueda, setBusqueda] = useState('')
   const [mensaje, setMensaje] = useState(null)
   const [formulario, setFormulario] = useState(null)
   const [cargandoEdicion, setCargandoEdicion] = useState(false)
@@ -64,10 +67,10 @@ function OrdenesCompraPage() {
     async (datos) => {
       if (formulario?.modo === 'editar') {
         await actualizar(formulario.orden.id, datos)
-        setMensaje({ tipo: 'exito', texto: 'Orden de compra actualizada.' })
+        setMensaje({ tipo: 'exito', texto: 'Orden de compra actualizada exitosamente.' })
       } else {
         await crear(datos)
-        setMensaje({ tipo: 'exito', texto: 'Orden de compra creada.' })
+        setMensaje({ tipo: 'exito', texto: 'Orden de compra registrada con éxito.' })
       }
       await cargarProductos()
       setFormulario(null)
@@ -106,7 +109,7 @@ const alternarDetalle = useCallback(
     setEliminando(true)
     try {
       await eliminar(ordenAEliminar.id)
-      setMensaje({ tipo: 'exito', texto: 'Orden de compra eliminada.' })
+      setMensaje({ tipo: 'exito', texto: 'Orden de compra eliminada exitosamente.' })
       if (detalle?.id === ordenAEliminar.id) setDetalle(null)
       setOrdenAEliminar(null)
     } catch (err) {
@@ -117,13 +120,27 @@ const alternarDetalle = useCallback(
     }
   }, [ordenAEliminar, eliminar, detalle])
 
+  const visibles = useMemo(() => {
+    const texto = busqueda.trim().toLowerCase()
+    if (!texto) return ordenes
+
+    return ordenes.filter((orden) => {
+      const proveedor = orden?.proveedor?.nombre || (orden?.proveedor?.id != null ? `Proveedor #${orden.proveedor.id}` : '')
+      const contenido = [`#${orden.id}`, proveedor, formatearFecha(orden.fecha)]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase()
+
+      return contenido.includes(texto)
+    })
+  }, [ordenes, busqueda])
+
+  const limpiarBusqueda = useCallback(() => setBusqueda(''), [])
+
   return (
     <section className="main-admin" id="main-ordenes-compra">
       <header className="header-admin">
         <h1 className="orden-h1">Órdenes de compra</h1>
-        <button type="button" className="agregar-prod" onClick={abrirCrear}>
-          + Nueva orden
-        </button>
       </header>
 
       {mensaje && (
@@ -139,6 +156,45 @@ const alternarDetalle = useCallback(
             aria-label="Cerrar mensaje"
           >
             ×
+          </button>
+        </div>
+      )}
+
+      {!cargando && !error && ordenes.length > 0 && (
+        <div className="orden-toolbar">
+          <div className="orden-toolbar-izquierda">
+            <div className="orden-busqueda-wrapper">
+              <LuSearch className="orden-busqueda-icono" size={16} aria-hidden="true" />
+              <input
+                type="search"
+                className="orden-busqueda-input"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+                placeholder="Buscar por #orden, proveedor o fecha..."
+                aria-label="Buscar órdenes de compra"
+              />
+              {busqueda && (
+                <button
+                  type="button"
+                  className="orden-busqueda-limpiar"
+                  onClick={limpiarBusqueda}
+                  aria-label="Limpiar búsqueda"
+                  title="Limpiar búsqueda"
+                >
+                  <LuX size={14} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+            <span className="orden-conteo">
+              {visibles.length === ordenes.length
+                ? `${ordenes.length} ${ordenes.length === 1 ? 'orden' : 'órdenes'}`
+                : `${visibles.length} de ${ordenes.length} órdenes`}
+            </span>
+          </div>
+
+          <button type="button" className="orden-btn-nuevo" onClick={abrirCrear}>
+            <LuPlus size={18} aria-hidden="true" />
+            <span>Nueva orden</span>
           </button>
         </div>
       )}
@@ -164,16 +220,26 @@ const alternarDetalle = useCallback(
         </MensajeVacio>
       )}
 
-      {!cargando && !error && ordenes.length > 0 && (
-        <section className="sec-prod-admin" aria-live="polite">
+      {!cargando && !error && ordenes.length > 0 && visibles.length === 0 && (
+        <MensajeVacio
+          titulo="No se encontraron órdenes de compra"
+          texto={`No hay ninguna orden que coincida con "${busqueda}".`}
+        >
+          <button type="button" className="orden-btn orden-btn-primario" onClick={limpiarBusqueda}>
+            Limpiar búsqueda
+          </button>
+        </MensajeVacio>
+      )}
+
+      {!cargando && !error && visibles.length > 0 && (
+        <section className="sec-prod-admin orden-tabla-contenedor" aria-live="polite">
           <table className="tabla-prod-admin orden-tabla">
             <caption className="orden-visually-hidden">
               Órdenes de compra registradas
             </caption>
             <thead>
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Fecha</th>
+                <th scope="col">Orden y fecha</th>
                 <th scope="col">Proveedor</th>
                 <th scope="col">Total</th>
                 <th scope="col" className="orden-col-acciones">
@@ -182,10 +248,11 @@ const alternarDetalle = useCallback(
               </tr>
             </thead>
             <tbody>
-              {ordenes.map((orden) => (
+              {visibles.map((orden, index) => (
                 <FilaOrdenCompra
                   key={orden.id}
                   orden={orden}
+                  numeroFila={index + 1}
                   detalle={detalle}
                   productosPorId={productosPorId}
                   onAlternarDetalle={alternarDetalle}

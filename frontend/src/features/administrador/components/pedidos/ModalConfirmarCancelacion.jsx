@@ -24,7 +24,7 @@ function ModalConfirmarCancelacion({ pedido, visible, cargando, onConfirmar, onC
   }
 
   return (
-    <Modal titulo={`Cancelar Pedido #${pedido.id}`} onCerrar={handleCerrar} tamanio="normal">
+    <Modal titulo="Cancelar Pedido" onCerrar={handleCerrar} tamanio="normal">
       <form onSubmit={handleSubmit} className="form-confirmacion-accion">
         <p className="mensaje-confirmacion">
           ¿Estás seguro de que deseas cancelar el pedido del comercio{' '}

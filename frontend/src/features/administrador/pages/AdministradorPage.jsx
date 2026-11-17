@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import { LuPlus, LuSearch } from 'react-icons/lu'
 import { useProductosAdmin } from '../hooks/useProductosAdmin'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
@@ -7,12 +8,18 @@ import ModalFormProducto from '../components/productos/ModalFormProducto'
 import ModalConfirmarEliminar from '../components/productos/ModalConfirmarEliminar'
 import '../../../styles/panelAdmin/ordenesCompra.css'
 
+function obtenerNombreCategoria(categoria) {
+  if (typeof categoria === 'string') return categoria.trim()
+  return categoria?.nombre?.trim() || ''
+}
+
 function AdministradorPage() {
   const {
     productos,
     cargando,
     error,
     procesandoAccion,
+    crearProducto,
     actualizarProducto,
     eliminarProducto
   } = useProductosAdmin()
@@ -21,10 +28,40 @@ function AdministradorPage() {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null)
   const [productoParaEliminar, setProductoParaEliminar] = useState(null)
   const [alerta, setAlerta] = useState(null)
+  const [busqueda, setBusqueda] = useState('')
+  const [categoriaFiltro, setCategoriaFiltro] = useState('')
+
+  const categoriasDisponibles = useMemo(() => {
+    const unicas = new Set()
+    for (const prod of productos || []) {
+      const cat = obtenerNombreCategoria(prod.categoria)
+      if (cat) unicas.add(cat)
+    }
+    return Array.from(unicas).sort((a, b) => a.localeCompare(b, 'es'))
+  }, [productos])
+
+  const productosFiltrados = useMemo(() => {
+    const termino = busqueda.trim().toLowerCase()
+    return (productos || []).filter((prod) => {
+      const coincideBusqueda = !termino ||
+        (prod.nombre || '').toLowerCase().includes(termino) ||
+        (prod.marca || '').toLowerCase().includes(termino)
+
+      const coincideCategoria = !categoriaFiltro ||
+        obtenerNombreCategoria(prod.categoria) === categoriaFiltro
+
+      return coincideBusqueda && coincideCategoria
+    })
+  }, [productos, busqueda, categoriaFiltro])
 
   const mostrarMensaje = (texto, tipo = 'exito') => {
     setAlerta({ texto, tipo })
     setTimeout(() => setAlerta(null), 4000)
+  }
+
+  const handleAbrirCrear = () => {
+    setProductoSeleccionado(null)
+    setModalFormAbierto(true)
   }
 
   const handleAbrirEditar = (producto) => {
@@ -38,10 +75,14 @@ function AdministradorPage() {
   }
 
   const handleGuardarProducto = async (datos) => {
-    if (!productoSeleccionado) return
-    await actualizarProducto(productoSeleccionado.id, datos)
     const nombreProducto = datos instanceof FormData ? datos.get('nombre') : datos.nombre
-    mostrarMensaje(`Producto "${nombreProducto}" actualizado con éxito`)
+    if (productoSeleccionado) {
+      await actualizarProducto(productoSeleccionado.id, datos)
+      mostrarMensaje(`Producto "${nombreProducto}" actualizado exitosamente.`)
+    } else {
+      await crearProducto(datos)
+      mostrarMensaje(`Producto "${nombreProducto}" creado exitosamente.`)
+    }
     handleCerrarForm()
   }
 
@@ -57,7 +98,7 @@ function AdministradorPage() {
     if (!productoParaEliminar) return
     try {
       await eliminarProducto(productoParaEliminar.id)
-      mostrarMensaje(`Producto "${productoParaEliminar.nombre}" eliminado`, 'exito')
+      mostrarMensaje(`Producto "${productoParaEliminar.nombre}" eliminado exitosamente.`, 'exito')
       setProductoParaEliminar(null)
     } catch (err) {
       mostrarMensaje(`Error al eliminar: ${err.message}`, 'error')
@@ -87,30 +128,63 @@ function AdministradorPage() {
           </div>
         )}
 
+        <div className="prod-barra-acciones">
+          <div className="prod-filtros-grupo">
+            <div className="prod-busqueda-wrapper">
+              <LuSearch className="prod-busqueda-icono" size={16} aria-hidden="true" />
+              <input
+                type="search"
+                className="prod-busqueda-input"
+                placeholder="Buscar producto..."
+                aria-label="Buscar producto"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+
+            <select
+              className="prod-filtro-categoria"
+              aria-label="Filtro por categoría"
+              value={categoriaFiltro}
+              onChange={(e) => setCategoriaFiltro(e.target.value)}
+            >
+              <option value="">Filtro por categoría</option>
+              {categoriasDisponibles.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            type="button"
+            className="prod-btn-nuevo"
+            onClick={handleAbrirCrear}
+          >
+            <LuPlus size={18} aria-hidden="true" />
+            <span>Nuevo Producto</span>
+          </button>
+        </div>
+
         <section id="sec-prod-admin" className="sec-prod-admin" aria-live="polite">
           <table className="tabla-prod-admin">
             <thead>
               <tr>
-                <th>Imagen</th>
                 <th>Producto</th>
-                <th>Marca</th>
-                <th>Descripción</th>
                 <th>Categoría</th>
-                <th>Precio venta</th>
-                <th>Precio costo</th>
+                <th>Precios</th>
                 <th>Stock</th>
-                <th>En promoción</th>
-                <th>Precio con promo</th>
+                <th>Promo</th>
                 <th>Estado</th>
-                <th>Destacado</th>
                 <th>En catálogo</th>
                 <th style={{ textAlign: 'center' }}>Acciones</th>
               </tr>
             </thead>
 
             <tbody id="tabla-admin-body">
-              {totalProductos > 0 ? (
-                productos.map((prod) => (
+              {productosFiltrados.length > 0 ? (
+                productosFiltrados.map((prod) => (
                   <FilaProducto
                     key={prod.id}
                     producto={prod}
@@ -120,20 +194,25 @@ function AdministradorPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="14" style={{ textAlign: 'center', padding: '2rem' }}>
-                    No hay productos registrados en el sistema.
+                  <td colSpan="8" style={{ textAlign: 'center', padding: '2rem' }}>
+                    {totalProductos > 0
+                      ? 'No se encontraron productos con los filtros aplicados.'
+                      : 'No hay productos registrados en el sistema.'}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
           <div className="tabla-admin-pie">
-            <span id="info-pag">Total: {totalProductos} producto(s)</span>
+            <span id="info-pag">
+              {productosFiltrados.length === totalProductos
+                ? `Total: ${totalProductos} producto(s)`
+                : `Mostrando ${productosFiltrados.length} de ${totalProductos} producto(s)`}
+            </span>
           </div>
         </section>
       </section>
 
-      {/* Modal Crear / Editar */}
       {modalFormAbierto && (
         <ModalFormProducto
           producto={productoSeleccionado}
@@ -144,7 +223,6 @@ function AdministradorPage() {
         />
       )}
 
-      {/* Modal Confirmar Eliminación */}
       {Boolean(productoParaEliminar) && (
         <ModalConfirmarEliminar
           producto={productoParaEliminar}

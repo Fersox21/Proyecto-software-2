@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { LuImagePlus } from 'react-icons/lu'
 import {
   crearCategoria,
   crearTipoPromocion,
@@ -270,16 +271,23 @@ function NuevoProductoInlineForm({
           )}
         </div>
 
-        <div className="orden-campo orden-producto-inline-checkbox">
-          <label className="orden-checkbox-label" htmlFor={`orden-lote-${indice}-prod-destacado`}>
-            <input
-              id={`orden-lote-${indice}-prod-destacado`}
-              type="checkbox"
-              checked={Boolean(producto.destacado)}
-              onChange={(e) => onCambiarCampo(indice, 'destacado', e.target.checked)}
-            />
-            Destacado en el home
-          </label>
+        <div className="orden-campo orden-producto-inline-full">
+          <div className="orden-producto-inline-switch">
+            <label className="prod-switch-label" htmlFor={`orden-lote-${indice}-prod-destacado`}>
+              <span className="prod-switch-control">
+                <input
+                  id={`orden-lote-${indice}-prod-destacado`}
+                  type="checkbox"
+                  role="switch"
+                  className="prod-switch-input"
+                  checked={Boolean(producto.destacado)}
+                  onChange={(e) => onCambiarCampo(indice, 'destacado', e.target.checked)}
+                />
+                <span className="prod-switch-slider" aria-hidden="true" />
+              </span>
+              <span>Destacado en el home</span>
+            </label>
+          </div>
         </div>
 
         <div className="orden-campo orden-producto-inline-full">
@@ -288,29 +296,40 @@ function NuevoProductoInlineForm({
             id={`orden-lote-${indice}-prod-imagen`}
             type="file"
             accept="image/*"
+            className="orden-visually-hidden"
             onChange={(e) => {
               const archivo = e.target.files?.[0] || null
               onCambiarCampo(indice, 'imagenArchivo', archivo)
             }}
             aria-invalid={Boolean(errorCampo('imagenArchivo'))}
           />
-          {errorCampo('imagenArchivo') && (
-            <p className="orden-campo-error">{errorCampo('imagenArchivo')}</p>
-          )}
-          {vistaPrevia && (
-            <div style={{ marginTop: '0.5rem' }}>
+          <label
+            htmlFor={`orden-lote-${indice}-prod-imagen`}
+            className="prod-dropzone"
+          >
+            <div className="prod-dropzone-info">
+              <span className="prod-dropzone-icono" aria-hidden="true">
+                <LuImagePlus size={18} />
+              </span>
+              <div className="prod-dropzone-textos">
+                <span className="prod-dropzone-titulo">Haz clic para subir una imagen</span>
+                {producto.imagenArchivo && (
+                  <span className="prod-dropzone-archivo">
+                    {producto.imagenArchivo.name}
+                  </span>
+                )}
+              </div>
+            </div>
+            {vistaPrevia && (
               <img
                 src={vistaPrevia}
                 alt="Vista previa del nuevo producto"
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  objectFit: 'cover',
-                  borderRadius: '8px',
-                  border: '1px solid #dee2e6',
-                }}
+                className="prod-dropzone-preview"
               />
-            </div>
+            )}
+          </label>
+          {errorCampo('imagenArchivo') && (
+            <p className="orden-campo-error">{errorCampo('imagenArchivo')}</p>
           )}
         </div>
 

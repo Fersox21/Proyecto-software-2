@@ -24,7 +24,8 @@
 }
 
 .h1-admin {
-  font-size: 1.75rem;
+  font-family: var(--fuente-titulos);
+  font-size: 1.85rem;
   font-weight: 700;
   color: var(--admin-texto);
   margin: 0;
@@ -33,11 +34,11 @@
 /* Botones de Acción de Cabecera */
 .btn-agregar,
 .agregar-prod {
-  padding: 0.8rem 1.2rem;
+  padding: 0.75rem 1.35rem;
   background-color: var(--admin-primario);
   color: #FFFFFF;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid var(--admin-primario);
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   font-size: 0.9rem;
@@ -49,6 +50,12 @@
   background-color: var(--admin-primario-hover);
 }
 
+.btn-agregar:focus-visible,
+.agregar-prod:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
 /* Estructura de Tabla Unificada (Ventas y Pedidos) */
 .sec-tabla-admin,
 .sec-prod-admin,
@@ -58,8 +65,8 @@
   display: block;
   overflow-x: auto;
   background: var(--admin-superficie);
-  border-radius: 12px;
-  border: 1px solid var(--admin-borde);
+  border-radius: 16px;
+  border: 1px solid var(--admin-borde-suave);
   box-shadow: var(--admin-sombra);
 }
 
@@ -123,10 +130,10 @@
 
 /* Botones de Acción dentro de la Tabla */
 .btn-accion {
-  padding: 0.4rem 0.85rem;
-  border-radius: 6px;
+  padding: 0.45rem 0.9rem;
+  border-radius: 10px;
   font-size: 0.85rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--admin-borde-btn);
   background-color: var(--admin-superficie);
@@ -139,6 +146,12 @@
   border-color: var(--admin-texto-terciario);
 }
 
+.btn-accion:focus-visible,
+.btn-pag:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
 .btn-editar {
   border-color: var(--admin-acento);
   color: var(--admin-acento);
@@ -147,6 +160,122 @@
 .btn-editar:hover {
   background-color: var(--admin-primario);
   color: #FFFFFF;
+}
+
+/* Tabla de Ventas */
+.sec-tabla-ventas {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: var(--admin-sombra);
+  overflow-x: visible;
+}
+
+.tabla-ventas {
+  width: 100%;
+  table-layout: auto;
+}
+
+.tabla-ventas th.col-acciones {
+  text-align: right;
+}
+
+.venta-id-fecha {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.venta-id {
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.venta-fecha {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.venta-total-bloque {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.venta-total-linea {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.venta-total-final {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.venta-total-original {
+  text-decoration: line-through;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.venta-total-motivo {
+  font-size: 0.78rem;
+  color: #64748b;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.venta-acciones {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.venta-btn-icono {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.venta-btn-icono:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
+.venta-btn-ver {
+  color: #334155;
+}
+
+.venta-btn-ver:hover {
+  background-color: #f1f5f9;
+}
+
+.venta-btn-editar {
+  color: #2563eb;
+}
+
+.venta-btn-editar:hover {
+  background-color: #eff6ff;
+}
+
+.venta-btn-eliminar {
+  color: #dc2626;
+}
+
+.venta-btn-eliminar:hover {
+  background-color: #fef2f2;
 }
 
 /* Badges para Estados */
@@ -193,10 +322,10 @@
 }
 
 .btn-pag {
-  padding: 0.35rem 0.75rem;
+  padding: 0.4rem 0.85rem;
   border: 1px solid var(--admin-borde);
   background-color: var(--admin-superficie);
-  border-radius: 6px;
+  border-radius: 10px;
   color: var(--admin-texto-btn);
   cursor: pointer;
   font-weight: 600;
@@ -247,5 +376,11 @@ a:hover {
   .btn-agregar,
   .agregar-prod {
     width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .sec-tabla-ventas {
+    overflow-x: auto;
   }
 }

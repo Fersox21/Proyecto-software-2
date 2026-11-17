@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { LuImagePlus } from 'react-icons/lu'
 import Modal from '../comunes/Modal'
 import CampoFormulario from '../comunes/CampoFormulario'
 import {
@@ -60,7 +61,7 @@ function calcularPorcentajeInicial(producto) {
 
 function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }) {
   const editando = Boolean(producto)
-  const sinLotesVigentes = editando && producto?.tieneLoteVigente === false
+  const tieneLotesVigentes = Boolean(producto?.tieneLoteVigente) && Number(producto?.stock) > 0
 
   const [categorias, setCategorias] = useState([])
   const [tiposPromocion, setTiposPromocion] = useState([])
@@ -273,7 +274,7 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
       }
     }
 
-    if (valores.visibleCatalogo && !producto?.imagen && !imagenArchivo) {
+    if (tieneLotesVigentes && valores.visibleCatalogo && !producto?.imagen && !imagenArchivo) {
       const msg = 'Debe cargar una imagen para publicar el producto en el catálogo'
       nuevosErrores.imagen = msg
       nuevosErrores.visibleCatalogo = msg
@@ -305,7 +306,7 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
       formData.append('precioPromo', '')
     }
     formData.append('destacado', String(valores.destacado))
-    formData.append('visibleCatalogo', String(Boolean(valores.visibleCatalogo)))
+    formData.append('visibleCatalogo', String(Boolean(tieneLotesVigentes && valores.visibleCatalogo)))
 
     if (categorias.length > 0 && valores.categoriaId) {
       formData.append('categoriaId', String(Number(valores.categoriaId)))
@@ -331,15 +332,15 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
       tamanio="normal"
     >
       <form className="orden-form" onSubmit={manejarEnvio} noValidate>
-        <div className="orden-modal-cuerpo" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+        <div className="orden-modal-cuerpo prod-modal-cuerpo">
           {errorServidor && (
-            <div className="orden-alerta orden-alerta-error" role="alert" style={{ gridColumn: 'span 2' }}>
+            <div className="orden-alerta orden-alerta-error prod-modal-span-2" role="alert">
               <span>{errorServidor}</span>
             </div>
           )}
 
-          <div style={{ gridColumn: 'span 2' }}>
-            <CampoFormulario label="Nombre del Producto *" id="prod-nombre" error={errores.nombre}>
+          <div className="prod-modal-span-2">
+            <CampoFormulario label="Nombre del producto *" id="prod-nombre" error={errores.nombre}>
               <input
                 id="prod-nombre"
                 type="text"
@@ -394,20 +395,35 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
             )}
           </CampoFormulario>
 
-          <div style={{ gridColumn: 'span 2' }}>
-            <CampoFormulario label="Descripción" id="prod-descripcion" error={errores.descripcion}>
-              <textarea
-                id="prod-descripcion"
-                rows={2}
-                placeholder="Descripción del producto"
-                value={valores.descripcion}
-                onChange={(e) => actualizarCampo('descripcion', e.target.value)}
+          <div className="prod-modal-grilla-3">
+            <CampoFormulario label="Precio Costo ($) *" id="prod-costo" error={errores.precioCosto}>
+              <input
+                id="prod-costo"
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                value={valores.precioCosto}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onChange={(e) => actualizarCampo('precioCosto', sanitizarDecimalPositivo(e.target.value))}
                 disabled={guardando}
               />
             </CampoFormulario>
-          </div>
 
-          <div style={{ gridColumn: 'span 2' }}>
+            <CampoFormulario label="Precio Venta ($) *" id="prod-venta" error={errores.precioVenta}>
+              <input
+                id="prod-venta"
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                value={valores.precioVenta}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onChange={(e) => actualizarPrecioVenta(e.target.value)}
+                disabled={guardando}
+              />
+            </CampoFormulario>
+
             <CampoFormulario label="Stock actual *" id="prod-stock" error={errores.stock}>
               <input
                 id="prod-stock"
@@ -423,37 +439,22 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
             </CampoFormulario>
           </div>
 
-          <CampoFormulario label="Precio Costo ($) *" id="prod-costo" error={errores.precioCosto}>
-            <input
-              id="prod-costo"
-              type="number"
-              min="0.01"
-              step="0.01"
-              inputMode="decimal"
-              value={valores.precioCosto}
-              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
-              onChange={(e) => actualizarCampo('precioCosto', sanitizarDecimalPositivo(e.target.value))}
-              disabled={guardando}
-            />
-          </CampoFormulario>
+          <div className="prod-modal-span-2">
+            <CampoFormulario label="Descripción" id="prod-descripcion" error={errores.descripcion}>
+              <textarea
+                id="prod-descripcion"
+                rows={2}
+                placeholder="Descripción del producto"
+                value={valores.descripcion}
+                onChange={(e) => actualizarCampo('descripcion', e.target.value)}
+                disabled={guardando}
+              />
+            </CampoFormulario>
+          </div>
 
-          <CampoFormulario label="Precio Venta ($) *" id="prod-venta" error={errores.precioVenta}>
-            <input
-              id="prod-venta"
-              type="number"
-              min="0.01"
-              step="0.01"
-              inputMode="decimal"
-              value={valores.precioVenta}
-              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
-              onChange={(e) => actualizarPrecioVenta(e.target.value)}
-              disabled={guardando}
-            />
-          </CampoFormulario>
-
-          <div style={{ gridColumn: 'span 2' }}>
+          <div className="prod-modal-span-2">
             <CampoFormulario
-              label={valores.visibleCatalogo && !producto?.imagen ? 'Imagen del producto *' : 'Imagen del producto (opcional)'}
+              label={tieneLotesVigentes && valores.visibleCatalogo && !producto?.imagen ? 'Imagen del producto *' : 'Imagen del producto (opcional)'}
               id="prod-imagen"
               error={errores.imagen}
             >
@@ -461,7 +462,8 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
                 id="prod-imagen"
                 type="file"
                 accept="image/*"
-                required={valores.visibleCatalogo && !producto?.imagen}
+                className="orden-visually-hidden"
+                required={tieneLotesVigentes && valores.visibleCatalogo && !producto?.imagen}
                 onChange={(e) => {
                   const archivo = e.target.files?.[0] || null
                   setImagenArchivo(archivo)
@@ -471,117 +473,138 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
                 }}
                 disabled={guardando}
               />
-              {vistaPrevia && (
-                <div style={{ marginTop: '0.5rem' }}>
+              <label
+                htmlFor="prod-imagen"
+                className={`prod-dropzone${guardando ? ' prod-dropzone-deshabilitada' : ''}`}
+              >
+                <div className="prod-dropzone-info">
+                  <span className="prod-dropzone-icono" aria-hidden="true">
+                    <LuImagePlus size={18} />
+                  </span>
+                  <div className="prod-dropzone-textos">
+                    <span className="prod-dropzone-titulo">Haz clic para subir una imagen</span>
+                    {(imagenArchivo || vistaPrevia) && (
+                      <span className="prod-dropzone-archivo">
+                        {imagenArchivo ? imagenArchivo.name : 'Imagen actual cargada'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {vistaPrevia && (
                   <img
                     src={vistaPrevia}
                     alt="Vista previa del producto"
+                    className="prod-dropzone-preview"
                     onError={manejarErrorImagenProducto}
-                    style={{
-                      width: '96px',
-                      height: '96px',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      border: '1px solid #dee2e6',
-                    }}
                   />
-                </div>
-              )}
+                )}
+              </label>
             </CampoFormulario>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={valores.enPromocion}
-                onChange={(e) => {
-                  const check = e.target.checked
-                  setValores((prev) => ({
-                    ...prev,
-                    enPromocion: check,
-                    ...(check
-                      ? {}
-                      : {
-                          tipoPromocionId: '',
-                          porcentajeDescuento: '',
-                          precioPromo: '',
-                        }),
-                  }))
-                  if (!check) {
-                    setErrores((prev) => ({
-                      ...prev,
-                      tipoPromocionId: null,
-                      porcentajeDescuento: null,
-                      precioPromo: null,
-                    }))
-                  }
-                }}
-                disabled={guardando}
-              />
-              ¿En promoción?
-            </label>
-          </div>
+          <div className="prod-switches-fila">
+            <div className="prod-switch-bloque">
+              <label className={`prod-switch-label${guardando ? ' prod-switch-label-deshabilitada' : ''}`}>
+                <span className="prod-switch-control">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="prod-switch-input"
+                    checked={valores.enPromocion}
+                    onChange={(e) => {
+                      const check = e.target.checked
+                      setValores((prev) => ({
+                        ...prev,
+                        enPromocion: check,
+                        ...(check
+                          ? {}
+                          : {
+                              tipoPromocionId: '',
+                              porcentajeDescuento: '',
+                              precioPromo: '',
+                            }),
+                      }))
+                      if (!check) {
+                        setErrores((prev) => ({
+                          ...prev,
+                          tipoPromocionId: null,
+                          porcentajeDescuento: null,
+                          precioPromo: null,
+                        }))
+                      }
+                    }}
+                    disabled={guardando}
+                  />
+                  <span className="prod-switch-slider" aria-hidden="true" />
+                </span>
+                <span>¿En promoción?</span>
+              </label>
+            </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={valores.destacado}
-                onChange={(e) => actualizarCampo('destacado', e.target.checked)}
-                disabled={guardando}
-              />
-              ¿Destacado en catálogo?
-            </label>
-          </div>
+            <div className="prod-switch-bloque">
+              <label className={`prod-switch-label${guardando ? ' prod-switch-label-deshabilitada' : ''}`}>
+                <span className="prod-switch-control">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="prod-switch-input"
+                    checked={valores.destacado}
+                    onChange={(e) => actualizarCampo('destacado', e.target.checked)}
+                    disabled={guardando}
+                  />
+                  <span className="prod-switch-slider" aria-hidden="true" />
+                </span>
+                <span>¿Destacado en catálogo?</span>
+              </label>
+            </div>
 
-          <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column', gap: '0.25rem', marginTop: '0.25rem' }}>
-            <label
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '0.4rem',
-                cursor: sinLotesVigentes ? 'not-allowed' : 'pointer',
-                opacity: sinLotesVigentes ? 0.65 : 1,
-              }}
-            >
-              <input
-                type="checkbox"
-                checked={valores.visibleCatalogo}
-                onChange={(e) => {
-                  const check = e.target.checked
-                  if (check && !producto?.imagen && !imagenArchivo) {
-                    const msg = 'Debe cargar una imagen para publicar el producto en el catálogo'
-                    setErrores((prev) => ({
-                      ...prev,
-                      visibleCatalogo: msg,
-                      imagen: msg,
-                    }))
-                    return
-                  }
-                  actualizarCampo('visibleCatalogo', check)
-                  if (!check && errores.imagen === 'Debe cargar una imagen para publicar el producto en el catálogo') {
-                    setErrores((prev) => ({ ...prev, imagen: null }))
-                  }
-                }}
-                disabled={guardando || sinLotesVigentes}
-              />
-              Mostrar en Catálogo Público
-            </label>
-            {sinLotesVigentes && (
-              <p className="orden-campo-error" style={{ margin: 0 }}>
-                No hay lotes vigentes
-              </p>
-            )}
-            {errores.visibleCatalogo && (
-              <p className="orden-campo-error" role="alert" style={{ margin: 0 }}>
-                {errores.visibleCatalogo}
-              </p>
-            )}
+            <div className="prod-switch-bloque">
+              <label
+                className={`prod-switch-label${guardando || !tieneLotesVigentes ? ' prod-switch-label-deshabilitada' : ''}`}
+              >
+                <span className="prod-switch-control">
+                  <input
+                    type="checkbox"
+                    role="switch"
+                    className="prod-switch-input"
+                    checked={tieneLotesVigentes ? valores.visibleCatalogo : false}
+                    onChange={(e) => {
+                      const check = e.target.checked
+                      if (check && !producto?.imagen && !imagenArchivo) {
+                        const msg = 'Debe cargar una imagen para publicar el producto en el catálogo'
+                        setErrores((prev) => ({
+                          ...prev,
+                          visibleCatalogo: msg,
+                          imagen: msg,
+                        }))
+                        return
+                      }
+                      actualizarCampo('visibleCatalogo', check)
+                      if (!check && errores.imagen === 'Debe cargar una imagen para publicar el producto en el catálogo') {
+                        setErrores((prev) => ({ ...prev, imagen: null }))
+                      }
+                    }}
+                    disabled={guardando || !tieneLotesVigentes}
+                  />
+                  <span className="prod-switch-slider" aria-hidden="true" />
+                </span>
+                <span>Mostrar en Catálogo Público</span>
+              </label>
+              {!tieneLotesVigentes && (
+                <p className="orden-campo-error">
+                  No hay lotes vigentes. No se puede hacer público.
+                </p>
+              )}
+              {errores.visibleCatalogo && (
+                <p className="orden-campo-error" role="alert">
+                  {errores.visibleCatalogo}
+                </p>
+              )}
+            </div>
           </div>
 
           {valores.enPromocion && (
-            <div style={{ gridColumn: 'span 2' }}>
+            <div className="prod-modal-span-2">
               <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
                 <select
                   id="prod-tipo-promo"
@@ -666,10 +689,10 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
           )}
         </div>
 
-        <div className="orden-modal-acciones">
+        <div className="orden-modal-acciones prod-modal-acciones">
           <button
             type="button"
-            className="orden-btn"
+            className="orden-btn prod-btn-secundario"
             onClick={onCerrar}
             disabled={guardando}
           >
@@ -677,10 +700,10 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
           </button>
           <button
             type="submit"
-            className="orden-btn orden-btn-primario"
+            className="orden-btn prod-btn-primario"
             disabled={guardando}
           >
-            {guardando ? 'Guardando...' : editando ? 'Guardar Cambios' : 'Crear Producto'}
+            {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : 'Crear producto'}
           </button>
         </div>
       </form>

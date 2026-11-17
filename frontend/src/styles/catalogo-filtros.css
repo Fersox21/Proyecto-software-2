@@ -7,13 +7,12 @@
 
 /* ---------- Marco contenedor de los filtros ---------- */
 .tarjeta-filtros {
-  background-color: var(--main-bgc, #ffffff);
+  background-color: var(--color-tarjeta, #FFFFFF);
   border-radius: 16px;
-  border: 1px solid #ede8e3;
+  border: 1px solid var(--color-superficie, #EFEBE2);
   padding: 1.5rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
-  
-  /* Mantiene los filtros visibles al scrollear */
+  box-shadow: var(--sombra-suave);
+  font-family: var(--fuente-base);
   position: sticky;
   top: 24px;
 }
@@ -47,22 +46,24 @@
 
 input.campo-busqueda-tag {
   width: 100%;
-  height: 42px;
+  height: 44px;
   padding: 0 34px 0 36px;
+  font-family: var(--fuente-base);
   font-size: 0.9rem;
-  color: var(--color-input, #212529);
-  border: 1px solid #e2e8f0;
-  border-radius: 10px;
-  background-color: var(--color-body, #f8fafc);
+  color: var(--color-primario-oscuro, #0A1331);
+  border: 1px solid #D5CEC2;
+  border-radius: 12px;
+  background-color: var(--color-body, #F9F6F2);
   outline: none;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 
-input.campo-busqueda-tag:focus {
-  background-color: #ffffff;
-  border-color: var(--accent-hover);
-  box-shadow: 0 0 0 3px rgba(176, 125, 30, 0.15);
+input.campo-busqueda-tag:focus,
+input.campo-busqueda-tag:focus-visible {
+  background-color: #FFFFFF;
+  border-color: var(--color-primario, #102055);
+  box-shadow: 0 0 0 3px rgba(16, 32, 85, 0.14);
 }
 
 .btn-limpiar-busqueda {
@@ -113,9 +114,15 @@ input.campo-busqueda-tag:focus {
 
 /* Categoría seleccionada / activa */
 .item-categoria-btn.activa {
-  background-color: var(--color-topbar); /* #0A1331 de tu paleta */
-  color: var(--color-topbar-texto);      /* white */
+  background-color: var(--color-primario, #102055);
+  color: #FFFFFF;
   font-weight: 600;
+}
+
+.item-categoria-btn:focus-visible,
+.btn-limpiar-tag:focus-visible {
+  outline: 2px solid var(--color-primario, #102055);
+  outline-offset: 2px;
 }
 
 /* Contador de ítems por categoría */
@@ -151,4 +158,10 @@ input.campo-busqueda-tag:focus {
 
 .btn-limpiar-tag:hover {
   background: #f9d5db;
+}
+
+@media (max-width: 991px) {
+  .tarjeta-filtros {
+    position: static;
+  }
 }

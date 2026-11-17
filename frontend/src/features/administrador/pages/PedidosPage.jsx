@@ -29,6 +29,7 @@ function PedidosPage() {
   const [modificacionParaAceptar, setModificacionParaAceptar] = useState(null)
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null)
   const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false)
+  const [mensaje, setMensaje] = useState(null)
 
   const handleVerDetalle = async (id) => {
     setModalDetalleAbierto(true)
@@ -57,8 +58,11 @@ function PedidosPage() {
       if (pedidoDetalle?.id === id) {
         setModalDetalleAbierto(false)
       }
+      setMensaje({ tipo: 'exito', texto: 'Pedido aprobado exitosamente.' })
     } catch (err) {
-      alert(`Error al aceptar pedido: ${err.message}`)
+      setPedidoParaAceptar(null)
+      setModificacionParaAceptar(null)
+      setMensaje({ tipo: 'error', texto: err.message })
     }
   }
 
@@ -74,8 +78,10 @@ function PedidosPage() {
     try {
       await cancelarPedido(id, motivoRechazo)
       setPedidoParaCancelar(null)
+      setMensaje({ tipo: 'exito', texto: 'El pedido ha sido cancelado.' })
     } catch (err) {
-      alert(`Error al cancelar pedido: ${err.message}`)
+      setPedidoParaCancelar(null)
+      setMensaje({ tipo: 'error', texto: err.message })
     }
   }
 
@@ -93,25 +99,44 @@ function PedidosPage() {
         <h1 className="h1-admin">Gestión de Pedidos</h1>
       </header>
 
+      {mensaje && (
+        <div
+          className={`orden-alerta ${
+            mensaje.tipo === 'error' ? 'orden-alerta-error' : 'orden-alerta-exito'
+          }`}
+          role="alert"
+        >
+          <span>{mensaje.texto}</span>
+          <button
+            type="button"
+            className="orden-alerta-cerrar"
+            onClick={() => setMensaje(null)}
+            aria-label="Cerrar mensaje"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <section className="sec-prod-admin" aria-live="polite">
         <table className="tabla-prod-admin">
           <thead>
             <tr>
-              <th># Pedido</th>
-              <th>Comercio</th>
+              <th>Cliente / Comercio</th>
               <th>Fecha</th>
               <th>Total</th>
               <th>Estado</th>
-              <th style={{ textAlign: 'center' }}>Acciones</th>
+              <th className="col-acciones-header">Acciones</th>
             </tr>
           </thead>
 
           <tbody>
             {totalPedidos > 0 ? (
-              pedidosPendientes.map((pedido) => (
+              pedidosPendientes.map((pedido, index) => (
                 <FilaPedido
                   key={pedido.id}
                   pedido={pedido}
+                  numeroFila={index + 1}
                   onVerDetalle={handleVerDetalle}
                   onIniciarAceptar={handleIniciarAceptar}
                   onIniciarCancelar={handleIniciarCancelar}
@@ -119,7 +144,7 @@ function PedidosPage() {
               ))
             ) : (
               <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '1rem' }}>
+                <td colSpan="5" className="pedido-tabla-vacia">
                   No hay pedidos registrados.
                 </td>
               </tr>

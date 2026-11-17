@@ -6,11 +6,11 @@
     flex-wrap: wrap;
     align-items: flex-end;
     gap: 1rem;
-    padding: 1rem 1.5rem;
-    margin-bottom: 1rem;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
     background-color: var(--admin-superficie);
-    border: 1px solid var(--admin-borde);
-    border-radius: 12px;
+    border: 1px solid var(--admin-borde-suave);
+    border-radius: 16px;
     box-shadow: var(--admin-sombra);
 }
 
@@ -26,21 +26,76 @@
     line-height: 2.4;
 }
 
+.lotes-tabla-contenedor {
+    background-color: var(--admin-superficie);
+    border: 1px solid var(--admin-borde-suave);
+    border-radius: 16px;
+    box-shadow: var(--admin-sombra);
+    overflow-x: auto;
+}
+
 .lotes-tabla {
-    min-width: 880px;
+    width: 100%;
+    min-width: 0;
+    table-layout: fixed;
 }
 
 .lotes-tabla th,
 .lotes-tabla td {
-    white-space: nowrap;
+    padding: 0.9rem 1rem;
+}
+
+.lotes-col-referencia {
+    width: 12%;
+}
+
+.lotes-col-proveedor {
+    width: 18%;
+}
+
+.lotes-col-cantidad {
+    width: 9%;
+}
+
+.lotes-col-total {
+    width: 12%;
+}
+
+.lotes-col-fechas {
+    width: 17%;
+}
+
+.lotes-col-acciones {
+    width: 104px;
+}
+
+.lotes-celda-doble {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
 }
 
 .lotes-codigo {
-    font-weight: 600;
+    font-weight: 700;
+    color: #102055;
 }
 
-.lotes-secundario {
-    color: var(--admin-texto-secundario);
+.lotes-principal {
+    font-weight: 600;
+    color: var(--admin-texto);
+}
+
+.lotes-subtexto {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+.lotes-proveedor {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .lotes-col-numero {
@@ -49,6 +104,111 @@
 
 .lotes-numero {
     font-variant-numeric: tabular-nums;
+}
+
+.lotes-total {
+    font-weight: 600;
+}
+
+.lotes-vencimiento,
+.lotes-vencimiento-ok,
+.lotes-vencimiento-critico {
+    display: inline-block;
+    width: fit-content;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+.lotes-vencimiento-ok {
+    color: #15803d;
+    font-weight: 500;
+}
+
+.lotes-vencimiento-critico {
+    background-color: #fef2f2;
+    color: #b91c1c;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+.lotes-acciones {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.4rem;
+}
+
+.lotes-btn-icono {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    background-color: transparent;
+    cursor: pointer;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.lotes-btn-icono:focus-visible {
+    outline: 2px solid var(--admin-acento);
+    outline-offset: 2px;
+}
+
+.lotes-btn-editar {
+    color: #334155;
+}
+
+.lotes-btn-editar:hover:not(:disabled) {
+    background-color: #f1f5f9;
+}
+
+.lotes-btn-eliminar {
+    color: #dc2626;
+}
+
+.lotes-btn-eliminar:hover:not(:disabled) {
+    background-color: #fef2f2;
+}
+
+.lotes-btn-icono:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+html[data-tema="oscuro"] .lotes-codigo {
+    color: var(--admin-acento);
+}
+
+html[data-tema="oscuro"] .lotes-subtexto {
+    color: var(--admin-texto-secundario);
+}
+
+html[data-tema="oscuro"] .lotes-vencimiento-ok {
+    color: #6ee7b7;
+}
+
+html[data-tema="oscuro"] .lotes-vencimiento-critico {
+    background-color: rgba(185, 28, 28, 0.22);
+    color: #fca5a5;
+}
+
+html[data-tema="oscuro"] .lotes-btn-editar {
+    color: var(--admin-texto-btn);
+}
+
+html[data-tema="oscuro"] .lotes-btn-editar:hover:not(:disabled) {
+    background-color: var(--admin-hover);
+}
+
+html[data-tema="oscuro"] .lotes-btn-eliminar {
+    color: #fca5a5;
+}
+
+html[data-tema="oscuro"] .lotes-btn-eliminar:hover:not(:disabled) {
+    background-color: rgba(220, 38, 38, 0.18);
 }
 
 /* Separación entre la sección de producto/orden y la de cantidad/fechas. */
@@ -74,5 +234,12 @@
     .lotes-conteo {
         margin-left: 0;
         line-height: normal;
+    }
+}
+
+@media (max-width: 768px) {
+    .lotes-tabla {
+        min-width: 680px;
+        table-layout: auto;
     }
 }

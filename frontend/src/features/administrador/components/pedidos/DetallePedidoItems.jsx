@@ -1,3 +1,4 @@
+import { LuPackageOpen } from 'react-icons/lu'
 import { formatearPrecio } from '../../../../shared/utils/formato'
 
 function DetallePedidoItems({ items = [], total = 0 }) {
@@ -5,7 +6,10 @@ function DetallePedidoItems({ items = [], total = 0 }) {
     <div className="detalle-pedido-seccion">
       <h3 className="detalle-subtitulo">Productos del Pedido</h3>
       {items.length === 0 ? (
-        <p className="detalle-vacio">No hay productos registrados en este pedido.</p>
+        <div className="detalle-vacio">
+          <LuPackageOpen size={40} className="detalle-vacio-icono" aria-hidden="true" />
+          <p className="detalle-vacio-texto">No hay productos registrados en este pedido.</p>
+        </div>
       ) : (
         <div
           className="tabla-detalle-contenedor"

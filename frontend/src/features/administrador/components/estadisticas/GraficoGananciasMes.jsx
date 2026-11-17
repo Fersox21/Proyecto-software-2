@@ -1,3 +1,4 @@
+import { LuTrendingUp } from 'react-icons/lu'
 import Spinner from '../../../../shared/components/Spinner'
 import MensajeVacio from '../../../../shared/components/MensajeVacio'
 import { formatearPrecio } from '../../../../shared/utils/formato'
@@ -21,7 +22,10 @@ function GraficoGananciasMes({ ganancias, listaGanancias }) {
       ) : ganancias.error ? (
         <MensajeVacio titulo="Sin datos de ganancias" texto={ganancias.error.message} />
       ) : listaGanancias.length === 0 ? (
-        <p className="estadistica-vacio">No hay ventas registradas en los últimos 12 meses.</p>
+        <div className="estadistica-vacio">
+          <LuTrendingUp className="estadistica-vacio-icono" size={48} aria-hidden="true" />
+          <p className="estadistica-vacio-texto">No hay ventas registradas en los últimos 12 meses.</p>
+        </div>
       ) : (
         <>
           <div className="estadistica-barras" role="img" aria-label="Ganancias por mes">
