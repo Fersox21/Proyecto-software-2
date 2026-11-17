@@ -3,6 +3,13 @@ import { normalizarProducto } from './productos.precio.js';
 
 const SQL_BASE = `
   SELECT p.*,
+         COALESCE((
+           SELECT SUM(l.cantidad)
+           FROM lotes l
+           WHERE l.producto_id = p.id
+             AND l.activo = true
+             AND l.fecha_vencimiento >= CURRENT_DATE
+         ), 0) AS stock_calculado,
          c.nombre AS categoria_nombre,
          tp.nombre AS tipo_promocion_nombre,
          EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) AS tiene_lote_vigente
@@ -13,6 +20,7 @@ const SQL_BASE = `
 
 const mapearProducto = (row) => {
   if (!row) return null;
+  const stockFinal = row.stock_calculado !== undefined ? Number(row.stock_calculado) : Number(row.stock);
   return normalizarProducto({
     id: row.id,
     nombre: row.nombre,
@@ -22,7 +30,7 @@ const mapearProducto = (row) => {
     marca: row.marca,
     enPromocion: row.en_promocion,
     precioPromo: row.precio_promo,
-    stock: row.stock,
+    stock: stockFinal,
     categoria: row.categoria_nombre ?? row.categoria,
     categoriaId: row.categoria_id ?? null,
     tipoPromocionId: row.tipo_promocion_id ?? null,
@@ -42,7 +50,7 @@ export const findAll = async (client = pool) => {
 
 export const findAllCatalogo = async (client = pool) => {
   const { rows } = await client.query(
-    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND p.stock > 0 AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`
+    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`
   );
   return rows.map(mapearProducto);
 };
@@ -171,27 +179,23 @@ export const updateImagen = async (id, imagen, visibleCatalogo) => {
   return await findById(rows[0].id);
 };
 
-export const ajustarStock = async (id, delta, client = pool) => {
+export const recalcularStock = async (id, client = pool) => {
   const { rows } = await client.query(
     `UPDATE productos
-     SET stock = stock + $1
-     WHERE id = $2 AND stock + $1 >= 0
+     SET stock = COALESCE((
+       SELECT SUM(cantidad)
+       FROM lotes
+       WHERE producto_id = $1
+         AND activo = true
+         AND fecha_vencimiento >= CURRENT_DATE
+     ), 0)
+     WHERE id = $1
      RETURNING id, stock`,
-    [delta, id]
+    [id]
   );
+  return rows[0] ?? null;
+};
 
-  if (rows.length > 0) {
-    return rows[0];
-  }
-
-  const { rows: existeRows } = await client.query('SELECT id FROM productos WHERE id = $1', [id]);
-  if (existeRows.length === 0) {
-    const error = new Error('Producto no encontrado');
-    error.status = 404;
-    throw error;
-  }
-
-  const error = new Error('Stock insuficiente para realizar la operación');
-  error.status = 409;
-  throw error;
+export const ajustarStock = async (id, delta, client = pool) => {
+  return await recalcularStock(id, client);
 };

@@ -65,7 +65,7 @@ CREATE TABLE productos (
     )
 );
 
--- 6. Órdenes de Compra
+-- 6. Órdenes de Compra (1 Proveedor -> 1..* Órdenes de Compra)
 CREATE TABLE ordenes_compra (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE pedidos (
     total_modificado DECIMAL(10, 2) DEFAULT NULL CHECK (total_modificado IS NULL OR total_modificado > 0),
     motivo_modificacion TEXT DEFAULT NULL,
     metodo_pago VARCHAR(30) NOT NULL,
-    telefono VARCHAR(40) NOT NULL,
+    telefono VARCHAR(40) NOT NULL CHECK (telefono ~ '^\+?[0-9]{7,15}$'),
     comercio VARCHAR(100) NOT NULL,
     persona_contacto VARCHAR(100),
     modalidad_entrega VARCHAR(20) NOT NULL,
@@ -97,20 +97,22 @@ CREATE TABLE pedidos (
     usuario_id INTEGER NOT NULL REFERENCES usuarios(id)
 );
 
--- 8. Lotes (incluye columna normalizada total y validación de fechas)
+-- 8. Lotes (1 Producto -> 1..* Lotes; 1 Orden de Compra -> 1..* Lotes -> 1 Proveedor)
 CREATE TABLE lotes (
     id SERIAL PRIMARY KEY,
     fecha_arribo DATE NOT NULL,
     fecha_vencimiento DATE NOT NULL,
+    cantidad_inicial INTEGER NOT NULL CHECK (cantidad_inicial > 0),
     cantidad INTEGER NOT NULL CHECK (cantidad >= 0),
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     activo BOOLEAN NOT NULL DEFAULT true,
     orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
     producto_id INTEGER NOT NULL REFERENCES productos(id),
-    CONSTRAINT chk_lotes_fechas CHECK (fecha_vencimiento >= fecha_arribo)
+    CONSTRAINT chk_lotes_fechas CHECK (fecha_vencimiento >= fecha_arribo),
+    CONSTRAINT chk_lotes_cantidad_max CHECK (cantidad <= cantidad_inicial)
 );
 
--- 9. Ventas
+-- 9. Ventas (1 Pedido -> 0..1 Venta)
 CREATE TABLE ventas (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
@@ -118,10 +120,10 @@ CREATE TABLE ventas (
     total_modificado DECIMAL(10, 2) DEFAULT NULL CHECK (total_modificado IS NULL OR total_modificado > 0),
     motivo_modificacion TEXT DEFAULT NULL,
     activo BOOLEAN NOT NULL DEFAULT true,
-    pedido_id INTEGER NOT NULL REFERENCES pedidos(id)
+    pedido_id INTEGER NOT NULL UNIQUE REFERENCES pedidos(id)
 );
 
--- 10. Tiene (Relación N:M entre Pedidos y Productos)
+-- 10. Tiene / Item (Relación N:M entre Pedidos y Productos)
 CREATE TABLE tiene (
     cantidad INTEGER NOT NULL CHECK (cantidad >= 0),
     precio DECIMAL(10, 2) NOT NULL,
@@ -129,4 +131,14 @@ CREATE TABLE tiene (
     producto_id INTEGER NOT NULL REFERENCES productos(id),
     pedido_id INTEGER NOT NULL REFERENCES pedidos(id),
     PRIMARY KEY (pedido_id, producto_id)
+);
+
+-- 11. Trazabilidad de Lotes por Pedido
+CREATE TABLE pedido_lotes (
+    id SERIAL PRIMARY KEY,
+    pedido_id INTEGER NOT NULL REFERENCES pedidos(id) ON DELETE CASCADE,
+    producto_id INTEGER NOT NULL REFERENCES productos(id),
+    lote_id INTEGER NOT NULL REFERENCES lotes(id),
+    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    consumido_entero BOOLEAN NOT NULL DEFAULT false
 );

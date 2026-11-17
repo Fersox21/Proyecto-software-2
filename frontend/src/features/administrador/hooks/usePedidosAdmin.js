@@ -74,10 +74,10 @@ export function usePedidosAdmin() {
     }
   }, [cargarPedidos, pedidoDetalle, cargarDetallePedido])
 
-  const aceptarPedido = useCallback(async (id, datosModificacion = null) => {
+  const aceptarPedido = useCallback(async (id, datosModificacion = null, asignacionesLotes = null) => {
     setProcesandoAccion(true)
     try {
-      await apiAceptarPedido(id, datosModificacion)
+      await apiAceptarPedido(id, datosModificacion, asignacionesLotes)
       setPedidos((prev) => prev.filter((p) => p.id !== id))
       if (pedidoDetalle?.id === id) {
         cerrarDetalle()

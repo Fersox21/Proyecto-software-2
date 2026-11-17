@@ -13,6 +13,7 @@ function ItemLoteForm({
   tiposPromocion,
   errores,
   puedeEliminar,
+  deshabilitado = false,
   onCambiar,
   onCambiarProductoNuevo,
   onCategoriaCreada,
@@ -48,6 +49,7 @@ function ItemLoteForm({
           <select
             id={`orden-lote-producto-${indice}`}
             value={lote.productoId}
+            disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'productoId', e.target.value)}
             aria-invalid={Boolean(errores[`lote-${indice}-producto`])}
           >
@@ -74,6 +76,7 @@ function ItemLoteForm({
             step="1"
             inputMode="numeric"
             value={lote.cantidad}
+            disabled={deshabilitado}
             onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
             onChange={(e) => onCambiar(indice, 'cantidad', sanitizarEnteroPositivo(e.target.value))}
             aria-invalid={Boolean(errores[`lote-${indice}-cantidad`])}
@@ -89,6 +92,7 @@ function ItemLoteForm({
             id={`orden-lote-arribo-${indice}`}
             type="date"
             value={lote.fechaArribo}
+            disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'fechaArribo', e.target.value)}
             aria-invalid={Boolean(errores[`lote-${indice}-arribo`])}
           />
@@ -104,6 +108,7 @@ function ItemLoteForm({
             type="date"
             min={lote.fechaArribo || undefined}
             value={lote.fechaVencimiento}
+            disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'fechaVencimiento', e.target.value)}
             aria-invalid={Boolean(errores[`lote-${indice}-vencimiento`])}
           />
@@ -116,7 +121,7 @@ function ItemLoteForm({
           type="button"
           className="orden-btn orden-btn-peligro orden-btn-quitar"
           onClick={() => onQuitar(indice)}
-          disabled={!puedeEliminar}
+          disabled={!puedeEliminar || deshabilitado}
           aria-label={`Quitar lote ${indice + 1}`}
         >
           Quitar

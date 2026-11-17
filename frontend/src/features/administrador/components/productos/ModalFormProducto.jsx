@@ -424,17 +424,15 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
               />
             </CampoFormulario>
 
-            <CampoFormulario label="Stock actual *" id="prod-stock" error={errores.stock}>
+            <CampoFormulario label="Stock actual (calculado por lotes)" id="prod-stock" error={errores.stock}>
               <input
                 id="prod-stock"
                 type="number"
-                min="0"
-                step="1"
-                inputMode="numeric"
                 value={valores.stock}
-                onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
-                onChange={(e) => actualizarCampo('stock', sanitizarEnteroPositivo(e.target.value))}
-                disabled={guardando}
+                readOnly
+                disabled
+                title="El stock se calcula automáticamente como la suma de sus lotes activos y vigentes"
+                style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
               />
             </CampoFormulario>
           </div>

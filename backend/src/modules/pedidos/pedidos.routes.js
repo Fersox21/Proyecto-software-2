@@ -9,6 +9,7 @@ router.post('/', controller.crear);
 
 // La gestión de pedidos es exclusiva del panel administrador.
 router.get('/', verificarToken, controller.listar);
+router.get('/:id/lotes-disponibles', verificarToken, controller.obtenerLotesDisponibles);
 router.delete('/:pedido_id/items/:producto_id', verificarToken, controller.eliminarItem);
 router.get('/:id', verificarToken, controller.obtener);
 router.put('/:id', verificarToken, controller.actualizar)

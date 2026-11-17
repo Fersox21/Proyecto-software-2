@@ -63,7 +63,30 @@ function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar })
         </span>
       </td>
       <td className="lotes-col-numero lotes-numero">
-        {lote.cantidad ?? '—'}
+        {Number(lote.cantidad) === 0 ? (
+          <span
+            style={{
+              display: 'inline-block',
+              padding: '0.2rem 0.5rem',
+              borderRadius: '4px',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              backgroundColor: '#fee2e2',
+              color: '#991b1b',
+            }}
+          >
+            0 (Agotado)
+          </span>
+        ) : (
+          <span>
+            {lote.cantidad}
+            {lote.cantidadInicial && lote.cantidadInicial !== lote.cantidad ? (
+              <span style={{ fontSize: '0.8rem', color: '#6b7280', marginLeft: '0.25rem' }}>
+                / {lote.cantidadInicial}
+              </span>
+            ) : null}
+          </span>
+        )}
       </td>
       <td className="lotes-col-numero lotes-numero lotes-total">
         {totalLote != null ? formatearPrecio(totalLote) : '—'}

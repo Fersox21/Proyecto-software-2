@@ -34,6 +34,8 @@ export const productosVencidos = async () => {
     FROM lotes l
     JOIN productos p ON p.id = l.producto_id
     WHERE l.fecha_vencimiento < CURRENT_DATE
+      AND l.activo = true
+      AND l.cantidad > 0
     ORDER BY l.fecha_vencimiento ASC;
   `);
   return rows;

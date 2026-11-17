@@ -83,7 +83,29 @@ export const obtenerItemsPorPedidoId = async (pedidoId) => {
      ORDER BY pr.nombre ASC`,
     [pedidoId]
   );
-  return rows.map(mapearItem);
+
+  const { rows: lotesRows } = await pool.query(
+    `SELECT pl.producto_id, pl.lote_id, pl.cantidad, pl.consumido_entero,
+            l.fecha_vencimiento
+     FROM pedido_lotes pl
+     JOIN lotes l ON l.id = pl.lote_id
+     WHERE pl.pedido_id = $1
+     ORDER BY pl.id ASC`,
+    [pedidoId]
+  );
+
+  return rows.map((item) => {
+    const itemMapeado = mapearItem(item);
+    itemMapeado.lotesUsados = lotesRows
+      .filter((l) => Number(l.producto_id) === Number(item.producto_id))
+      .map((l) => ({
+        loteId: l.lote_id,
+        cantidad: Number(l.cantidad),
+        consumidoEntero: Boolean(l.consumido_entero),
+        fechaVencimiento: l.fecha_vencimiento
+      }));
+    return itemMapeado;
+  });
 };
 
 export const obtenerDetalle = async (id) => {

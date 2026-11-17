@@ -136,6 +136,14 @@ const normalizarItems = async (items) => {
   return [...acumulados.values()];
 };
 
+export const obtenerLotesDisponibles = async (id) => {
+  const pedido = await repository.findById(id);
+  if (!pedido) {
+    throw crearError('Pedido no encontrado', 404);
+  }
+  return await repository.findLotesDisponiblesParaPedido(id);
+};
+
 export const crearPedido = async (data) => {
   const usuario = await repositoryRol.findById(USUARIO_PUBLICO_ID);
   if (!usuario) {
@@ -287,7 +295,12 @@ export const actualizarPedido = async (id, data) => {
     }
 
     if (estadoSolicitado === 'aprobado') {
-      return await repository.aprobarPedido(id, modificacionTotal);
+      const asignaciones = Array.isArray(data.asignacionesLotes)
+        ? data.asignacionesLotes
+        : Array.isArray(data.lotes)
+          ? data.lotes
+          : null;
+      return await repository.aprobarPedido(id, modificacionTotal, asignaciones);
     }
   }
 

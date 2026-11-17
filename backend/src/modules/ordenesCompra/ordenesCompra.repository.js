@@ -100,7 +100,7 @@ export const findById = async (id) => {
   const row = ordenRows[0];
 
   const { rows: lotesRows } = await pool.query(
-    `SELECT l.id, l.cantidad, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+    `SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
             prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca
      FROM lotes l
      LEFT JOIN productos prod ON prod.id = l.producto_id
@@ -112,6 +112,7 @@ export const findById = async (id) => {
   const lotes = lotesRows.map((l) => ({
     id: l.id,
     cantidad: l.cantidad,
+    cantidadInicial: l.cantidad_inicial,
     total: l.total != null ? Number(l.total) : null,
     fechaArribo: l.fecha_arribo,
     fechaVencimiento: l.fecha_vencimiento,
@@ -167,12 +168,12 @@ export const create = async (data) => {
       const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
       await client.query(
-        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
-         VALUES ($1, $2, $3, $4, $5, true, $6)`,
+        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
+         VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
         [fArribo, fVenci, lote.cantidad, nuevaOrden.id, prodId, lote.total]
       );
 
-      await productosRepo.ajustarStock(prodId, lote.cantidad, client);
+      await productosRepo.recalcularStock(prodId, client);
     }
 
     await client.query('COMMIT');
@@ -216,9 +217,17 @@ export const update = async (id, data) => {
 
     if (Array.isArray(lotes)) {
       const { rows: lotesPrevios } = await client.query(
-        `SELECT producto_id, cantidad FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
+        `SELECT id, producto_id, cantidad, cantidad_inicial FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
         [id]
       );
+
+      // Si algún lote ya fue consumido (cantidad < cantidad_inicial), no se permite reescribir los lotes
+      const loteConsumido = lotesPrevios.find((l) => Number(l.cantidad) < Number(l.cantidad_inicial));
+      if (loteConsumido) {
+        const error = new Error('No se pueden modificar los lotes de esta orden porque algunos ya registraron salidas o ventas');
+        error.status = 409;
+        throw error;
+      }
 
       // Desactivamos los lotes anteriores de esta orden
       await client.query(
@@ -226,23 +235,24 @@ export const update = async (id, data) => {
         [id]
       );
 
-      for (const lotePrevio of lotesPrevios) {
-        await productosRepo.ajustarStock(lotePrevio.producto_id, -lotePrevio.cantidad, client);
-      }
+      const productosAfectados = new Set(lotesPrevios.map((l) => l.producto_id));
 
       // Insertamos los lotes actualizados
       for (const lote of lotes) {
         const prodId = await resolverProductoEnTransaccion(lote, client);
+        productosAfectados.add(prodId);
         const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
         const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
         await client.query(
-          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
-           VALUES ($1, $2, $3, $4, $5, true, $6)`,
+          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
+           VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
           [fArribo, fVenci, lote.cantidad, id, prodId, lote.total]
         );
+      }
 
-        await productosRepo.ajustarStock(prodId, lote.cantidad, client);
+      for (const prodId of productosAfectados) {
+        await productosRepo.recalcularStock(prodId, client);
       }
     }
 
@@ -267,7 +277,7 @@ export const remove = async (id) => {
     const { rowCount } = await client.query('UPDATE ordenes_compra SET activo = false WHERE id = $1', [id]);
     await client.query('UPDATE lotes SET activo = false WHERE orden_compra_id = $1 AND activo = true', [id]);
     for (const lote of lotesActivos) {
-      await productosRepo.ajustarStock(lote.producto_id, -lote.cantidad, client);
+      await productosRepo.recalcularStock(lote.producto_id, client);
     }
     await client.query('COMMIT');
     return rowCount;

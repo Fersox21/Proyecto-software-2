@@ -200,12 +200,7 @@ export const crearProducto = async (data, archivo) => {
       data.precioVenta,
       'El precio de venta del producto debe ser mayor a 0'
     );
-    const stock = esVacio(data.stock)
-      ? 0
-      : validarEnteroNoNegativo(
-          data.stock,
-          'El stock del producto debe ser un número entero mayor o igual a 0'
-        );
+    const stock = 0; // El stock se calcula automáticamente como la suma de sus lotes activos y no vencidos
 
     const enPromocion = normalizarBooleano(data.enPromocion);
     const destacado = normalizarBooleano(data.destacado);
@@ -260,13 +255,7 @@ export const actualizarProducto = async (id, data, archivo) => {
           )
         : productoExistente.precioVenta;
 
-    const stock =
-      data.stock !== undefined
-        ? validarEnteroNoNegativo(
-            data.stock,
-            'El stock del producto debe ser un número entero mayor o igual a 0'
-          )
-        : productoExistente.stock;
+    const stock = productoExistente.stock; // El stock se administra automáticamente a través de los lotes
 
     const enPromocion =
       data.enPromocion !== undefined

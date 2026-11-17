@@ -77,6 +77,11 @@ function calcularPrecioTotalLote(lote, productos) {
 
 function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   const editando = Boolean(orden)
+  const tieneLotesConsumidos = Boolean(
+    orden?.lotes?.some(
+      (l) => l.cantidadInicial != null && Number(l.cantidad) < Number(l.cantidadInicial)
+    )
+  )
 
   const [proveedores, setProveedores] = useState([])
   const [productos, setProductos] = useState([])
@@ -229,7 +234,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
     if (!valores.total || Number.isNaN(total) || total <= 0) {
       nuevosErrores.total = 'El total debe ser mayor a 0'
     }
-    if (!valores.fecha) nuevosErrores.fecha = 'La fecha es obligatoria'
+    if (!valores.fecha) nuevosErrores.fecha = 'La fecha de pedido es obligatoria'
     if (!valores.proveedorId) {
       nuevosErrores.proveedorId = 'Elegí un proveedor'
     } else if (valores.proveedorId === '__nuevo__') {
@@ -426,7 +431,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
             </select>
           </CampoFormulario>
 
-          <CampoFormulario label="Fecha" id="orden-fecha" error={errores.fecha}>
+          <CampoFormulario label="Fecha de pedido" id="orden-fecha" error={errores.fecha}>
             <input
               id="orden-fecha"
               name="fecha"
@@ -468,10 +473,18 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
         <section className="orden-lotes" aria-labelledby="orden-lotes-titulo">
           <div className="orden-lotes-cabecera">
             <h3 className="orden-lotes-titulo" id="orden-lotes-titulo">Lotes</h3>
-            <button type="button" className="orden-btn" onClick={agregarLote}>
-              + Agregar lote
-            </button>
+            {!tieneLotesConsumidos && (
+              <button type="button" className="orden-btn" onClick={agregarLote}>
+                + Agregar lote
+              </button>
+            )}
           </div>
+
+          {tieneLotesConsumidos && (
+            <div className="orden-alerta" style={{ marginBottom: '1rem', backgroundColor: '#eff6ff', color: '#1e40af', border: '1px solid #bfdbfe' }}>
+              Los lotes de esta orden ya registraron ventas o salidas de stock, por lo que su configuración permanece fija para preservar la trazabilidad histórica.
+            </div>
+          )}
 
           {valores.lotes.length === 0 ? (
             <>
@@ -488,7 +501,8 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                 categorias={categorias}
                 tiposPromocion={tiposPromocion}
                 errores={errores}
-                puedeEliminar={valores.lotes.length > 1}
+                puedeEliminar={!tieneLotesConsumidos && valores.lotes.length > 1}
+                deshabilitado={tieneLotesConsumidos}
                 onCambiar={cambiarLote}
                 onCambiarProductoNuevo={cambiarProductoNuevo}
                 onCategoriaCreada={agregarCategoria}

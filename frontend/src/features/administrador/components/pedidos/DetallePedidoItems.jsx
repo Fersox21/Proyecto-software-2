@@ -47,7 +47,29 @@ function DetallePedidoItems({ items = [], total = 0 }) {
 
                 return (
                   <tr key={item.id || item.producto_id || index}>
-                    <td>{nombre}</td>
+                    <td>
+                      <div>{nombre}</div>
+                      {Array.isArray(item.lotesUsados) && item.lotesUsados.length > 0 && (
+                        <div style={{ fontSize: '0.75rem', color: '#4b5563', marginTop: '0.2rem' }}>
+                          Lotes:{' '}
+                          {item.lotesUsados.map((l, i) => (
+                            <span
+                              key={i}
+                              style={{
+                                display: 'inline-block',
+                                marginRight: '0.35rem',
+                                padding: '0.1rem 0.35rem',
+                                backgroundColor: '#f3f4f6',
+                                borderRadius: '3px',
+                                border: '1px solid #e5e7eb',
+                              }}
+                            >
+                              #{l.loteId} ({l.cantidad} u.{l.consumidoEntero ? ' - entero' : ''})
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </td>
                     <td>{marca}</td>
                     <td style={{ textAlign: 'right' }}>{formatearPrecio(precio)}</td>
                     <td style={{ textAlign: 'center' }}>{cantidad}</td>

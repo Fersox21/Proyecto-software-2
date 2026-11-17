@@ -18,6 +18,15 @@ export const obtener = async (req, res, next) => {
   }
 };
 
+export const obtenerLotesDisponibles = async (req, res, next) => {
+  try {
+    const lotes = await service.obtenerLotesDisponibles(req.params.id);
+    res.json(lotes);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const crear = async (req, res, next) => {
   try {
     const nuevoPedido = await service.crearPedido(req.body);

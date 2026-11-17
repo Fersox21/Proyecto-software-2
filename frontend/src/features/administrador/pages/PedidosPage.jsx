@@ -50,9 +50,9 @@ function PedidosPage() {
     setModificacionParaAceptar(datosModificacion)
   }
 
-  const handleConfirmarAceptar = async (id) => {
+  const handleConfirmarAceptar = async (id, asignacionesLotes = null) => {
     try {
-      await aceptarPedido(id, modificacionParaAceptar)
+      await aceptarPedido(id, modificacionParaAceptar, asignacionesLotes)
       setPedidoParaAceptar(null)
       setModificacionParaAceptar(null)
       if (pedidoDetalle?.id === id) {
