@@ -1,15 +1,18 @@
-/*ESTO ES PARA BORRAR TODOS LOS DATOS DE LAS TABLAS*/
-TRUNCATE TABLE tiene,
-ventas,
-lotes,
-pedidos,
-ordenes_compra,
-productos,
-tipos_promocion,
-categorias,
-usuarios,
-proveedores RESTART IDENTITY CASCADE;
-/*Inserciones*/
+BEGIN;
+
+TRUNCATE TABLE
+    tiene,
+    ventas,
+    lotes,
+    pedidos,
+    ordenes_compra,
+    productos,
+    tipos_promocion,
+    categorias,
+    usuarios,
+    proveedores
+RESTART IDENTITY CASCADE;
+
 -- 1. Proveedores
 INSERT INTO proveedores (nombre, activo, telefono) VALUES
 ('Molinos del Sur S.A.', true, '+541145550101'),
@@ -44,21 +47,33 @@ INSERT INTO productos (nombre, descripcion, precio_costo, precio_venta, marca, e
 ('Mozzarella 500g', 'Queso mozzarella en barra', 2100.00, 3100.00, 'Barraza', true, 2790.00, 30, 'Frescos', 3, 1, NULL, true, false, true),
 ('Puré Tomate 520g', 'Puré de tomate en tetra brik', 350.00, 580.00, 'Noel', false, NULL, 200, 'Enlatados', 4, NULL, NULL, false, false, true);
 
--- 6. Órdenes de Compra (Asociadas al Proveedor)
+-- Normalización de promociones a porcentaje entero (1% a 99%)
+UPDATE productos
+SET precio_promo = ROUND(
+      precio_venta * (1 - ROUND((1 - precio_promo / precio_venta) * 100) / 100),
+      2
+    )
+WHERE en_promocion = true
+  AND precio_promo IS NOT NULL
+  AND precio_promo > 0
+  AND precio_promo < precio_venta
+  AND ROUND((1 - precio_promo / precio_venta) * 100) BETWEEN 1 AND 99;
+
+-- 6. Órdenes de Compra
 INSERT INTO ordenes_compra (fecha, total, activo, proveedor_id) VALUES
 ('2026-10-01', 225000.00, true, 1),
 ('2026-10-10', 120000.00, true, 3),
 ('2026-10-15', 420000.00, true, 2),
 ('2026-11-01', 210000.00, true, 3);
 
--- 7. Lotes (Vincular la OC con el Producto correspondientes)
+-- 7. Lotes
 INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, total, activo, orden_compra_id, producto_id) VALUES
 ('2026-10-03', '2027-04-03', 300, 135000.00, true, 1, 1),
 ('2026-10-11', '2026-11-25', 200, 120000.00, true, 2, 2),
 ('2026-10-17', '2027-10-17', 350, 420000.00, true, 3, 3),
 ('2026-11-02', '2026-12-15', 100, 210000.00, false, 4, 4);
 
--- 8. Pedidos (Asociados al Usuario / usuario_id)
+-- 8. Pedidos
 INSERT INTO pedidos (fecha, subtotal, envio, total, metodo_pago, telefono, comercio, persona_contacto, modalidad_entrega, direccion, descripcion_direccion, observaciones, estado, motivo_rechazo, activo, usuario_id) VALUES
 ('2026-11-05', 2550.00, 0, 2550.00, 'Efectivo', '2664123456', 'La Fe Distribuidora', 'Pedro Álvarez', 'Delivery', 'Av. San Martín 1234', 'Portón negro', NULL, 'entregado', NULL, true, 2),
 ('2026-11-06', 5650.00, 0, 5650.00, 'Transferencia', '2664567890', 'La Fe Distribuidora', 'María Gómez', 'Retiro', NULL, NULL, 'Retira a las 10 hs', 'aprobado', NULL, true, 3),
@@ -75,7 +90,9 @@ INSERT INTO tiene (pedido_id, producto_id, cantidad, precio, activo) VALUES
 (3, 3, 1, 1850.00, true),
 (4, 4, 1, 3100.00, true);
 
--- 10. Ventas (Consolidación de Pedidos)
+-- 10. Ventas
 INSERT INTO ventas (fecha, total, activo, pedido_id) VALUES
 ('2026-11-05', 2550.00, true, 1),
 ('2026-11-06', 5650.00, true, 2);
+
+COMMIT;
