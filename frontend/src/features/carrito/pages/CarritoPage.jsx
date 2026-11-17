@@ -40,9 +40,9 @@ function CarritoPage() {
           <h1 className="h1 mb-2 text-start">Tu carrito</h1>
           <div className="d-flex justify-content-between">
             <small className="ps-3">{items.length} productos · {cantidadTotal} unidades</small>
-            <a href="/catalogo" className="text-decoration-none text-black">
+            <Link to="/catalogo" className="text-decoration-none text-black">
               <MdArrowBack /> Seguir comprando
-            </a>
+            </Link>
           </div>
           <ul className="list-group mt-4">
             {items.map((prod) => (

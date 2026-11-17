@@ -1,12 +1,20 @@
 import { Router } from 'express';
-import * as controller from './estadisticas.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './estadisticas.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 
-const router = Router();
+export const crearEstadisticasRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin
+} = {}) => {
+  const router = Router();
 
-router.get('/ganancias-mensuales', verificarToken, controller.gananciasMensuales);
-router.get('/productos-vencidos', verificarToken, controller.productosVencidos);
-router.get('/mas-vendidos', verificarToken, controller.masVendidos);
-router.get('/promedio-diario', verificarToken, controller.promedioDiario);
+  router.get('/ganancias-mensuales', middlewareToken, middlewareAdmin, controller.gananciasMensuales);
+  router.get('/productos-vencidos', middlewareToken, middlewareAdmin, controller.productosVencidos);
+  router.get('/mas-vendidos', middlewareToken, middlewareAdmin, controller.masVendidos);
+  router.get('/promedio-diario', middlewareToken, middlewareAdmin, controller.promedioDiario);
 
-export default router;
+  return router;
+};
+
+export default crearEstadisticasRoutes();

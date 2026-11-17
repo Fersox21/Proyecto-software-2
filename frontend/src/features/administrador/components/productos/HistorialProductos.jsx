@@ -58,7 +58,7 @@ function HistorialProductos() {
       if (chip === 'sin-imagen' && Boolean(p.imagen)) return false
 
       if (q) {
-        const texto = [p.nombre, p.marca, p.categoria, `#${p.id}`]
+        const texto = [p.nombre, p.marca, p.categoria]
           .filter(Boolean)
           .join(' ')
           .toLowerCase()
@@ -114,7 +114,7 @@ function HistorialProductos() {
         onChipChange={(c) => { setChip(c); setPagina(1) }}
         busqueda={busqueda}
         onBusquedaChange={(v) => { setBusqueda(v); setPagina(1) }}
-        placeholderBusqueda="Nombre, marca, categoría o #producto"
+        placeholderBusqueda="Nombre, marca o categoría"
         totalVisibles={filtrados.length}
         totalRegistros={productos.length}
         hayFiltrosActivos={chip !== 'todos' || busqueda !== ''}
@@ -201,6 +201,7 @@ function HistorialProductos() {
 
       {productoDetalle && (
         <ModalFormProducto
+          key={productoDetalle.id}
           producto={productoDetalle}
           visible={Boolean(productoDetalle)}
           guardando={false}

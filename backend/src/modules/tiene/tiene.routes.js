@@ -1,14 +1,22 @@
 import { Router } from 'express';
-import * as controller from './tiene.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './tiene.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 
-const router = Router();
+export const crearTieneRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin
+} = {}) => {
+  const router = Router();
 
-router.get('/',verificarToken, controller.listar);
-router.get('/:id',verificarToken, controller.obtener);
-router.post('/', verificarToken, controller.crear);
-router.put('/', verificarToken, controller.actualizar)
-router.delete('/:pedido_id/:producto_id', verificarToken, controller.eliminar);
+  router.get('/', middlewareToken, middlewareAdmin, controller.listar);
+  router.get('/:id', middlewareToken, middlewareAdmin, controller.obtener);
+  router.post('/', middlewareToken, middlewareAdmin, controller.crear);
+  router.put('/', middlewareToken, middlewareAdmin, controller.actualizar);
+  router.delete('/:pedido_id/:producto_id', middlewareToken, middlewareAdmin, controller.eliminar);
 
-export default router;
+  return router;
+};
+
+export default crearTieneRoutes();
  

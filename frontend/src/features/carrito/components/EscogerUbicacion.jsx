@@ -37,13 +37,13 @@ function EscogerUbicacion({ direccion, onDireccionChange }) {
                         }}
                     />
 
-                    <div
-                        role="button"
+                    <button
+                        type="button"
                         className="btn btn-dark d-flex align-items-center justify-content-center user-select-none"
                         onClick={actualizarMapa}
                     >
                         Ver en mapa
-                    </div>
+                    </button>
                 </div>
             </div>
 

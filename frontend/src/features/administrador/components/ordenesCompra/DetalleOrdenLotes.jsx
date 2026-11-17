@@ -1,6 +1,6 @@
 import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
-function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
+function DetalleOrdenLotes({ detalle, productosPorId, numeroOrden }) {
   if (detalle.cargando) {
     return <p className="orden-detalle-estado">Cargando lotes...</p>
   }
@@ -22,7 +22,7 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
   return (
     <table className="orden-tabla-lotes">
       <caption className="orden-visually-hidden">
-        Lotes de la orden {ordenId}
+        {numeroOrden != null ? `Lotes de la orden #${numeroOrden}` : 'Lotes de la orden'}
       </caption>
       <thead>
         <tr>
@@ -35,21 +35,18 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
         </tr>
       </thead>
       <tbody>
-        {lotes.map((lote) => {
+        {lotes.map((lote, index) => {
           const idProducto = lote.producto?.id
           const nombre = productosPorId[idProducto] || lote.producto?.nombre
           const productoEliminado = lote.producto?.activo === false
 
           return (
-            <tr key={lote.id ?? `${idProducto}-${lote.fechaVencimiento}`}>
+            <tr key={lote.id ?? `${idProducto}-${lote.fechaVencimiento}-${index}`}>
               <td>
-                <strong>#{lote.id ?? '—'}</strong>
+                <strong>#{index + 1}</strong>
               </td>
               <td>
-                {nombre ||
-                  (idProducto != null
-                    ? `Producto #${idProducto}`
-                    : 'Sin producto')}
+                {nombre || 'Sin producto'}
                 {productoEliminado && (
                   <span className="hist-item-eliminado-tag">Producto eliminado</span>
                 )}

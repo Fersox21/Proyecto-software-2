@@ -28,8 +28,6 @@ function LotesPage() {
 
     return lotes.filter((lote) => {
       const contenido = [
-        `#${lote.id}`,
-        lote.ordenCompra?.id != null ? `#${lote.ordenCompra.id}` : null,
         lote.producto?.nombre,
         lote.producto?.marca,
         lote.ordenCompra?.proveedor?.nombre,
@@ -156,7 +154,7 @@ function LotesPage() {
           {visibles.length === 0 ? (
             <MensajeVacio
               titulo="No hay lotes que coincidan"
-              texto="Probá con otro producto, proveedor, orden o código de lote."
+              texto="Probá con otro producto, marca o proveedor."
             >
               <button type="button" className="orden-btn" onClick={limpiarBusqueda}>
                 Limpiar búsqueda

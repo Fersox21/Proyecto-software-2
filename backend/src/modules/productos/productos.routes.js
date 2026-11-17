@@ -1,18 +1,26 @@
 import { Router } from 'express';
-import * as controller from './productos.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './productos.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 import { recibirImagen } from './productos.imagen.js';
 
-const router = Router();
+export const crearProductosRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin
+} = {}) => {
+  const router = Router();
 
-router.get('/', controller.listar);
-router.get('/catalogo', controller.listarCatalogo);
-router.get('/historial', verificarToken, controller.listarHistorial);
-router.get('/:id', controller.obtener);
-router.post('/', verificarToken, recibirImagen, controller.crear);
-router.put('/:id', verificarToken, recibirImagen, controller.actualizar);
-router.post('/:id/imagen', verificarToken, recibirImagen, controller.subirImagen);
-router.delete('/:id/imagen', verificarToken, controller.quitarImagen);
-router.delete('/:id', verificarToken, controller.eliminar);
+  router.get('/catalogo', controller.listarCatalogo);
+  router.get('/historial', middlewareToken, middlewareAdmin, controller.listarHistorial);
+  router.get('/', middlewareToken, middlewareAdmin, controller.listar);
+  router.get('/:id', middlewareToken, middlewareAdmin, controller.obtener);
+  router.post('/', middlewareToken, middlewareAdmin, recibirImagen, controller.crear);
+  router.put('/:id', middlewareToken, middlewareAdmin, recibirImagen, controller.actualizar);
+  router.post('/:id/imagen', middlewareToken, middlewareAdmin, recibirImagen, controller.subirImagen);
+  router.delete('/:id/imagen', middlewareToken, middlewareAdmin, controller.quitarImagen);
+  router.delete('/:id', middlewareToken, middlewareAdmin, controller.eliminar);
 
-export default router;
+  return router;
+};
+
+export default crearProductosRoutes();

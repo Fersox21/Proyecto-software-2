@@ -19,11 +19,13 @@ function CarruselMarcas() {
                 <div className="degradado-derecho"></div>
 
                 <div className="carrusel-track">
-                {[...marcas, ...marcas, ...marcas].map((marca, index) => (
-                    <div className="marca-item" key={index}>
-                    {marca}
-                    </div>
-                ))}
+                {[0, 1, 2].flatMap((repeticion) =>
+                    marcas.map((marca) => (
+                        <div className="marca-item" key={`${repeticion}-${marca}`}>
+                            {marca}
+                        </div>
+                    ))
+                )}
                 </div>
             </div>
         </section>

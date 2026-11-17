@@ -1,98 +1,51 @@
-const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+import { pedirAdmin, URL_BASE } from './httpAdmin'
 
-function headers(conJson = true) {
-  const token = sessionStorage.getItem('token')
-  const base = {
-    'Authorization': `Bearer ${token}`
-  }
-  if (conJson) {
-    base['Content-Type'] = 'application/json'
-  }
-  return base
+export function obtenerProductos() {
+  return pedirAdmin(`${URL_BASE}/productos`, { method: 'GET' }, 'No se pudieron obtener los productos')
 }
 
-export async function obtenerProductos() {
-  const respuesta = await fetch(`${URL_BASE}/productos`, {
-    headers: headers()
-  })
-  
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudieron obtener los productos')
-  }
-  
-  return respuesta.json()
+export function obtenerHistorialProductos() {
+  return pedirAdmin(
+    `${URL_BASE}/productos/historial`,
+    { method: 'GET' },
+    'No se pudo obtener el historial de productos',
+  )
 }
 
-export async function obtenerHistorialProductos() {
-  const respuesta = await fetch(`${URL_BASE}/productos/historial`, {
-    headers: headers()
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudo obtener el historial de productos')
-  }
-
-  return respuesta.json()
+export function obtenerProductoPorId(id) {
+  return pedirAdmin(`${URL_BASE}/productos/${id}`, { method: 'GET' }, 'El producto que buscás no existe')
 }
 
-export async function obtenerProductoPorId(id) {
-  const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
-    headers: headers()
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'El producto que buscás no existe')
-  }
-
-  return respuesta.json()
-}
-
-export async function crearProducto(datos) {
+export function crearProducto(datos) {
   const esFormData = datos instanceof FormData
-  const respuesta = await fetch(`${URL_BASE}/productos`, {
-    method: 'POST',
-    headers: headers(!esFormData),
-    body: esFormData ? datos : JSON.stringify(datos)
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudo crear el producto')
-  }
-
-  return respuesta.json()
+  return pedirAdmin(
+    `${URL_BASE}/productos`,
+    {
+      method: 'POST',
+      body: esFormData ? datos : JSON.stringify(datos),
+    },
+    'No se pudo crear el producto',
+  )
 }
 
-export async function actualizarProducto(id, datos) {
+export function actualizarProducto(id, datos) {
   const esFormData = datos instanceof FormData
-  const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
-    method: 'PUT',
-    headers: headers(!esFormData),
-    body: esFormData ? datos : JSON.stringify(datos)
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudo actualizar el producto')
-  }
-
-  return respuesta.json()
+  return pedirAdmin(
+    `${URL_BASE}/productos/${id}`,
+    {
+      method: 'PUT',
+      body: esFormData ? datos : JSON.stringify(datos),
+    },
+    'No se pudo actualizar el producto',
+  )
 }
 
 export async function eliminarProducto(id) {
-  const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
-    method: 'DELETE',
-    headers: headers()
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudo eliminar el producto')
-  }
-
+  await pedirAdmin(
+    `${URL_BASE}/productos/${id}`,
+    { method: 'DELETE' },
+    'No se pudo eliminar el producto',
+  )
   return true
 }
 
@@ -101,28 +54,14 @@ export async function obtenerDestacados() {
   return productos.filter((p) => p.destacado)
 }
 
-export async function obtenerCategorias() {
-  const respuesta = await fetch(`${URL_BASE}/categorias`, {
-    headers: headers()
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudieron obtener las categorías')
-  }
-
-  return respuesta.json()
+export function obtenerCategorias() {
+  return pedirAdmin(`${URL_BASE}/categorias`, { method: 'GET' }, 'No se pudieron obtener las categorías')
 }
 
-export async function obtenerTiposPromocion() {
-  const respuesta = await fetch(`${URL_BASE}/tipos-promocion`, {
-    headers: headers()
-  })
-
-  if (!respuesta.ok) {
-    const errorData = await respuesta.json().catch(() => ({}))
-    throw new Error(errorData.error || 'No se pudieron obtener los tipos de promoción')
-  }
-
-  return respuesta.json()
+export function obtenerTiposPromocion() {
+  return pedirAdmin(
+    `${URL_BASE}/tipos-promocion`,
+    { method: 'GET' },
+    'No se pudieron obtener los tipos de promoción',
+  )
 }

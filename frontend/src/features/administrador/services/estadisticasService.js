@@ -1,25 +1,11 @@
-const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
+import { pedirAdmin, URL_BASE } from './httpAdmin'
 
-function headers() {
-  const token = sessionStorage.getItem('token')
-  return {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
-  }
-}
-
-async function get(path) {
-  const respuesta = await fetch(`${URL_BASE}/estadisticas${path}`, {
-    method: 'GET',
-    headers: headers(),
-  })
-
-  if (!respuesta.ok) {
-    const cuerpo = await respuesta.json().catch(() => null)
-    throw new Error(cuerpo?.error || cuerpo?.mensaje || 'No se pudieron obtener las estadísticas')
-  }
-
-  return respuesta.json()
+function get(path) {
+  return pedirAdmin(
+    `${URL_BASE}/estadisticas${path}`,
+    { method: 'GET' },
+    'No se pudieron obtener las estadísticas',
+  )
 }
 
 export function obtenerGananciasMensuales() {

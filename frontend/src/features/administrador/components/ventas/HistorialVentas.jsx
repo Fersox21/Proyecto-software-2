@@ -59,8 +59,6 @@ function HistorialVentas() {
 
       if (q) {
         const texto = [
-          `#${v.id}`,
-          v.pedidoId != null ? `#${v.pedidoId}` : null,
           v.comercio,
           v.motivoModificacion ?? v.motivo_modificacion,
         ]
@@ -112,7 +110,7 @@ function HistorialVentas() {
     setErrorDetalle('')
     setVentaDetalle(null)
     try {
-      const detalle = await obtenerVentaPorId(ventaId)
+      const detalle = await obtenerVentaPorId(ventaId, { historial: true })
       let pedido = detalle?.pedido || null
       let items = detalle?.items || detalle?.productos || pedido?.items || null
       const pedidoId = detalle?.pedido_id ?? detalle?.pedidoId
@@ -126,7 +124,7 @@ function HistorialVentas() {
       }
       if (!items) {
         try {
-          items = await obtenerProductosVenta(ventaId)
+          items = await obtenerProductosVenta(ventaId, { historial: true })
         } catch {
           items = []
         }
@@ -170,7 +168,7 @@ function HistorialVentas() {
         onChipChange={(c) => { setChip(c); setPagina(1) }}
         busqueda={busqueda}
         onBusquedaChange={(v) => { setBusqueda(v); setPagina(1) }}
-        placeholderBusqueda="#venta, comercio o motivo de ajuste"
+        placeholderBusqueda="Comercio o motivo de ajuste"
         conRangoFechas
         desde={desde}
         hasta={hasta}
@@ -208,7 +206,8 @@ function HistorialVentas() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((venta) => {
+              {visibles.map((venta, index) => {
+                const numeroFila = (paginaSegura - 1) * POR_PAGINA + index + 1
                 const totalMod = venta.totalModificado ?? venta.total_modificado
                 const motivoMod = venta.motivoModificacion ?? venta.motivo_modificacion
                 const totalOriginal = venta.total ?? 0
@@ -220,7 +219,7 @@ function HistorialVentas() {
                   <tr key={venta.id} className={esEliminada ? 'hist-fila-eliminada' : ''}>
                     <td className="col-admin">
                       <div className="venta-id-fecha">
-                        <span className="venta-id">#{venta.id}</span>
+                        <span className="venta-id">#{numeroFila}</span>
                         <span className="venta-fecha">
                           {venta.fecha ? formatearFecha(venta.fecha) : '-'}
                         </span>
@@ -250,7 +249,7 @@ function HistorialVentas() {
                         type="button"
                         className="venta-btn-icono venta-btn-ver"
                         title="Ver detalle"
-                        aria-label={`Ver detalle de venta #${venta.id}`}
+                        aria-label={`Ver detalle de venta #${numeroFila}`}
                         onClick={() => verDetalle(venta.id)}
                       >
                         <LuEye size={16} aria-hidden="true" />

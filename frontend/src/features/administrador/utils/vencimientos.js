@@ -49,16 +49,11 @@ export function textoDias(dias) {
 }
 
 export function nombreProducto(lote) {
-  if (lote?.producto?.nombre) return lote.producto.nombre
-  if (lote?.producto?.id != null) return `Producto #${lote.producto.id}`
-  return 'Sin producto'
+  return lote?.producto?.nombre || 'Sin producto'
 }
 
 export function nombreProveedor(lote) {
-  const proveedor = lote?.ordenCompra?.proveedor
-  if (proveedor?.nombre) return proveedor.nombre
-  if (proveedor?.id != null) return `Proveedor #${proveedor.id}`
-  return 'Sin proveedor'
+  return lote?.ordenCompra?.proveedor?.nombre || 'Sin proveedor'
 }
 
 export function compararPorVencimiento(a, b) {

@@ -45,33 +45,29 @@ export const precioConDescuento = (precioVenta, porcentaje) => {
 
 export const precioPromocionalValido = (precioVenta, precioPromo, enPromocion) => {
   if (enPromocion !== true) return false;
-  const normal = aNumero(precioVenta);
-  const promo = aNumero(precioPromo);
-  return (
-    Number.isFinite(normal) &&
-    Number.isFinite(promo) &&
-    normal > 0 &&
-    promo > 0 &&
-    promo < normal
-  );
+  return porcentajeDescuento(precioVenta, precioPromo) !== null;
 };
 
 // Normaliza un producto para que precioPromo y descuento sean coherentes.
-// Conserva el precio promocional exacto redondeado a 2 decimales cuando es válido.
+// Calcula el porcentaje entero (1% a 99%) y normaliza precioPromo al monto exacto de ese porcentaje.
 export const normalizarProducto = (producto) => {
   if (!producto) return producto;
 
   const precioVenta = producto.precioVenta ?? producto.precio_venta;
-  const precioPromo =
+  const rawPromo =
     producto.precioPromo !== undefined ? producto.precioPromo : producto.precio_promo;
   const enPromocion = producto.enPromocion ?? producto.en_promocion;
 
-  const esValido = precioPromocionalValido(precioVenta, precioPromo, enPromocion);
-  const porcentaje = esValido ? porcentajeDescuento(precioVenta, precioPromo) : null;
+  const porcentaje = enPromocion === true ? porcentajeDescuento(precioVenta, rawPromo) : null;
+  const precioPromo = porcentaje !== null
+    ? precioConDescuento(precioVenta, porcentaje)
+    : (rawPromo !== undefined && rawPromo !== null && rawPromo !== ''
+        ? redondear2(rawPromo)
+        : rawPromo);
 
   return {
     ...producto,
-    precioPromo: esValido ? redondear2(precioPromo) : precioPromo,
+    precioPromo,
     descuento: porcentaje
   };
 };

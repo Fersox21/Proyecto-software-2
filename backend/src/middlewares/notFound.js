@@ -1,4 +1,8 @@
-// Si ninguna ruta respondió, la URL no existe
 export const notFound = (req, res) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
+  res.status(404).json({
+    success: false,
+    error: 'Ruta no encontrada',
+    message: 'Ruta no encontrada',
+    statusCode: 404
+  });
 };

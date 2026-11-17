@@ -37,6 +37,56 @@ function instantaneaProducto(producto) {
   }
 }
 
+function conciliarCarritoConCatalogo(prev, productosPorId) {
+  if (prev.length === 0) return { items: prev, huboRemovidos: false }
+
+  let huboCambios = false
+  let huboRemovidos = false
+  const actualizados = []
+
+  for (const item of prev) {
+    const productoActual = productosPorId.get(item.id)
+    if (!productoActual || Number(productoActual.stock) <= 0) {
+      huboCambios = true
+      huboRemovidos = true
+      continue
+    }
+
+    const stockActual = Number(productoActual.stock)
+    const cantidadAjustada = Math.max(1, Math.min(item.cantidad, stockActual))
+    const instantanea = instantaneaProducto(productoActual)
+
+    const cambioDatos =
+      item.stock !== instantanea.stock ||
+      item.precioVenta !== instantanea.precioVenta ||
+      item.enPromocion !== instantanea.enPromocion ||
+      item.precioPromo !== instantanea.precioPromo ||
+      item.precioCosto !== instantanea.precioCosto ||
+      item.nombre !== instantanea.nombre ||
+      item.marca !== instantanea.marca ||
+      item.descripcion !== instantanea.descripcion ||
+      item.categoria !== instantanea.categoria ||
+      item.imagen !== instantanea.imagen ||
+      cantidadAjustada !== item.cantidad
+
+    if (cambioDatos) {
+      huboCambios = true
+      actualizados.push({
+        ...item,
+        ...instantanea,
+        cantidad: cantidadAjustada,
+      })
+    } else {
+      actualizados.push(item)
+    }
+  }
+
+  return {
+    items: huboCambios ? actualizados : prev,
+    huboRemovidos,
+  }
+}
+
 export function useCarrito() {
   const [items, setItems] = useState(leerCarritoGuardado);
   const [avisoProductosRemovidos, setAvisoProductosRemovidos] = useState(false);
@@ -46,7 +96,11 @@ export function useCarrito() {
   itemsRef.current = items;
 
   useEffect(() => {
-    localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items))
+    try {
+      localStorage.setItem(CLAVE_STORAGE, JSON.stringify(items))
+    } catch {
+      // Ignora errores de cuota o almacenamiento bloqueado
+    }
   }, [items]);
 
   const verificarDisponibilidad = useCallback(async () => {
@@ -62,28 +116,7 @@ export function useCarrito() {
         return !productoActual || Number(productoActual.stock) <= 0;
       });
 
-      setItems((prev) => {
-        if (prev.length === 0) return prev;
-        let huboCambios = false;
-        const actualizados = [];
-
-        for (const item of prev) {
-          const productoActual = productosPorId.get(item.id);
-          if (!productoActual || Number(productoActual.stock) <= 0) {
-            huboCambios = true;
-            continue;
-          }
-
-          if (item.imagen == null && productoActual.imagen != null) {
-            huboCambios = true;
-            actualizados.push({ ...item, imagen: productoActual.imagen });
-          } else {
-            actualizados.push(item);
-          }
-        }
-
-        return huboCambios ? actualizados : prev;
-      });
+      setItems((prev) => conciliarCarritoConCatalogo(prev, productosPorId).items);
 
       if (hayNoDisponibles) {
         setAvisoProductosRemovidos(true);
@@ -96,8 +129,37 @@ export function useCarrito() {
   }, []);
 
   useEffect(() => {
-    verificarDisponibilidad();
-  }, [verificarDisponibilidad]);
+    if (itemsRef.current.length === 0 || verificandoRef.current) return undefined;
+    let ignorar = false;
+    verificandoRef.current = true;
+
+    obtenerProductos()
+      .then((productos) => {
+        if (ignorar) return;
+        const productosPorId = new Map(productos.map((producto) => [producto.id, producto]));
+        const hayNoDisponibles = itemsRef.current.some((item) => {
+          const productoActual = productosPorId.get(item.id);
+          return !productoActual || Number(productoActual.stock) <= 0;
+        });
+
+        setItems((prev) => conciliarCarritoConCatalogo(prev, productosPorId).items);
+
+        if (hayNoDisponibles) {
+          setAvisoProductosRemovidos(true);
+        }
+      })
+      .catch(() => {
+        // Si falla la consulta al catálogo, se conserva el carrito actual.
+      })
+      .finally(() => {
+        verificandoRef.current = false;
+      });
+
+    return () => {
+      ignorar = true;
+      verificandoRef.current = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!avisoProductosRemovidos) return;

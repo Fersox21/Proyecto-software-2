@@ -33,7 +33,7 @@ function FiltrosVencimientos({
         <input
           id="venc-busqueda"
           type="search"
-          placeholder="Producto, proveedor o código"
+          placeholder="Producto, marca o proveedor"
           value={busqueda}
           onChange={(e) => onBusquedaChange(e.target.value)}
         />

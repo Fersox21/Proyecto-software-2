@@ -2,16 +2,11 @@ import { LuPencil, LuTrash2 } from 'react-icons/lu'
 import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function nombreProducto(lote) {
-  if (lote?.producto?.nombre) return lote.producto.nombre
-  if (lote?.producto?.id != null) return `Producto #${lote.producto.id}`
-  return 'Sin producto'
+  return lote?.producto?.nombre || 'Sin producto'
 }
 
 function nombreProveedor(lote) {
-  const proveedor = lote?.ordenCompra?.proveedor
-  if (proveedor?.nombre) return proveedor.nombre
-  if (proveedor?.id != null) return `Proveedor #${proveedor.id}`
-  return 'Sin proveedor'
+  return lote?.ordenCompra?.proveedor?.nombre || 'Sin proveedor'
 }
 
 function calcularDiasRestantes(fechaISO) {
@@ -43,9 +38,13 @@ function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar })
     <tr>
       <td>
         <div className="lotes-celda-doble">
-          <span className="lotes-codigo">#{lote.id}</span>
+          <span className="lotes-codigo">#{numeroFila}</span>
           <span className="lotes-subtexto">
-            {lote.ordenCompra?.id != null ? `Orden: #${lote.ordenCompra.id}` : 'Sin orden'}
+            {lote.ordenCompra?.fecha
+              ? `Orden: ${formatearFecha(lote.ordenCompra.fecha)}`
+              : lote.ordenCompra
+                ? 'Orden asociada'
+                : 'Sin orden'}
           </span>
         </div>
       </td>
@@ -107,7 +106,7 @@ function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar })
             type="button"
             className="lotes-btn-icono lotes-btn-editar"
             onClick={() => onEditar(lote)}
-            aria-label={`Editar lote #${lote.id}`}
+            aria-label={`Editar lote #${numeroFila}`}
             title="Editar lote"
           >
             <LuPencil size={16} aria-hidden="true" />
@@ -117,7 +116,7 @@ function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar })
             className="lotes-btn-icono lotes-btn-eliminar"
             onClick={() => onEliminar(lote)}
             disabled={esUltimoDeSuOrden}
-            aria-label={`Dar de baja lote #${lote.id}`}
+            aria-label={`Dar de baja lote #${numeroFila}`}
             title={
               esUltimoDeSuOrden
                 ? 'La orden de compra debe tener al menos un lote'

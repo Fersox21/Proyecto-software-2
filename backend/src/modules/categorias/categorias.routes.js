@@ -1,13 +1,13 @@
 import { Router } from 'express';
 import * as controller from './categorias.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 
 const router = Router();
 
 router.get('/', controller.listar);
 router.get('/:id', controller.obtener);
-router.post('/', verificarToken, controller.crear);
-router.put('/:id', verificarToken, controller.actualizar);
-router.delete('/:id', verificarToken, controller.eliminar);
+router.post('/', verificarToken, soloAdmin, controller.crear);
+router.put('/:id', verificarToken, soloAdmin, controller.actualizar);
+router.delete('/:id', verificarToken, soloAdmin, controller.eliminar);
 
 export default router;

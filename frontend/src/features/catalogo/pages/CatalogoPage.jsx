@@ -15,17 +15,18 @@ function CatalogoPage() {
   const { agregarProducto } = useOutletContext()
   const { datos: productos, cargando, error } = useFetch(obtenerProductos)
   const filtros = useFiltros(productos)
+  const { setCategoria } = filtros
 
   const [searchParams] = useSearchParams()
   const categoriaUrl = searchParams.get('categoria')
 
-  useEffect(function() {
-  if (categoriaUrl !== null) {
-    filtros.setCategoria(categoriaUrl)
-  } else {
-    filtros.setCategoria('todas')
-          }
-  }, [categoriaUrl])
+  useEffect(() => {
+    if (categoriaUrl !== null) {
+      setCategoria(categoriaUrl)
+    } else {
+      setCategoria('todas')
+    }
+  }, [categoriaUrl, setCategoria])
 
   if (cargando) return <Spinner texto="Cargando catálogo..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar el catálogo" texto={error.message} />

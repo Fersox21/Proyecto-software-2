@@ -11,6 +11,8 @@ import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/adminPedidos.css'
 import '../../../styles/panelAdmin/historial.css'
 
+const POR_PAGINA = 25
+
 function PedidosPage() {
   const {
     pedidos,
@@ -28,6 +30,7 @@ function PedidosPage() {
   } = usePedidosAdmin()
 
   const [vistaHistorial, setVistaHistorial] = useState(false)
+  const [pagina, setPagina] = useState(1)
   const [pedidoParaAceptar, setPedidoParaAceptar] = useState(null)
   const [modificacionParaAceptar, setModificacionParaAceptar] = useState(null)
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null)
@@ -113,6 +116,10 @@ function PedidosPage() {
     ['pendiente', 'nuevo'].includes(String(p.estado || '').toLowerCase())
   )
   const totalPedidos = pedidosPendientes.length
+  const totalPaginas = Math.max(1, Math.ceil(totalPedidos / POR_PAGINA))
+  const paginaActual = Math.min(pagina, totalPaginas)
+  const inicio = (paginaActual - 1) * POR_PAGINA
+  const pedidosVisibles = pedidosPendientes.slice(inicio, inicio + POR_PAGINA)
 
   return (
     <section className="main-admin" id="main-pedidos">
@@ -160,11 +167,11 @@ function PedidosPage() {
 
           <tbody>
             {totalPedidos > 0 ? (
-              pedidosPendientes.map((pedido, index) => (
+              pedidosVisibles.map((pedido, index) => (
                 <FilaPedido
                   key={pedido.id}
                   pedido={pedido}
-                  numeroFila={index + 1}
+                  numeroFila={inicio + index + 1}
                   onVerDetalle={handleVerDetalle}
                   onIniciarAceptar={handleIniciarAceptar}
                   onIniciarCancelar={handleIniciarCancelar}
@@ -180,16 +187,38 @@ function PedidosPage() {
           </tbody>
         </table>
 
-        <div className="tabla-admin-pie">
-          <span id="info-pag">
-            Mostrando {totalPedidos > 0 ? 1 : 0}–{totalPedidos} de {totalPedidos}
-          </span>
-          <div className="control-pag">
-            <button type="button" id="anterior-pag">‹</button>
-            <span id="nums-pag">1</span>
-            <button type="button" id="siguiente-pag">›</button>
+        {totalPedidos > 0 && (
+          <div className="tabla-admin-pie">
+            <span id="info-pag">
+              Mostrando {inicio + 1}–{Math.min(inicio + POR_PAGINA, totalPedidos)} de {totalPedidos}
+            </span>
+            <div className="control-pag">
+              <button
+                type="button"
+                className="btn-pag"
+                id="anterior-pag"
+                disabled={paginaActual <= 1}
+                onClick={() => setPagina(paginaActual - 1)}
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+              <span className="nums-pag" id="nums-pag">
+                {paginaActual} / {totalPaginas}
+              </span>
+              <button
+                type="button"
+                className="btn-pag"
+                id="siguiente-pag"
+                disabled={paginaActual >= totalPaginas}
+                onClick={() => setPagina(paginaActual + 1)}
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {/* Modal de Detalle */}

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LuPlus, LuSearch } from 'react-icons/lu'
 import { useProductosAdmin } from '../hooks/useProductosAdmin'
 import Spinner from '../../../shared/components/Spinner'
@@ -57,9 +57,14 @@ function AdministradorPage() {
     })
   }, [productos, busqueda, categoriaFiltro])
 
+  useEffect(() => {
+    if (!alerta) return undefined
+    const timer = setTimeout(() => setAlerta(null), 4000)
+    return () => clearTimeout(timer)
+  }, [alerta])
+
   const mostrarMensaje = (texto, tipo = 'exito') => {
     setAlerta({ texto, tipo })
-    setTimeout(() => setAlerta(null), 4000)
   }
 
   const handleAbrirCrear = () => {
@@ -243,6 +248,7 @@ function AdministradorPage() {
 
       {modalFormAbierto && (
         <ModalFormProducto
+          key={productoSeleccionado?.id ?? 'nuevo'}
           producto={productoSeleccionado}
           visible={modalFormAbierto}
           guardando={procesandoAccion}

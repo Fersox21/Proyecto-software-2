@@ -1,12 +1,11 @@
-import * as ventasRepository from './ventas.repository.js';
-import * as repositoryPedidos from '../pedidos/pedidos.repository.js';
-
-
-const crearError = (mensaje, status) => {
-  const error = new Error(mensaje);
-  error.status = status;
-  return error;
-};
+import * as defaultVentasRepository from './ventas.repository.js';
+import * as defaultRepositoryPedidos from '../pedidos/pedidos.repository.js';
+import {
+  crearError,
+  normalizarFecha,
+  validarFecha,
+  validarIdEnteroPositivo
+} from '../../utils/validaciones.js';
 
 const validarDecimalPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
@@ -31,128 +30,163 @@ const validarDecimalPositivo = (valor, mensaje) => {
   throw crearError(mensaje, 400);
 };
 
-export const listarVentas = async (periodo) => {
-  if (periodo === 'ultimo-mes') {
-    return await ventasUltimoMes();
-  }
+export const crearVentasService = ({
+  ventasRepository = defaultVentasRepository,
+  repositoryPedidos = defaultRepositoryPedidos
+} = {}) => {
+  const ventasUltimoMes = async () => {
+    return await ventasRepository.obtenerVentasMes();
+  };
 
-  if (periodo) {
-    const error = new Error(`El parámetro periodo '${periodo}' no es válido`);
-    error.status = 400;
-    throw error;
-  }
-
-  return await ventasRepository.listar();
-};
-
-export const listarHistorialVentas = async () => {
-  return await ventasRepository.listarHistorial();
-};
-
-export const obtenerVenta = async (id) => {
-  const venta = await ventasRepository.obtenerDetalle(id);
-
-  if (!venta) {
-    throw crearError(`La venta con ID ${id} no existe`, 404);
-  }
-
-  return venta;
-};
-
-export const obtenerProductosVenta = async (id) => {
-  const rows = await ventasRepository.obtener(id);
-
-  if (!rows || rows.length === 0) {
-    throw crearError(`La venta con ID ${id} no existe`, 404);
-  }
-
-  const venta = rows[0];
-  if (!venta.pedido_id) {
-    return [];
-  }
-
-  return await ventasRepository.obtenerItemsPorPedidoId(venta.pedido_id);
-};
-
-export const crearVenta = async (data) => {
-  const pedidoId = data.pedido_id ?? data.pedidoId;
-
-  if (!pedidoId) {
-    throw crearError('Faltan datos obligatorios para crear venta', 400);
-  }
-
-  const pedidoExistente = await repositoryPedidos.findById(pedidoId);
-  if (!pedidoExistente) {
-    throw crearError('No existe pedido con ese id', 404);
-  }
-
-  const ventaExistente = await ventasRepository.obtenerPorPedidoId(pedidoId);
-  if (ventaExistente) {
-    throw crearError('Ya existe una venta activa para este pedido', 409);
-  }
-
-  if (!data.fecha || data.total === undefined || data.total === null) {
-    throw crearError('Faltan datos obligatorios para crear venta', 400);
-  }
-
-  const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
-
-  return await ventasRepository.create({ ...data, pedido_id: pedidoId, total });
-};
-
-export const update = async (id, data) => {
-  const rows = await ventasRepository.obtener(id);
-
-  if (!rows || rows.length === 0) {
-    throw crearError('No existe venta con ese id', 404);
-  }
-
-  const ventaActual = rows[0];
-  const fecha = data.fecha !== undefined && data.fecha !== null && data.fecha !== ''
-    ? data.fecha
-    : ventaActual.fecha;
-
-  const rawTotalModificado = data.totalModificado !== undefined
-    ? data.totalModificado
-    : data.total_modificado;
-  const rawMotivoModificacion = data.motivoModificacion !== undefined
-    ? data.motivoModificacion
-    : data.motivo_modificacion;
-
-  let totalModificado = ventaActual.total_modificado ?? null;
-  let motivoModificacion = ventaActual.motivo_modificacion ?? null;
-
-  if (rawTotalModificado !== undefined && rawTotalModificado !== null && rawTotalModificado !== '') {
-    totalModificado = validarDecimalPositivo(
-      rawTotalModificado,
-      'El total modificado de la venta debe ser mayor a 0'
-    );
-
-    if (typeof rawMotivoModificacion !== 'string' || rawMotivoModificacion.trim().length === 0) {
-      throw crearError('El motivo de modificación es obligatorio cuando se modifica el total', 400);
+  const listarVentas = async (periodo) => {
+    if (periodo === 'ultimo-mes') {
+      return await ventasUltimoMes();
     }
 
-    motivoModificacion = rawMotivoModificacion.trim();
-  } else if (rawTotalModificado === null || rawTotalModificado === '') {
-    totalModificado = null;
-    motivoModificacion = null;
-  }
+    if (periodo) {
+      throw crearError(`El parámetro periodo '${periodo}' no es válido`, 400);
+    }
 
-  return await ventasRepository.update(id, {
-    fecha,
-    totalModificado,
-    motivoModificacion
-  });
+    return await ventasRepository.listar();
+  };
+
+  const listarHistorialVentas = async () => {
+    return await ventasRepository.listarHistorial();
+  };
+
+  const obtenerVenta = async (id, incluirInactivos = false) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de venta inválido');
+    const venta = await ventasRepository.obtenerDetalle(idNum, incluirInactivos);
+
+    if (!venta) {
+      throw crearError('Venta no encontrada', 404);
+    }
+
+    return venta;
+  };
+
+  const obtenerProductosVenta = async (id, incluirInactivos = false) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de venta inválido');
+    const rows = await ventasRepository.obtener(idNum, incluirInactivos);
+
+    if (!rows || rows.length === 0) {
+      throw crearError('Venta no encontrada', 404);
+    }
+
+    const venta = rows[0];
+    if (!venta.pedido_id) {
+      return [];
+    }
+
+    return await ventasRepository.obtenerItemsPorPedidoId(venta.pedido_id);
+  };
+
+  const crearVenta = async (data) => {
+    const rawPedidoId = data?.pedido_id ?? data?.pedidoId;
+
+    if (!rawPedidoId) {
+      throw crearError('Faltan datos obligatorios para crear venta', 400);
+    }
+
+    const pedidoId = validarIdEnteroPositivo(rawPedidoId, 'ID de pedido inválido');
+
+    if (!data?.fecha || data?.total === undefined || data?.total === null) {
+      throw crearError('Faltan datos obligatorios para crear venta', 400);
+    }
+
+    const fecha = validarFecha(data.fecha, 'La fecha de la venta');
+    const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
+
+    const pedidoExistente = await repositoryPedidos.findById(pedidoId);
+    if (!pedidoExistente) {
+      throw crearError('No existe pedido con ese id', 404);
+    }
+
+    const ventaExistente = await ventasRepository.obtenerPorPedidoId(pedidoId);
+    if (ventaExistente) {
+      throw crearError('Ya existe una venta activa para este pedido', 409);
+    }
+
+    return await ventasRepository.create({ ...data, fecha, pedido_id: pedidoId, total });
+  };
+
+  const update = async (id, data) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de venta inválido');
+
+    const fechaValidada = data?.fecha !== undefined
+      ? validarFecha(data.fecha, 'La fecha de la venta')
+      : undefined;
+
+    const rows = await ventasRepository.obtener(idNum);
+
+    if (!rows || rows.length === 0) {
+      throw crearError('Venta no encontrada', 404);
+    }
+
+    const ventaActual = rows[0];
+    const fecha = fechaValidada ?? normalizarFecha(ventaActual.fecha);
+
+    const rawTotalModificado = data?.totalModificado !== undefined
+      ? data.totalModificado
+      : data?.total_modificado;
+    const rawMotivoModificacion = data?.motivoModificacion !== undefined
+      ? data.motivoModificacion
+      : data?.motivo_modificacion;
+
+    let totalModificado = ventaActual.total_modificado ?? null;
+    let motivoModificacion = ventaActual.motivo_modificacion ?? null;
+
+    if (rawTotalModificado !== undefined && rawTotalModificado !== null && rawTotalModificado !== '') {
+      totalModificado = validarDecimalPositivo(
+        rawTotalModificado,
+        'El total modificado de la venta debe ser mayor a 0'
+      );
+
+      if (typeof rawMotivoModificacion !== 'string' || rawMotivoModificacion.trim().length === 0) {
+        throw crearError('El motivo de modificación es obligatorio cuando se modifica el total', 400);
+      }
+
+      motivoModificacion = rawMotivoModificacion.trim();
+    } else if (rawTotalModificado === null || rawTotalModificado === '') {
+      totalModificado = null;
+      motivoModificacion = null;
+    }
+
+    return await ventasRepository.update(idNum, {
+      fecha,
+      totalModificado,
+      motivoModificacion
+    });
+  };
+
+  const remove = async (id) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de venta inválido');
+    const rowCount = await ventasRepository.remove(idNum);
+    if (rowCount === 0) {
+      throw crearError('Venta no encontrada', 404);
+    }
+    return true;
+  };
+
+  return {
+    listarVentas,
+    listarHistorialVentas,
+    obtenerVenta,
+    obtenerProductosVenta,
+    crearVenta,
+    update,
+    remove,
+    ventasUltimoMes
+  };
 };
 
-export const remove = async (id) => {
-  const rowCount = await ventasRepository.remove(id);
-  if (rowCount === 0) {
-    throw crearError('Venta no encontrada', 404);
-  }
-  return true;
-};
+const defaultService = crearVentasService();
 
-export const ventasUltimoMes = async () => {
-  return await ventasRepository.obtenerVentasMes();
-};
+export const listarVentas = defaultService.listarVentas;
+export const listarHistorialVentas = defaultService.listarHistorialVentas;
+export const obtenerVenta = defaultService.obtenerVenta;
+export const obtenerProductosVenta = defaultService.obtenerProductosVenta;
+export const crearVenta = defaultService.crearVenta;
+export const update = defaultService.update;
+export const remove = defaultService.remove;
+export const ventasUltimoMes = defaultService.ventasUltimoMes;

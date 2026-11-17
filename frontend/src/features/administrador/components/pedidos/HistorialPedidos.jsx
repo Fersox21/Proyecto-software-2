@@ -64,7 +64,6 @@ function HistorialPedidos() {
 
       if (q) {
         const texto = [
-          `#${p.id}`,
           p.comercio,
           p.personaContacto,
           p.telefono,
@@ -150,7 +149,7 @@ function HistorialPedidos() {
         onChipChange={(c) => { setChip(c); setPagina(1) }}
         busqueda={busqueda}
         onBusquedaChange={(v) => { setBusqueda(v); setPagina(1) }}
-        placeholderBusqueda="#pedido, comercio, contacto o teléfono"
+        placeholderBusqueda="Comercio, contacto o teléfono"
         conRangoFechas
         desde={desde}
         hasta={hasta}
@@ -189,7 +188,8 @@ function HistorialPedidos() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((pedido) => {
+              {visibles.map((pedido, index) => {
+                const numeroFila = (paginaSegura - 1) * POR_PAGINA + index + 1
                 const abierto = abiertoId === pedido.id
                 const cat = categoriaEstado(pedido)
                 const esEliminado = cat === 'eliminado'
@@ -202,7 +202,7 @@ function HistorialPedidos() {
                       <td>
                         <div className="lotes-celda-doble">
                           <span className="lotes-principal">
-                            #{pedido.id} · {pedido.comercio || 'Sin comercio'}
+                            #{numeroFila} · {pedido.comercio || 'Sin comercio'}
                           </span>
                           {pedido.personaContacto && (
                             <span className="lotes-subtexto">{pedido.personaContacto}</span>

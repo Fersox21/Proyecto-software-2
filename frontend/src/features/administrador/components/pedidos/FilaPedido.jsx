@@ -52,7 +52,7 @@ function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onInic
               type="button"
               className="pedido-btn-icono pedido-btn-aceptar"
               onClick={() => onIniciarAceptar(pedido)}
-              aria-label={`Aceptar pedido #${pedido.id}`}
+              aria-label={`Aceptar pedido #${numeroFila}`}
               title="Aceptar pedido"
             >
               <LuCheck size={17} aria-hidden="true" />
@@ -65,7 +65,7 @@ function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onInic
             type="button"
             className="pedido-btn-icono pedido-btn-detalle"
             onClick={() => onVerDetalle(pedido.id)}
-            aria-label={`Ver detalle del pedido #${pedido.id}`}
+            aria-label={`Ver detalle del pedido #${numeroFila}`}
             title="Ver detalle"
           >
             <LuEye size={17} aria-hidden="true" />
@@ -76,7 +76,7 @@ function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onInic
               type="button"
               className="pedido-btn-icono pedido-btn-cancelar"
               onClick={() => onIniciarCancelar(pedido)}
-              aria-label={`Cancelar pedido #${pedido.id}`}
+              aria-label={`Cancelar pedido #${numeroFila}`}
               title="Cancelar pedido"
             >
               <LuX size={17} aria-hidden="true" />

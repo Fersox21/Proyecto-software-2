@@ -365,7 +365,39 @@ html[data-tema="oscuro"] .prod-precio-costo {
 
 .control-pag {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
+}
+
+.btn-pag {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--admin-borde);
+  background-color: var(--admin-superficie);
+  border-radius: 10px;
+  color: var(--admin-texto-btn);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-pag:hover:not(:disabled) {
+  background-color: var(--admin-hover-btn);
+}
+
+.btn-pag:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-pag:focus-visible {
+  outline: 2px solid var(--admin-foco, #102055);
+  outline-offset: 2px;
+}
+
+.nums-pag {
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: var(--admin-acento);
 }
 
 a {

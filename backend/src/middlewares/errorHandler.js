@@ -1,10 +1,18 @@
 // Middleware de errores: tiene 4 parámetros y se registra al final de app.js
 export const errorHandler = (err, req, res, next) => {
-  const status = err.status || err.statusCode || 500;
-  const mensaje = err.message || 'Error interno del servidor';
+  let status = err.status || err.statusCode || 500;
+  let mensaje = err.message || 'Error interno del servidor';
 
-  // `message` se mantiene por compatibilidad con los servicios del frontend
-  // que ya leían ese campo; `error` y `statusCode` siguen el contrato de AGENTS.md.
+  if (err.type === 'entity.parse.failed') {
+    status = 400;
+    mensaje = 'El cuerpo de la solicitud no es un JSON válido';
+  } else if (err.type === 'entity.too.large') {
+    status = 413;
+    mensaje = 'El cuerpo de la solicitud supera el tamaño máximo permitido';
+  } else if (status >= 500) {
+    mensaje = 'Error interno del servidor';
+  }
+
   res.status(status).json({
     success: false,
     error: mensaje,

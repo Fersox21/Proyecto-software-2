@@ -178,7 +178,7 @@ function DetalleVentaModal({ venta, cargando, error, onCerrar }) {
                       const nombre =
                         item.producto?.nombre ||
                         item.nombre ||
-                        `Producto #${item.producto_id || item.producto?.id || index + 1}`
+                        `Producto ${index + 1}`
                       const marca = item.producto?.marca || item.marca || '-'
                       const precio = item.precio != null ? item.precio : (item.precioVenta || 0)
                       const cantidad = item.cantidad || 0

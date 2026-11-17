@@ -128,8 +128,8 @@ const alternarDetalle = useCallback(
     if (!texto) return ordenes
 
     return ordenes.filter((orden) => {
-      const proveedor = orden?.proveedor?.nombre || (orden?.proveedor?.id != null ? `Proveedor #${orden.proveedor.id}` : '')
-      const contenido = [`#${orden.id}`, proveedor, formatearFecha(orden.fecha)]
+      const proveedor = orden?.proveedor?.nombre || ''
+      const contenido = [proveedor, formatearFecha(orden.fecha)]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -187,7 +187,7 @@ const alternarDetalle = useCallback(
                 className="orden-busqueda-input"
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
-                placeholder="Buscar por #orden, proveedor o fecha..."
+                placeholder="Buscar por proveedor o fecha..."
                 aria-label="Buscar órdenes de compra"
               />
               {busqueda && (

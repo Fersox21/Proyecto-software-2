@@ -85,7 +85,6 @@ function VencimientosPage() {
           fila.productoNombre,
           fila.proveedorNombre,
           fila.producto?.marca,
-          `#${fila.id}`,
         ]
           .filter(Boolean)
           .join(' ')

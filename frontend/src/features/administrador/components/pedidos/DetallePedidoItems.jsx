@@ -1,5 +1,5 @@
 import { LuPackageOpen } from 'react-icons/lu'
-import { formatearPrecio } from '../../../../shared/utils/formato'
+import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 
 function DetallePedidoItems({ items = [], total = 0 }) {
   return (
@@ -39,7 +39,7 @@ function DetallePedidoItems({ items = [], total = 0 }) {
             </thead>
             <tbody>
               {items.map((item, index) => {
-                const nombre = item.producto?.nombre || item.nombre || `Producto #${item.producto_id || index + 1}`
+                const nombre = item.producto?.nombre || item.nombre || `Producto ${index + 1}`
                 const marca = item.producto?.marca || item.marca || '-'
                 const precio = item.precio != null ? item.precio : (item.precioVenta || 0)
                 const cantidad = item.cantidad || 0
@@ -67,7 +67,9 @@ function DetallePedidoItems({ items = [], total = 0 }) {
                                 border: '1px solid #e5e7eb',
                               }}
                             >
-                              #{l.loteId} ({l.cantidad} u.{l.consumidoEntero ? ' - entero' : ''})
+                              Lote #{i + 1}
+                              {l.fechaVencimiento ? ` · vto. ${formatearFecha(l.fechaVencimiento)}` : ''}
+                              {` (${l.cantidad} u.${l.consumidoEntero ? ' - entero' : ''})`}
                             </span>
                           ))}
                         </div>

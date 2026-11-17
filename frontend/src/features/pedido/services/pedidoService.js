@@ -1,31 +1,28 @@
 const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 function headers() {
-  const token = sessionStorage.getItem('token')
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
   }
 }
 
 async function procesarRespuesta(respuesta, mensajeErrorPorDefecto) {
-  if (!respuesta.ok) {
-    if (respuesta.status === 401) {
-      throw new Error('No autorizado: necesitás iniciar sesión para registrar el pedido')
-    }
-
-    let errorData = null
+  const texto = await respuesta.text()
+  let datos = null
+  if (texto) {
     try {
-      errorData = await respuesta.json()
+      datos = JSON.parse(texto)
     } catch {
-      // Ignora error de parseo si la respuesta no es JSON
+      datos = null
     }
+  }
 
-    const mensaje = errorData?.error || errorData?.message || mensajeErrorPorDefecto
+  if (!respuesta.ok) {
+    const mensaje = datos?.error || datos?.message || mensajeErrorPorDefecto
     throw new Error(mensaje)
   }
 
-  return respuesta.json()
+  return datos
 }
 
 export async function crearPedido(pedido) {

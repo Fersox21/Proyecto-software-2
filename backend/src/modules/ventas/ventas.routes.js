@@ -1,16 +1,24 @@
 import { Router } from 'express';
-import * as controller from './ventas.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './ventas.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 
-const router = Router();
+export const crearVentasRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin
+} = {}) => {
+  const router = Router();
 
-router.get('/', verificarToken, controller.listar);
-router.get('/historial', verificarToken, controller.listarHistorial);
-router.post('/', verificarToken, controller.crear);
-router.get('/:id/productos', verificarToken, controller.obtenerProductos);
-router.get('/:id', verificarToken, controller.obtener);
-router.put('/:id', verificarToken, controller.actualizar);
-router.delete('/:id', verificarToken, controller.eliminar);
+  router.get('/', middlewareToken, middlewareAdmin, controller.listar);
+  router.get('/historial', middlewareToken, middlewareAdmin, controller.listarHistorial);
+  router.post('/', middlewareToken, middlewareAdmin, controller.crear);
+  router.get('/:id/productos', middlewareToken, middlewareAdmin, controller.obtenerProductos);
+  router.get('/:id', middlewareToken, middlewareAdmin, controller.obtener);
+  router.put('/:id', middlewareToken, middlewareAdmin, controller.actualizar);
+  router.delete('/:id', middlewareToken, middlewareAdmin, controller.eliminar);
 
-export default router;
+  return router;
+};
+
+export default crearVentasRoutes();
  

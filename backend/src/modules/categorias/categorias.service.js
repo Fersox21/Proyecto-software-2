@@ -1,18 +1,5 @@
 import * as repository from './categorias.repository.js';
-
-const crearError = (mensaje, status) => {
-  const error = new Error(mensaje);
-  error.status = status;
-  return error;
-};
-
-const validarId = (id) => {
-  const idNum = Number(id);
-  if (!Number.isInteger(idNum) || idNum <= 0) {
-    throw crearError('ID de categoría inválido', 400);
-  }
-  return idNum;
-};
+import { crearError, validarIdEnteroPositivo } from '../../utils/validaciones.js';
 
 const validarNombreCategoria = (valor) => {
   const nombre = typeof valor === 'string' ? valor.trim() : '';
@@ -33,7 +20,7 @@ export const listarCategorias = async () => {
 };
 
 export const obtenerCategoriaPorId = async (id) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de categoría inválido');
   const categoria = await repository.findById(idNum);
   if (!categoria || !categoria.activo) {
     throw crearError('Categoría no encontrada', 404);
@@ -63,7 +50,7 @@ export const crearCategoria = async (data) => {
 };
 
 export const actualizarCategoria = async (id, data) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de categoría inválido');
   const existente = await repository.findById(idNum);
   if (!existente || !existente.activo) {
     throw crearError('Categoría no encontrada', 404);
@@ -86,7 +73,7 @@ export const actualizarCategoria = async (id, data) => {
 };
 
 export const eliminarCategoria = async (id) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de categoría inválido');
   const rowCount = await repository.remove(idNum);
   if (rowCount === 0) {
     throw crearError('Categoría no encontrada', 404);

@@ -1,20 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
 
-vi.mock('../src/modules/productos/productos.repository.js', () => ({
-  findAll: vi.fn(),
-  findById: vi.fn(),
-  create: vi.fn(),
-  update: vi.fn(),
-  remove: vi.fn()
-}))
-
-import * as repository from '../src/modules/productos/productos.repository.js'
 import {
   porcentajeDescuento,
   precioConDescuento,
   precioVigente
-} from '../src/modules/productos/productos.precio.js'
-import { actualizarProducto, crearProducto } from '../src/modules/productos/productos.service.js'
+} from '../src/modules/productos/productos.precio.js';
+import { crearProductosService } from '../src/modules/productos/productos.service.js';
 
 const productoBase = () => ({
   nombre: 'Producto de prueba',
@@ -25,97 +17,148 @@ const productoBase = () => ({
   precioPromo: 800,
   stock: 10,
   categoria: 'Almacén',
-  peso: 1000,
   destacado: false
-})
+});
+
+const categoriasMock = {
+  findByNombreInsensitive: async (nombre) => ({ id: 1, nombre, activo: true }),
+  findById: async (id) => ({ id, nombre: 'Almacén', activo: true }),
+  create: async (nombre) => ({ id: 1, nombre, activo: true })
+};
 
 describe('regla de promoción', () => {
   it('convierte venta 900 y promo 800 en un 11% exacto (801)', () => {
-    expect(porcentajeDescuento(900, 800)).toBe(11)
-    expect(precioConDescuento(900, 11)).toBe(801)
-    expect(precioVigente({ precioVenta: 900, precioPromo: 800, enPromocion: true })).toBe(801)
-  })
+    assert.equal(porcentajeDescuento(900, 800), 11);
+    assert.equal(precioConDescuento(900, 11), 801);
+    assert.equal(precioVigente({ precioVenta: 900, precioPromo: 800, enPromocion: true }), 801);
+  });
 
   it('normaliza otras promociones sin perder el porcentaje entero', () => {
-    expect(precioVigente({ precioVenta: 950, precioPromo: 850, enPromocion: true })).toBe(845.5)
-    expect(precioVigente({ precioVenta: 3100, precioPromo: 2800, enPromocion: true })).toBe(2790)
-  })
+    assert.equal(precioVigente({ precioVenta: 950, precioPromo: 850, enPromocion: true }), 845.5);
+    assert.equal(precioVigente({ precioVenta: 3100, precioPromo: 2800, enPromocion: true }), 2790);
+  });
 
   it('ignora la promoción cuando el flag está apagado', () => {
-    expect(precioVigente({ precioVenta: 900, precioPromo: 800, enPromocion: false })).toBe(900)
-  })
+    assert.equal(precioVigente({ precioVenta: 900, precioPromo: 800, enPromocion: false }), 900);
+  });
 
-  it('rechaza descuentos que no se pueden representar como entero', () => {
-    expect(porcentajeDescuento(900, 900)).toBeNull()
-    expect(porcentajeDescuento(900, 899.99)).toBeNull()
-    expect(porcentajeDescuento(900, 1000)).toBeNull()
-    expect(porcentajeDescuento(900, 0)).toBeNull()
-  })
-})
+  it('rechaza descuentos que no se pueden representar como entero >= 1% y < 100%', () => {
+    assert.equal(porcentajeDescuento(900, 900), null);
+    assert.equal(porcentajeDescuento(900, 899.99), null);
+    assert.equal(porcentajeDescuento(900, 1000), null);
+    assert.equal(porcentajeDescuento(900, 0), null);
+  });
+});
 
 describe('crearProducto', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    repository.create.mockImplementation(async (data) => data)
-  })
+  it('guarda el precio promocional normalizado al porcentaje entero y unifica ruta de imagen', async () => {
+    let guardado = null;
+    const service = crearProductosService({
+      repository: {
+        create: async (data) => {
+          guardado = data;
+          return data;
+        }
+      },
+      categoriasRepository: categoriasMock
+    });
 
-  it('guarda el precio promocional normalizado al porcentaje entero', async () => {
-    await crearProducto(productoBase())
+    await service.crearProducto(productoBase(), { filename: 'foto-test.jpg' });
 
-    expect(repository.create).toHaveBeenCalledWith(
-      expect.objectContaining({ precioVenta: 900, precioPromo: 801, descuento: 11 })
-    )
-  })
+    assert.equal(guardado.precioVenta, 900);
+    assert.equal(guardado.precioPromo, 801);
+    assert.equal(guardado.descuento, 11);
+    assert.equal(guardado.stock, 0);
+    assert.equal(guardado.imagen, '/uploads/productos/foto-test.jpg');
+  });
 
   it('rechaza una promoción igual o mayor al precio de venta', async () => {
-    await expect(
-      crearProducto({ ...productoBase(), precioPromo: 900 })
-    ).rejects.toMatchObject({ status: 400 })
+    let creado = false;
+    const service = crearProductosService({
+      repository: {
+        create: async () => {
+          creado = true;
+        }
+      },
+      categoriasRepository: categoriasMock
+    });
 
-    expect(repository.create).not.toHaveBeenCalled()
-  })
+    await assert.rejects(
+      () => service.crearProducto({ ...productoBase(), precioPromo: 900 }),
+      (err) => err.status === 400
+    );
+    assert.equal(creado, false);
+  });
 
   it('rechaza una promo con menos de 1% de descuento', async () => {
-    await expect(
-      crearProducto({ ...productoBase(), precioPromo: 899.99 })
-    ).rejects.toMatchObject({ status: 400 })
-  })
-})
+    const service = crearProductosService({
+      repository: { create: async (data) => data },
+      categoriasRepository: categoriasMock
+    });
+
+    await assert.rejects(
+      () => service.crearProducto({ ...productoBase(), precioPromo: 899.99 }),
+      (err) => err.status === 400
+    );
+  });
+});
 
 describe('actualizarProducto', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-    repository.findById.mockResolvedValue({
-      id: 1,
-      nombre: 'Producto de prueba',
-      precioCosto: 500,
-      precioVenta: 900,
-      marca: 'Marca',
-      enPromocion: true,
-      precioPromo: 801,
-      descuento: 11,
-      stock: 10,
-      categoria: 'Almacén',
-      peso: 1000,
-      destacado: false
-    })
-    repository.update.mockImplementation(async (id, data) => data)
-  })
+  const existente = {
+    id: 1,
+    nombre: 'Producto de prueba',
+    precioCosto: 500,
+    precioVenta: 900,
+    marca: 'Marca',
+    enPromocion: true,
+    precioPromo: 801,
+    descuento: 11,
+    stock: 10,
+    categoria: 'Almacén',
+    categoriaId: 1,
+    destacado: false,
+    visibleCatalogo: false,
+    tieneLoteVigente: false
+  };
 
-  it('recalcula la promo al cambiar el precio de venta', async () => {
-    await actualizarProducto(1, { precioVenta: 1000 })
+  it('recalcula la promo al cambiar el precio de venta e ignora alteración manual de stock', async () => {
+    let actualizado = null;
+    const service = crearProductosService({
+      repository: {
+        findById: async () => ({ ...existente }),
+        update: async (id, data) => {
+          actualizado = { id, data };
+          return data;
+        }
+      },
+      categoriasRepository: categoriasMock
+    });
 
-    expect(repository.update).toHaveBeenCalledWith(
-      1,
-      expect.objectContaining({ precioVenta: 1000, precioPromo: 800, descuento: 20 })
-    )
-  })
+    await service.actualizarProducto(1, { precioVenta: 1000, stock: 9999 });
+
+    assert.equal(actualizado.id, 1);
+    assert.equal(actualizado.data.precioVenta, 1000);
+    assert.equal(actualizado.data.precioPromo, 800);
+    assert.equal(actualizado.data.descuento, 20);
+    assert.equal(actualizado.data.stock, 10);
+  });
 
   it('rechaza una actualización que deja la promo inválida', async () => {
-    await expect(
-      actualizarProducto(1, { precioVenta: 800 })
-    ).rejects.toMatchObject({ status: 400 })
+    let llamadoUpdate = false;
+    const service = crearProductosService({
+      repository: {
+        findById: async () => ({ ...existente }),
+        update: async () => {
+          llamadoUpdate = true;
+        }
+      },
+      categoriasRepository: categoriasMock
+    });
 
-    expect(repository.update).not.toHaveBeenCalled()
-  })
-})
+    await assert.rejects(
+      () => service.actualizarProducto(1, { precioVenta: 800 }),
+      (err) => err.status === 400
+    );
+    assert.equal(llamadoUpdate, false);
+  });
+});

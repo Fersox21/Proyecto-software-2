@@ -31,7 +31,6 @@ function ProveedoresPage() {
 
     return activos.filter((proveedor) => {
       const contenido = [
-        `#${proveedor.id}`,
         proveedor.nombre,
         proveedor.telefono,
       ]

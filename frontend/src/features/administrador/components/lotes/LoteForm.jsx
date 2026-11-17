@@ -207,7 +207,11 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               <input
                 id="lote-orden"
                 type="text"
-                value={ordenActual ? `Orden #${ordenActual.id}${ordenActual.proveedor?.nombre ? ` · ${ordenActual.proveedor.nombre}` : ''}` : 'Sin orden'}
+                value={
+                  ordenActual
+                    ? `Orden del ${formatearFecha(ordenActual.fecha)}${ordenActual.proveedor?.nombre ? ` · ${ordenActual.proveedor.nombre}` : ''}`
+                    : 'Sin orden'
+                }
                 readOnly
                 disabled
               />
@@ -222,7 +226,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
                 <option value="">Elegí una orden de compra</option>
                 {ordenesDisponibles.map((orden) => (
                   <option key={orden.id} value={orden.id}>
-                    {`Orden #${orden.id} · ${formatearFecha(orden.fecha)}${orden.proveedor?.nombre ? ` · ${orden.proveedor.nombre}` : ''}`}
+                    {`Orden del ${formatearFecha(orden.fecha)}${orden.proveedor?.nombre ? ` · ${orden.proveedor.nombre}` : ''}`}
                   </option>
                 ))}
               </select>

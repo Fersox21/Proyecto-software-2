@@ -1,12 +1,21 @@
 import { Router } from 'express';
-import * as controller from './auth.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './auth.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
+import { loginRateLimiter } from './auth.rateLimit.js';
 
-const router = Router();
+export const crearAuthRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin,
+  rateLimiter = loginRateLimiter
+} = {}) => {
+  const router = Router();
 
-router.post('/login', controller.login);
-router.get('/usuario', verificarToken, controller.usuario);
-router.post('/registro', controller.registrar);
+  router.post('/login', rateLimiter, controller.login);
+  router.get('/usuario', middlewareToken, controller.usuario);
+  router.post('/registro', middlewareToken, middlewareAdmin, controller.registrar);
 
+  return router;
+};
 
-export default router;
+export default crearAuthRoutes();

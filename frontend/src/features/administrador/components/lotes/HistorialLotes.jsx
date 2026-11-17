@@ -73,8 +73,6 @@ function HistorialLotes() {
 
       if (q) {
         const texto = [
-          `#${l.id}`,
-          l.ordenCompra?.id != null ? `#${l.ordenCompra.id}` : null,
           l.producto?.nombre,
           l.producto?.marca,
           l.ordenCompra?.proveedor?.nombre,
@@ -138,7 +136,7 @@ function HistorialLotes() {
         onChipChange={(c) => { setChip(c); setPagina(1) }}
         busqueda={busqueda}
         onBusquedaChange={(v) => { setBusqueda(v); setPagina(1) }}
-        placeholderBusqueda="Producto, marca, proveedor, #orden o #lote"
+        placeholderBusqueda="Producto, marca o proveedor"
         conRangoFechas
         desde={desde}
         hasta={hasta}
@@ -183,7 +181,8 @@ function HistorialLotes() {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((lote) => {
+              {visibles.map((lote, index) => {
+                const numeroFila = (paginaSegura - 1) * POR_PAGINA + index + 1
                 const badge = ETIQUETA_SITUACION[lote.situacion] || ETIQUETA_SITUACION.vigente
                 const abierto = detalleId === lote.id
                 const loteParaDetalle = {
@@ -197,9 +196,13 @@ function HistorialLotes() {
                     <tr className={lote.eliminado ? 'hist-fila-eliminada' : ''}>
                       <td>
                         <div className="lotes-celda-doble">
-                          <span className="lotes-codigo">#{lote.id}</span>
+                          <span className="lotes-codigo">#{numeroFila}</span>
                           <span className="lotes-subtexto">
-                            {lote.ordenCompra?.id != null ? `Orden: #${lote.ordenCompra.id}` : 'Sin orden'}
+                            {lote.ordenCompra?.fecha
+                              ? `Orden: ${formatearFecha(lote.ordenCompra.fecha)}`
+                              : lote.ordenCompra
+                                ? 'Orden asociada'
+                                : 'Sin orden'}
                           </span>
                         </div>
                       </td>
@@ -243,7 +246,7 @@ function HistorialLotes() {
                     {abierto && (
                       <tr className="venc-fila-detalle">
                         <td colSpan={8}>
-                          <DetalleLote lote={loteParaDetalle} />
+                          <DetalleLote lote={loteParaDetalle} numeroLote={numeroFila} />
                           <div className="hist-salidas-bloque">
                             <h4 className="hist-salidas-titulo">Salidas registradas del lote</h4>
                             {!lote.salidas || lote.salidas.length === 0 ? (
@@ -254,7 +257,7 @@ function HistorialLotes() {
                               <ul className="hist-salidas-lista">
                                 {lote.salidas.map((s, idx) => (
                                   <li key={`${s.pedidoId}-${idx}`} className="hist-salidas-item">
-                                    <span><strong>Pedido #{s.pedidoId}</strong></span>
+                                    <span><strong>Salida #{idx + 1}</strong></span>
                                     <span>· {s.comercio || 'Sin comercio'}</span>
                                     <span>· {formatearFecha(s.fecha)}</span>
                                     <span>· <strong>{s.cantidad} u.</strong>{s.consumidoEntero ? ' (consumo entero)' : ''}</span>

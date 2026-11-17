@@ -63,8 +63,9 @@ export const findAllCatalogo = async (client = pool) => {
   return rows.map(mapearProducto);
 };
 
-export const findById = async (id, client = pool) => {
-  const { rows } = await client.query(`${SQL_BASE} WHERE p.id = $1`, [id]);
+export const findById = async (id, client = pool, incluirInactivos = false) => {
+  const filtroActivo = incluirInactivos ? '' : ' AND p.activo = true';
+  const { rows } = await client.query(`${SQL_BASE} WHERE p.id = $1${filtroActivo}`, [id]);
   return mapearProducto(rows[0]);
 };
 
@@ -128,7 +129,6 @@ export const update = async (id, data, client = pool) => {
     marca = null,
     enPromocion,
     precioPromo,
-    stock,
     categoria,
     categoriaId = null,
     tipoPromocionId = null,
@@ -141,12 +141,12 @@ export const update = async (id, data, client = pool) => {
   const precioPromoFinal = promoActiva ? precioPromo : null;
   const tipoPromocionIdFinal = promoActiva ? tipoPromocionId : null;
 
-  await client.query(
+  const { rowCount } = await client.query(
     `UPDATE productos
      SET nombre = $1, descripcion = $2, precio_costo = $3, precio_venta = $4, marca = $5,
-         en_promocion = $6, precio_promo = $7, stock = $8, categoria = $9, categoria_id = $10,
-         tipo_promocion_id = $11, destacado = $12, visible_catalogo = $13, imagen = $14
-     WHERE id = $15`,
+         en_promocion = $6, precio_promo = $7, categoria = $8, categoria_id = $9,
+         tipo_promocion_id = $10, destacado = $11, visible_catalogo = $12, imagen = $13
+     WHERE id = $14 AND activo = true`,
     [
       nombre,
       descripcion,
@@ -155,7 +155,6 @@ export const update = async (id, data, client = pool) => {
       marca,
       promoActiva,
       precioPromoFinal,
-      stock,
       categoria,
       categoriaId,
       tipoPromocionIdFinal,
@@ -166,11 +165,15 @@ export const update = async (id, data, client = pool) => {
     ]
   );
 
+  if (rowCount === 0) return null;
   return await findById(id, client);
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('UPDATE productos SET activo = false WHERE id = $1', [id]);
+  const { rowCount } = await pool.query(
+    'UPDATE productos SET activo = false WHERE id = $1 AND activo = true',
+    [id]
+  );
   return rowCount;
 };
 
@@ -178,8 +181,8 @@ export const remove = async (id) => {
 export const updateImagen = async (id, imagen, visibleCatalogo) => {
   const query =
     visibleCatalogo === undefined
-      ? 'UPDATE productos SET imagen = $1 WHERE id = $2 RETURNING id'
-      : 'UPDATE productos SET imagen = $1, visible_catalogo = $2 WHERE id = $3 RETURNING id';
+      ? 'UPDATE productos SET imagen = $1 WHERE id = $2 AND activo = true RETURNING id'
+      : 'UPDATE productos SET imagen = $1, visible_catalogo = $2 WHERE id = $3 AND activo = true RETURNING id';
   const params =
     visibleCatalogo === undefined ? [imagen, id] : [imagen, visibleCatalogo, id];
   const { rows } = await pool.query(query, params);
@@ -202,8 +205,4 @@ export const recalcularStock = async (id, client = pool) => {
     [id]
   );
   return rows[0] ?? null;
-};
-
-export const ajustarStock = async (id, delta, client = pool) => {
-  return await recalcularStock(id, client);
 };

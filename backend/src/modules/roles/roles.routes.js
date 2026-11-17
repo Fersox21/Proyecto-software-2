@@ -1,12 +1,21 @@
 import { Router } from 'express';
-import * as controller from './roles.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import * as defaultController from './roles.controller.js';
+import { verificarToken, soloAdmin } from '../../middlewares/verificarToken.js';
 
-const router = Router();
+export const crearRolesRoutes = ({
+  controller = defaultController,
+  middlewareToken = verificarToken,
+  middlewareAdmin = soloAdmin
+} = {}) => {
+  const router = Router();
 
-router.get('/', verificarToken, controller.listar);
-router.get('/:id', verificarToken, controller.obtener);
-router.put('/:id', verificarToken, controller.actualizar)
-router.delete('/:id', verificarToken, controller.eliminar);
+  router.get('/', middlewareToken, middlewareAdmin, controller.listar);
+  router.get('/:id', middlewareToken, middlewareAdmin, controller.obtener);
+  router.post('/', middlewareToken, middlewareAdmin, controller.crear);
+  router.put('/:id', middlewareToken, middlewareAdmin, controller.actualizar);
+  router.delete('/:id', middlewareToken, middlewareAdmin, controller.eliminar);
 
-export default router;
+  return router;
+};
+
+export default crearRolesRoutes();

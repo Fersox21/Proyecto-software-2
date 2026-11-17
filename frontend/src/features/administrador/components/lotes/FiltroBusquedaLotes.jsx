@@ -6,7 +6,7 @@ function FiltroBusquedaLotes({ busqueda, onBusquedaChange, onLimpiar, totalVisib
         <input
           id="lotes-busqueda"
           type="search"
-          placeholder="Producto, marca, proveedor, orden o #lote"
+          placeholder="Producto, marca o proveedor"
           value={busqueda}
           onChange={(e) => onBusquedaChange(e.target.value)}
         />

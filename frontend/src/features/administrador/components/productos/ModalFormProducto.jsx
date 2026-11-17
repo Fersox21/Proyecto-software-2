@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LuImagePlus } from 'react-icons/lu'
 import Modal from '../comunes/Modal'
 import CampoFormulario from '../comunes/CampoFormulario'
@@ -14,6 +14,8 @@ import {
 import {
   manejarErrorImagenProducto,
   obtenerUrlImagenProducto,
+  porcentajeDescuento,
+  precioConDescuento,
 } from '../../../../shared/utils/formato'
 
 const CATEGORIAS_DISPONIBLES = [
@@ -41,22 +43,9 @@ function obtenerTipoPromocionInicialId(producto) {
   return ''
 }
 
-function redondear2(valor) {
-  return Math.round((valor + Number.EPSILON) * 100) / 100
-}
-
 function calcularPorcentajeInicial(producto) {
-  const precioVenta = Number(producto?.precioVenta)
-  const precioPromo = Number(producto?.precioPromo)
-  if (
-    !Number.isFinite(precioVenta) ||
-    !Number.isFinite(precioPromo) ||
-    precioPromo <= 0 ||
-    precioPromo >= precioVenta
-  ) {
-    return ''
-  }
-  return String(redondear2(100 - ((precioPromo * 100) / precioVenta)))
+  const pct = porcentajeDescuento(producto?.precioVenta, producto?.precioPromo)
+  return pct !== null ? String(pct) : ''
 }
 
 function ModalFormProducto({ producto, visible, guardando, soloLectura = false, onGuardar, onCerrar }) {
@@ -86,21 +75,22 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
   })
 
   const [imagenArchivo, setImagenArchivo] = useState(null)
-  const [vistaPrevia, setVistaPrevia] = useState(() =>
-    producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '',
-  )
   const [errores, setErrores] = useState({})
   const [errorServidor, setErrorServidor] = useState(null)
 
+  const vistaPreviaArchivo = useMemo(
+    () => (imagenArchivo ? URL.createObjectURL(imagenArchivo) : ''),
+    [imagenArchivo],
+  )
+
   useEffect(() => {
-    if (!imagenArchivo) {
-      setVistaPrevia(producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '')
-      return
-    }
-    const objectUrl = URL.createObjectURL(imagenArchivo)
-    setVistaPrevia(objectUrl)
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [imagenArchivo, producto])
+    if (!vistaPreviaArchivo) return undefined
+    return () => URL.revokeObjectURL(vistaPreviaArchivo)
+  }, [vistaPreviaArchivo])
+
+  const vistaPrevia =
+    vistaPreviaArchivo ||
+    (producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '')
 
   useEffect(() => {
     if (!visible) return
@@ -137,13 +127,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
 
   if (!visible) return null
 
-  const tipoPromocionSeleccionado = tiposPromocion.find(
-    (tp) => String(tp.id) === String(valores.tipoPromocionId),
-  )
-  const esTipoDescuento = Boolean(
-    tipoPromocionSeleccionado?.nombre?.toLowerCase().includes('descuento'),
-  )
-
   const actualizarCampo = (campo, valor) => {
     setValores((prev) => ({ ...prev, [campo]: valor }))
     if (errores[campo]) {
@@ -160,14 +143,18 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       const siguiente = { ...prev, precioVenta: limpio }
       if (
         prev.enPromocion &&
-        esTipoDescuento &&
         prev.porcentajeDescuento !== '' &&
         Number.isFinite(precioVentaNum) &&
         precioVentaNum > 0 &&
-        Number.isFinite(porcentajeNum)
+        Number.isInteger(porcentajeNum) &&
+        porcentajeNum >= 1 &&
+        porcentajeNum < 100
       ) {
-        const nuevoPrecioPromo = redondear2(precioVentaNum - (precioVentaNum * (porcentajeNum / 100)))
-        siguiente.precioPromo = nuevoPrecioPromo >= 0 ? String(nuevoPrecioPromo) : ''
+        const nuevoPrecioPromo = precioConDescuento(precioVentaNum, porcentajeNum)
+        siguiente.precioPromo =
+          Number.isFinite(nuevoPrecioPromo) && nuevoPrecioPromo > 0
+            ? String(nuevoPrecioPromo)
+            : ''
       }
       return siguiente
     })
@@ -178,17 +165,22 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
   }
 
   const manejarCambioPorcentaje = (valor) => {
-    const limpio = sanitizarDecimalPositivo(valor)
+    const limpio = sanitizarEnteroPositivo(valor)
     const porcentajeNum = Number(limpio)
     const precioVentaNum = Number(valores.precioVenta)
 
     setValores((prev) => {
-      let nuevoPrecioPromo = prev.precioPromo
-      if (limpio === '') {
-        nuevoPrecioPromo = ''
-      } else if (Number.isFinite(precioVentaNum) && precioVentaNum > 0 && Number.isFinite(porcentajeNum)) {
-        const calculado = redondear2(precioVentaNum - (precioVentaNum * (porcentajeNum / 100)))
-        nuevoPrecioPromo = calculado >= 0 ? String(calculado) : ''
+      let nuevoPrecioPromo = ''
+      if (
+        limpio !== '' &&
+        Number.isFinite(precioVentaNum) &&
+        precioVentaNum > 0 &&
+        Number.isInteger(porcentajeNum) &&
+        porcentajeNum >= 1 &&
+        porcentajeNum < 100
+      ) {
+        const calculado = precioConDescuento(precioVentaNum, porcentajeNum)
+        nuevoPrecioPromo = Number.isFinite(calculado) && calculado > 0 ? String(calculado) : ''
       }
       return {
         ...prev,
@@ -208,12 +200,15 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     const precioVentaNum = Number(valores.precioVenta)
 
     setValores((prev) => {
-      let nuevoPorcentaje = prev.porcentajeDescuento
-      if (limpio === '') {
-        nuevoPorcentaje = ''
-      } else if (Number.isFinite(precioVentaNum) && precioVentaNum > 0 && Number.isFinite(precioPromoNum)) {
-        const calculado = redondear2(100 - ((precioPromoNum * 100) / precioVentaNum))
-        nuevoPorcentaje = calculado >= 0 ? String(calculado) : ''
+      let nuevoPorcentaje = ''
+      if (
+        limpio !== '' &&
+        Number.isFinite(precioVentaNum) &&
+        precioVentaNum > 0 &&
+        Number.isFinite(precioPromoNum)
+      ) {
+        const calculado = porcentajeDescuento(precioVentaNum, precioPromoNum)
+        nuevoPorcentaje = calculado !== null ? String(calculado) : ''
       }
       return {
         ...prev,
@@ -252,15 +247,15 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       nuevosErrores.stock = 'El stock debe ser un número entero mayor o igual a 0'
     }
 
-    if (valores.enPromocion && esTipoDescuento) {
+    if (valores.enPromocion) {
       const porcentajeNum = Number(valores.porcentajeDescuento)
       if (
         valores.porcentajeDescuento === '' ||
-        isNaN(porcentajeNum) ||
-        porcentajeNum <= 0 ||
+        !Number.isInteger(porcentajeNum) ||
+        porcentajeNum < 1 ||
         porcentajeNum >= 100
       ) {
-        nuevosErrores.porcentajeDescuento = 'El porcentaje debe ser mayor a 0 y menor a 100'
+        nuevosErrores.porcentajeDescuento = 'El porcentaje debe ser un entero entre 1% y 99%'
       }
 
       const precioPromoNum = Number(valores.precioPromo)
@@ -271,6 +266,12 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
         (!isNaN(precioVentaNum) && precioVentaNum > 0 && precioPromoNum >= precioVentaNum)
       ) {
         nuevosErrores.precioPromo = 'El precio en promoción debe ser mayor a 0 y menor al precio de venta'
+      } else if (
+        !isNaN(precioVentaNum) &&
+        precioVentaNum > 0 &&
+        porcentajeDescuento(precioVentaNum, precioPromoNum) === null
+      ) {
+        nuevosErrores.precioPromo = 'El descuento debe ser de al menos 1% y menor al 100%'
       }
     }
 
@@ -299,8 +300,15 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     formData.append('stock', String(Number(valores.stock)))
     formData.append('enPromocion', String(valores.enPromocion))
     if (valores.enPromocion) {
+      const precioPromoNormalizado = precioConDescuento(
+        Number(valores.precioVenta),
+        Number(valores.porcentajeDescuento),
+      )
       formData.append('tipoPromocionId', valores.tipoPromocionId ? String(Number(valores.tipoPromocionId)) : '')
-      formData.append('precioPromo', esTipoDescuento ? String(Number(valores.precioPromo)) : '')
+      formData.append(
+        'precioPromo',
+        String(Number.isFinite(precioPromoNormalizado) ? precioPromoNormalizado : Number(valores.precioPromo)),
+      )
     } else {
       formData.append('tipoPromocionId', '')
       formData.append('precioPromo', '')
@@ -609,49 +617,35 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
           </div>
 
           {valores.enPromocion && (
-            <div className="prod-modal-span-2">
-              <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
-                <select
-                  id="prod-tipo-promo"
-                  value={valores.tipoPromocionId}
-                  onChange={(e) => {
-                    const nuevoTipoId = e.target.value
-                    const nuevoTipo = tiposPromocion.find((tp) => String(tp.id) === String(nuevoTipoId))
-                    const nuevoEsDescuento = Boolean(
-                      nuevoTipo?.nombre?.toLowerCase().includes('descuento'),
-                    )
-                    setValores((prev) => ({
-                      ...prev,
-                      tipoPromocionId: nuevoTipoId,
-                      ...(nuevoEsDescuento
-                        ? {}
-                        : {
-                            porcentajeDescuento: '',
-                            precioPromo: '',
-                          }),
-                    }))
-                    setErrores((prev) => ({
-                      ...prev,
-                      tipoPromocionId: null,
-                      porcentajeDescuento: null,
-                      precioPromo: null,
-                    }))
-                  }}
-                  disabled={guardando}
-                >
-                  <option value="">Ninguna</option>
-                  {tiposPromocion.map((tp) => (
-                    <option key={tp.id} value={tp.id}>
-                      {tp.nombre}
-                    </option>
-                  ))}
-                </select>
-              </CampoFormulario>
-            </div>
-          )}
-
-          {valores.enPromocion && esTipoDescuento && (
             <>
+              <div className="prod-modal-span-2">
+                <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
+                  <select
+                    id="prod-tipo-promo"
+                    value={valores.tipoPromocionId}
+                    onChange={(e) => {
+                      const nuevoTipoId = e.target.value
+                      setValores((prev) => ({
+                        ...prev,
+                        tipoPromocionId: nuevoTipoId,
+                      }))
+                      setErrores((prev) => ({
+                        ...prev,
+                        tipoPromocionId: null,
+                      }))
+                    }}
+                    disabled={guardando}
+                  >
+                    <option value="">Ninguna</option>
+                    {tiposPromocion.map((tp) => (
+                      <option key={tp.id} value={tp.id}>
+                        {tp.nombre}
+                      </option>
+                    ))}
+                  </select>
+                </CampoFormulario>
+              </div>
+
               <CampoFormulario
                 label="Porcentaje de descuento (%)"
                 id="prod-porcentaje-promo"
@@ -660,13 +654,13 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                 <input
                   id="prod-porcentaje-promo"
                   type="number"
-                  min="0.01"
-                  max="99.99"
-                  step="0.01"
-                  inputMode="decimal"
+                  min="1"
+                  max="99"
+                  step="1"
+                  inputMode="numeric"
                   placeholder="Ej. 15"
                   value={valores.porcentajeDescuento}
-                  onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                  onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
                   onChange={(e) => manejarCambioPorcentaje(e.target.value)}
                   disabled={guardando}
                 />

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
   formatearPrecio,
   obtenerPreciosProducto,
@@ -12,21 +12,22 @@ import '../../../styles/carrito.css'
 
 function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
   const imagenUrl = obtenerUrlImagenProducto(item?.imagen)
-  const [cantidadTexto, setCantidadTexto] = useState(String(item.cantidad))
+  const [borradorCantidad, setBorradorCantidad] = useState(null)
 
-  useEffect(() => {
-    setCantidadTexto(String(item.cantidad))
-  }, [item.cantidad])
+  const cantidadTexto =
+    borradorCantidad && borradorCantidad.base === item.cantidad
+      ? borradorCantidad.valor
+      : String(item.cantidad)
 
   function handleCantidadChange(e) {
     const valor = sanitizarEnteroPositivo(e.target.value)
     if (valor === '') {
-      setCantidadTexto('')
+      setBorradorCantidad({ base: item.cantidad, valor: '' })
       return
     }
     const maxStock = Number.isFinite(item.stock) ? item.stock : Infinity
     const numero = Math.min(Math.max(1, Number(valor)), maxStock)
-    setCantidadTexto(String(numero))
+    setBorradorCantidad(null)
     if (numero !== item.cantidad) {
       onCambiarCantidad(item.id, numero)
     }
@@ -34,7 +35,7 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
 
   function handleCantidadBlur() {
     if (cantidadTexto === '') {
-      setCantidadTexto('1')
+      setBorradorCantidad(null)
       if (item.cantidad !== 1) {
         onCambiarCantidad(item.id, 1)
       }

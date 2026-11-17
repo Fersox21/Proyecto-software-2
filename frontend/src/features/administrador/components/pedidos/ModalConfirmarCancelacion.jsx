@@ -24,50 +24,40 @@ function ModalConfirmarCancelacion({ pedido, visible, cargando, onConfirmar, onC
   }
 
   return (
-    <Modal titulo="Cancelar Pedido" onCerrar={handleCerrar} tamanio="normal">
-      <form onSubmit={handleSubmit} className="form-confirmacion-accion">
-        <p className="mensaje-confirmacion">
-          ¿Estás seguro de que deseas cancelar el pedido del comercio{' '}
-          <strong>{pedido.comercio || 'N/A'}</strong>?
-        </p>
+    <Modal titulo="Cancelar Pedido" onCerrar={handleCerrar} tamanio="chico">
+      <form onSubmit={handleSubmit} className="orden-form">
+        <div className="orden-modal-cuerpo">
+          <p className="orden-confirmar-texto">
+            ¿Estás seguro de que deseas cancelar el pedido del comercio{' '}
+            <strong>{pedido.comercio || 'N/A'}</strong>?
+          </p>
 
-        <div className="campo-grupo" style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <label htmlFor="motivo-rechazo" style={{ fontWeight: '600' }}>
-            Motivo de cancelación <span style={{ color: 'var(--admin-peligro, #e53e3e)' }}>*</span>:
-          </label>
-          <textarea
-            id="motivo-rechazo"
-            rows="3"
-            value={motivo}
-            onChange={(e) => {
-              setMotivo(e.target.value)
-              if (errorValidacion) setErrorValidacion('')
-            }}
-            placeholder="Ej. Falta de stock de producto solicitado, cliente no responde, etc."
-            required
-            disabled={cargando}
-            style={{
-              padding: '0.6rem',
-              borderRadius: '6px',
-              border: errorValidacion ? '1px solid var(--admin-peligro, #e53e3e)' : '1px solid #ccc',
-              resize: 'vertical'
-            }}
-          />
-          {errorValidacion && (
-            <span style={{ color: 'var(--admin-peligro, #e53e3e)', fontSize: '0.85rem' }}>
-              {errorValidacion}
-            </span>
-          )}
+          <div className="orden-campo">
+            <label htmlFor="motivo-rechazo">
+              Motivo de cancelación <span style={{ color: 'var(--admin-peligro)' }}>*</span>
+            </label>
+            <textarea
+              id="motivo-rechazo"
+              rows="3"
+              value={motivo}
+              onChange={(e) => {
+                setMotivo(e.target.value)
+                if (errorValidacion) setErrorValidacion('')
+              }}
+              placeholder="Ej. Falta de stock de producto solicitado, cliente no responde, etc."
+              required
+              disabled={cargando}
+              aria-invalid={Boolean(errorValidacion)}
+            />
+            {errorValidacion && (
+              <p className="orden-campo-error" role="alert">
+                {errorValidacion}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="modal-acciones-footer" style={{ marginTop: '1.5rem' }}>
-          <button
-            type="submit"
-            className="orden-btn orden-btn-peligro"
-            disabled={cargando}
-          >
-            {cargando ? 'Cancelando...' : 'Confirmar Cancelación'}
-          </button>
+        <div className="orden-modal-acciones">
           <button
             type="button"
             className="orden-btn"
@@ -75,6 +65,13 @@ function ModalConfirmarCancelacion({ pedido, visible, cargando, onConfirmar, onC
             disabled={cargando}
           >
             Volver
+          </button>
+          <button
+            type="submit"
+            className="orden-btn orden-btn-peligro"
+            disabled={cargando}
+          >
+            {cargando ? 'Cancelando...' : 'Confirmar Cancelación'}
           </button>
         </div>
       </form>

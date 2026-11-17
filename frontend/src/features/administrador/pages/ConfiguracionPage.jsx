@@ -42,10 +42,12 @@ function ConfiguracionPage() {
                                 <dt>Correo electrónico</dt>
                                 <dd>{usuario.correo}</dd>
                             </div>
-                            <div className="config-dato">
-                                <dt>Identificador</dt>
-                                <dd>#{usuario.id}</dd>
-                            </div>
+                            {usuario.rol && (
+                                <div className="config-dato">
+                                    <dt>Rol</dt>
+                                    <dd>{usuario.rol === 'admin' ? 'Administrador' : usuario.rol}</dd>
+                                </div>
+                            )}
                         </dl>
                     )}
                 </section>

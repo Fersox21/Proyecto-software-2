@@ -1,30 +1,40 @@
-import { pool } from '../../config/db.js';
 import * as authService from './auth.service.js';
 
-export const registrar = async (req, res, next) => {
-  try {
-    const { correo, password } = req.body;
-    
-    const rows = await authService.registro(correo, password);
-    
-    res.status(201).json(rows);
-  } catch (err) {
-    next(err);
-  }
+export const crearAuthController = (service = authService) => {
+  const registrar = async (req, res, next) => {
+    try {
+      const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {};
+      const { correo, password, rol } = body;
+
+      const nuevoUsuario = await service.registro(correo, password, rol);
+      res.status(201).json(nuevoUsuario);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  const login = async (req, res, next) => {
+    try {
+      const body = req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {};
+      const correo = body.correo !== undefined ? body.correo : body.email;
+      const { password } = body;
+
+      const resultado = await service.login(correo, password);
+      res.json(resultado);
+    } catch (err) {
+      next(err);
+    }
+  };
+
+  const usuario = (req, res) => {
+    res.json(req.usuario);
+  };
+
+  return { registrar, login, usuario };
 };
 
-export const login = async (req, res, next) => {
-  try {
-    const correo = req.body.correo || req.body.email;
-    const { password } = req.body;
-    
-    const token = await authService.login(correo, password);
-    res.json({ token });
-  } catch (err) {
-    next(err);
-  }
-};
+const defaultController = crearAuthController();
 
-export const usuario = (req, res) => {
-  res.json(req.usuario);
-};
+export const registrar = defaultController.registrar;
+export const login = defaultController.login;
+export const usuario = defaultController.usuario;

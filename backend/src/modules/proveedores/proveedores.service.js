@@ -1,12 +1,7 @@
-import * as repository from './proveedores.repository.js';
+import * as defaultRepository from './proveedores.repository.js';
+import { crearError, validarIdEnteroPositivo } from '../../utils/validaciones.js';
 
 const REGEX_TELEFONO = /^\+?\d+$/;
-
-const crearError = (mensaje, status) => {
-  const error = new Error(mensaje);
-  error.status = status;
-  return error;
-};
 
 export const validarNombreProveedor = (valor) => {
   const nombre = typeof valor === 'string' ? valor.trim() : '';
@@ -40,47 +35,68 @@ export const validarTelefonoProveedor = (valor) => {
   return telefono;
 };
 
-export const listarProveedores = async () => {
-  return await repository.findAll();
+export const crearProveedoresService = (repository = defaultRepository) => {
+  const listarProveedores = async () => {
+    return await repository.findAll();
+  };
+
+  const obtenerProveedorPorId = async (id) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de proveedor inválido');
+    const proveedor = await repository.findById(idNum);
+    if (!proveedor) {
+      throw crearError('Proveedor no encontrado', 404);
+    }
+    return proveedor;
+  };
+
+  const crearProveedor = async (data) => {
+    const nombre = validarNombreProveedor(data?.nombre);
+    const telefono = validarTelefonoProveedor(data?.telefono);
+
+    return await repository.create({ nombre, telefono });
+  };
+
+  const actualizarProveedor = async (id, data) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de proveedor inválido');
+    const proveedorExistente = await repository.findById(idNum);
+    if (!proveedorExistente) {
+      throw crearError('Proveedor no encontrado', 404);
+    }
+
+    const nombre =
+      data?.nombre !== undefined
+        ? validarNombreProveedor(data.nombre)
+        : proveedorExistente.nombre;
+    const telefono =
+      data?.telefono !== undefined
+        ? validarTelefonoProveedor(data.telefono)
+        : proveedorExistente.telefono;
+
+    return await repository.update(idNum, { nombre, telefono });
+  };
+
+  const eliminarProveedor = async (id) => {
+    const idNum = validarIdEnteroPositivo(id, 'ID de proveedor inválido');
+    const rowCount = await repository.remove(idNum);
+    if (rowCount === 0) {
+      throw crearError('Proveedor no encontrado', 404);
+    }
+    return true;
+  };
+
+  return {
+    listarProveedores,
+    obtenerProveedorPorId,
+    crearProveedor,
+    actualizarProveedor,
+    eliminarProveedor
+  };
 };
 
-export const obtenerProveedorPorId = async (id) => {
-  const proveedor = await repository.findById(id);
-  if (!proveedor) {
-    throw crearError('Proveedor no encontrado', 404);
-  }
-  return proveedor;
-};
+const defaultService = crearProveedoresService();
 
-export const crearProveedor = async (data) => {
-  const nombre = validarNombreProveedor(data?.nombre);
-  const telefono = validarTelefonoProveedor(data?.telefono);
-
-  return await repository.create({ nombre, telefono });
-};
-
-export const actualizarProveedor = async (id, data) => {
-  const proveedorExistente = await repository.findById(id);
-  if (!proveedorExistente) {
-    throw crearError('Proveedor no encontrado', 404);
-  }
-
-  const nombre =
-    data?.nombre !== undefined
-      ? validarNombreProveedor(data.nombre)
-      : proveedorExistente.nombre;
-  const telefono =
-    data?.telefono !== undefined
-      ? validarTelefonoProveedor(data.telefono)
-      : proveedorExistente.telefono;
-
-  return await repository.update(id, { nombre, telefono });
-};
-
-export const eliminarProveedor = async (id) => {
-  const rowCount = await repository.remove(id);
-  if (rowCount === 0) {
-    throw crearError('Proveedor no encontrado', 404);
-  }
-  return true;
-};
+export const listarProveedores = defaultService.listarProveedores;
+export const obtenerProveedorPorId = defaultService.obtenerProveedorPorId;
+export const crearProveedor = defaultService.crearProveedor;
+export const actualizarProveedor = defaultService.actualizarProveedor;
+export const eliminarProveedor = defaultService.eliminarProveedor;

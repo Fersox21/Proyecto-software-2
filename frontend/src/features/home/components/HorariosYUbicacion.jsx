@@ -1,4 +1,4 @@
-import { FaRegClock, FaWhatsapp, FaRegEnvelope, FaMapMarkerAlt, FaExternalLinkAlt } from "react-icons/fa";
+import { FaRegClock, FaWhatsapp, FaRegEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { HiArrowUpRight } from 'react-icons/hi2';
 
 function HorariosYUbicacion(){

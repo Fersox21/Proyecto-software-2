@@ -2,10 +2,18 @@ import { esRequerido } from "../../../shared/utils/validaciones"
 import Boton from '../../../shared/components/Boton'
 import { useRef, useState } from 'react'
 
+const REGEX_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const MAX_EMAIL_LEN = 254
+const MAX_PASSWORD_LEN = 128
 
 function validar(valor) {
   const errores = {}
-  if (!esRequerido(valor.email)) errores.email = 'Ingresá tu correo.'
+  const emailLimpio = String(valor.email ?? '').trim()
+  if (!esRequerido(emailLimpio)) {
+    errores.email = 'Ingresá tu correo.'
+  } else if (!REGEX_EMAIL.test(emailLimpio)) {
+    errores.email = 'Ingresá un correo válido.'
+  }
   if (!esRequerido(valor.password)) errores.password = 'Ingresá tu contraseña.'
   return errores
 }
@@ -19,6 +27,7 @@ function FormLogin({ onIngresar }) {
   const [enviando, setEnviando] = useState(false)
   const [mostrarPassword, setMostrarPassword] = useState(false)
   const formularioRef = useRef(null)
+  const enviandoRef = useRef(false)
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -29,8 +38,11 @@ function FormLogin({ onIngresar }) {
 
   async function handleSubmit(e) {
     e.preventDefault()
+    if (enviandoRef.current) return
 
-    const nuevosErrores = validar(valores)
+    const emailLimpio = valores.email.trim()
+    const valoresNormalizados = { email: emailLimpio, password: valores.password }
+    const nuevosErrores = validar(valoresNormalizados)
     setErrores(nuevosErrores)
 
     const primerCampoConError = Object.keys(nuevosErrores)[0]
@@ -39,11 +51,14 @@ function FormLogin({ onIngresar }) {
       return
     }
 
+    enviandoRef.current = true
     setEnviando(true)
     try {
-      await onIngresar(valores)
+      await onIngresar(valoresNormalizados)
     } catch (error) {
-      setErrorServidor(error.message)
+      setErrorServidor(error.message || 'Ocurrió un error al iniciar sesión.')
+    } finally {
+      enviandoRef.current = false
       setEnviando(false)
     }
   }
@@ -61,17 +76,20 @@ function FormLogin({ onIngresar }) {
             Email
           </label>
           <div className="sec-input">
-            <input 
+            <input
               id="email"
-              type="text"
+              type="email"
               name="email"
-              autoComplete="current-email"
+              autoComplete="email"
+              required
+              maxLength={MAX_EMAIL_LEN}
+              aria-invalid={errores.email ? 'true' : undefined}
               className={`form-control ${errores.email ? 'is-invalid' : ''}`}
               value={valores.email}
               onChange={handleChange}
               disabled={enviando}
-
-              />
+            />
+            {errores.email && <div className="invalid-feedback">{errores.email}</div>}
           </div>
       </div>
 
@@ -85,6 +103,9 @@ function FormLogin({ onIngresar }) {
             name="password"
             type={mostrarPassword ? 'text' : 'password'}
             autoComplete="current-password"
+            required
+            maxLength={MAX_PASSWORD_LEN}
+            aria-invalid={errores.password ? 'true' : undefined}
             className={`form-control ${errores.password ? 'is-invalid' : ''}`}
             value={valores.password}
             onChange={handleChange}

@@ -61,7 +61,7 @@ function CategoriasPage() {
     if (!texto) return activas
 
     return activas.filter((categoria) => {
-      const contenido = [`#${categoria.id}`, categoria.nombre]
+      const contenido = [categoria.nombre]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -166,7 +166,7 @@ function CategoriasPage() {
               <input
                 id="filtro-categorias-busqueda"
                 type="search"
-                placeholder="Buscar por nombre o #id..."
+                placeholder="Buscar por nombre..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />

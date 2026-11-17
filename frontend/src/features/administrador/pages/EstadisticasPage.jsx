@@ -34,7 +34,7 @@ function EstadisticasPage() {
 
   const listaVentas = useMemo(() => ventas.datos || [], [ventas.datos])
   const totalUltimoMes = useMemo(
-    () => listaVentas.reduce((acc, v) => acc + Number(v.total || 0), 0),
+    () => listaVentas.reduce((acc, v) => acc + Number(v.totalModificado ?? v.total_modificado ?? v.total ?? 0), 0),
     [listaVentas],
   )
 
@@ -51,7 +51,7 @@ function EstadisticasPage() {
     const ventasPorDia = {}
     listaVentas.forEach((v) => {
       const dia = String(v.fecha).slice(0, 10)
-      ventasPorDia[dia] = (ventasPorDia[dia] || 0) + Number(v.total || 0)
+      ventasPorDia[dia] = (ventasPorDia[dia] || 0) + Number(v.totalModificado ?? v.total_modificado ?? v.total ?? 0)
     })
     return Object.entries(ventasPorDia).sort(([a], [b]) => a.localeCompare(b))
   }, [listaVentas])

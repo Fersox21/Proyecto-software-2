@@ -1,18 +1,5 @@
 import * as repository from './tiposPromocion.repository.js';
-
-const crearError = (mensaje, status) => {
-  const error = new Error(mensaje);
-  error.status = status;
-  return error;
-};
-
-const validarId = (id) => {
-  const idNum = Number(id);
-  if (!Number.isInteger(idNum) || idNum <= 0) {
-    throw crearError('ID de tipo de promoción inválido', 400);
-  }
-  return idNum;
-};
+import { crearError, validarIdEnteroPositivo } from '../../utils/validaciones.js';
 
 const validarNombreTipoPromocion = (valor) => {
   const nombre = typeof valor === 'string' ? valor.trim() : '';
@@ -33,7 +20,7 @@ export const listarTiposPromocion = async () => {
 };
 
 export const obtenerTipoPromocionPorId = async (id) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de tipo de promoción inválido');
   const tipo = await repository.findById(idNum);
   if (!tipo || !tipo.activo) {
     throw crearError('Tipo de promoción no encontrado', 404);
@@ -63,7 +50,7 @@ export const crearTipoPromocion = async (data) => {
 };
 
 export const actualizarTipoPromocion = async (id, data) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de tipo de promoción inválido');
   const existente = await repository.findById(idNum);
   if (!existente || !existente.activo) {
     throw crearError('Tipo de promoción no encontrado', 404);
@@ -86,7 +73,7 @@ export const actualizarTipoPromocion = async (id, data) => {
 };
 
 export const eliminarTipoPromocion = async (id) => {
-  const idNum = validarId(id);
+  const idNum = validarIdEnteroPositivo(id, 'ID de tipo de promoción inválido');
   const rowCount = await repository.remove(idNum);
   if (rowCount === 0) {
     throw crearError('Tipo de promoción no encontrado', 404);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { LuImagePlus } from 'react-icons/lu'
 import {
   crearCategoria,
@@ -24,17 +24,16 @@ function NuevoProductoInlineForm({
 
   const [creandoPromo, setCreandoPromo] = useState(false)
   const [errorPromoRapida, setErrorPromoRapida] = useState(null)
-  const [vistaPrevia, setVistaPrevia] = useState('')
+
+  const vistaPrevia = useMemo(() => {
+    if (!producto.imagenArchivo) return ''
+    return URL.createObjectURL(producto.imagenArchivo)
+  }, [producto.imagenArchivo])
 
   useEffect(() => {
-    if (!producto.imagenArchivo) {
-      setVistaPrevia('')
-      return
-    }
-    const objectUrl = URL.createObjectURL(producto.imagenArchivo)
-    setVistaPrevia(objectUrl)
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [producto.imagenArchivo])
+    if (!vistaPrevia) return undefined
+    return () => URL.revokeObjectURL(vistaPrevia)
+  }, [vistaPrevia])
 
   const categoriasActivas = categorias.filter((cat) => cat?.activo !== false)
   const tiposPromocionActivos = tiposPromocion.filter((tp) => tp?.activo !== false)

@@ -10,7 +10,7 @@ function Dato({ etiqueta, children }) {
   )
 }
 
-function DetalleLote({ lote }) {
+function DetalleLote({ lote, numeroLote }) {
   const producto = lote.producto ?? {}
   const proveedor = lote.ordenCompra?.proveedor ?? {}
   const ordenCompra = lote.ordenCompra ?? {}
@@ -19,7 +19,7 @@ function DetalleLote({ lote }) {
     <div className="venc-detalle">
       <section className="venc-detalle-bloque" aria-labelledby={`venc-lote-${lote.id}`}>
         <h3 className="venc-detalle-titulo" id={`venc-lote-${lote.id}`}>
-          Lote #{lote.id}
+          {numeroLote != null ? `Lote #${numeroLote}` : 'Detalle del lote'}
         </h3>
         <dl className="venc-detalle-datos">
           <Dato etiqueta="Cantidad">{lote.cantidad ?? '—'}</Dato>
@@ -64,7 +64,6 @@ function DetalleLote({ lote }) {
           Orden de compra
         </h3>
         <dl className="venc-detalle-datos">
-          <Dato etiqueta="Número">{ordenCompra.id != null ? `#${ordenCompra.id}` : '—'}</Dato>
           <Dato etiqueta="Fecha">{formatearFecha(ordenCompra.fecha)}</Dato>
           <Dato etiqueta="Total">
             {ordenCompra.total != null ? formatearPrecio(ordenCompra.total) : '—'}

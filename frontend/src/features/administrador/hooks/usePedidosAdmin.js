@@ -22,24 +22,36 @@ export function usePedidosAdmin() {
   const [errorDetalle, setErrorDetalle] = useState(null)
 
   const [procesandoAccion, setProcesandoAccion] = useState(false)
+  const [recarga, setRecarga] = useState(0)
+
+  useEffect(() => {
+    let ignorar = false
+
+    obtenerPedidos()
+      .then((data) => {
+        if (ignorar) return
+        const lista = Array.isArray(data) ? data : (data?.pedidos || [])
+        setPedidos(lista.filter(esPedidoPendiente))
+        setError(null)
+      })
+      .catch((err) => {
+        if (ignorar) return
+        setError(err)
+      })
+      .finally(() => {
+        if (!ignorar) setCargando(false)
+      })
+
+    return () => {
+      ignorar = true
+    }
+  }, [recarga])
 
   const cargarPedidos = useCallback(async () => {
     setCargando(true)
     setError(null)
-    try {
-      const data = await obtenerPedidos()
-      const lista = Array.isArray(data) ? data : (data?.pedidos || [])
-      setPedidos(lista.filter(esPedidoPendiente))
-    } catch (err) {
-      setError(err)
-    } finally {
-      setCargando(false)
-    }
+    setRecarga((n) => n + 1)
   }, [])
-
-  useEffect(() => {
-    cargarPedidos()
-  }, [cargarPedidos])
 
   const cargarDetallePedido = useCallback(async (id) => {
     setCargandoDetalle(true)

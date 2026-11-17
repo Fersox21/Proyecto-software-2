@@ -1,22 +1,9 @@
-import * as repository from './lotes.repository.js';
-import * as repositoryOrdenCompra from '../ordenesCompra/ordenesCompra.repository.js';
-import * as repositoryProducto from '../productos/productos.repository.js';
+import * as defaultRepository from './lotes.repository.js';
+import * as defaultRepositoryOrdenCompra from '../ordenesCompra/ordenesCompra.repository.js';
+import * as defaultRepositoryProducto from '../productos/productos.repository.js';
+import { crearError, validarIdEnteroPositivo } from '../../utils/validaciones.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
-
-const crearError = (mensaje, status) => {
-  const error = new Error(mensaje);
-  error.status = status;
-  return error;
-};
-
-const validarId = (id) => {
-  const numero = Number(id);
-  if (!Number.isInteger(numero) || numero <= 0) {
-    throw crearError('El id del lote no es válido', 400);
-  }
-  return numero;
-};
 
 const validarCantidad = (cantidad) => {
   const mensaje = 'La cantidad del lote debe ser un entero mayor a 0';
@@ -111,140 +98,165 @@ const validarOrdenDeFechas = (fechaArribo, fechaVencimiento) => {
   }
 };
 
-export const listarLotes = async () => {
-  return await repository.findAll();
-};
+export const crearLotesService = ({
+  repository = defaultRepository,
+  repositoryOrdenCompra = defaultRepositoryOrdenCompra,
+  repositoryProducto = defaultRepositoryProducto
+} = {}) => {
+  const listarLotes = async () => {
+    return await repository.findAll();
+  };
 
-export const listarHistorialLotes = async () => {
-  return await repository.findHistorial();
-};
+  const listarHistorialLotes = async () => {
+    return await repository.findHistorial();
+  };
 
-export const obtenerLotePorId = async (id) => {
-  const lote = await repository.findById(validarId(id));
-  if (!lote) {
-    throw crearError('Lote no encontrado', 404);
-  }
-  return lote;
-};
-
-export const crearLote = async (data) => {
-  if (
-    data?.cantidad == null ||
-    !data?.fechaArribo ||
-    !data?.fechaVencimiento ||
-    data?.ordenCompra == null ||
-    data?.producto == null
-  ) {
-    throw crearError(
-      'Faltan datos obligatorios para crear el lote (cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto)',
-      400
+  const obtenerLotePorId = async (id) => {
+    const lote = await repository.findById(
+      validarIdEnteroPositivo(id, 'El id del lote no es válido')
     );
-  }
+    if (!lote) {
+      throw crearError('Lote no encontrado', 404);
+    }
+    return lote;
+  };
 
-  const ordenCompraId = Number(data.ordenCompra);
-  const productoId = Number(data.producto);
+  const crearLote = async (data) => {
+    if (
+      data?.cantidad == null ||
+      !data?.fechaArribo ||
+      !data?.fechaVencimiento ||
+      data?.ordenCompra == null ||
+      data?.producto == null
+    ) {
+      throw crearError(
+        'Faltan datos obligatorios para crear el lote (cantidad, fechaArribo, fechaVencimiento, ordenCompra, producto)',
+        400
+      );
+    }
 
-  if (!Number.isInteger(ordenCompraId) || ordenCompraId <= 0) {
-    throw crearError('La orden de compra indicada no es válida', 400);
-  }
+    const ordenCompraId = validarIdEnteroPositivo(
+      data.ordenCompra,
+      'La orden de compra indicada no es válida'
+    );
+    const productoId = validarIdEnteroPositivo(
+      data.producto,
+      'El producto indicado no es válido'
+    );
 
-  if (!Number.isInteger(productoId) || productoId <= 0) {
-    throw crearError('El producto indicado no es válido', 400);
-  }
+    const ordenCompraExistente = await repositoryOrdenCompra.findById(ordenCompraId);
+    const productoExistente = await repositoryProducto.findById(productoId);
 
-  const ordenCompraExistente = await repositoryOrdenCompra.findById(ordenCompraId);
-  const productoExistente = await repositoryProducto.findById(productoId);
+    if (!ordenCompraExistente) {
+      throw crearError('La orden de compra indicada no existe', 400);
+    }
 
-  if (!ordenCompraExistente) {
-    throw crearError('La orden de compra indicada no existe', 400);
-  }
+    if (!productoExistente) {
+      throw crearError('El producto indicado no existe', 400);
+    }
 
-  if (!productoExistente) {
-    throw crearError('El producto indicado no existe', 400);
-  }
+    const cantidad = validarCantidad(data.cantidad);
+    const fechaArribo = validarFecha(data.fechaArribo, 'La fecha de arribo');
+    const fechaVencimiento = validarFecha(data.fechaVencimiento, 'La fecha de vencimiento');
 
-  const cantidad = validarCantidad(data.cantidad);
-  const fechaArribo = validarFecha(data.fechaArribo, 'La fecha de arribo');
-  const fechaVencimiento = validarFecha(data.fechaVencimiento, 'La fecha de vencimiento');
+    validarOrdenDeFechas(fechaArribo, fechaVencimiento);
 
-  validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+    const total = Number((Number(productoExistente.precioCosto) * cantidad).toFixed(2));
 
-  const total = Number((Number(productoExistente.precioCosto) * cantidad).toFixed(2));
+    return await repository.create({
+      cantidad,
+      total,
+      fechaArribo,
+      fechaVencimiento,
+      ordenCompra: ordenCompraId,
+      producto: productoId
+    });
+  };
 
-  return await repository.create({
-    cantidad,
-    total,
-    fechaArribo,
-    fechaVencimiento,
-    ordenCompra: ordenCompraId,
-    producto: productoId
-  });
+  const actualizarVencimiento = async (id, data) => {
+    const idLote = validarIdEnteroPositivo(id, 'El id del lote no es válido');
+    const fechaVencimiento = validarFecha(data?.fechaVencimiento, 'La fecha de vencimiento');
+
+    const loteExistente = await repository.findById(idLote);
+    if (!loteExistente) {
+      throw crearError('Lote no encontrado', 404);
+    }
+
+    const fechaArribo = normalizarFecha(loteExistente.fechaArribo);
+    validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+
+    const actualizado = await repository.updateFechaVencimiento(idLote, fechaVencimiento);
+    if (!actualizado) {
+      throw crearError('Lote no encontrado', 404);
+    }
+
+    return await repository.findById(idLote);
+  };
+
+  const actualizarLote = async (id, data) => {
+    const idLote = validarIdEnteroPositivo(id, 'El id del lote no es válido');
+
+    const loteExistente = await repository.findById(idLote);
+    if (!loteExistente) {
+      throw crearError('Lote no encontrado', 404);
+    }
+
+    const cantidad =
+      data?.cantidad !== undefined ? validarCantidad(data.cantidad) : loteExistente.cantidad;
+    const fechaArribo =
+      data?.fechaArribo !== undefined
+        ? validarFecha(data.fechaArribo, 'La fecha de arribo')
+        : normalizarFecha(loteExistente.fechaArribo);
+    const fechaVencimiento =
+      data?.fechaVencimiento !== undefined
+        ? validarFecha(data.fechaVencimiento, 'La fecha de vencimiento')
+        : normalizarFecha(loteExistente.fechaVencimiento);
+
+    validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+
+    const total =
+      data?.total !== undefined
+        ? validarTotal(data.total)
+        : data?.cantidad !== undefined && loteExistente.producto?.precioCosto != null
+          ? Number((Number(loteExistente.producto.precioCosto) * cantidad).toFixed(2))
+          : loteExistente.total;
+
+    return await repository.update(idLote, { cantidad, total, fechaArribo, fechaVencimiento });
+  };
+
+  const eliminarLote = async (id) => {
+    const idLote = validarIdEnteroPositivo(id, 'El id del lote no es válido');
+
+    const loteExistente = await repository.findById(idLote);
+    if (!loteExistente) {
+      throw crearError('Lote no encontrado', 404);
+    }
+
+    const rowCount = await repository.removeSiNoEsElUltimoLote(idLote);
+    if (rowCount === 0) {
+      throw crearError('No se puede eliminar el único lote de la orden de compra', 409);
+    }
+
+    return true;
+  };
+
+  return {
+    listarLotes,
+    listarHistorialLotes,
+    obtenerLotePorId,
+    crearLote,
+    actualizarVencimiento,
+    actualizarLote,
+    eliminarLote
+  };
 };
 
-// Edita solo la fecha de vencimiento, conservando el id y el resto del lote.
-export const actualizarVencimiento = async (id, data) => {
-  const idLote = validarId(id);
-  const fechaVencimiento = validarFecha(data?.fechaVencimiento, 'La fecha de vencimiento');
+const defaultService = crearLotesService();
 
-  const loteExistente = await repository.findById(idLote);
-  if (!loteExistente) {
-    throw crearError('Lote no encontrado', 404);
-  }
-
-  const fechaArribo = normalizarFecha(loteExistente.fechaArribo);
-  validarOrdenDeFechas(fechaArribo, fechaVencimiento);
-
-  const actualizado = await repository.updateFechaVencimiento(idLote, fechaVencimiento);
-  if (!actualizado) {
-    throw crearError('Lote no encontrado', 404);
-  }
-
-  return await repository.findById(idLote);
-};
-
-export const actualizarLote = async (id, data) => {
-  const idLote = validarId(id);
-
-  const loteExistente = await repository.findById(idLote);
-  if (!loteExistente) {
-    throw crearError('Lote no encontrado', 404);
-  }
-
-  const cantidad =
-    data?.cantidad !== undefined ? validarCantidad(data.cantidad) : loteExistente.cantidad;
-  const fechaArribo =
-    data?.fechaArribo !== undefined
-      ? validarFecha(data.fechaArribo, 'La fecha de arribo')
-      : normalizarFecha(loteExistente.fechaArribo);
-  const fechaVencimiento =
-    data?.fechaVencimiento !== undefined
-      ? validarFecha(data.fechaVencimiento, 'La fecha de vencimiento')
-      : normalizarFecha(loteExistente.fechaVencimiento);
-
-  validarOrdenDeFechas(fechaArribo, fechaVencimiento);
-
-  const total =
-    data?.total !== undefined
-      ? validarTotal(data.total)
-      : data?.cantidad !== undefined && loteExistente.producto?.precioCosto != null
-        ? Number((Number(loteExistente.producto.precioCosto) * cantidad).toFixed(2))
-        : loteExistente.total;
-
-  return await repository.update(idLote, { cantidad, total, fechaArribo, fechaVencimiento });
-};
-
-export const eliminarLote = async (id) => {
-  const idLote = validarId(id);
-
-  const loteExistente = await repository.findById(idLote);
-  if (!loteExistente) {
-    throw crearError('Lote no encontrado', 404);
-  }
-
-  const rowCount = await repository.removeSiNoEsElUltimoLote(idLote);
-  if (rowCount === 0) {
-    throw crearError('No se puede eliminar el único lote de la orden de compra', 409);
-  }
-
-  return true;
-};
+export const listarLotes = defaultService.listarLotes;
+export const listarHistorialLotes = defaultService.listarHistorialLotes;
+export const obtenerLotePorId = defaultService.obtenerLotePorId;
+export const crearLote = defaultService.crearLote;
+export const actualizarVencimiento = defaultService.actualizarVencimiento;
+export const actualizarLote = defaultService.actualizarLote;
+export const eliminarLote = defaultService.eliminarLote;

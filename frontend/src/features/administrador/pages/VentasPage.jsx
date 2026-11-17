@@ -24,8 +24,11 @@ import '../../../styles/panelAdmin/ordenesCompra.css';
 import '../../../styles/panelAdmin/adminPedidos.css';
 import '../../../styles/panelAdmin/historial.css';
 
+const POR_PAGINA = 25
+
 function VentasPage() {
   const [vistaHistorial, setVistaHistorial] = useState(false);
+  const [pagina, setPagina] = useState(1);
   const [recarga, setRecarga] = useState(0);
   const { datos: ventas, cargando, error } = useFetch(obtenerVentas, recarga);
 
@@ -66,6 +69,10 @@ function VentasPage() {
 
   const listaVentas = Array.isArray(ventas) ? ventas : [];
   const totalVentas = listaVentas.length;
+  const totalPaginas = Math.max(1, Math.ceil(totalVentas / POR_PAGINA));
+  const paginaActual = Math.min(pagina, totalPaginas);
+  const inicio = (paginaActual - 1) * POR_PAGINA;
+  const ventasVisibles = listaVentas.slice(inicio, inicio + POR_PAGINA);
 
   const verDetalle = async (ventaId) => {
     setModalDetalleAbierto(true);
@@ -230,7 +237,7 @@ function VentasPage() {
 
           <tbody>
             {totalVentas > 0 ? (
-              listaVentas.map((venta, index) => {
+              ventasVisibles.map((venta, index) => {
                 const totalModificado = venta.totalModificado ?? venta.total_modificado;
                 const motivoModificacion = venta.motivoModificacion ?? venta.motivo_modificacion;
                 const totalOriginal = venta.monto ?? venta.total ?? 0;
@@ -241,7 +248,7 @@ function VentasPage() {
                   <tr key={venta.id}>
                     <td className="col-admin">
                       <div className="venta-id-fecha">
-                        <span className="venta-id">#{index + 1}</span>
+                        <span className="venta-id">#{inicio + index + 1}</span>
                         <span className="venta-fecha">
                           {venta.fecha ? formatearFecha(venta.fecha) : '-'}
                         </span>
@@ -308,16 +315,38 @@ function VentasPage() {
           </tbody>
         </table>
 
-        <div className="tabla-admin-pie">
-          <span className="info-pag">
-            Mostrando {totalVentas > 0 ? 1 : 0}–{totalVentas} de {totalVentas}
-          </span>
-          <div className="control-pag">
-            <button type="button" className="btn-pag" id="anterior-pag">‹</button>
-            <span className="nums-pag">1</span>
-            <button type="button" className="btn-pag" id="siguiente-pag">›</button>
+        {totalVentas > 0 && (
+          <div className="tabla-admin-pie">
+            <span className="info-pag">
+              Mostrando {inicio + 1}–{Math.min(inicio + POR_PAGINA, totalVentas)} de {totalVentas}
+            </span>
+            <div className="control-pag">
+              <button
+                type="button"
+                className="btn-pag"
+                id="anterior-pag"
+                disabled={paginaActual <= 1}
+                onClick={() => setPagina(paginaActual - 1)}
+                aria-label="Página anterior"
+              >
+                ‹
+              </button>
+              <span className="nums-pag">
+                {paginaActual} / {totalPaginas}
+              </span>
+              <button
+                type="button"
+                className="btn-pag"
+                id="siguiente-pag"
+                disabled={paginaActual >= totalPaginas}
+                onClick={() => setPagina(paginaActual + 1)}
+                aria-label="Página siguiente"
+              >
+                ›
+              </button>
+            </div>
           </div>
-        </div>
+        )}
       </section>
 
       {modalDetalleAbierto && (

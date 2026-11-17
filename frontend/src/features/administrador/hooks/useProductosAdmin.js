@@ -11,23 +11,35 @@ export function useProductosAdmin() {
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
   const [procesandoAccion, setProcesandoAccion] = useState(false)
+  const [recarga, setRecarga] = useState(0)
+
+  useEffect(() => {
+    let ignorar = false
+
+    obtenerProductos()
+      .then((data) => {
+        if (ignorar) return
+        setProductos(Array.isArray(data) ? data : [])
+        setError(null)
+      })
+      .catch((err) => {
+        if (ignorar) return
+        setError(err)
+      })
+      .finally(() => {
+        if (!ignorar) setCargando(false)
+      })
+
+    return () => {
+      ignorar = true
+    }
+  }, [recarga])
 
   const cargarProductos = useCallback(async () => {
     setCargando(true)
     setError(null)
-    try {
-      const data = await obtenerProductos()
-      setProductos(Array.isArray(data) ? data : [])
-    } catch (err) {
-      setError(err)
-    } finally {
-      setCargando(false)
-    }
+    setRecarga((n) => n + 1)
   }, [])
-
-  useEffect(() => {
-    cargarProductos()
-  }, [cargarProductos])
 
   const crearProducto = useCallback(async (datos) => {
     setProcesandoAccion(true)

@@ -12,7 +12,7 @@ function FilaVencimiento({ fila, numeroFila, abierta, onAlternarDetalle, onEdita
           <div className="venc-prod-celda">
             <span className="venc-prod-nombre">{fila.productoNombre}</span>
             <span className="venc-prod-meta">
-              Lote #{fila.id} · {fila.proveedorNombre}
+              Lote #{numeroFila} · {fila.proveedorNombre}
             </span>
           </div>
         </td>
@@ -47,7 +47,7 @@ function FilaVencimiento({ fila, numeroFila, abierta, onAlternarDetalle, onEdita
               onClick={() => onAlternarDetalle(fila.id)}
               aria-expanded={abierta}
               aria-controls={`venc-detalle-${fila.id}`}
-              aria-label={abierta ? `Ocultar detalle del lote #${fila.id}` : `Ver detalle del lote #${fila.id}`}
+              aria-label={abierta ? `Ocultar detalle del lote #${numeroFila}` : `Ver detalle del lote #${numeroFila}`}
               title={abierta ? 'Ocultar detalle' : 'Ver detalle'}
             >
               <LuEye size={16} aria-hidden="true" />
@@ -56,7 +56,7 @@ function FilaVencimiento({ fila, numeroFila, abierta, onAlternarDetalle, onEdita
               type="button"
               className="venc-btn-icono venc-btn-editar"
               onClick={() => onEditar(fila)}
-              aria-label={`Editar fecha de vencimiento del lote #${fila.id}`}
+              aria-label={`Editar fecha de vencimiento del lote #${numeroFila}`}
               title="Editar fecha"
             >
               <LuPencil size={16} aria-hidden="true" />
@@ -68,7 +68,7 @@ function FilaVencimiento({ fila, numeroFila, abierta, onAlternarDetalle, onEdita
       {abierta && (
         <tr className="venc-fila-detalle">
           <td colSpan={5} id={`venc-detalle-${fila.id}`}>
-            <DetalleLote lote={fila} />
+            <DetalleLote lote={fila} numeroLote={numeroFila} />
           </td>
         </tr>
       )}

@@ -32,9 +32,25 @@ function PedidoPage() {
 
   if (compraConfirmada) {
     return (
-      <MensajeVacio titulo="¡Gracias por tu compra!" texto="Te enviamos un email con el detalle del pedido.">
+      <MensajeVacio
+        titulo="¡Gracias por tu pedido!"
+        texto="Registramos tu solicitud. Nos vamos a contactar por teléfono para confirmar y coordinar la entrega."
+      >
         <Link to="/catalogo" className="btn btn-dark">
           Seguir comprando
+        </Link>
+      </MensajeVacio>
+    )
+  }
+
+  if (items.length === 0) {
+    return (
+      <MensajeVacio
+        titulo="Tu carrito está vacío"
+        texto="Agregá productos desde el catálogo antes de finalizar tu pedido."
+      >
+        <Link to="/catalogo" className="btn btn-dark">
+          Ir al catálogo
         </Link>
       </MensajeVacio>
     )

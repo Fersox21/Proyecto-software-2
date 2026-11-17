@@ -56,7 +56,6 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
 
       if (q) {
         const texto = [
-          `#${o.id}`,
           o.proveedor?.nombre,
           o.proveedor?.telefono,
           formatearFecha(o.fecha),
@@ -144,7 +143,7 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
         onChipChange={(c) => { setChip(c); setPagina(1) }}
         busqueda={busqueda}
         onBusquedaChange={(v) => { setBusqueda(v); setPagina(1) }}
-        placeholderBusqueda="#orden, proveedor o fecha"
+        placeholderBusqueda="Proveedor o fecha"
         conRangoFechas
         desde={desde}
         hasta={hasta}
@@ -183,7 +182,8 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
               </tr>
             </thead>
             <tbody>
-              {visibles.map((oc) => {
+              {visibles.map((oc, index) => {
+                const numeroFila = (paginaSegura - 1) * POR_PAGINA + index + 1
                 const abierta = abiertaId === oc.id
                 const esEliminada = Boolean(oc.eliminada || oc.activo === false)
                 const detalleOrden = detallesPorId[oc.id]
@@ -193,7 +193,7 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
                     <tr className={esEliminada ? 'hist-fila-eliminada' : ''}>
                       <td className="orden-col-orden">
                         <div className="orden-id-fecha">
-                          <span className="orden-id">#{oc.id}</span>
+                          <span className="orden-id">#{numeroFila}</span>
                           <span className="orden-fecha">{formatearFecha(oc.fecha)}</span>
                         </div>
                       </td>
@@ -232,7 +232,7 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
                               orden: detalleOrden,
                             }}
                             productosPorId={productosPorId}
-                            ordenId={oc.id}
+                            numeroOrden={numeroFila}
                           />
                         </td>
                       </tr>

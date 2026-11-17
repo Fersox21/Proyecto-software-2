@@ -18,7 +18,7 @@ function FiltroBusquedaProveedores({
           <input
             id="proveedores-busqueda"
             type="search"
-            placeholder="Nombre, teléfono o #ID..."
+            placeholder="Buscar por nombre o teléfono..."
             value={busqueda}
             onChange={(e) => onBusquedaChange(e.target.value)}
             autoComplete="off"

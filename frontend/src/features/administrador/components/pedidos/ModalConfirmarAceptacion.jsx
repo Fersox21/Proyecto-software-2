@@ -1,35 +1,89 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Modal from '../comunes/Modal'
 import Spinner from '../../../../shared/components/Spinner'
 import { formatearFecha, formatearPrecio } from '../../../../shared/utils/formato'
 import { obtenerLotesDisponibles } from '../../services/pedidosService'
 
-function ModalConfirmarAceptacion({
+function calcularEstadoProducto(prod, configuracion) {
+  if (prod.productoActivo === false) {
+    return {
+      cubierto: false,
+      error: 'Este producto fue eliminado y no puede aprobarse. Recordá llamar al cliente para coordinar el pedido.',
+      detallesConsumo: [],
+    }
+  }
+
+  const config = configuracion || { modo: 'auto', seleccionados: [] }
+  const requerido = prod.cantidadRequerida
+  const totalDisponible = prod.lotes.reduce((sum, l) => sum + l.cantidad, 0)
+
+  if (totalDisponible < requerido) {
+    return {
+      cubierto: false,
+      error: 'Stock total insuficiente en lotes vigentes',
+      detallesConsumo: [],
+    }
+  }
+
+  if (config.modo === 'auto') {
+    let rest = requerido
+    const detalles = []
+    for (const lote of prod.lotes) {
+      if (rest <= 0) break
+      const aConsumir = Math.min(rest, lote.cantidad)
+      if (aConsumir <= 0) continue
+      detalles.push({
+        loteId: lote.id,
+        cantidad: aConsumir,
+        entero: aConsumir === lote.cantidad,
+      })
+      rest -= aConsumir
+    }
+    return {
+      cubierto: rest <= 0,
+      detallesConsumo: detalles,
+    }
+  }
+
+  let acumulado = 0
+  let rest = requerido
+  const detalles = []
+  for (const loteId of config.seleccionados) {
+    if (rest <= 0) break
+    const loteObj = prod.lotes.find((l) => l.id === loteId)
+    if (!loteObj) continue
+    const aConsumir = Math.min(rest, loteObj.cantidad)
+    if (aConsumir <= 0) continue
+    acumulado += loteObj.cantidad
+    detalles.push({
+      loteId,
+      cantidad: aConsumir,
+      entero: aConsumir === loteObj.cantidad,
+    })
+    rest = Math.max(0, rest - aConsumir)
+  }
+
+  return {
+    cubierto: acumulado >= requerido,
+    acumulado,
+    detallesConsumo: detalles,
+  }
+}
+
+function ModalConfirmarAceptacionContenido({
   pedido,
   datosModificacion,
-  visible,
   cargando,
   onConfirmar,
   onCerrar,
 }) {
   const [lotesPorProducto, setLotesPorProducto] = useState([])
-  const [cargandoLotes, setCargandoLotes] = useState(false)
+  const [cargandoLotes, setCargandoLotes] = useState(true)
   const [errorLotes, setErrorLotes] = useState(null)
-
-  // Estado de configuración por producto: { [productoId]: { modo: 'auto' | 'manual', seleccionados: [loteId] } }
   const [configuraciones, setConfiguraciones] = useState({})
 
   useEffect(() => {
-    if (!visible || !pedido?.id) {
-      setLotesPorProducto([])
-      setConfiguraciones({})
-      setErrorLotes(null)
-      return
-    }
-
     let ignorar = false
-    setCargandoLotes(true)
-    setErrorLotes(null)
 
     obtenerLotesDisponibles(pedido.id)
       .then((data) => {
@@ -37,7 +91,6 @@ function ModalConfirmarAceptacion({
         const lista = Array.isArray(data) ? data : []
         setLotesPorProducto(lista)
 
-        // Configuración inicial por defecto: todos en modo 'auto'
         const initialConfig = {}
         lista.forEach((p) => {
           initialConfig[p.productoId] = {
@@ -46,6 +99,7 @@ function ModalConfirmarAceptacion({
           }
         })
         setConfiguraciones(initialConfig)
+        setErrorLotes(null)
       })
       .catch((err) => {
         if (!ignorar) setErrorLotes(err.message || 'Error al cargar lotes disponibles')
@@ -57,9 +111,7 @@ function ModalConfirmarAceptacion({
     return () => {
       ignorar = true
     }
-  }, [visible, pedido?.id])
-
-  if (!visible || !pedido) return null
+  }, [pedido.id])
 
   const totalFinal =
     datosModificacion?.totalModificado ?? pedido.totalModificado ?? pedido.total ?? 0
@@ -74,18 +126,15 @@ function ModalConfirmarAceptacion({
     }))
   }
 
-  const toggleLoteSeleccionado = (productoId, loteId, cantidadRequerida, todosLotes) => {
+  const toggleLoteSeleccionado = (productoId, loteId) => {
     setConfiguraciones((prev) => {
       const config = prev[productoId] || { modo: 'manual', seleccionados: [] }
       const actual = config.seleccionados || []
       const existe = actual.includes(loteId)
 
-      let nuevosSeleccionados
-      if (existe) {
-        nuevosSeleccionados = actual.filter((id) => id !== loteId)
-      } else {
-        nuevosSeleccionados = [...actual, loteId]
-      }
+      const nuevosSeleccionados = existe
+        ? actual.filter((id) => id !== loteId)
+        : [...actual, loteId]
 
       return {
         ...prev,
@@ -97,88 +146,31 @@ function ModalConfirmarAceptacion({
     })
   }
 
-  // Verifica el estado de cobertura de cada producto
-  const calcularEstadoProducto = (prod) => {
-    if (prod.productoActivo === false) {
-      return {
-        cubierto: false,
-        error: 'Este producto fue eliminado y no puede aprobarse. Recordá llamar al cliente para coordinar el pedido.',
-        detallesConsumo: [],
-      }
+  const estadosPorProductoMap = useMemo(() => {
+    const mapa = new Map()
+    for (const prod of lotesPorProducto) {
+      mapa.set(prod.productoId, calcularEstadoProducto(prod, configuraciones[prod.productoId]))
     }
-
-    const config = configuraciones[prod.productoId] || { modo: 'auto', seleccionados: [] }
-    const requerido = prod.cantidadRequerida
-    const totalDisponible = prod.lotes.reduce((sum, l) => sum + l.cantidad, 0)
-
-    if (totalDisponible < requerido) {
-      return {
-        cubierto: false,
-        error: 'Stock total insuficiente en lotes vigentes',
-        detallesConsumo: [],
-      }
-    }
-
-    if (config.modo === 'auto') {
-      let rest = requerido
-      const detalles = []
-      for (const lote of prod.lotes) {
-        if (rest <= 0) break
-        const aConsumir = Math.min(rest, lote.cantidad)
-        detalles.push({
-          loteId: lote.id,
-          cantidad: aConsumir,
-          entero: aConsumir === lote.cantidad,
-        })
-        rest -= aConsumir
-      }
-      return {
-        cubierto: rest <= 0,
-        detallesConsumo: detalles,
-      }
-    }
-
-    // Modo manual: acumular en el orden en que se seleccionaron
-    let acumulado = 0
-    let rest = requerido
-    const detalles = []
-    for (const loteId of config.seleccionados) {
-      const loteObj = prod.lotes.find((l) => l.id === loteId)
-      if (!loteObj) continue
-      const aConsumir = Math.min(rest, loteObj.cantidad)
-      acumulado += loteObj.cantidad
-      detalles.push({
-        loteId,
-        cantidad: aConsumir,
-        entero: aConsumir === loteObj.cantidad,
-      })
-      rest = Math.max(0, rest - aConsumir)
-    }
-
-    return {
-      cubierto: acumulado >= requerido,
-      acumulado,
-      detallesConsumo: detalles,
-    }
-  }
-
-  const estadosPorProducto = lotesPorProducto.map((p) => ({
-    productoId: p.productoId,
-    estado: calcularEstadoProducto(p),
-  }))
+    return mapa
+  }, [lotesPorProducto, configuraciones])
 
   const todosCubiertos =
-    estadosPorProducto.length > 0 && estadosPorProducto.every((ep) => ep.estado.cubierto)
+    lotesPorProducto.length > 0 &&
+    lotesPorProducto.every((p) => estadosPorProductoMap.get(p.productoId)?.cubierto)
 
   const handleConfirmar = () => {
     if (!todosCubiertos) return
 
     const asignaciones = lotesPorProducto.map((p) => {
       const config = configuraciones[p.productoId] || { modo: 'auto', seleccionados: [] }
+      const estadoProd = estadosPorProductoMap.get(p.productoId)
       return {
         productoId: p.productoId,
         modo: config.modo,
-        lotes: config.modo === 'manual' ? config.seleccionados : [],
+        lotes:
+          config.modo === 'manual'
+            ? (estadoProd?.detallesConsumo || []).map((d) => d.loteId)
+            : [],
       }
     })
 
@@ -232,7 +224,10 @@ function ModalConfirmarAceptacion({
                   modo: 'auto',
                   seleccionados: [],
                 }
-                const estadoProd = calcularEstadoProducto(prod)
+                const estadoProd = estadosPorProductoMap.get(prod.productoId) || {
+                  cubierto: false,
+                  detallesConsumo: [],
+                }
 
                 return (
                   <div
@@ -271,6 +266,7 @@ function ModalConfirmarAceptacion({
                             name={`modo-${prod.productoId}`}
                             value="auto"
                             checked={config.modo === 'auto'}
+                            disabled={prod.productoActivo === false}
                             onChange={() => cambiarModo(prod.productoId, 'auto')}
                           />
                           Automático (próximo a vencer)
@@ -281,6 +277,7 @@ function ModalConfirmarAceptacion({
                             name={`modo-${prod.productoId}`}
                             value="manual"
                             checked={config.modo === 'manual'}
+                            disabled={prod.productoActivo === false}
                             onChange={() => cambiarModo(prod.productoId, 'manual')}
                           />
                           Selección manual
@@ -288,14 +285,13 @@ function ModalConfirmarAceptacion({
                       </div>
                     </div>
 
-                    {/* Lista de lotes */}
                     {prod.lotes.length === 0 ? (
                       <p style={{ fontSize: '0.85rem', color: 'var(--color-peligro, #ef4444)' }}>
                         No hay lotes activos y vigentes para este producto.
                       </p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        {prod.lotes.map((lote) => {
+                        {prod.lotes.map((lote, indiceLote) => {
                           const detalleConsumo = estadoProd.detallesConsumo.find(
                             (d) => d.loteId === lote.id,
                           )
@@ -323,13 +319,9 @@ function ModalConfirmarAceptacion({
                                     type="checkbox"
                                     id={`lote-${lote.id}`}
                                     checked={estaSeleccionado}
+                                    disabled={prod.productoActivo === false}
                                     onChange={() =>
-                                      toggleLoteSeleccionado(
-                                        prod.productoId,
-                                        lote.id,
-                                        prod.cantidadRequerida,
-                                        prod.lotes,
-                                      )
+                                      toggleLoteSeleccionado(prod.productoId, lote.id)
                                     }
                                   />
                                 ) : (
@@ -341,7 +333,7 @@ function ModalConfirmarAceptacion({
                                   htmlFor={`lote-${lote.id}`}
                                   style={{ cursor: config.modo === 'manual' ? 'pointer' : 'default' }}
                                 >
-                                  <strong>Lote #{lote.id}</strong> · Vence:{' '}
+                                  <strong>Lote #{indiceLote + 1}</strong> · Vence:{' '}
                                   <strong>{formatearFecha(lote.fechaVencimiento)}</strong> · Disponible:{' '}
                                   <strong>{lote.cantidad} unidades</strong>
                                 </label>
@@ -372,7 +364,6 @@ function ModalConfirmarAceptacion({
                       </div>
                     )}
 
-                    {/* Resumen de cobertura */}
                     <div style={{ marginTop: '0.5rem', fontSize: '0.85rem' }}>
                       {config.modo === 'manual' && (
                         <div>
@@ -424,6 +415,28 @@ function ModalConfirmarAceptacion({
         </div>
       </div>
     </Modal>
+  )
+}
+
+function ModalConfirmarAceptacion({
+  pedido,
+  datosModificacion,
+  visible,
+  cargando,
+  onConfirmar,
+  onCerrar,
+}) {
+  if (!visible || !pedido) return null
+
+  return (
+    <ModalConfirmarAceptacionContenido
+      key={pedido.id}
+      pedido={pedido}
+      datosModificacion={datosModificacion}
+      cargando={cargando}
+      onConfirmar={onConfirmar}
+      onCerrar={onCerrar}
+    />
   )
 }
 

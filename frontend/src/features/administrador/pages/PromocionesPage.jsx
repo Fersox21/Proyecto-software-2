@@ -61,7 +61,7 @@ function PromocionesPage() {
     if (!texto) return activas
 
     return activas.filter((promo) => {
-      const contenido = [`#${promo.id}`, promo.nombre]
+      const contenido = [promo.nombre]
         .filter(Boolean)
         .join(' ')
         .toLowerCase()
@@ -166,7 +166,7 @@ function PromocionesPage() {
               <input
                 id="filtro-promociones-busqueda"
                 type="search"
-                placeholder="Buscar por nombre o #id..."
+                placeholder="Buscar por nombre..."
                 value={busqueda}
                 onChange={(e) => setBusqueda(e.target.value)}
               />
