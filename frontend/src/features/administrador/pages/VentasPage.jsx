@@ -18,11 +18,14 @@ import Spinner from '../../../shared/components/Spinner';
 import MensajeVacio from '../../../shared/components/MensajeVacio';
 import Modal from '../components/comunes/Modal';
 import DetalleVentaModal from '../components/ventas/DetalleVentaModal';
+import HistorialVentas from '../components/ventas/HistorialVentas';
 import '../../../styles/panelAdmin/adminVentas.css';
 import '../../../styles/panelAdmin/ordenesCompra.css';
 import '../../../styles/panelAdmin/adminPedidos.css';
+import '../../../styles/panelAdmin/historial.css';
 
 function VentasPage() {
+  const [vistaHistorial, setVistaHistorial] = useState(false);
   const [recarga, setRecarga] = useState(0);
   const { datos: ventas, cargando, error } = useFetch(obtenerVentas, recarga);
 
@@ -39,6 +42,24 @@ function VentasPage() {
   const [errorModal, setErrorModal] = useState('');
 
   const [ventaAEliminar, setVentaAEliminar] = useState(null);
+
+  if (vistaHistorial) {
+    return (
+      <section className="main-admin" id="main-ventas">
+        <header className="header-admin">
+          <h1 className="h1-admin">Historial de Ventas</h1>
+          <button
+            type="button"
+            className="orden-btn"
+            onClick={() => setVistaHistorial(false)}
+          >
+            Volver al listado
+          </button>
+        </header>
+        <HistorialVentas />
+      </section>
+    );
+  }
 
   if (cargando) return <Spinner texto="Cargando ventas..." />;
   if (error) return <MensajeVacio titulo="No pudimos cargar las ventas" texto={error.message} />;
@@ -169,6 +190,13 @@ function VentasPage() {
     <section className="main-admin" id="main-ventas">
       <header className="header-admin">
         <h1 className="h1-admin">Ventas</h1>
+        <button
+          type="button"
+          className="orden-btn"
+          onClick={() => setVistaHistorial(true)}
+        >
+          Ver historial
+        </button>
       </header>
 
       {mensaje && (

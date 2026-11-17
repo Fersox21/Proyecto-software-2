@@ -24,6 +24,19 @@ export async function obtenerProductos() {
   return respuesta.json()
 }
 
+export async function obtenerHistorialProductos() {
+  const respuesta = await fetch(`${URL_BASE}/productos/historial`, {
+    headers: headers()
+  })
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}))
+    throw new Error(errorData.error || 'No se pudo obtener el historial de productos')
+  }
+
+  return respuesta.json()
+}
+
 export async function obtenerProductoPorId(id) {
   const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
     headers: headers()

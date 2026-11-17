@@ -9,11 +9,14 @@ import Modal from '../components/comunes/Modal'
 import OrdenCompraForm from '../components/ordenesCompra/OrdenCompraForm'
 import ConfirmarEliminacion from '../components/ordenesCompra/ConfirmarEliminacion'
 import FilaOrdenCompra from '../components/ordenesCompra/FilaOrdenCompra'
+import HistorialOrdenesCompra from '../components/ordenesCompra/HistorialOrdenesCompra'
 import '../../../styles/panelAdmin/ordenesCompra.css'
+import '../../../styles/panelAdmin/historial.css'
 
 function OrdenesCompraPage() {
   const { ordenes, cargando, error, recargar, crear, actualizar, eliminar } = useOrdenesCompra()
 
+  const [vistaHistorial, setVistaHistorial] = useState(false)
   const [busqueda, setBusqueda] = useState('')
   const [mensaje, setMensaje] = useState(null)
   const [formulario, setFormulario] = useState(null)
@@ -140,8 +143,22 @@ const alternarDetalle = useCallback(
   return (
     <section className="main-admin" id="main-ordenes-compra">
       <header className="header-admin">
-        <h1 className="orden-h1">Órdenes de compra</h1>
+        <h1 className="orden-h1">
+          {vistaHistorial ? 'Historial de Órdenes de compra' : 'Órdenes de compra'}
+        </h1>
+        <button
+          type="button"
+          className="orden-btn"
+          onClick={() => setVistaHistorial((v) => !v)}
+        >
+          {vistaHistorial ? 'Volver al listado' : 'Ver historial'}
+        </button>
       </header>
+
+      {vistaHistorial ? (
+        <HistorialOrdenesCompra productosPorId={productosPorId} />
+      ) : (
+        <>
 
       {mensaje && (
         <div
@@ -291,6 +308,8 @@ const alternarDetalle = useCallback(
           onConfirmar={confirmarEliminar}
           onCancelar={cancelarEliminar}
         />
+      )}
+        </>
       )}
     </section>
   )

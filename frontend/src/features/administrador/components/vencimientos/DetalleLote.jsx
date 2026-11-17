@@ -36,7 +36,12 @@ function DetalleLote({ lote }) {
           Producto
         </h3>
         <dl className="venc-detalle-datos">
-          <Dato etiqueta="Nombre">{producto.nombre}</Dato>
+          <Dato etiqueta="Nombre">
+            {producto.nombre}
+            {producto.activo === false && (
+              <span className="hist-item-eliminado-tag">Producto eliminado</span>
+            )}
+          </Dato>
           <Dato etiqueta="Marca">{producto.marca}</Dato>
           <Dato etiqueta="Categoría">{producto.categoria}</Dato>
           <Dato etiqueta="Descripción">{producto.descripcion || '—'}</Dato>

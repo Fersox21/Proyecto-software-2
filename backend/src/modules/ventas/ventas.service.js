@@ -45,6 +45,10 @@ export const listarVentas = async (periodo) => {
   return await ventasRepository.listar();
 };
 
+export const listarHistorialVentas = async () => {
+  return await ventasRepository.listarHistorial();
+};
+
 export const obtenerVenta = async (id) => {
   const venta = await ventasRepository.obtenerDetalle(id);
 

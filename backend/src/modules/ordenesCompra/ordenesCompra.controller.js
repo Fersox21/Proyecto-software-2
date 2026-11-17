@@ -39,9 +39,19 @@ export const listar = async (req, res, next) => {
   }
 };
 
+export const listarHistorial = async (req, res, next) => {
+  try {
+    const ordenesCompra = await service.listarHistorialOrdenesCompra();
+    res.json(ordenesCompra);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const obtener = async (req, res, next) => {
   try {
-    const ordenCompra = await service.obtenerOrdenCompraPorId(req.params.id);
+    const incluirInactivos = req.query.historial === 'true';
+    const ordenCompra = await service.obtenerOrdenCompraPorId(req.params.id, incluirInactivos);
     res.json(ordenCompra);
   } catch (err) {
     next(err);

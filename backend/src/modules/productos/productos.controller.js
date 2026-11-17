@@ -9,6 +9,15 @@ export const listar = async (req, res, next) => {
   }
 };
 
+export const listarHistorial = async (req, res, next) => {
+  try {
+    const productos = await service.listarHistorialProductos();
+    res.json(productos);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const listarCatalogo = async (req, res, next) => {
   try {
     const productos = await service.listarCatalogo();

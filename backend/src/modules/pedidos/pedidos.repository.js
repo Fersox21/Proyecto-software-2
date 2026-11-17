@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js';
+import * as productosRepo from '../productos/productos.repository.js';
 
 const mapearPedido = (row) => {
   if (!row) return null;
@@ -62,30 +63,107 @@ export const findAll = async () => {
   return rows.map(mapearPedido);
 };
 
+export const findHistorial = async () => {
+  const { rows } = await pool.query(
+    'SELECT * FROM pedidos ORDER BY fecha DESC, id DESC'
+  );
+  return rows.map((row) => {
+    const pedido = mapearPedido(row);
+    const estadoNorm = String(pedido.estado ?? '').trim().toLowerCase();
+    return {
+      ...pedido,
+      eliminado: pedido.activo === false || estadoNorm === 'eliminado',
+    };
+  });
+};
+
 export const findById = async (id) => {
   const { rows } = await pool.query('SELECT * FROM pedidos WHERE id = $1', [id]);
   return mapearPedido(rows[0]);
 };
 
-export const findItemsByPedido = async (pedido_id) => {
+export const findItemsByPedido = async (pedido_id, incluirInactivos = false) => {
+  const filtroActivo = incluirInactivos ? '' : 'AND t.activo = true';
   const { rows } = await pool.query(
     `SELECT t.pedido_id, t.producto_id, t.cantidad, t.precio, t.activo,
-            p.nombre, p.marca
+            p.nombre, p.marca, p.activo AS producto_activo
      FROM tiene t
      JOIN productos p ON p.id = t.producto_id
-     WHERE t.pedido_id = $1 AND t.activo = true
+     WHERE t.pedido_id = $1 ${filtroActivo}
      ORDER BY p.nombre ASC`,
     [pedido_id]
   );
-  return rows.map(mapearItem);
+
+  const { rows: lotesRows } = await pool.query(
+    `SELECT pl.producto_id, pl.lote_id, pl.cantidad, pl.consumido_entero,
+            l.fecha_vencimiento
+     FROM pedido_lotes pl
+     JOIN lotes l ON l.id = pl.lote_id
+     WHERE pl.pedido_id = $1
+     ORDER BY pl.id ASC`,
+    [pedido_id]
+  );
+
+  return rows.map((row) => {
+    const item = mapearItem(row);
+    return {
+      ...item,
+      productoActivo: row.producto_activo !== false,
+      eliminado: row.activo === false,
+      lotesUsados: lotesRows
+        .filter((l) => Number(l.producto_id) === Number(row.producto_id))
+        .map((l) => ({
+          loteId: l.lote_id,
+          cantidad: Number(l.cantidad),
+          consumidoEntero: Boolean(l.consumido_entero),
+          fechaVencimiento: l.fecha_vencimiento,
+        })),
+    };
+  });
 };
 
-export const findByIdConItems = async (id) => {
+export const findByIdConItems = async (id, incluirInactivos = false) => {
   const pedido = await findById(id);
   if (!pedido) return null;
 
-  const items = await findItemsByPedido(id);
+  const items = await findItemsByPedido(id, incluirInactivos);
   return { ...pedido, items };
+};
+
+export const findLotesDisponiblesParaPedido = async (pedidoId) => {
+  const items = await findItemsByPedido(pedidoId);
+  const resultado = [];
+
+  for (const item of items) {
+    const { rows: lotes } = await pool.query(
+      `SELECT l.id, l.cantidad, l.cantidad_inicial, l.fecha_arribo, l.fecha_vencimiento, l.orden_compra_id
+       FROM lotes l
+       WHERE l.producto_id = $1
+         AND l.activo = true
+         AND l.cantidad > 0
+         AND l.fecha_vencimiento >= CURRENT_DATE
+       ORDER BY l.fecha_vencimiento ASC, l.id ASC`,
+      [item.producto_id]
+    );
+
+    resultado.push({
+      productoId: item.producto_id,
+      nombre: item.nombre,
+      marca: item.marca,
+      productoActivo: item.productoActivo !== false,
+      cantidadRequerida: item.cantidad,
+      lotes: lotes.map((l) => ({
+        id: l.id,
+        cantidad: Number(l.cantidad),
+        cantidadInicial: Number(l.cantidad_inicial ?? l.cantidad),
+        fechaArribo: l.fecha_arribo,
+        fechaVencimiento: l.fecha_vencimiento,
+        ordenCompraId: l.orden_compra_id
+      }))
+    });
+  }
+
+  return resultado;
 };
 
 const crearError = (mensaje, status) => {
@@ -209,7 +287,7 @@ export const createConItems = async (pedido, items) => {
   });
 };
 
-export const aprobarPedido = async (id, modificacion = {}) => {
+export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = null) => {
   return conTransaccion(async (cliente) => {
     const { rows: pedidoRows } = await cliente.query(
       'SELECT * FROM pedidos WHERE id = $1 FOR UPDATE',
@@ -231,7 +309,7 @@ export const aprobarPedido = async (id, modificacion = {}) => {
     }
 
     const { rows: items } = await cliente.query(
-      `SELECT t.producto_id, t.cantidad, p.nombre
+      `SELECT t.producto_id, t.cantidad, p.nombre, p.activo AS producto_activo
        FROM tiene t
        JOIN productos p ON p.id = t.producto_id
        WHERE t.pedido_id = $1 AND t.activo`,
@@ -244,55 +322,127 @@ export const aprobarPedido = async (id, modificacion = {}) => {
       throw error;
     }
 
-    for (const item of items) {
-      const { rowCount } = await cliente.query(
-        'UPDATE productos SET stock = stock - $1 WHERE id = $2 AND stock >= $1',
-        [item.cantidad, item.producto_id]
+    const productoEliminado = items.find((item) => item.producto_activo === false);
+    if (productoEliminado) {
+      const error = new Error(
+        `El producto "${productoEliminado.nombre}" fue eliminado y no puede aprobarse. Recordá llamar al cliente para coordinar el pedido.`
       );
+      error.status = 409;
+      throw error;
+    }
 
-      if (rowCount === 0) {
-        const error = new Error(`Stock insuficiente para "${item.nombre}"`);
-        error.status = 409;
-        throw error;
+    // Mapa de asignaciones enviadas desde el frontend si existen
+    const mapaAsignaciones = new Map();
+    if (Array.isArray(asignacionesLotes)) {
+      for (const asig of asignacionesLotes) {
+        if (asig && asig.productoId) {
+          mapaAsignaciones.set(Number(asig.productoId), asig);
+        }
       }
+    }
 
-      const { rows: lotes } = await cliente.query(
-        `SELECT id, cantidad
-         FROM lotes
-         WHERE producto_id = $1
-           AND activo = true
-           AND cantidad > 0
-           AND fecha_vencimiento >= CURRENT_DATE
-         ORDER BY fecha_vencimiento ASC, id ASC
-         FOR UPDATE`,
-        [item.producto_id]
-      );
+    const productosAfectados = new Set();
 
+    for (const item of items) {
+      const prodId = Number(item.producto_id);
+      productosAfectados.add(prodId);
       let restante = Number(item.cantidad);
 
-      for (const lote of lotes) {
+      const asig = mapaAsignaciones.get(prodId);
+      const modoManual = asig && asig.modo === 'manual' && Array.isArray(asig.lotes) && asig.lotes.length > 0;
+
+      let lotesParaConsumir = [];
+
+      if (modoManual) {
+        // En modo manual, el admin seleccionó una lista ordenada de IDs de lotes
+        for (const loteIdRaw of asig.lotes) {
+          const loteId = Number(loteIdRaw);
+          const { rows: loteRows } = await cliente.query(
+            `SELECT id, cantidad, cantidad_inicial, fecha_vencimiento
+             FROM lotes
+             WHERE id = $1 AND producto_id = $2 AND activo = true
+             FOR UPDATE`,
+            [loteId, prodId]
+          );
+
+          if (loteRows.length === 0) {
+            const error = new Error(`El lote #${loteId} no pertenece al producto "${item.nombre}" o está inactivo`);
+            error.status = 409;
+            throw error;
+          }
+
+          const l = loteRows[0];
+          const hoyISO = new Date().toISOString().slice(0, 10);
+          const fVenci = String(l.fecha_vencimiento).slice(0, 10);
+          if (fVenci < hoyISO) {
+            const error = new Error(`El lote #${loteId} de "${item.nombre}" se encuentra vencido`);
+            error.status = 409;
+            throw error;
+          }
+
+          if (Number(l.cantidad) <= 0) {
+            const error = new Error(`El lote #${loteId} de "${item.nombre}" no tiene stock disponible`);
+            error.status = 409;
+            throw error;
+          }
+
+          lotesParaConsumir.push(l);
+        }
+      } else {
+        // Modo automático: lotes activos vigentes ordenados por fecha_vencimiento ASC, id ASC
+        const { rows: lotesAuto } = await cliente.query(
+          `SELECT id, cantidad, cantidad_inicial, fecha_vencimiento
+           FROM lotes
+           WHERE producto_id = $1
+             AND activo = true
+             AND cantidad > 0
+             AND fecha_vencimiento >= CURRENT_DATE
+           ORDER BY fecha_vencimiento ASC, id ASC
+           FOR UPDATE`,
+          [prodId]
+        );
+        lotesParaConsumir = lotesAuto;
+      }
+
+      for (const lote of lotesParaConsumir) {
         if (restante <= 0) break;
 
         const cantidadLote = Number(lote.cantidad);
         const descontar = Math.min(restante, cantidadLote);
         const nuevaCantidad = cantidadLote - descontar;
+        const consumidoEntero = (nuevaCantidad === 0);
 
+        // Se descuenta la cantidad sin cambiar activo a false (preserva registro histórico si llega a 0)
         await cliente.query(
           `UPDATE lotes
-           SET cantidad = $1,
-               activo = CASE WHEN $1 = 0 THEN false ELSE activo END
+           SET cantidad = $1
            WHERE id = $2`,
           [nuevaCantidad, lote.id]
+        );
+
+        await cliente.query(
+          `INSERT INTO pedido_lotes (pedido_id, producto_id, lote_id, cantidad, consumido_entero)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [id, prodId, lote.id, descontar, consumidoEntero]
         );
 
         restante -= descontar;
       }
 
       if (restante > 0) {
-        const error = new Error(`Lotes vigentes insuficientes para "${item.nombre}"`);
+        const error = new Error(
+          modoManual
+            ? `Los lotes seleccionados para "${item.nombre}" son insuficientes para cubrir la cantidad requerida`
+            : `Lotes vigentes insuficientes para "${item.nombre}"`
+        );
         error.status = 409;
         throw error;
       }
+    }
+
+    // Sincronizar stock calculado en tabla productos para cada producto afectado
+    for (const prodId of productosAfectados) {
+      await productosRepo.recalcularStock(prodId, cliente);
     }
 
     const tieneModificacionNueva = modificacion.totalModificado !== undefined;

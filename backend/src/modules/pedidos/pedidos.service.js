@@ -87,8 +87,12 @@ export const listarPedidos = async () => {
   return await repository.findAll();
 };
 
-export const obtenerPedidoPorId = async (id) => {
-  const pedido = await repository.findByIdConItems(id);
+export const listarHistorialPedidos = async () => {
+  return await repository.findHistorial();
+};
+
+export const obtenerPedidoPorId = async (id, incluirInactivos = false) => {
+  const pedido = await repository.findByIdConItems(id, incluirInactivos);
   if (!pedido) {
     throw crearError('Pedido no encontrado', 404);
   }
@@ -134,6 +138,14 @@ const normalizarItems = async (items) => {
   }
 
   return [...acumulados.values()];
+};
+
+export const obtenerLotesDisponibles = async (id) => {
+  const pedido = await repository.findById(id);
+  if (!pedido) {
+    throw crearError('Pedido no encontrado', 404);
+  }
+  return await repository.findLotesDisponiblesParaPedido(id);
 };
 
 export const crearPedido = async (data) => {
@@ -287,7 +299,12 @@ export const actualizarPedido = async (id, data) => {
     }
 
     if (estadoSolicitado === 'aprobado') {
-      return await repository.aprobarPedido(id, modificacionTotal);
+      const asignaciones = Array.isArray(data.asignacionesLotes)
+        ? data.asignacionesLotes
+        : Array.isArray(data.lotes)
+          ? data.lotes
+          : null;
+      return await repository.aprobarPedido(id, modificacionTotal, asignaciones);
     }
   }
 

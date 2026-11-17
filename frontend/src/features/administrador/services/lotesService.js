@@ -39,6 +39,10 @@ export function obtenerLotes() {
   return pedir(`${URL_BASE}/lotes`)
 }
 
+export function obtenerHistorialLotes() {
+  return pedir(`${URL_BASE}/lotes/historial`)
+}
+
 export function obtenerLotePorId(id) {
   return pedir(`${URL_BASE}/lotes/${id}`)
 }

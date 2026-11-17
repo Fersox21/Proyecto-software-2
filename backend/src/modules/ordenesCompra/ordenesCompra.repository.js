@@ -85,7 +85,34 @@ export const findAll = async () => {
   }));
 };
 
-export const findById = async (id) => {
+export const findHistorial = async () => {
+  const { rows } = await pool.query(`
+    SELECT oc.id, oc.fecha, oc.total, oc.activo,
+           p.id AS proveedor_id, p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono,
+           (SELECT COUNT(*) FROM lotes l WHERE l.orden_compra_id = oc.id)::int AS cantidad_lotes
+    FROM ordenes_compra oc
+    LEFT JOIN proveedores p ON p.id = oc.proveedor_id
+    ORDER BY oc.fecha DESC, oc.id DESC;
+  `);
+
+  return rows.map((row) => ({
+    id: row.id,
+    fecha: row.fecha,
+    total: Number(row.total),
+    activo: row.activo,
+    eliminada: row.activo === false,
+    cantidadLotes: Number(row.cantidad_lotes ?? 0),
+    proveedor: row.proveedor_id
+      ? {
+          id: row.proveedor_id,
+          nombre: row.proveedor_nombre,
+          telefono: row.proveedor_telefono,
+        }
+      : null,
+  }));
+};
+
+export const findById = async (id, incluirInactivos = false) => {
   const { rows: ordenRows } = await pool.query(
     `SELECT oc.id, oc.fecha, oc.total, oc.activo,
             p.id AS proveedor_id, p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono
@@ -98,13 +125,15 @@ export const findById = async (id) => {
   if (ordenRows.length === 0) return null;
 
   const row = ordenRows[0];
+  const filtroLotes = incluirInactivos ? '' : 'AND l.activo = true';
 
   const { rows: lotesRows } = await pool.query(
-    `SELECT l.id, l.cantidad, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
-            prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca
+    `SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+            prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca,
+            prod.activo AS producto_activo
      FROM lotes l
      LEFT JOIN productos prod ON prod.id = l.producto_id
-     WHERE l.orden_compra_id = $1 AND l.activo = true
+     WHERE l.orden_compra_id = $1 ${filtroLotes}
      ORDER BY l.id ASC`,
     [id]
   );
@@ -112,6 +141,7 @@ export const findById = async (id) => {
   const lotes = lotesRows.map((l) => ({
     id: l.id,
     cantidad: l.cantidad,
+    cantidadInicial: l.cantidad_inicial,
     total: l.total != null ? Number(l.total) : null,
     fechaArribo: l.fecha_arribo,
     fechaVencimiento: l.fecha_vencimiento,
@@ -120,6 +150,7 @@ export const findById = async (id) => {
       id: l.producto_id,
       nombre: l.producto_nombre,
       marca: l.producto_marca,
+      activo: l.producto_activo !== false,
     },
   }));
 
@@ -167,12 +198,12 @@ export const create = async (data) => {
       const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
       await client.query(
-        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
-         VALUES ($1, $2, $3, $4, $5, true, $6)`,
+        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
+         VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
         [fArribo, fVenci, lote.cantidad, nuevaOrden.id, prodId, lote.total]
       );
 
-      await productosRepo.ajustarStock(prodId, lote.cantidad, client);
+      await productosRepo.recalcularStock(prodId, client);
     }
 
     await client.query('COMMIT');
@@ -216,9 +247,17 @@ export const update = async (id, data) => {
 
     if (Array.isArray(lotes)) {
       const { rows: lotesPrevios } = await client.query(
-        `SELECT producto_id, cantidad FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
+        `SELECT id, producto_id, cantidad, cantidad_inicial FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
         [id]
       );
+
+      // Si algún lote ya fue consumido (cantidad < cantidad_inicial), no se permite reescribir los lotes
+      const loteConsumido = lotesPrevios.find((l) => Number(l.cantidad) < Number(l.cantidad_inicial));
+      if (loteConsumido) {
+        const error = new Error('No se pueden modificar los lotes de esta orden porque algunos ya registraron salidas o ventas');
+        error.status = 409;
+        throw error;
+      }
 
       // Desactivamos los lotes anteriores de esta orden
       await client.query(
@@ -226,23 +265,24 @@ export const update = async (id, data) => {
         [id]
       );
 
-      for (const lotePrevio of lotesPrevios) {
-        await productosRepo.ajustarStock(lotePrevio.producto_id, -lotePrevio.cantidad, client);
-      }
+      const productosAfectados = new Set(lotesPrevios.map((l) => l.producto_id));
 
       // Insertamos los lotes actualizados
       for (const lote of lotes) {
         const prodId = await resolverProductoEnTransaccion(lote, client);
+        productosAfectados.add(prodId);
         const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
         const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
         await client.query(
-          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad, orden_compra_id, producto_id, activo, total)
-           VALUES ($1, $2, $3, $4, $5, true, $6)`,
+          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
+           VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
           [fArribo, fVenci, lote.cantidad, id, prodId, lote.total]
         );
+      }
 
-        await productosRepo.ajustarStock(prodId, lote.cantidad, client);
+      for (const prodId of productosAfectados) {
+        await productosRepo.recalcularStock(prodId, client);
       }
     }
 
@@ -267,7 +307,7 @@ export const remove = async (id) => {
     const { rowCount } = await client.query('UPDATE ordenes_compra SET activo = false WHERE id = $1', [id]);
     await client.query('UPDATE lotes SET activo = false WHERE orden_compra_id = $1 AND activo = true', [id]);
     for (const lote of lotesActivos) {
-      await productosRepo.ajustarStock(lote.producto_id, -lote.cantidad, client);
+      await productosRepo.recalcularStock(lote.producto_id, client);
     }
     await client.query('COMMIT');
     return rowCount;

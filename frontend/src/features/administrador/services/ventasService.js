@@ -21,6 +21,19 @@ export async function obtenerVentas() {
   return respuesta.json()
 }
 
+export async function obtenerHistorialVentas() {
+  const respuesta = await fetch(`${URL_BASE}/ventas/historial`, {
+    headers: headers()
+  })
+  if (!respuesta.ok) {
+    if (respuesta.status === 401) {
+      throw new Error('No autorizado: Token inválido o expirado')
+    }
+    throw new Error('No se pudo obtener el historial de ventas')
+  }
+  return respuesta.json()
+}
+
 
 export async function obtenerVentasUltimoMes() {
   const respuesta = await fetch(`${URL_BASE}/ventas?periodo=ultimo-mes`, {

@@ -57,6 +57,25 @@ export const listar = async () => {
   return rows.map(mapearVenta);
 };
 
+export const listarHistorial = async () => {
+  const { rows } = await pool.query(
+    `SELECT v.*,
+            p.comercio AS pedido_comercio,
+            p.estado AS pedido_estado,
+            COALESCE(v.total_modificado, p.total_modificado) AS total_modificado,
+            COALESCE(v.motivo_modificacion, p.motivo_modificacion) AS motivo_modificacion
+     FROM ventas v
+     LEFT JOIN pedidos p ON p.id = v.pedido_id
+     ORDER BY v.fecha DESC, v.id DESC`
+  );
+  return rows.map((row) => ({
+    ...mapearVenta(row),
+    comercio: row.pedido_comercio ?? null,
+    estadoPedido: row.pedido_estado ?? null,
+    eliminada: row.activo === false,
+  }));
+};
+
 export const obtener = async (id) => {
   const { rows } = await pool.query(
     `SELECT v.*,
@@ -83,7 +102,29 @@ export const obtenerItemsPorPedidoId = async (pedidoId) => {
      ORDER BY pr.nombre ASC`,
     [pedidoId]
   );
-  return rows.map(mapearItem);
+
+  const { rows: lotesRows } = await pool.query(
+    `SELECT pl.producto_id, pl.lote_id, pl.cantidad, pl.consumido_entero,
+            l.fecha_vencimiento
+     FROM pedido_lotes pl
+     JOIN lotes l ON l.id = pl.lote_id
+     WHERE pl.pedido_id = $1
+     ORDER BY pl.id ASC`,
+    [pedidoId]
+  );
+
+  return rows.map((item) => {
+    const itemMapeado = mapearItem(item);
+    itemMapeado.lotesUsados = lotesRows
+      .filter((l) => Number(l.producto_id) === Number(item.producto_id))
+      .map((l) => ({
+        loteId: l.lote_id,
+        cantidad: Number(l.cantidad),
+        consumidoEntero: Boolean(l.consumido_entero),
+        fechaVencimiento: l.fecha_vencimiento
+      }));
+    return itemMapeado;
+  });
 };
 
 export const obtenerDetalle = async (id) => {

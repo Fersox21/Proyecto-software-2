@@ -9,6 +9,15 @@ export const listar = async (req, res, next) => {
   }
 };
 
+export const listarHistorial = async (req, res, next) => {
+  try {
+    const lotes = await service.listarHistorialLotes();
+    res.json(lotes);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const obtener = async (req, res, next) => {
   try {
     const lote = await service.obtenerLotePorId(req.params.id);

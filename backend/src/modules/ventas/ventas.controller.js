@@ -16,6 +16,15 @@ export const listar = async (req, res, next) => {
   }
 };
 
+export const listarHistorial = async (req, res, next) => {
+  try {
+    const ventas = await ventasService.listarHistorialVentas();
+    return res.json(ventas);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const obtener = async (req, res, next) => {
   try {
     const { id } = req.params;

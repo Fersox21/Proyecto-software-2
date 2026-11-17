@@ -5,9 +5,18 @@ import * as productosRepo from '../productos/productos.repository.js';
 // Consulta base: cada lote con su producto, su orden de compra y el proveedor
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
 const SQL_DETALLE = `
-  SELECT l.id, l.cantidad, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+  SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+         (SELECT COUNT(*) FROM lotes l2 WHERE l2.orden_compra_id = l.orden_compra_id AND l2.activo = true)::int AS total_lotes_orden,
          p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca,
-         p.categoria AS producto_categoria, p.stock AS producto_stock,
+         p.activo AS producto_activo,
+         p.categoria AS producto_categoria,
+         COALESCE((
+           SELECT SUM(lv.cantidad)
+           FROM lotes lv
+           WHERE lv.producto_id = p.id
+             AND lv.activo = true
+             AND lv.fecha_vencimiento >= CURRENT_DATE
+         ), 0)::int AS producto_stock,
          p.precio_costo AS producto_precio_costo, p.precio_venta AS producto_precio_venta,
          p.en_promocion AS producto_en_promocion, p.precio_promo AS producto_precio_promo,
          p.destacado AS producto_destacado,
@@ -41,10 +50,12 @@ const mapearLoteConDetalle = (row) => {
   return {
     id: row.id,
     cantidad: row.cantidad,
+    cantidadInicial: row.cantidad_inicial != null ? row.cantidad_inicial : row.cantidad,
     total: row.total != null ? Number(row.total) : null,
     fechaArribo: row.fecha_arribo,
     fechaVencimiento: row.fecha_vencimiento,
     activo: row.activo,
+    totalLotesOrden: row.total_lotes_orden != null ? Number(row.total_lotes_orden) : null,
     producto: normalizarProducto({
       id: row.producto_id,
       nombre: row.producto_nombre,
@@ -55,7 +66,8 @@ const mapearLoteConDetalle = (row) => {
       precioVenta: row.producto_precio_venta,
       enPromocion: row.producto_en_promocion,
       precioPromo: row.producto_precio_promo,
-      destacado: row.producto_destacado
+      destacado: row.producto_destacado,
+      activo: row.producto_activo !== false
     }),
     ordenCompra
   };
@@ -63,9 +75,59 @@ const mapearLoteConDetalle = (row) => {
 
 export const findAll = async () => {
   const { rows } = await pool.query(
-    `${SQL_DETALLE} WHERE l.activo = true ORDER BY l.fecha_vencimiento ASC, l.id ASC`
+    `${SQL_DETALLE} WHERE l.activo = true AND l.cantidad > 0 AND p.activo = true ORDER BY l.fecha_vencimiento ASC, l.id ASC`
   );
   return rows.map(mapearLoteConDetalle);
+};
+
+export const findHistorial = async () => {
+  const { rows } = await pool.query(
+    `${SQL_DETALLE} ORDER BY l.id DESC`
+  );
+
+  const { rows: salidasRows } = await pool.query(`
+    SELECT pl.lote_id, pl.pedido_id, pl.cantidad, pl.consumido_entero,
+           ped.fecha AS pedido_fecha, ped.comercio AS pedido_comercio, ped.estado AS pedido_estado
+    FROM pedido_lotes pl
+    JOIN pedidos ped ON ped.id = pl.pedido_id
+    ORDER BY pl.id ASC
+  `);
+
+  const salidasPorLote = new Map();
+  for (const s of salidasRows) {
+    const idLote = Number(s.lote_id);
+    if (!salidasPorLote.has(idLote)) salidasPorLote.set(idLote, []);
+    salidasPorLote.get(idLote).push({
+      pedidoId: s.pedido_id,
+      fecha: s.pedido_fecha,
+      comercio: s.pedido_comercio,
+      estado: s.pedido_estado,
+      cantidad: Number(s.cantidad),
+      consumidoEntero: Boolean(s.consumido_entero),
+    });
+  }
+
+  const hoyISO = new Date().toISOString().slice(0, 10);
+
+  return rows.map((row) => {
+    const lote = mapearLoteConDetalle(row);
+    const fVenci = String(lote.fechaVencimiento ?? '').slice(0, 10);
+    let situacion = 'vigente';
+    if (lote.activo === false) {
+      situacion = 'eliminado';
+    } else if (Number(lote.cantidad) === 0) {
+      situacion = 'agotado';
+    } else if (fVenci && fVenci < hoyISO) {
+      situacion = 'vencido';
+    }
+
+    return {
+      ...lote,
+      situacion,
+      eliminado: lote.activo === false,
+      salidas: salidasPorLote.get(Number(lote.id)) ?? [],
+    };
+  });
 };
 
 export const findById = async (id) => {
@@ -79,12 +141,12 @@ export const create = async (data) => {
   try {
     await client.query('BEGIN');
     const { rows } = await client.query(
-      `INSERT INTO lotes (cantidad, total, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
-      VALUES ($1, $2, $3, $4, $5, $6, true)
+      `INSERT INTO lotes (cantidad_inicial, cantidad, total, fecha_arribo, fecha_vencimiento, orden_compra_id, producto_id, activo)
+      VALUES ($1, $1, $2, $3, $4, $5, $6, true)
       RETURNING id`,
       [cantidad, total, fechaArribo, fechaVencimiento, ordenCompra, producto]
     );
-    await productosRepo.ajustarStock(producto, cantidad, client);
+    await productosRepo.recalcularStock(producto, client);
     await client.query('COMMIT');
     return await findById(rows[0].id);
   } catch (error) {
@@ -101,7 +163,7 @@ export const update = async (id, data) => {
   try {
     await client.query('BEGIN');
     const { rows: loteRows } = await client.query(
-      'SELECT cantidad, producto_id FROM lotes WHERE id = $1 AND activo = true FOR UPDATE',
+      'SELECT cantidad, cantidad_inicial, producto_id FROM lotes WHERE id = $1 AND activo = true FOR UPDATE',
       [id]
     );
     if (loteRows.length === 0) {
@@ -109,19 +171,24 @@ export const update = async (id, data) => {
       error.status = 404;
       throw error;
     }
-    const { cantidad: cantidadAnterior, producto_id: productoId } = loteRows[0];
+    const { cantidad: cantidadAnterior, cantidad_inicial: cantidadInicial, producto_id: productoId } = loteRows[0];
+
+    if (cantidad !== undefined && Number(cantidad) !== Number(cantidadAnterior)) {
+      if (Number(cantidadAnterior) < Number(cantidadInicial)) {
+        const error = new Error('No se puede modificar la cantidad de un lote que ya registró ventas o salidas');
+        error.status = 409;
+        throw error;
+      }
+    }
 
     await client.query(
       `UPDATE lotes
-      SET cantidad = $1, total = $2, fecha_arribo = $3, fecha_vencimiento = $4
+      SET cantidad = $1, cantidad_inicial = $1, total = $2, fecha_arribo = $3, fecha_vencimiento = $4
       WHERE id = $5`,
       [cantidad, total, fechaArribo, fechaVencimiento, id]
     );
 
-    const diferencia = Number(cantidad) - Number(cantidadAnterior);
-    if (diferencia !== 0) {
-      await productosRepo.ajustarStock(productoId, diferencia, client);
-    }
+    await productosRepo.recalcularStock(productoId, client);
 
     await client.query('COMMIT');
     return await findById(id);
@@ -152,7 +219,7 @@ export const remove = async (id) => {
       [id]
     );
     if (rowCount > 0) {
-      await productosRepo.ajustarStock(rows[0].producto_id, -rows[0].cantidad, client);
+      await productosRepo.recalcularStock(rows[0].producto_id, client);
     }
     await client.query('COMMIT');
     return rowCount;
@@ -184,7 +251,7 @@ export const removeSiNoEsElUltimoLote = async (id) => {
       [id]
     );
     if (rowCount > 0) {
-      await productosRepo.ajustarStock(rows[0].producto_id, -rows[0].cantidad, client);
+      await productosRepo.recalcularStock(rows[0].producto_id, client);
     }
     await client.query('COMMIT');
     return rowCount;

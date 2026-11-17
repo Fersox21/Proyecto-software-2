@@ -7,12 +7,15 @@ import LoteForm from '../components/lotes/LoteForm'
 import ConfirmarEliminacionLote from '../components/lotes/ConfirmarEliminacionLote'
 import FiltroBusquedaLotes from '../components/lotes/FiltroBusquedaLotes'
 import FilaLote from '../components/lotes/FilaLote'
+import HistorialLotes from '../components/lotes/HistorialLotes'
 import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/lotes.css'
+import '../../../styles/panelAdmin/historial.css'
 
 function LotesPage() {
   const { lotes, cargando, error, recargar, actualizar, eliminar } = useLotes()
 
+  const [vistaHistorial, setVistaHistorial] = useState(false)
   const [busqueda, setBusqueda] = useState('')
   const [mensaje, setMensaje] = useState(null)
   const [formulario, setFormulario] = useState(null)
@@ -89,8 +92,20 @@ function LotesPage() {
   return (
     <section className="main-admin" id="main-lotes">
       <header className="header-admin">
-        <h1 className="orden-h1">Lotes</h1>
+        <h1 className="orden-h1">{vistaHistorial ? 'Historial de Lotes' : 'Lotes'}</h1>
+        <button
+          type="button"
+          className="orden-btn"
+          onClick={() => setVistaHistorial((v) => !v)}
+        >
+          {vistaHistorial ? 'Volver al listado' : 'Ver historial'}
+        </button>
       </header>
+
+      {vistaHistorial ? (
+        <HistorialLotes />
+      ) : (
+        <>
 
       {mensaje && (
         <div
@@ -186,7 +201,7 @@ function LotesPage() {
                       numeroFila={index + 1}
                       esUltimoDeSuOrden={
                         lote.ordenCompra?.id != null &&
-                        lotesPorOrden.get(lote.ordenCompra.id) === 1
+                        (lote.totalLotesOrden ?? lotesPorOrden.get(lote.ordenCompra.id)) === 1
                       }
                       onEditar={abrirEditar}
                       onEliminar={pedirEliminar}
@@ -219,6 +234,8 @@ function LotesPage() {
           onConfirmar={confirmarEliminar}
           onCancelar={cancelarEliminar}
         />
+      )}
+        </>
       )}
     </section>
   )

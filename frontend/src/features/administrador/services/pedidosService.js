@@ -34,8 +34,18 @@ export async function obtenerPedidos() {
   return procesarRespuesta(respuesta, 'No se pudieron obtener los pedidos')
 }
 
-export async function obtenerPedidoPorId(id) {
-  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
+export async function obtenerHistorialPedidos() {
+  const respuesta = await fetch(`${URL_BASE}/pedidos/historial`, {
+    method: 'GET',
+    headers: headers()
+  })
+
+  return procesarRespuesta(respuesta, 'No se pudo obtener el historial de pedidos')
+}
+
+export async function obtenerPedidoPorId(id, { historial = false } = {}) {
+  const query = historial ? '?historial=true' : ''
+  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}${query}`, {
     method: 'GET',
     headers: headers()
   })
@@ -69,7 +79,16 @@ export async function modificarTotalPedido(id, { totalModificado, motivoModifica
   return procesarRespuesta(respuesta, 'No se pudo modificar el total del pedido')
 }
 
-export async function aceptarPedido(id, datosModificacion = null) {
+export async function obtenerLotesDisponibles(id) {
+  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}/lotes-disponibles`, {
+    method: 'GET',
+    headers: headers()
+  })
+
+  return procesarRespuesta(respuesta, 'No se pudieron obtener los lotes disponibles para el pedido')
+}
+
+export async function aceptarPedido(id, datosModificacion = null, asignacionesLotes = null) {
   const payload = {
     estado: 'aceptado'
   }
@@ -77,6 +96,10 @@ export async function aceptarPedido(id, datosModificacion = null) {
   if (datosModificacion && datosModificacion.totalModificado != null) {
     payload.totalModificado = datosModificacion.totalModificado
     payload.motivoModificacion = datosModificacion.motivoModificacion
+  }
+
+  if (Array.isArray(asignacionesLotes)) {
+    payload.asignacionesLotes = asignacionesLotes
   }
 
   const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {

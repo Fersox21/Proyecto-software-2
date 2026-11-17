@@ -6,7 +6,9 @@ import MensajeVacio from '../../../shared/components/MensajeVacio'
 import FilaProducto from '../components/productos/FilaProducto'
 import ModalFormProducto from '../components/productos/ModalFormProducto'
 import ModalConfirmarEliminar from '../components/productos/ModalConfirmarEliminar'
+import HistorialProductos from '../components/productos/HistorialProductos'
 import '../../../styles/panelAdmin/ordenesCompra.css'
+import '../../../styles/panelAdmin/historial.css'
 
 function obtenerNombreCategoria(categoria) {
   if (typeof categoria === 'string') return categoria.trim()
@@ -24,6 +26,7 @@ function AdministradorPage() {
     eliminarProducto
   } = useProductosAdmin()
 
+  const [vistaHistorial, setVistaHistorial] = useState(false)
   const [modalFormAbierto, setModalFormAbierto] = useState(false)
   const [productoSeleccionado, setProductoSeleccionado] = useState(null)
   const [productoParaEliminar, setProductoParaEliminar] = useState(null)
@@ -105,6 +108,24 @@ function AdministradorPage() {
     }
   }
 
+  if (vistaHistorial) {
+    return (
+      <section className="main-admin" id="main-admin">
+        <header className="header-admin">
+          <h1 className="h1-admin">Historial de Productos</h1>
+          <button
+            type="button"
+            className="orden-btn"
+            onClick={() => setVistaHistorial(false)}
+          >
+            Volver al listado
+          </button>
+        </header>
+        <HistorialProductos />
+      </section>
+    )
+  }
+
   if (cargando) return <Spinner texto="Cargando productos..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar los productos" texto={error.message} />
 
@@ -115,6 +136,13 @@ function AdministradorPage() {
       <section className="main-admin" id="main-admin">
         <header className="header-admin">
           <h1 className="h1-admin">Gestión de Productos</h1>
+          <button
+            type="button"
+            className="orden-btn"
+            onClick={() => setVistaHistorial(true)}
+          >
+            Ver historial
+          </button>
         </header>
 
         {alerta && (

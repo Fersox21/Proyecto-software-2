@@ -9,10 +9,29 @@ export const listar = async (req, res, next) => {
   }
 };
 
+export const listarHistorial = async (req, res, next) => {
+  try {
+    const pedidos = await service.listarHistorialPedidos();
+    res.json(pedidos);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const obtener = async (req, res, next) => {
   try {
-    const pedido = await service.obtenerPedidoPorId(req.params.id);
+    const incluirInactivos = req.query.historial === 'true';
+    const pedido = await service.obtenerPedidoPorId(req.params.id, incluirInactivos);
     res.json(pedido);
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const obtenerLotesDisponibles = async (req, res, next) => {
+  try {
+    const lotes = await service.obtenerLotesDisponibles(req.params.id);
+    res.json(lotes);
   } catch (err) {
     next(err);
   }

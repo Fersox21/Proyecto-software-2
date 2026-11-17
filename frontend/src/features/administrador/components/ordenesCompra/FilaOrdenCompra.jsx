@@ -26,7 +26,7 @@ function FilaOrdenCompra({
       <tr>
         <td className="orden-col-orden">
           <div className="orden-id-fecha">
-            <span className="orden-id">#{numeroFila}</span>
+            <span className="orden-id">#{orden.id}</span>
             <span className="orden-fecha">{formatearFecha(orden.fecha)}</span>
           </div>
         </td>

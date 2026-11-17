@@ -115,6 +115,10 @@ export const listarLotes = async () => {
   return await repository.findAll();
 };
 
+export const listarHistorialLotes = async () => {
+  return await repository.findHistorial();
+};
+
 export const obtenerLotePorId = async (id) => {
   const lote = await repository.findById(validarId(id));
   if (!lote) {
