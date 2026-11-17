@@ -1,8 +1,10 @@
 import Modal from '../comunes/Modal'
 import { formatearPrecio } from '../../../../shared/utils/formato'
 
-function ModalConfirmarAceptacion({ pedido, visible, cargando, onConfirmar, onCerrar }) {
+function ModalConfirmarAceptacion({ pedido, datosModificacion, visible, cargando, onConfirmar, onCerrar }) {
   if (!visible || !pedido) return null
+
+  const totalFinal = datosModificacion?.totalModificado ?? pedido.totalModificado ?? pedido.total ?? 0
 
   return (
     <Modal titulo={`Aceptar Pedido #${pedido.id}`} onCerrar={onCerrar} tamanio="normal">
@@ -13,7 +15,7 @@ function ModalConfirmarAceptacion({ pedido, visible, cargando, onConfirmar, onCe
         </p>
         <p style={{ marginTop: '0.75rem', fontSize: '0.95rem', color: 'var(--admin-texto-secundario, #555)' }}>
           Al aceptar este pedido, se consolidará y registrará automáticamente como <strong>venta</strong> por un monto total de{' '}
-          <strong>{formatearPrecio(pedido.total || 0)}</strong>.
+          <strong>{formatearPrecio(totalFinal)}</strong>.
         </p>
 
         <div className="modal-acciones-footer" style={{ marginTop: '1.5rem' }}>

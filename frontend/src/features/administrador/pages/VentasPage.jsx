@@ -1,12 +1,14 @@
 import {
   obtenerVentas,
+  obtenerVentaPorId,
   obtenerProductosVenta,
   actualizarVenta,
   eliminarVenta,
 } from '../services/ventasService';
-import { Fragment, useState } from 'react';
+import { obtenerPedidoPorId } from '../services/pedidosService';
+import { useState } from 'react';
 import { useFetch } from '../../../shared/hooks/useFetch';
-import { formatearFecha } from '../../../shared/utils/formato';
+import { formatearFecha, formatearPrecio } from '../../../shared/utils/formato';
 import {
   bloquearTeclasNoNumericas,
   sanitizarDecimalPositivo,
@@ -14,19 +16,24 @@ import {
 import Spinner from '../../../shared/components/Spinner';
 import MensajeVacio from '../../../shared/components/MensajeVacio';
 import Modal from '../components/comunes/Modal';
+import DetalleVentaModal from '../components/ventas/DetalleVentaModal';
 import '../../../styles/panelAdmin/adminVentas.css';
 import '../../../styles/panelAdmin/ordenesCompra.css';
+import '../../../styles/panelAdmin/adminPedidos.css';
 
 function VentasPage() {
   const [recarga, setRecarga] = useState(0);
   const { datos: ventas, cargando, error } = useFetch(obtenerVentas, recarga);
 
-  const [ventaAbiertaId, setVentaAbiertaId] = useState(null);
-  const [productosVenta, setProductosVenta] = useState([]);
+  const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
+  const [ventaDetalle, setVentaDetalle] = useState(null);
+  const [cargandoDetalle, setCargandoDetalle] = useState(false);
+  const [errorDetalle, setErrorDetalle] = useState('');
 
   const [ventaAEditar, setVentaAEditar] = useState(null);
   const [fechaEditada, setFechaEditada] = useState('');
-  const [totalEditado, setTotalEditado] = useState('');
+  const [totalModificadoEditado, setTotalModificadoEditado] = useState('');
+  const [motivoEditado, setMotivoEditado] = useState('');
   const [errorModal, setErrorModal] = useState('');
 
   const [ventaAEliminar, setVentaAEliminar] = useState(null);
@@ -34,46 +41,104 @@ function VentasPage() {
   if (cargando) return <Spinner texto="Cargando ventas..." />;
   if (error) return <MensajeVacio titulo="No pudimos cargar las ventas" texto={error.message} />;
 
-  const listaVentas = ventas || [];
+  const listaVentas = Array.isArray(ventas) ? ventas : [];
   const totalVentas = listaVentas.length;
 
-  const verProductos = async (ventaId) => {
-    if (ventaAbiertaId === ventaId) {
-      setVentaAbiertaId(null);
-      setProductosVenta([]);
-      return;
-    }
+  const verDetalle = async (ventaId) => {
+    setModalDetalleAbierto(true);
+    setCargandoDetalle(true);
+    setErrorDetalle('');
+    setVentaDetalle(null);
 
     try {
-      const items = await obtenerProductosVenta(ventaId);
-      setProductosVenta(items || []);
-      setVentaAbiertaId(ventaId);
+      const detalle = await obtenerVentaPorId(ventaId);
+      let pedido = detalle?.pedido || null;
+      let items = detalle?.items || detalle?.productos || pedido?.items || pedido?.tiene || pedido?.productos || null;
+
+      const pedidoId = detalle?.pedido_id ?? detalle?.pedidoId;
+      if (!pedido && pedidoId) {
+        try {
+          pedido = await obtenerPedidoPorId(pedidoId);
+          if (!items) {
+            items = pedido?.items || pedido?.tiene || pedido?.productos || null;
+          }
+        } catch {
+          // Continúa con los datos disponibles de la venta
+        }
+      }
+
+      if (!items) {
+        try {
+          items = await obtenerProductosVenta(ventaId);
+        } catch {
+          items = [];
+        }
+      }
+
+      setVentaDetalle({
+        ...detalle,
+        pedido: pedido || detalle?.pedido || {},
+        items: Array.isArray(items) ? items : [],
+      });
     } catch (err) {
-      alert(err.message);
+      setErrorDetalle(err.message || 'No se pudo cargar el detalle de la venta.');
+    } finally {
+      setCargandoDetalle(false);
     }
+  };
+
+  const cerrarDetalle = () => {
+    setModalDetalleAbierto(false);
+    setVentaDetalle(null);
+    setErrorDetalle('');
   };
 
   const handleEditar = (venta) => {
     setVentaAEditar(venta);
     setFechaEditada(venta.fecha ? String(venta.fecha).slice(0, 10) : '');
-    setTotalEditado(venta.total || '');
+    const totalOriginal = venta.monto ?? venta.total ?? '';
+    const totalMod = venta.totalModificado ?? venta.total_modificado;
+    setTotalModificadoEditado(
+      totalMod != null ? String(totalMod) : (totalOriginal !== '' ? String(totalOriginal) : '')
+    );
+    setMotivoEditado(venta.motivoModificacion ?? venta.motivo_modificacion ?? '');
     setErrorModal('');
   };
+
+  const totalOriginalEdicion = Number(ventaAEditar?.monto ?? ventaAEditar?.total ?? 0);
+  const precioIngresadoStr = String(totalModificadoEditado ?? '').trim();
+  const precioIngresado = Number(precioIngresadoStr);
+  const precioModificado =
+    precioIngresadoStr !== '' &&
+    Number.isFinite(precioIngresado) &&
+    precioIngresado !== totalOriginalEdicion;
 
   const guardarEdicion = async (e) => {
     e.preventDefault();
 
-    if (!fechaEditada || !totalEditado || Number(totalEditado) <= 0) {
-      setErrorModal('Completá una fecha válida y un total mayor a 0.');
+    if (!fechaEditada) {
+      setErrorModal('Completá una fecha válida.');
+      return;
+    }
+
+    if (precioIngresadoStr === '' || !Number.isFinite(precioIngresado) || precioIngresado <= 0) {
+      setErrorModal('El precio final debe ser mayor a 0.');
+      return;
+    }
+
+    if (precioModificado && !motivoEditado.trim()) {
+      setErrorModal('Ingresá el motivo de la modificación del precio.');
       return;
     }
 
     try {
       await actualizarVenta(ventaAEditar.id, {
         fecha: fechaEditada,
-        total: Number(totalEditado),
+        total: totalOriginalEdicion,
         estado: true,
-        pedidoId: ventaAEditar.pedidoId || 1,
+        pedido_id: ventaAEditar.pedido_id ?? ventaAEditar.pedidoId,
+        totalModificado: precioModificado ? precioIngresado : null,
+        motivoModificacion: precioModificado ? motivoEditado.trim() : null,
       });
       setVentaAEditar(null);
       setRecarga(recarga + 1);
@@ -85,10 +150,10 @@ function VentasPage() {
   const confirmarEliminar = async () => {
     try {
       await eliminarVenta(ventaAEliminar.id);
-      setVentaAEliminar(null);
-      if (ventaAbiertaId === ventaAEliminar.id) {
-        setVentaAbiertaId(null);
+      if (ventaDetalle?.id === ventaAEliminar.id) {
+        cerrarDetalle();
       }
+      setVentaAEliminar(null);
       setRecarga(recarga + 1);
     } catch (err) {
       alert(err.message);
@@ -115,85 +180,58 @@ function VentasPage() {
           <tbody>
             {totalVentas > 0 ? (
               listaVentas.map((venta) => {
-                const abierta = ventaAbiertaId === venta.id;
+                const totalModificado = venta.totalModificado ?? venta.total_modificado;
+                const motivoModificacion = venta.motivoModificacion ?? venta.motivo_modificacion;
+                const totalOriginal = venta.monto ?? venta.total ?? 0;
 
                 return (
-                  <Fragment key={venta.id}>
-                    <tr>
-                      <td className="col-admin col-id">#{venta.id}</td>
-                      <td className="col-admin col-fecha">
-                        {venta.fecha ? formatearFecha(venta.fecha) : '-'}
-                      </td>
-                      <td className="col-admin col-monto">
-                        ${Number(venta.monto || venta.total || 0).toLocaleString('es-AR', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </td>
-                      <td className="col-admin col-acciones">
-                        <div className="orden-acciones">
-                          <button
-                            type="button"
-                            className="orden-btn orden-btn-chico"
-                            onClick={() => verProductos(venta.id)}
-                          >
-                            {abierta ? 'Ocultar productos' : 'Ver productos'}
-                          </button>
-                          <button
-                            type="button"
-                            className="orden-btn orden-btn-chico"
-                            onClick={() => handleEditar(venta)}
-                          >
-                            Editar
-                          </button>
-                          <button
-                            type="button"
-                            className="orden-btn orden-btn-chico orden-btn-peligro"
-                            onClick={() => setVentaAEliminar(venta)}
-                          >
-                            Eliminar
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-
-                    {abierta && (
-                      <tr className="orden-fila-detalle">
-                        <td colSpan="4">
-                          {productosVenta.length === 0 ? (
-                            <p className="orden-detalle-estado">
-                              Esta venta no tiene productos cargados.
-                            </p>
-                          ) : (
-                            <table className="orden-tabla-lotes">
-                              <thead>
-                                <tr>
-                                  <th>Producto</th>
-                                  <th>Marca</th>
-                                  <th>Cantidad</th>
-                                  <th>Precio unitario</th>
-                                  <th>Subtotal</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {productosVenta.map((item, idx) => (
-                                  <tr key={item.id || idx}>
-                                    <td>{item.producto?.nombre || `Producto #${item.producto?.id}`}</td>
-                                    <td>{item.producto?.marca || '-'}</td>
-                                    <td>{item.cantidad} unidades</td>
-                                    <td>${Number(item.precio || 0).toLocaleString('es-AR')}</td>
-                                    <td>
-                                      ${Number((item.cantidad || 0) * (item.precio || 0)).toLocaleString('es-AR')}
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
+                  <tr key={venta.id}>
+                    <td className="col-admin col-id">#{venta.id}</td>
+                    <td className="col-admin col-fecha">
+                      {venta.fecha ? formatearFecha(venta.fecha) : '-'}
+                    </td>
+                    <td className="col-admin col-monto">
+                      {totalModificado != null ? (
+                        <div style={{ whiteSpace: 'normal' }}>
+                          <span>
+                            Total: {formatearPrecio(totalOriginal)} (Modificado a: {formatearPrecio(totalModificado)})
+                          </span>
+                          {motivoModificacion && (
+                            <div className="detalle-etiqueta" style={{ marginTop: '0.2rem', fontWeight: 400 }}>
+                              Motivo: {motivoModificacion}
+                            </div>
                           )}
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
+                        </div>
+                      ) : (
+                        formatearPrecio(totalOriginal)
+                      )}
+                    </td>
+                    <td className="col-admin col-acciones">
+                      <div className="orden-acciones">
+                        <button
+                          type="button"
+                          className="orden-btn orden-btn-chico"
+                          onClick={() => verDetalle(venta.id)}
+                        >
+                          Ver detalle
+                        </button>
+                        <button
+                          type="button"
+                          className="orden-btn orden-btn-chico"
+                          onClick={() => handleEditar(venta)}
+                        >
+                          Editar
+                        </button>
+                        <button
+                          type="button"
+                          className="orden-btn orden-btn-chico orden-btn-peligro"
+                          onClick={() => setVentaAEliminar(venta)}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
                 );
               })
             ) : (
@@ -218,6 +256,15 @@ function VentasPage() {
         </div>
       </section>
 
+      {modalDetalleAbierto && (
+        <DetalleVentaModal
+          venta={ventaDetalle}
+          cargando={cargandoDetalle}
+          error={errorDetalle}
+          onCerrar={cerrarDetalle}
+        />
+      )}
+
       {ventaAEditar && (
         <Modal titulo="Editar venta" onCerrar={() => setVentaAEditar(null)}>
           <form className="orden-form" onSubmit={guardarEdicion}>
@@ -235,23 +282,57 @@ function VentasPage() {
                     id="venta-fecha"
                     type="date"
                     value={fechaEditada}
-                    onChange={(e) => setFechaEditada(e.target.value)}
+                    onChange={(e) => {
+                      setFechaEditada(e.target.value);
+                      setErrorModal('');
+                    }}
                   />
                 </div>
 
                 <div className="orden-campo">
-                  <label htmlFor="venta-total">Total</label>
+                  <label htmlFor="venta-total-original">Total original</label>
                   <input
-                    id="venta-total"
+                    id="venta-total-original"
+                    type="text"
+                    value={formatearPrecio(totalOriginalEdicion)}
+                    disabled
+                    readOnly
+                  />
+                </div>
+
+                <div className="orden-campo">
+                  <label htmlFor="venta-total-modificado">Modificar Precio Final</label>
+                  <input
+                    id="venta-total-modificado"
                     type="number"
                     min="0.01"
                     step="0.01"
                     inputMode="decimal"
-                    value={totalEditado}
+                    placeholder={String(totalOriginalEdicion)}
+                    value={totalModificadoEditado}
                     onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
-                    onChange={(e) => setTotalEditado(sanitizarDecimalPositivo(e.target.value))}
+                    onChange={(e) => {
+                      setTotalModificadoEditado(sanitizarDecimalPositivo(e.target.value));
+                      setErrorModal('');
+                    }}
                   />
                 </div>
+
+                {precioModificado && (
+                  <div className="orden-campo">
+                    <label htmlFor="venta-motivo-modificacion">Motivo de la modificación</label>
+                    <input
+                      id="venta-motivo-modificacion"
+                      type="text"
+                      placeholder="Explicá el motivo del ajuste..."
+                      value={motivoEditado}
+                      onChange={(e) => {
+                        setMotivoEditado(e.target.value);
+                        setErrorModal('');
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 

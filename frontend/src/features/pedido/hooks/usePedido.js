@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { crearPedido } from '../services/pedidoService'
-import { precioVigente } from '../../../shared/utils/formato'
+import { precioVigente, redondear2 } from '../../../shared/utils/formato'
 import { COSTO_ENVIO, ENVIO_GRATIS_DESDE } from '../constants'
 
 const DATOS_INICIALES = {
@@ -12,18 +12,22 @@ const DATOS_INICIALES = {
   observacionesPedido: ''
 }
 
-export function usePedido({ items = [], subtotal = 0, vaciarCarrito }) {
+export function usePedido({ items = [], subtotal = 0, subtotalOriginal, descuentosAplicados = 0, vaciarCarrito }) {
   const [datosPedido, setDatosPedido] = useState(DATOS_INICIALES)
   const [entrega, setEntrega] = useState(null)
   const [enviando, setEnviando] = useState(false)
   const [error, setError] = useState(null)
   const [compraConfirmada, setCompraConfirmada] = useState(false)
 
+  const subtotalBase = subtotalOriginal ?? subtotal
+  const descuentos = redondear2(descuentosAplicados) || 0
+  const subtotalNeto = redondear2(Math.max(0, subtotalBase - descuentos))
+
   const esRetiro = entrega === 'retiro'
   const esEnvio = entrega === 'estandar'
-  const envio = esEnvio && subtotal < ENVIO_GRATIS_DESDE ? COSTO_ENVIO : 0
-  const total = subtotal + envio
-  const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotal
+  const envio = esEnvio && subtotalNeto < ENVIO_GRATIS_DESDE ? COSTO_ENVIO : 0
+  const total = redondear2(subtotalBase - descuentos + envio)
+  const faltaParaEnvioGratis = ENVIO_GRATIS_DESDE - subtotalNeto
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -103,6 +107,8 @@ export function usePedido({ items = [], subtotal = 0, vaciarCarrito }) {
     compraConfirmada,
     esRetiro,
     esEnvio,
+    subtotalOriginal: subtotalBase,
+    descuentosAplicados: descuentos,
     envio,
     total,
     faltaParaEnvioGratis,

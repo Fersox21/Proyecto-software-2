@@ -9,7 +9,22 @@ function FilaPedido({ pedido, onVerDetalle, onIniciarAceptar, onIniciarCancelar 
       <td className="col-admin">#{pedido.id}</td>
       <td className="col-admin">{pedido.comercio || 'N/A'}</td>
       <td className="col-admin">{pedido.fecha ? formatearFecha(pedido.fecha) : 'N/A'}</td>
-      <td className="col-admin">{pedido.total != null ? formatearPrecio(pedido.total) : '$0.00'}</td>
+      <td className="col-admin">
+        {pedido.totalModificado != null ? (
+          <div>
+            <span>
+              Total: {formatearPrecio(pedido.total || 0)} (Modificado a: {formatearPrecio(pedido.totalModificado)})
+            </span>
+            {pedido.motivoModificacion && (
+              <div className="detalle-etiqueta" style={{ marginTop: '0.2rem' }}>
+                Motivo: {pedido.motivoModificacion}
+              </div>
+            )}
+          </div>
+        ) : (
+          pedido.total != null ? formatearPrecio(pedido.total) : '$0.00'
+        )}
+      </td>
       <td className="col-admin">
         <span className="estado-texto-plano">
           {pedido.estado || 'Desconocido'}

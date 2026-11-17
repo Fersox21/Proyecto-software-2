@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { precioVigente } from '../../../shared/utils/formato'
+import { obtenerPreciosProducto, precioVigente, redondear2 } from '../../../shared/utils/formato'
 import { obtenerProductos } from '../../catalogo/services/catalogoService'
 
 const CLAVE_STORAGE = 'distribuidora-lafe:carrito'
@@ -101,14 +101,17 @@ export function useCarrito() {
   }
 
   function cambiarCantidad(id, cantidad) {
-    if (cantidad < 1) {
+    const numero = Number(cantidad)
+    if (!Number.isFinite(numero)) return
+    const entera = Math.trunc(numero)
+    if (entera < 1) {
       quitarProducto(id)
       return
     }
     setItems((prev) =>
       prev.map((item) =>
         item.id === id
-          ? { ...item, cantidad: Number.isFinite(item.stock) ? Math.min(cantidad, item.stock) : cantidad }
+          ? { ...item, cantidad: Number.isFinite(item.stock) ? Math.min(entera, item.stock) : entera }
           : item,
       ),
     )
@@ -123,11 +126,30 @@ export function useCarrito() {
   }
 
   const cantidadTotal = items.reduce((acumulado, item) => acumulado + item.cantidad, 0)
-  // El subtotal siempre usa el precio vigente (promoción incluida), igual que el backend.
-  const subtotal = items.reduce(
-    (acumulado, item) => acumulado + precioVigente(item) * item.cantidad,
-    0,
+  const subtotalOriginal = redondear2(
+    items.reduce((acumulado, item) => {
+      const { precioNormal } = obtenerPreciosProducto(item)
+      return acumulado + (Number.isFinite(precioNormal) ? precioNormal : 0) * item.cantidad
+    }, 0),
   )
+  // El subtotal siempre usa el precio vigente (promoción incluida), igual que el backend.
+  const subtotal = redondear2(
+    items.reduce(
+      (acumulado, item) => acumulado + precioVigente(item) * item.cantidad,
+      0,
+    ),
+  )
+  const descuentosAplicados = redondear2(Math.max(0, subtotalOriginal - subtotal))
 
-  return { items, cantidadTotal, subtotal, agregarProducto, cambiarCantidad, quitarProducto, vaciarCarrito }
+  return {
+    items,
+    cantidadTotal,
+    subtotal,
+    subtotalOriginal,
+    descuentosAplicados,
+    agregarProducto,
+    cambiarCantidad,
+    quitarProducto,
+    vaciarCarrito,
+  }
 }

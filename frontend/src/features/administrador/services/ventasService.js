@@ -35,14 +35,36 @@ export async function obtenerVentasUltimoMes() {
   return respuesta.json()
 }
 
+async function procesarRespuesta(respuesta, mensajeErrorPorDefecto) {
+  if (!respuesta.ok) {
+    if (respuesta.status === 401) {
+      throw new Error('No autorizado: Token inválido o expirado')
+    }
+    let errorData = null
+    try {
+      errorData = await respuesta.json()
+    } catch {
+      // Sin cuerpo JSON
+    }
+    const mensaje = errorData?.error || errorData?.message || mensajeErrorPorDefecto
+    throw new Error(mensaje)
+  }
+  if (respuesta.status === 204) return null
+  return respuesta.json()
+}
+
+export async function obtenerVentaPorId(id) {
+  const respuesta = await fetch(`${URL_BASE}/ventas/${id}`, {
+    headers: headers()
+  })
+  return procesarRespuesta(respuesta, `No se pudo obtener el detalle de la venta #${id}`)
+}
+
 export async function obtenerProductosVenta(id) {
   const respuesta = await fetch(`${URL_BASE}/ventas/${id}/productos`, {
     headers: headers()
   })
-  if (!respuesta.ok) {
-    throw new Error('No se pudieron obtener los productos de la venta')
-  }
-  return respuesta.json()
+  return procesarRespuesta(respuesta, 'No se pudieron obtener los productos de la venta')
 }
 
 export async function actualizarVenta(id, datos) {
@@ -51,9 +73,7 @@ export async function actualizarVenta(id, datos) {
     headers: headers(),
     body: JSON.stringify(datos)
   })
-  if (!respuesta.ok) {
-    throw new Error('No se pudo actualizar la venta')
-  }
+  return procesarRespuesta(respuesta, 'No se pudo actualizar la venta')
 }
 
 export async function eliminarVenta(id) {

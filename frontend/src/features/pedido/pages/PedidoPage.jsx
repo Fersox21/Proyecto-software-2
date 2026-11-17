@@ -9,7 +9,7 @@ import { usePedido } from '../hooks/usePedido'
 import '../../../styles/formulario.css'
 
 function PedidoPage() {
-  const { items, cantidadTotal, subtotal, vaciarCarrito } = useOutletContext()
+  const { items, cantidadTotal, subtotal, subtotalOriginal, descuentosAplicados, vaciarCarrito } = useOutletContext()
 
   const {
     datosPedido,
@@ -22,11 +22,13 @@ function PedidoPage() {
     compraConfirmada,
     esRetiro,
     esEnvio,
+    subtotalOriginal: subtotalSinDescuento,
+    descuentosAplicados: descuentosPedido,
     envio,
     total,
     faltaParaEnvioGratis,
     handleFinalizarPedido
-  } = usePedido({ items, subtotal, vaciarCarrito })
+  } = usePedido({ items, subtotal, subtotalOriginal, descuentosAplicados, vaciarCarrito })
 
   if (compraConfirmada) {
     return (
@@ -84,6 +86,8 @@ function PedidoPage() {
               items={items}
               cantidadTotal={cantidadTotal}
               subtotal={subtotal}
+              subtotalOriginal={subtotalSinDescuento}
+              descuentosAplicados={descuentosPedido}
               total={total}
               envio={envio}
               esEnvio={esEnvio}

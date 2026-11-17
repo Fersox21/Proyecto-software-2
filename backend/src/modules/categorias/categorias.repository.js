@@ -30,3 +30,27 @@ export const create = async (nombre, client = pool) => {
   );
   return rows[0];
 };
+
+export const reactivar = async (id, nombre, client = pool) => {
+  const { rows } = await client.query(
+    'UPDATE categorias SET nombre = $1, activo = true WHERE id = $2 RETURNING id, nombre, activo',
+    [nombre, id]
+  );
+  return rows[0] || null;
+};
+
+export const update = async (id, nombre, client = pool) => {
+  const { rows } = await client.query(
+    'UPDATE categorias SET nombre = $1 WHERE id = $2 AND activo = true RETURNING id, nombre, activo',
+    [nombre, id]
+  );
+  return rows[0] || null;
+};
+
+export const remove = async (id, client = pool) => {
+  const { rowCount } = await client.query(
+    'UPDATE categorias SET activo = false WHERE id = $1 AND activo = true',
+    [id]
+  );
+  return rowCount;
+};

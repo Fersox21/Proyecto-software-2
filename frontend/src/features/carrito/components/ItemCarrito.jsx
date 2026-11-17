@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   formatearPrecio,
   obtenerPreciosProducto,
@@ -5,11 +6,40 @@ import {
   obtenerUrlImagenProducto,
   manejarErrorImagenProducto,
 } from '../../../shared/utils/formato'
+import { bloquearTeclasNoNumericas, sanitizarEnteroPositivo } from '../../../shared/utils/validaciones'
 import { BsTrash } from 'react-icons/bs'
 import '../../../styles/carrito.css'
 
 function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
   const imagenUrl = obtenerUrlImagenProducto(item?.imagen)
+  const [cantidadTexto, setCantidadTexto] = useState(String(item.cantidad))
+
+  useEffect(() => {
+    setCantidadTexto(String(item.cantidad))
+  }, [item.cantidad])
+
+  function handleCantidadChange(e) {
+    const valor = sanitizarEnteroPositivo(e.target.value)
+    if (valor === '') {
+      setCantidadTexto('')
+      return
+    }
+    const maxStock = Number.isFinite(item.stock) ? item.stock : Infinity
+    const numero = Math.min(Math.max(1, Number(valor)), maxStock)
+    setCantidadTexto(String(numero))
+    if (numero !== item.cantidad) {
+      onCambiarCantidad(item.id, numero)
+    }
+  }
+
+  function handleCantidadBlur() {
+    if (cantidadTexto === '') {
+      setCantidadTexto('1')
+      if (item.cantidad !== 1) {
+        onCambiarCantidad(item.id, 1)
+      }
+    }
+  }
 
   const { precioNormal, enPromocion, descuento, precioVigente } = obtenerPreciosProducto(item)
 
@@ -74,7 +104,18 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
             >
               −
             </button>
-            <span className="px-2 fuente-titulos">{item.cantidad}</span>
+            <input
+              type="number"
+              min={1}
+              max={Number.isFinite(item.stock) ? item.stock : undefined}
+              step={1}
+              value={cantidadTexto}
+              onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
+              onChange={handleCantidadChange}
+              onBlur={handleCantidadBlur}
+              className="form-control form-control-sm border-0 bg-transparent text-center p-0 fuente-titulos carrito-input-cantidad"
+              aria-label={`Cantidad de ${item.nombre}`}
+            />
             <button
               className="btn btn-sm text-dark p-0 text-decoration-none border-0 rounded-circle btn-cantidad"
               type="button"
@@ -89,7 +130,13 @@ function ItemCarrito({ item, onCambiarCantidad, onQuitar }) {
 
         <div className="col-10 col-md-2 text-end text-md-center">
           <small className="text-body-secondary d-block mb-1">Total</small>
-          <span className="text-dark carrito-total fuente-titulos">
+          {enPromocion && (
+            <del className="carrito-precio-anterior d-block">
+              <span className="visually-hidden">Total anterior: </span>
+              {formatearPrecio(redondear2(precioNormal * item.cantidad))}
+            </del>
+          )}
+          <span className={`carrito-total fuente-titulos ${enPromocion ? 'carrito-precio-promo' : 'text-dark'}`}>
             {formatearPrecio(redondear2(precioVigente * item.cantidad))}
           </span>
         </div>

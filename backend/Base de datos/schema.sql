@@ -55,7 +55,8 @@ CREATE TABLE productos (
     activo BOOLEAN NOT NULL DEFAULT true,
     CONSTRAINT chk_promo_activa CHECK (
         NOT en_promocion
-        OR (precio_promo IS NOT NULL AND precio_promo > 0 AND precio_promo < precio_venta)
+        OR precio_promo IS NULL
+        OR (precio_promo > 0 AND precio_promo < precio_venta)
     )
 );
 -- Tabla 4: Órdenes de Compra (Depende de Proveedores)
@@ -73,6 +74,8 @@ CREATE TABLE pedidos (
     subtotal DECIMAL(10, 2) NOT NULL DEFAULT 0 CHECK (subtotal >= 0),
     envio DECIMAL(10, 2) NOT NULL DEFAULT 0 CHECK (envio >= 0),
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
+    total_modificado DECIMAL(10, 2) DEFAULT NULL CHECK (total_modificado IS NULL OR total_modificado > 0),
+    motivo_modificacion TEXT DEFAULT NULL,
     metodo_pago VARCHAR(30) NOT NULL,
     telefono VARCHAR(40) NOT NULL,
     comercio VARCHAR(100) NOT NULL,
@@ -91,7 +94,7 @@ CREATE TABLE lotes (
     id SERIAL PRIMARY KEY,
     fecha_arribo DATE NOT NULL,
     fecha_vencimiento DATE NOT NULL,
-    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    cantidad INTEGER NOT NULL CHECK (cantidad >= 0),
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
     activo BOOLEAN NOT NULL,
     orden_compra_id INTEGER NOT NULL REFERENCES ordenes_compra(id),
@@ -103,12 +106,14 @@ CREATE TABLE ventas (
     id SERIAL PRIMARY KEY,
     fecha DATE NOT NULL,
     total DECIMAL(10, 2) NOT NULL CHECK (total > 0),
+    total_modificado DECIMAL(10, 2) DEFAULT NULL CHECK (total_modificado IS NULL OR total_modificado > 0),
+    motivo_modificacion TEXT DEFAULT NULL,
     activo BOOLEAN NOT NULL DEFAULT true,
     pedido_id INTEGER NOT NULL REFERENCES pedidos(id)
 );
 -- Tabla 8: Tiene (Relación N:M entre Pedidos y Productos)
 CREATE TABLE tiene (
-    cantidad INTEGER NOT NULL CHECK (cantidad > 0),
+    cantidad INTEGER NOT NULL CHECK (cantidad >= 0),
     precio DECIMAL(10, 2) NOT NULL,
     activo BOOLEAN NOT NULL DEFAULT true,
     producto_id INTEGER NOT NULL REFERENCES productos(id),

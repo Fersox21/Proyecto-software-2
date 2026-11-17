@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/', verificarToken, controller.listar);
 router.post('/', verificarToken, controller.crear);
+router.get('/:id/productos', verificarToken, controller.obtenerProductos);
 router.get('/:id', verificarToken, controller.obtener);
 router.put('/:id', verificarToken, controller.actualizar);
 router.delete('/:id', verificarToken, controller.eliminar);

@@ -8,6 +8,8 @@ const mapearPedido = (row) => {
     subtotal: row.subtotal,
     envio: row.envio,
     total: row.total,
+    totalModificado: row.total_modificado != null ? Number(row.total_modificado) : null,
+    motivoModificacion: row.motivo_modificacion ?? null,
     metodoPago: row.metodo_pago,
     telefono: row.telefono,
     comercio: row.comercio,
@@ -54,7 +56,9 @@ const conTransaccion = async (accion) => {
 };
 
 export const findAll = async () => {
-  const { rows } = await pool.query('SELECT * FROM pedidos ORDER BY activo DESC, fecha ASC');
+  const { rows } = await pool.query(
+    "SELECT * FROM pedidos WHERE activo = true AND LOWER(estado) IN ('pendiente', 'nuevo') ORDER BY fecha ASC"
+  );
   return rows.map(mapearPedido);
 };
 
@@ -152,7 +156,7 @@ export const createConItems = async (pedido, items) => {
   });
 };
 
-export const aprobarPedido = async (id) => {
+export const aprobarPedido = async (id, modificacion = {}) => {
   return conTransaccion(async (cliente) => {
     const { rows: pedidoRows } = await cliente.query(
       'SELECT * FROM pedidos WHERE id = $1 FOR UPDATE',
@@ -166,7 +170,8 @@ export const aprobarPedido = async (id) => {
       throw error;
     }
 
-    if (pedido.estado !== 'pendiente') {
+    const estadoActual = String(pedido.estado ?? '').trim().toLowerCase();
+    if (!['pendiente', 'nuevo'].includes(estadoActual)) {
       const error = new Error('Solo se puede aprobar un pedido pendiente');
       error.status = 409;
       throw error;
@@ -197,20 +202,71 @@ export const aprobarPedido = async (id) => {
         error.status = 409;
         throw error;
       }
+
+      const { rows: lotes } = await cliente.query(
+        `SELECT id, cantidad
+         FROM lotes
+         WHERE producto_id = $1
+           AND activo = true
+           AND cantidad > 0
+           AND fecha_vencimiento >= CURRENT_DATE
+         ORDER BY fecha_vencimiento ASC, id ASC
+         FOR UPDATE`,
+        [item.producto_id]
+      );
+
+      let restante = Number(item.cantidad);
+
+      for (const lote of lotes) {
+        if (restante <= 0) break;
+
+        const cantidadLote = Number(lote.cantidad);
+        const descontar = Math.min(restante, cantidadLote);
+        const nuevaCantidad = cantidadLote - descontar;
+
+        await cliente.query(
+          `UPDATE lotes
+           SET cantidad = $1,
+               activo = CASE WHEN $1 = 0 THEN false ELSE activo END
+           WHERE id = $2`,
+          [nuevaCantidad, lote.id]
+        );
+
+        restante -= descontar;
+      }
+
+      if (restante > 0) {
+        const error = new Error(`Lotes vigentes insuficientes para "${item.nombre}"`);
+        error.status = 409;
+        throw error;
+      }
     }
 
+    const tieneModificacionNueva = modificacion.totalModificado !== undefined;
+    const totalModificadoFinal = tieneModificacionNueva
+      ? modificacion.totalModificado
+      : pedido.totalModificado;
+    const motivoModificacionFinal = tieneModificacionNueva
+      ? modificacion.motivoModificacion
+      : pedido.motivoModificacion;
+
     const { rows: pedidoActualizado } = await cliente.query(
-      "UPDATE pedidos SET estado = 'aprobado' WHERE id = $1 RETURNING *",
-      [id]
+      `UPDATE pedidos
+       SET estado = 'aprobado',
+           total_modificado = $1,
+           motivo_modificacion = $2
+       WHERE id = $3
+       RETURNING *`,
+      [totalModificadoFinal ?? null, motivoModificacionFinal ?? null, id]
     );
 
     await cliente.query(
-      `INSERT INTO ventas (fecha, total, pedido_id)
-       SELECT CURRENT_DATE, $1, $2
+      `INSERT INTO ventas (fecha, total, total_modificado, motivo_modificacion, pedido_id)
+       SELECT CURRENT_DATE, $1, $2, $3, $4
        WHERE NOT EXISTS (
-         SELECT 1 FROM ventas WHERE pedido_id = $2 AND activo = true
+         SELECT 1 FROM ventas WHERE pedido_id = $4 AND activo = true
        )`,
-      [pedido.total, id]
+      [pedido.total, totalModificadoFinal ?? null, motivoModificacionFinal ?? null, id]
     );
 
     return mapearPedido(pedidoActualizado[0]);
@@ -223,6 +279,8 @@ export const update = async (id, data) => {
     subtotal,
     envio,
     total,
+    totalModificado,
+    motivoModificacion,
     metodoPago,
     telefono,
     comercio,
@@ -241,23 +299,27 @@ export const update = async (id, data) => {
          subtotal = $2,
          envio = $3,
          total = $4,
-         metodo_pago = $5,
-         telefono = $6,
-         comercio = $7,
-         persona_contacto = $8,
-         modalidad_entrega = $9,
-         direccion = $10,
-         descripcion_direccion = $11,
-         observaciones = $12,
-         estado = $13,
-         motivo_rechazo = $14
-     WHERE id = $15
+         total_modificado = $5,
+         motivo_modificacion = $6,
+         metodo_pago = $7,
+         telefono = $8,
+         comercio = $9,
+         persona_contacto = $10,
+         modalidad_entrega = $11,
+         direccion = $12,
+         descripcion_direccion = $13,
+         observaciones = $14,
+         estado = $15,
+         motivo_rechazo = $16
+     WHERE id = $17
      RETURNING *`,
     [
       fecha ?? null,
       subtotal ?? 0,
       envio ?? 0,
       total,
+      totalModificado ?? null,
+      motivoModificacion ?? null,
       metodoPago,
       telefono,
       comercio,

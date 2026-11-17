@@ -42,7 +42,7 @@ export const findAll = async (client = pool) => {
 
 export const findAllCatalogo = async (client = pool) => {
   const { rows } = await client.query(
-    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`
+    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND p.stock > 0 AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`
   );
   return rows.map(mapearProducto);
 };
@@ -70,6 +70,10 @@ export const create = async (data, client = pool) => {
     imagen = null
   } = data;
 
+  const promoActiva = Boolean(enPromocion);
+  const precioPromoFinal = promoActiva ? precioPromo : null;
+  const tipoPromocionIdFinal = promoActiva ? tipoPromocionId : null;
+
   const { rows } = await client.query(
     `INSERT INTO productos (
        nombre, descripcion, precio_costo, precio_venta, marca,
@@ -84,12 +88,12 @@ export const create = async (data, client = pool) => {
       precioCosto,
       precioVenta,
       marca,
-      enPromocion,
-      precioPromo,
+      promoActiva,
+      precioPromoFinal,
       stock,
       categoria,
       categoriaId,
-      tipoPromocionId,
+      tipoPromocionIdFinal,
       destacado,
       visibleCatalogo,
       imagen
@@ -117,6 +121,10 @@ export const update = async (id, data, client = pool) => {
     imagen = null
   } = data;
 
+  const promoActiva = Boolean(enPromocion);
+  const precioPromoFinal = promoActiva ? precioPromo : null;
+  const tipoPromocionIdFinal = promoActiva ? tipoPromocionId : null;
+
   await client.query(
     `UPDATE productos
      SET nombre = $1, descripcion = $2, precio_costo = $3, precio_venta = $4, marca = $5,
@@ -129,12 +137,12 @@ export const update = async (id, data, client = pool) => {
       precioCosto,
       precioVenta,
       marca,
-      enPromocion,
-      precioPromo,
+      promoActiva,
+      precioPromoFinal,
       stock,
       categoria,
       categoriaId,
-      tipoPromocionId,
+      tipoPromocionIdFinal,
       destacado,
       visibleCatalogo,
       imagen,

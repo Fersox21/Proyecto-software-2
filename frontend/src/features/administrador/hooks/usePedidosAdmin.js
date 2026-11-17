@@ -2,9 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   obtenerPedidos,
   obtenerPedidoPorId,
+  modificarTotalPedido as apiModificarTotalPedido,
   aceptarPedido as apiAceptarPedido,
   cancelarPedido as apiCancelarPedido
 } from '../services/pedidosService'
+
+const ESTADOS_PENDIENTES = ['pendiente', 'nuevo']
+
+const esPedidoPendiente = (pedido) =>
+  ESTADOS_PENDIENTES.includes(String(pedido?.estado || '').toLowerCase())
 
 export function usePedidosAdmin() {
   const [pedidos, setPedidos] = useState([])
@@ -22,7 +28,8 @@ export function usePedidosAdmin() {
     setError(null)
     try {
       const data = await obtenerPedidos()
-      setPedidos(Array.isArray(data) ? data : (data?.pedidos || []))
+      const lista = Array.isArray(data) ? data : (data?.pedidos || [])
+      setPedidos(lista.filter(esPedidoPendiente))
     } catch (err) {
       setError(err)
     } finally {
@@ -54,10 +61,10 @@ export function usePedidosAdmin() {
     setErrorDetalle(null)
   }, [])
 
-  const aceptarPedido = useCallback(async (id) => {
+  const modificarTotalPedido = useCallback(async (id, datosModificacion) => {
     setProcesandoAccion(true)
     try {
-      await apiAceptarPedido(id)
+      await apiModificarTotalPedido(id, datosModificacion)
       await cargarPedidos()
       if (pedidoDetalle?.id === id) {
         await cargarDetallePedido(id)
@@ -66,6 +73,19 @@ export function usePedidosAdmin() {
       setProcesandoAccion(false)
     }
   }, [cargarPedidos, pedidoDetalle, cargarDetallePedido])
+
+  const aceptarPedido = useCallback(async (id, datosModificacion = null) => {
+    setProcesandoAccion(true)
+    try {
+      await apiAceptarPedido(id, datosModificacion)
+      setPedidos((prev) => prev.filter((p) => p.id !== id))
+      if (pedidoDetalle?.id === id) {
+        cerrarDetalle()
+      }
+    } finally {
+      setProcesandoAccion(false)
+    }
+  }, [pedidoDetalle, cerrarDetalle])
 
   const cancelarPedido = useCallback(async (id, motivoRechazo) => {
     setProcesandoAccion(true)
@@ -91,6 +111,7 @@ export function usePedidosAdmin() {
     cargarPedidos,
     cargarDetallePedido,
     cerrarDetalle,
+    modificarTotalPedido,
     aceptarPedido,
     cancelarPedido
   }

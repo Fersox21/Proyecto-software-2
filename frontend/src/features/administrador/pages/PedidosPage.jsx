@@ -20,11 +20,13 @@ function PedidosPage() {
     procesandoAccion,
     cargarDetallePedido,
     cerrarDetalle,
+    modificarTotalPedido,
     aceptarPedido,
     cancelarPedido
   } = usePedidosAdmin()
 
   const [pedidoParaAceptar, setPedidoParaAceptar] = useState(null)
+  const [modificacionParaAceptar, setModificacionParaAceptar] = useState(null)
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null)
   const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false)
 
@@ -42,17 +44,26 @@ function PedidosPage() {
     cerrarDetalle()
   }
 
-  const handleIniciarAceptar = (pedido) => {
+  const handleIniciarAceptar = (pedido, datosModificacion = null) => {
     setPedidoParaAceptar(pedido)
+    setModificacionParaAceptar(datosModificacion)
   }
 
   const handleConfirmarAceptar = async (id) => {
     try {
-      await aceptarPedido(id)
+      await aceptarPedido(id, modificacionParaAceptar)
       setPedidoParaAceptar(null)
+      setModificacionParaAceptar(null)
+      if (pedidoDetalle?.id === id) {
+        setModalDetalleAbierto(false)
+      }
     } catch (err) {
       alert(`Error al aceptar pedido: ${err.message}`)
     }
+  }
+
+  const handleGuardarModificacion = async (id, datosModificacion) => {
+    await modificarTotalPedido(id, datosModificacion)
   }
 
   const handleIniciarCancelar = (pedido) => {
@@ -71,7 +82,10 @@ function PedidosPage() {
   if (cargando) return <Spinner texto="Cargando pedidos..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar los pedidos" texto={error.message} />
 
-  const totalPedidos = pedidos ? pedidos.length : 0
+  const pedidosPendientes = (pedidos || []).filter((p) =>
+    ['pendiente', 'nuevo'].includes(String(p.estado || '').toLowerCase())
+  )
+  const totalPedidos = pedidosPendientes.length
 
   return (
     <section className="main-admin" id="main-pedidos">
@@ -94,7 +108,7 @@ function PedidosPage() {
 
           <tbody>
             {totalPedidos > 0 ? (
-              pedidos.map((pedido) => (
+              pedidosPendientes.map((pedido) => (
                 <FilaPedido
                   key={pedido.id}
                   pedido={pedido}
@@ -131,10 +145,10 @@ function PedidosPage() {
           pedido={pedidoDetalle}
           cargando={cargandoDetalle}
           error={errorDetalle}
+          procesandoAccion={procesandoAccion}
           onCerrar={handleCerrarDetalle}
-          onIniciarAceptar={(ped) => {
-            setPedidoParaAceptar(ped)
-          }}
+          onGuardarModificacion={handleGuardarModificacion}
+          onIniciarAceptar={handleIniciarAceptar}
           onIniciarCancelar={(ped) => {
             setPedidoParaCancelar(ped)
           }}
@@ -144,10 +158,14 @@ function PedidosPage() {
       {/* Modal de Confirmación para Aceptar (Venta) */}
       <ModalConfirmarAceptacion
         pedido={pedidoParaAceptar}
+        datosModificacion={modificacionParaAceptar}
         visible={Boolean(pedidoParaAceptar)}
         cargando={procesandoAccion}
         onConfirmar={handleConfirmarAceptar}
-        onCerrar={() => setPedidoParaAceptar(null)}
+        onCerrar={() => {
+          setPedidoParaAceptar(null)
+          setModificacionParaAceptar(null)
+        }}
       />
 
       {/* Modal de Confirmación para Cancelar */}

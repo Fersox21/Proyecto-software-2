@@ -1,12 +1,8 @@
 // Regla única de precio y promoción de un producto.
 //
-// El descuento se expresa siempre como un porcentaje entero (1% a 99%). A partir
-// del precio de venta y del precio promocional guardado se obtiene el porcentaje
-// más cercano y se recalcula el precio promocional en centavos, para que el
-// porcentaje mostrado y el precio cobrado concuerden exactamente.
-//
-// Ejemplo: precio de venta 900 y precio promocional 800 => 11% de descuento
-// => el precio promocional normalizado es 801 (900 - 11% = 801).
+// El descuento se calcula como porcentaje entero (1% a 99%) a partir del precio
+// de venta y el precio promocional guardado, conservando el precio promocional
+// exacto redondeado a 2 decimales cuando es válido.
 
 // Redondea a dos decimales evitando los errores de coma flotante.
 export const redondear2 = (valor) => {
@@ -49,27 +45,33 @@ export const precioConDescuento = (precioVenta, porcentaje) => {
 
 export const precioPromocionalValido = (precioVenta, precioPromo, enPromocion) => {
   if (enPromocion !== true) return false;
-  return porcentajeDescuento(precioVenta, precioPromo) !== null;
+  const normal = aNumero(precioVenta);
+  const promo = aNumero(precioPromo);
+  return (
+    Number.isFinite(normal) &&
+    Number.isFinite(promo) &&
+    normal > 0 &&
+    promo > 0 &&
+    promo < normal
+  );
 };
 
 // Normaliza un producto para que precioPromo y descuento sean coherentes.
-// Mantiene el precio guardado cuando la promoción no está activa o es inválida.
+// Conserva el precio promocional exacto redondeado a 2 decimales cuando es válido.
 export const normalizarProducto = (producto) => {
   if (!producto) return producto;
 
   const precioVenta = producto.precioVenta ?? producto.precio_venta;
-  const precioPromo = producto.precioPromo ?? producto.precio_promo;
+  const precioPromo =
+    producto.precioPromo !== undefined ? producto.precioPromo : producto.precio_promo;
   const enPromocion = producto.enPromocion ?? producto.en_promocion;
 
-  const porcentaje = precioPromocionalValido(precioVenta, precioPromo, enPromocion)
-    ? porcentajeDescuento(precioVenta, precioPromo)
-    : null;
+  const esValido = precioPromocionalValido(precioVenta, precioPromo, enPromocion);
+  const porcentaje = esValido ? porcentajeDescuento(precioVenta, precioPromo) : null;
 
   return {
     ...producto,
-    precioPromo: porcentaje !== null
-      ? precioConDescuento(precioVenta, porcentaje)
-      : precioPromo,
+    precioPromo: esValido ? redondear2(precioPromo) : precioPromo,
     descuento: porcentaje
   };
 };
@@ -77,8 +79,9 @@ export const normalizarProducto = (producto) => {
 export const precioVigente = (producto = {}) => {
   const normalizado = normalizarProducto(producto);
   const precioVenta = normalizado.precioVenta ?? normalizado.precio_venta;
+  const enPromocion = normalizado.enPromocion ?? normalizado.en_promocion;
 
-  if (normalizado.descuento !== null && normalizado.descuento !== undefined) {
+  if (precioPromocionalValido(precioVenta, normalizado.precioPromo, enPromocion)) {
     return Number(normalizado.precioPromo);
   }
 

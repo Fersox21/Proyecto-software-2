@@ -224,11 +224,42 @@ export const crearPedido = async (data) => {
   return await repository.createConItems(pedido, items);
 };
 
+const validarModificacionTotal = (data) => {
+  const rawTotalModificado = data.totalModificado !== undefined ? data.totalModificado : data.total_modificado;
+  const rawMotivo = data.motivoModificacion !== undefined ? data.motivoModificacion : data.motivo_modificacion;
+
+  if (rawTotalModificado === undefined) {
+    return {};
+  }
+
+  if (rawTotalModificado === null || (typeof rawTotalModificado === 'string' && rawTotalModificado.trim() === '')) {
+    return { totalModificado: null, motivoModificacion: null };
+  }
+
+  const totalModificado = validarDecimal(
+    rawTotalModificado,
+    { min: 0, exclusivo: true },
+    'El total modificado del pedido debe ser mayor a 0'
+  );
+
+  const motivoModificacion = rawMotivo !== undefined && rawMotivo !== null
+    ? String(rawMotivo).trim()
+    : '';
+
+  if (!motivoModificacion) {
+    throw crearError('El motivo de modificación del total es obligatorio', 400);
+  }
+
+  return { totalModificado, motivoModificacion };
+};
+
 export const actualizarPedido = async (id, data) => {
   const pedidoExistente = await repository.findById(id);
   if (!pedidoExistente) {
     throw crearError('Pedido no encontrado', 404);
   }
+
+  const modificacionTotal = validarModificacionTotal(data);
 
   const estadoSolicitado = normalizarEstado(data.estado);
   const motivoRechazo = data.motivoRechazo === undefined
@@ -240,7 +271,8 @@ export const actualizarPedido = async (id, data) => {
       throw crearError('El estado del pedido no es válido', 400);
     }
 
-    if (pedidoExistente.estado !== 'pendiente') {
+    const estadoActual = String(pedidoExistente.estado ?? '').trim().toLowerCase();
+    if (!['pendiente', 'nuevo'].includes(estadoActual)) {
       throw crearError('Solo se pueden modificar pedidos pendientes', 409);
     }
 
@@ -255,13 +287,9 @@ export const actualizarPedido = async (id, data) => {
     }
 
     if (estadoSolicitado === 'aprobado') {
-      return await repository.aprobarPedido(id);
+      return await repository.aprobarPedido(id, modificacionTotal);
     }
   }
-
-  const totalActualizado = data.total !== undefined
-    ? validarDecimal(data.total, { min: 0, exclusivo: true }, 'El total del pedido debe ser mayor a 0')
-    : undefined;
 
   const pedidoActualizado = {
     ...pedidoExistente,
@@ -270,7 +298,7 @@ export const actualizarPedido = async (id, data) => {
     ...(data.direccion !== undefined ? { direccion: data.direccion } : {}),
     ...(data.metodoPago !== undefined ? { metodoPago: data.metodoPago } : {}),
     ...(data.telefono !== undefined ? { telefono: data.telefono } : {}),
-    ...(totalActualizado !== undefined ? { total: totalActualizado } : {})
+    ...modificacionTotal
   };
 
   return await repository.update(id, pedidoActualizado);

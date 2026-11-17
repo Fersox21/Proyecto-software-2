@@ -9,7 +9,6 @@ import {
   normalizarFecha,
   obtenerOrdenesCompra,
   obtenerProductos,
-  obtenerProveedores,
 } from '../../services/lotesService'
 import CampoFormulario from '../comunes/CampoFormulario'
 
@@ -18,7 +17,6 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
 
   const [productos, setProductos] = useState([])
   const [ordenesCompra, setOrdenesCompra] = useState([])
-  const [proveedores, setProveedores] = useState([])
   const [cargandoCatalogos, setCargandoCatalogos] = useState(!editando)
   const [errorCatalogos, setErrorCatalogos] = useState(null)
 
@@ -44,12 +42,11 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     if (editando) return
     let ignorar = false
 
-    Promise.all([obtenerProductos(), obtenerOrdenesCompra(), obtenerProveedores()])
-      .then(([listaProductos, listaOrdenes, listaProveedores]) => {
+    Promise.all([obtenerProductos(), obtenerOrdenesCompra()])
+      .then(([listaProductos, listaOrdenes]) => {
         if (ignorar) return
         setProductos(Array.isArray(listaProductos) ? listaProductos : [])
         setOrdenesCompra(Array.isArray(listaOrdenes) ? listaOrdenes : [])
-        setProveedores(Array.isArray(listaProveedores) ? listaProveedores : [])
       })
       .catch((err) => {
         if (!ignorar) setErrorCatalogos(err.message)
@@ -62,14 +59,6 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
       ignorar = true
     }
   }, [editando])
-
-  const proveedoresPorId = useMemo(() => {
-    const mapa = {}
-    proveedores.forEach((p) => {
-      mapa[p.id] = p.nombre
-    })
-    return mapa
-  }, [proveedores])
 
   const ordenesDisponibles = useMemo(
     () => ordenesCompra.filter((orden) => orden.activo !== false),
@@ -233,7 +222,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
                 <option value="">Elegí una orden de compra</option>
                 {ordenesDisponibles.map((orden) => (
                   <option key={orden.id} value={orden.id}>
-                    {`Orden #${orden.id} · ${formatearFecha(orden.fecha)}${proveedoresPorId[orden.proveedor_id] ? ` · ${proveedoresPorId[orden.proveedor_id]}` : ''}`}
+                    {`Orden #${orden.id} · ${formatearFecha(orden.fecha)}${orden.proveedor?.nombre ? ` · ${orden.proveedor.nombre}` : ''}`}
                   </option>
                 ))}
               </select>

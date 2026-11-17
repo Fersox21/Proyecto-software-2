@@ -55,11 +55,25 @@ function DetallePedidoInfo({ pedido }) {
           <span className="detalle-valor">{envio ?? 'No especificado'}</span>
         </div>
         <div className="detalle-campo">
+          <span className="detalle-etiqueta">Total:</span>
+          <span className="detalle-valor">
+            {pedido.totalModificado != null
+              ? `Total: ${formatearPrecio(pedido.total || 0)} (Modificado a: ${formatearPrecio(pedido.totalModificado)})`
+              : (pedido.total != null ? formatearPrecio(pedido.total) : 'No especificado')}
+          </span>
+        </div>
+        <div className="detalle-campo">
           <span className="detalle-etiqueta">Estado Actual:</span>
           <span className="estado-texto-plano">
             {pedido.estado || 'Desconocido'}
           </span>
         </div>
+        {pedido.totalModificado != null && pedido.motivoModificacion && (
+          <div className="detalle-campo detalle-campo-alerta">
+            <span className="detalle-etiqueta">Motivo de Modificación de Total:</span>
+            <span className="detalle-valor motivo-texto">{pedido.motivoModificacion}</span>
+          </div>
+        )}
         {pedido.motivoRechazo && (
           <div className="detalle-campo detalle-campo-alerta">
             <span className="detalle-etiqueta">Motivo de Cancelación/Rechazo:</span>

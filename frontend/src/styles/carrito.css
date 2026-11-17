@@ -13,6 +13,19 @@
   background-color: #e9ecef;
 }
 
+.carrito-input-cantidad {
+  width: 42px;
+  min-width: 0;
+  box-shadow: none !important;
+  -moz-appearance: textfield;
+}
+
+.carrito-input-cantidad::-webkit-outer-spin-button,
+.carrito-input-cantidad::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
 /* Precio en promoción dentro del carrito */
 .carrito-precio-anterior {
   font-size: 0.8rem;

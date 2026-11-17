@@ -42,34 +42,49 @@ export const listarVentas = async (periodo) => {
     throw error;
   }
 
-  const rows = await ventasRepository.listar();
-  if (rows.length === 0) {
-    const error = new Error(`No hay ventas cargadas`);
-    error.status = 404;
-    throw error;
-  }
-  return rows;
+  return await ventasRepository.listar();
 };
 
 export const obtenerVenta = async (id) => {
-  const rows = await ventasRepository.obtener(id);
-  
-  if (rows.length === 0) {
-    const error = new Error(`La venta con ID ${id} no existe`);
-    error.status = 404;
-    throw error;
+  const venta = await ventasRepository.obtenerDetalle(id);
+
+  if (!venta) {
+    throw crearError(`La venta con ID ${id} no existe`, 404);
   }
 
-  return rows[0];
+  return venta;
+};
+
+export const obtenerProductosVenta = async (id) => {
+  const rows = await ventasRepository.obtener(id);
+
+  if (!rows || rows.length === 0) {
+    throw crearError(`La venta con ID ${id} no existe`, 404);
+  }
+
+  const venta = rows[0];
+  if (!venta.pedido_id) {
+    return [];
+  }
+
+  return await ventasRepository.obtenerItemsPorPedidoId(venta.pedido_id);
 };
 
 export const crearVenta = async (data) => {
-  const pedidoExistente = await repositoryPedidos.findById(data.pedido_id);
- 
-  if(!pedidoExistente){
-    const error = new Error('No existe pedido con ese id');
-    error.status = 404;
-    throw error;
+  const pedidoId = data.pedido_id ?? data.pedidoId;
+
+  if (!pedidoId) {
+    throw crearError('Faltan datos obligatorios para crear venta', 400);
+  }
+
+  const pedidoExistente = await repositoryPedidos.findById(pedidoId);
+  if (!pedidoExistente) {
+    throw crearError('No existe pedido con ese id', 404);
+  }
+
+  const ventaExistente = await ventasRepository.obtenerPorPedidoId(pedidoId);
+  if (ventaExistente) {
+    throw crearError('Ya existe una venta activa para este pedido', 409);
   }
 
   if (!data.fecha || data.total === undefined || data.total === null) {
@@ -78,43 +93,62 @@ export const crearVenta = async (data) => {
 
   const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
 
-  return await ventasRepository.create({ ...data, total });
+  return await ventasRepository.create({ ...data, pedido_id: pedidoId, total });
 };
 
-export const update = async (id,data) => {
-  const ventaExistente = await ventasRepository.obtener(id);
+export const update = async (id, data) => {
+  const rows = await ventasRepository.obtener(id);
 
-  if(!ventaExistente){
-    const error = new Error('No existe venta con ese id');
-    error.status = 404;
-    throw error;
+  if (!rows || rows.length === 0) {
+    throw crearError('No existe venta con ese id', 404);
   }
 
-  if (!data.fecha || data.total === undefined || data.total === null) {
-    throw crearError('Faltan datos obligatorios para actualizar venta', 400);
+  const ventaActual = rows[0];
+  const fecha = data.fecha !== undefined && data.fecha !== null && data.fecha !== ''
+    ? data.fecha
+    : ventaActual.fecha;
+
+  const rawTotalModificado = data.totalModificado !== undefined
+    ? data.totalModificado
+    : data.total_modificado;
+  const rawMotivoModificacion = data.motivoModificacion !== undefined
+    ? data.motivoModificacion
+    : data.motivo_modificacion;
+
+  let totalModificado = ventaActual.total_modificado ?? null;
+  let motivoModificacion = ventaActual.motivo_modificacion ?? null;
+
+  if (rawTotalModificado !== undefined && rawTotalModificado !== null && rawTotalModificado !== '') {
+    totalModificado = validarDecimalPositivo(
+      rawTotalModificado,
+      'El total modificado de la venta debe ser mayor a 0'
+    );
+
+    if (typeof rawMotivoModificacion !== 'string' || rawMotivoModificacion.trim().length === 0) {
+      throw crearError('El motivo de modificación es obligatorio cuando se modifica el total', 400);
+    }
+
+    motivoModificacion = rawMotivoModificacion.trim();
+  } else if (rawTotalModificado === null || rawTotalModificado === '') {
+    totalModificado = null;
+    motivoModificacion = null;
   }
 
-  const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
-
-  return await ventasRepository.update(id, { ...data, total });
+  return await ventasRepository.update(id, {
+    fecha,
+    totalModificado,
+    motivoModificacion
+  });
 };
 
 export const remove = async (id) => {
   const rowCount = await ventasRepository.remove(id);
   if (rowCount === 0) {
-    const error = new Error('Venta no encontrada');
-    error.status = 404;
-    throw error;
+    throw crearError('Venta no encontrada', 404);
   }
   return true;
 };
 
 export const ventasUltimoMes = async () => {
-  const rows = await ventasRepository.obtenerVentasMes();
-  if (rows.length === 0) {
-    const error = new Error('Ventas no encontradas');
-    error.status = 404;
-    throw error;
-  }
-  return rows;
+  return await ventasRepository.obtenerVentasMes();
 };

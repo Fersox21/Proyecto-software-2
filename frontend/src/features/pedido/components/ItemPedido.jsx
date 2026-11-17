@@ -62,7 +62,13 @@ function ItemPedido({ item }){
                 </div>
         
                 <div className="col-4 col-md-5 text-end">
-                    <span className="text-dark fs-5 fuente-titulos">
+                    {enPromocion && (
+                        <del className="pedido-precio-anterior d-block">
+                            <span className="visually-hidden">Total anterior: </span>
+                            {formatearPrecio(redondear2(precioNormal * item.cantidad))}
+                        </del>
+                    )}
+                    <span className={`fs-5 fuente-titulos ${enPromocion ? 'pedido-precio-promo' : 'text-dark'}`}>
                         {formatearPrecio(redondear2(precioVigente * item.cantidad))}
                     </span>
                 </div>

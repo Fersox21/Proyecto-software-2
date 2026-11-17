@@ -6,7 +6,7 @@ import { HomePage } from './features/home'
 import { CatalogoPage, DetalleProductoPage } from './features/catalogo'
 import { PreguntasFrecuentesPage } from './features/preguntasFrecuentes'
 import { CarritoPage } from './features/carrito'
-import { AdministradorPage, ConfiguracionPage, EstadisticasPage, LotesPage, OrdenesCompraPage, PedidosPage, PromocionesPage, ProveedoresPage, VencimientosPage, VentasPage} from './features/administrador' 
+import { AdministradorPage, CategoriasPage, ConfiguracionPage, EstadisticasPage, InicioAdminPage, LotesPage, OrdenesCompraPage, PedidosPage, PromocionesPage, ProveedoresPage, VencimientosPage, VentasPage} from './features/administrador' 
 import { PedidoPage } from './features/pedido'
 import { LoginPage, protegerRuta, redirigirSiHaySesion } from './features/auth'
 
@@ -33,7 +33,8 @@ export const router = createBrowserRouter([
     loader: protegerRuta, 
     errorElement: <NoEncontradaPage />,
     children: [
-      { index: true, element: <AdministradorPage />, loader: protegerRuta },
+      { index: true, element: <InicioAdminPage />, loader: protegerRuta },
+      { path: 'productos', element: <AdministradorPage />, loader: protegerRuta },
       { path: 'estadisticas', element: <EstadisticasPage />, loader: protegerRuta },
       { path: 'ventas', element: <VentasPage />, loader: protegerRuta },
       { path: 'lotes', element: <LotesPage />, loader: protegerRuta },
@@ -41,6 +42,7 @@ export const router = createBrowserRouter([
       { path: 'vencimientos', element: <VencimientosPage />, loader: protegerRuta },
       { path: 'ordenes-compra', element: <OrdenesCompraPage />, loader: protegerRuta },
       { path: 'promociones', element: <PromocionesPage />, loader: protegerRuta },
+      { path: 'categorias', element: <CategoriasPage />, loader: protegerRuta },
       { path: 'pedidos', element: <PedidosPage />, loader: protegerRuta },
       { path: 'configuracion', element: <ConfiguracionPage />, loader: protegerRuta },
       { path: '*', element: <NoEncontradaPage /> },

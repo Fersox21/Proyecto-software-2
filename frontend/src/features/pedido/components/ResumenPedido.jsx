@@ -1,9 +1,23 @@
 import ItemPedido from './ItemPedido'
-import { formatearPrecio } from '../../../shared/utils/formato'
+import { formatearPrecio, redondear2 } from '../../../shared/utils/formato'
 import { Link } from 'react-router'
 import { BsShieldCheck } from 'react-icons/bs';
 
-function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esEnvio, faltaParaEnvioGratis, enviando = false }) {
+function ResumenPedido({
+    items,
+    cantidadTotal,
+    subtotal,
+    subtotalOriginal,
+    descuentosAplicados = 0,
+    total,
+    envio,
+    esEnvio,
+    faltaParaEnvioGratis,
+    enviando = false,
+}) {
+    const subtotalBase = subtotalOriginal ?? subtotal
+    const descuentos = redondear2(descuentosAplicados) || 0
+
     return (
         <div className="card rounded-5 p-4 border-0 shadow-sm sticky-top" style={{ top: '2rem' }}>
             <div className="d-flex justify-content-between">
@@ -26,7 +40,13 @@ function ResumenPedido({ items, cantidadTotal, subtotal, total, envio, esEnvio, 
                 <div className="card-body">
                     <dl className="row mb-0 text-start">
                         <dt className="col-7 fw-normal" style={{ fontSize: '0.9rem'}}>Subtotal ({cantidadTotal} productos)</dt>
-                        <dd className="col-5 text-end fuente-titulos">{formatearPrecio(subtotal)}</dd>
+                        <dd className="col-5 text-end fuente-titulos">{formatearPrecio(subtotalBase)}</dd>
+
+                        <dt className="col-7 fw-normal" style={{ fontSize: '0.9rem'}}>Descuentos aplicados</dt>
+                        <dd className={`col-5 text-end fuente-titulos ${descuentos > 0 ? 'pedido-precio-promo' : 'text-body-secondary'}`}>
+                            {descuentos > 0 ? `- ${formatearPrecio(descuentos)}` : formatearPrecio(0)}
+                        </dd>
+
                         {esEnvio && (
                             <>
                                 <dt className="col-7 fw-normal">Envío</dt>

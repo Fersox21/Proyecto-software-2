@@ -1,7 +1,6 @@
 import * as repository from './productos.repository.js';
 import * as categoriasRepository from '../categorias/categorias.repository.js';
 import * as tiposPromocionRepository from '../tiposPromocion/tiposPromocion.repository.js';
-import { normalizarProducto, porcentajeDescuento } from './productos.precio.js';
 import { URL_BASE_IMAGENES, eliminarImagenFisica } from './productos.imagen.js';
 
 const crearError = (mensaje, status) => {
@@ -79,18 +78,19 @@ const validarDecimalPositivo = (valor, mensaje) => {
   throw crearError(mensaje, 400);
 };
 
-// Si el producto queda en promoción, el precio promocional debe representar un
-// descuento entero de entre 1% y 99%. El precio guardado se normaliza a centavos
-// para que el porcentaje mostrado y el precio cobrado concuerden.
-const validarPromocion = (precioVenta, precioPromo, enPromocion) => {
-  if (enPromocion !== true) return;
+const resolverPrecioPromo = (rawPromo, precioVenta) => {
+  if (esVacio(rawPromo)) return null;
 
-  if (porcentajeDescuento(precioVenta, precioPromo) === null) {
-    throw crearError(
-      'Si el producto está en promoción, el precio promocional debe ser mayor a 0, menor al precio de venta y representar un descuento de entre 1% y 99%',
-      400
-    );
+  const precioPromo = validarDecimalPositivo(
+    rawPromo,
+    'El precio del producto en promoción debe ser mayor a 0'
+  );
+
+  if (precioPromo >= precioVenta) {
+    throw crearError('El precio promocional debe ser menor al precio de venta', 400);
   }
+
+  return precioPromo;
 };
 
 const resolverCategoria = async (data, fallback = null) => {
@@ -209,14 +209,9 @@ export const crearProducto = async (data, archivo) => {
 
     const enPromocion = normalizarBooleano(data.enPromocion);
     const destacado = normalizarBooleano(data.destacado);
-    const precioPromo = enPromocion
-      ? validarDecimalPositivo(
-          data.precioPromo,
-          'El precio del producto en promoción debe ser mayor a 0'
-        )
-      : null;
-
-    const tipoPromocionId = await resolverTipoPromocion(data, null);
+    const rawPrecioPromo = data.precioPromo !== undefined ? data.precioPromo : data.precio_promo;
+    const precioPromo = enPromocion ? resolverPrecioPromo(rawPrecioPromo, precioVenta) : null;
+    const tipoPromocionId = enPromocion ? await resolverTipoPromocion(data, null) : null;
 
     return await repository.create({
       nombre,
@@ -280,19 +275,17 @@ export const actualizarProducto = async (id, data, archivo) => {
 
     let precioPromo = null;
     if (enPromocion) {
-      const rawPromo =
-        data.precioPromo !== undefined ? data.precioPromo : productoExistente.precioPromo;
-      precioPromo = validarDecimalPositivo(
-        rawPromo,
-        'El precio del producto en promoción debe ser mayor a 0'
-      );
+      const hasPrecioPromo = data.precioPromo !== undefined || data.precio_promo !== undefined;
+      const rawPromo = hasPrecioPromo
+        ? (data.precioPromo !== undefined ? data.precioPromo : data.precio_promo)
+        : productoExistente.precioPromo;
+      precioPromo = resolverPrecioPromo(rawPromo, precioVenta);
     }
 
     const categoriaResuelta = await resolverCategoria(data, productoExistente);
-    const tipoPromocionId = await resolverTipoPromocion(
-      data,
-      productoExistente.tipoPromocionId ?? null
-    );
+    const tipoPromocionId = enPromocion
+      ? await resolverTipoPromocion(data, productoExistente.tipoPromocionId ?? null)
+      : null;
 
     const nombre =
       data.nombre !== undefined

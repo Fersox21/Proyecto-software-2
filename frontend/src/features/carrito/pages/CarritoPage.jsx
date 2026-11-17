@@ -6,7 +6,16 @@ import ResumenCarrito from '../components/ResumenCarrito'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
 
 function CarritoPage() {
-  const { items, cantidadTotal, subtotal, cambiarCantidad, quitarProducto, vaciarCarrito } = useOutletContext();
+  const {
+    items,
+    cantidadTotal,
+    subtotal,
+    subtotalOriginal,
+    descuentosAplicados,
+    cambiarCantidad,
+    quitarProducto,
+    vaciarCarrito,
+  } = useOutletContext();
 
   if (items.length === 0) {
     return (
@@ -45,6 +54,8 @@ function CarritoPage() {
           <ResumenCarrito
             cantidadTotal={cantidadTotal}
             subtotal={subtotal}
+            subtotalOriginal={subtotalOriginal}
+            descuentosAplicados={descuentosAplicados}
             onVaciar={vaciarCarrito}
           />
         </div>

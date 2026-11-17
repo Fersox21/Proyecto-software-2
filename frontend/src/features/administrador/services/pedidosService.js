@@ -56,13 +56,33 @@ export async function cancelarPedido(id, motivoRechazo) {
   return procesarRespuesta(respuesta, `No se pudo cancelar el pedido #${id}`)
 }
 
-export async function aceptarPedido(id) {
+export async function modificarTotalPedido(id, { totalModificado, motivoModificacion }) {
   const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
     method: 'PUT',
     headers: headers(),
     body: JSON.stringify({
-      estado: 'aceptado'
+      totalModificado,
+      motivoModificacion
     })
+  })
+
+  return procesarRespuesta(respuesta, `No se pudo modificar el total del pedido #${id}`)
+}
+
+export async function aceptarPedido(id, datosModificacion = null) {
+  const payload = {
+    estado: 'aceptado'
+  }
+
+  if (datosModificacion && datosModificacion.totalModificado != null) {
+    payload.totalModificado = datosModificacion.totalModificado
+    payload.motivoModificacion = datosModificacion.motivoModificacion
+  }
+
+  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify(payload)
   })
 
   return procesarRespuesta(respuesta, `No se pudo aceptar el pedido #${id}`)

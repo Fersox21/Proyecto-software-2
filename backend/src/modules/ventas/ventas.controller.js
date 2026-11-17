@@ -26,6 +26,17 @@ export const obtener = async (req, res, next) => {
     next(err);
   }
 };
+
+export const obtenerProductos = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const items = await ventasService.obtenerProductosVenta(id);
+
+    res.status(200).json(items);
+  } catch (err) {
+    next(err);
+  }
+};
  
 export const crear = async (req, res, next) => {
   try {
