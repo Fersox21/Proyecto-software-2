@@ -14,6 +14,7 @@ function ItemLoteForm({
   errores,
   puedeEliminar,
   deshabilitado = false,
+  fechaPedidoMinima,
   onCambiar,
   onCambiarProductoNuevo,
   onCategoriaCreada,
@@ -91,6 +92,7 @@ function ItemLoteForm({
           <input
             id={`orden-lote-arribo-${indice}`}
             type="date"
+            min={fechaPedidoMinima || undefined}
             value={lote.fechaArribo}
             disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'fechaArribo', e.target.value)}

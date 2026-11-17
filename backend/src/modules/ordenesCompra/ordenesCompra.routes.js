@@ -6,6 +6,7 @@ import { recibirImagenesOrden } from '../productos/productos.imagen.js';
 const router = Router();
 
 router.get('/', controller.listar);
+router.get('/historial', verificarToken, controller.listarHistorial);
 router.get('/:id', controller.obtener);
 router.post('/', verificarToken, recibirImagenesOrden, controller.crear);
 router.put('/:id', verificarToken, recibirImagenesOrden, controller.actualizar);

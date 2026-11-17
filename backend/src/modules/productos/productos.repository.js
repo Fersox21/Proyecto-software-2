@@ -48,6 +48,14 @@ export const findAll = async (client = pool) => {
   return rows.map(mapearProducto);
 };
 
+export const findHistorial = async (client = pool) => {
+  const { rows } = await client.query(`${SQL_BASE} ORDER BY p.activo DESC, p.nombre ASC`);
+  return rows.map((row) => ({
+    ...mapearProducto(row),
+    eliminado: row.activo === false,
+  }));
+};
+
 export const findAllCatalogo = async (client = pool) => {
   const { rows } = await client.query(
     `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`

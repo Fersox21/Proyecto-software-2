@@ -85,7 +85,34 @@ export const findAll = async () => {
   }));
 };
 
-export const findById = async (id) => {
+export const findHistorial = async () => {
+  const { rows } = await pool.query(`
+    SELECT oc.id, oc.fecha, oc.total, oc.activo,
+           p.id AS proveedor_id, p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono,
+           (SELECT COUNT(*) FROM lotes l WHERE l.orden_compra_id = oc.id)::int AS cantidad_lotes
+    FROM ordenes_compra oc
+    LEFT JOIN proveedores p ON p.id = oc.proveedor_id
+    ORDER BY oc.fecha DESC, oc.id DESC;
+  `);
+
+  return rows.map((row) => ({
+    id: row.id,
+    fecha: row.fecha,
+    total: Number(row.total),
+    activo: row.activo,
+    eliminada: row.activo === false,
+    cantidadLotes: Number(row.cantidad_lotes ?? 0),
+    proveedor: row.proveedor_id
+      ? {
+          id: row.proveedor_id,
+          nombre: row.proveedor_nombre,
+          telefono: row.proveedor_telefono,
+        }
+      : null,
+  }));
+};
+
+export const findById = async (id, incluirInactivos = false) => {
   const { rows: ordenRows } = await pool.query(
     `SELECT oc.id, oc.fecha, oc.total, oc.activo,
             p.id AS proveedor_id, p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono
@@ -98,13 +125,15 @@ export const findById = async (id) => {
   if (ordenRows.length === 0) return null;
 
   const row = ordenRows[0];
+  const filtroLotes = incluirInactivos ? '' : 'AND l.activo = true';
 
   const { rows: lotesRows } = await pool.query(
     `SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
-            prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca
+            prod.id AS producto_id, prod.nombre AS producto_nombre, prod.marca AS producto_marca,
+            prod.activo AS producto_activo
      FROM lotes l
      LEFT JOIN productos prod ON prod.id = l.producto_id
-     WHERE l.orden_compra_id = $1 AND l.activo = true
+     WHERE l.orden_compra_id = $1 ${filtroLotes}
      ORDER BY l.id ASC`,
     [id]
   );
@@ -121,6 +150,7 @@ export const findById = async (id) => {
       id: l.producto_id,
       nombre: l.producto_nombre,
       marca: l.producto_marca,
+      activo: l.producto_activo !== false,
     },
   }));
 

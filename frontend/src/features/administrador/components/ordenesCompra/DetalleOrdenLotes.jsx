@@ -26,6 +26,7 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
       </caption>
       <thead>
         <tr>
+          <th scope="col">Lote</th>
           <th scope="col">Producto</th>
           <th scope="col">Cantidad</th>
           <th scope="col">Total lote</th>
@@ -36,15 +37,22 @@ function DetalleOrdenLotes({ detalle, productosPorId, ordenId }) {
       <tbody>
         {lotes.map((lote) => {
           const idProducto = lote.producto?.id
-          const nombre = productosPorId[idProducto]
+          const nombre = productosPorId[idProducto] || lote.producto?.nombre
+          const productoEliminado = lote.producto?.activo === false
 
           return (
             <tr key={lote.id ?? `${idProducto}-${lote.fechaVencimiento}`}>
+              <td>
+                <strong>#{lote.id ?? '—'}</strong>
+              </td>
               <td>
                 {nombre ||
                   (idProducto != null
                     ? `Producto #${idProducto}`
                     : 'Sin producto')}
+                {productoEliminado && (
+                  <span className="hist-item-eliminado-tag">Producto eliminado</span>
+                )}
               </td>
               <td>{lote.cantidad} Unidades</td>
               <td className="orden-col-monto">

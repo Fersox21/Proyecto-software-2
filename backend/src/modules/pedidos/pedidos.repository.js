@@ -63,29 +63,70 @@ export const findAll = async () => {
   return rows.map(mapearPedido);
 };
 
+export const findHistorial = async () => {
+  const { rows } = await pool.query(
+    'SELECT * FROM pedidos ORDER BY fecha DESC, id DESC'
+  );
+  return rows.map((row) => {
+    const pedido = mapearPedido(row);
+    const estadoNorm = String(pedido.estado ?? '').trim().toLowerCase();
+    return {
+      ...pedido,
+      eliminado: pedido.activo === false || estadoNorm === 'eliminado',
+    };
+  });
+};
+
 export const findById = async (id) => {
   const { rows } = await pool.query('SELECT * FROM pedidos WHERE id = $1', [id]);
   return mapearPedido(rows[0]);
 };
 
-export const findItemsByPedido = async (pedido_id) => {
+export const findItemsByPedido = async (pedido_id, incluirInactivos = false) => {
+  const filtroActivo = incluirInactivos ? '' : 'AND t.activo = true';
   const { rows } = await pool.query(
     `SELECT t.pedido_id, t.producto_id, t.cantidad, t.precio, t.activo,
-            p.nombre, p.marca
+            p.nombre, p.marca, p.activo AS producto_activo
      FROM tiene t
      JOIN productos p ON p.id = t.producto_id
-     WHERE t.pedido_id = $1 AND t.activo = true
+     WHERE t.pedido_id = $1 ${filtroActivo}
      ORDER BY p.nombre ASC`,
     [pedido_id]
   );
-  return rows.map(mapearItem);
+
+  const { rows: lotesRows } = await pool.query(
+    `SELECT pl.producto_id, pl.lote_id, pl.cantidad, pl.consumido_entero,
+            l.fecha_vencimiento
+     FROM pedido_lotes pl
+     JOIN lotes l ON l.id = pl.lote_id
+     WHERE pl.pedido_id = $1
+     ORDER BY pl.id ASC`,
+    [pedido_id]
+  );
+
+  return rows.map((row) => {
+    const item = mapearItem(row);
+    return {
+      ...item,
+      productoActivo: row.producto_activo !== false,
+      eliminado: row.activo === false,
+      lotesUsados: lotesRows
+        .filter((l) => Number(l.producto_id) === Number(row.producto_id))
+        .map((l) => ({
+          loteId: l.lote_id,
+          cantidad: Number(l.cantidad),
+          consumidoEntero: Boolean(l.consumido_entero),
+          fechaVencimiento: l.fecha_vencimiento,
+        })),
+    };
+  });
 };
 
-export const findByIdConItems = async (id) => {
+export const findByIdConItems = async (id, incluirInactivos = false) => {
   const pedido = await findById(id);
   if (!pedido) return null;
 
-  const items = await findItemsByPedido(id);
+  const items = await findItemsByPedido(id, incluirInactivos);
   return { ...pedido, items };
 };
 
@@ -109,6 +150,7 @@ export const findLotesDisponiblesParaPedido = async (pedidoId) => {
       productoId: item.producto_id,
       nombre: item.nombre,
       marca: item.marca,
+      productoActivo: item.productoActivo !== false,
       cantidadRequerida: item.cantidad,
       lotes: lotes.map((l) => ({
         id: l.id,
@@ -267,7 +309,7 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
     }
 
     const { rows: items } = await cliente.query(
-      `SELECT t.producto_id, t.cantidad, p.nombre
+      `SELECT t.producto_id, t.cantidad, p.nombre, p.activo AS producto_activo
        FROM tiene t
        JOIN productos p ON p.id = t.producto_id
        WHERE t.pedido_id = $1 AND t.activo`,
@@ -276,6 +318,15 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
 
     if (items.length === 0) {
       const error = new Error('El pedido no tiene productos para aprobar');
+      error.status = 409;
+      throw error;
+    }
+
+    const productoEliminado = items.find((item) => item.producto_activo === false);
+    if (productoEliminado) {
+      const error = new Error(
+        `El producto "${productoEliminado.nombre}" fue eliminado y no puede aprobarse. Recordá llamar al cliente para coordinar el pedido.`
+      );
       error.status = 409;
       throw error;
     }

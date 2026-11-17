@@ -154,6 +154,10 @@ export const listarProductos = async () => {
   return await repository.findAll();
 };
 
+export const listarHistorialProductos = async () => {
+  return await repository.findHistorial();
+};
+
 export const listarCatalogo = async () => await repository.findAllCatalogo();
 
 export const obtenerProductoPorId = async (id) => {

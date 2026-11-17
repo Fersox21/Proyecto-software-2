@@ -34,8 +34,18 @@ export async function obtenerPedidos() {
   return procesarRespuesta(respuesta, 'No se pudieron obtener los pedidos')
 }
 
-export async function obtenerPedidoPorId(id) {
-  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}`, {
+export async function obtenerHistorialPedidos() {
+  const respuesta = await fetch(`${URL_BASE}/pedidos/historial`, {
+    method: 'GET',
+    headers: headers()
+  })
+
+  return procesarRespuesta(respuesta, 'No se pudo obtener el historial de pedidos')
+}
+
+export async function obtenerPedidoPorId(id, { historial = false } = {}) {
+  const query = historial ? '?historial=true' : ''
+  const respuesta = await fetch(`${URL_BASE}/pedidos/${id}${query}`, {
     method: 'GET',
     headers: headers()
   })

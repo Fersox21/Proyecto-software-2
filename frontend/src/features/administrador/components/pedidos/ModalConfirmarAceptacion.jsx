@@ -99,6 +99,14 @@ function ModalConfirmarAceptacion({
 
   // Verifica el estado de cobertura de cada producto
   const calcularEstadoProducto = (prod) => {
+    if (prod.productoActivo === false) {
+      return {
+        cubierto: false,
+        error: 'Este producto fue eliminado y no puede aprobarse. Recordá llamar al cliente para coordinar el pedido.',
+        detallesConsumo: [],
+      }
+    }
+
     const config = configuraciones[prod.productoId] || { modo: 'auto', seleccionados: [] }
     const requerido = prod.cantidadRequerida
     const totalDisponible = prod.lotes.reduce((sum, l) => sum + l.cantidad, 0)
@@ -177,6 +185,8 @@ function ModalConfirmarAceptacion({
     onConfirmar(pedido.id, asignaciones)
   }
 
+  const hayProductoEliminado = lotesPorProducto.some((p) => p.productoActivo === false)
+
   return (
     <Modal titulo="Aceptar Pedido y Asignar Lotes" onCerrar={onCerrar} tamanio="grande">
       <div className="form-confirmacion-accion" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
@@ -187,6 +197,16 @@ function ModalConfirmarAceptacion({
           Al aceptar este pedido, se consolidará y registrará automáticamente como <strong>venta</strong> por un monto total de{' '}
           <strong>{formatearPrecio(totalFinal)}</strong>.
         </p>
+
+        {hayProductoEliminado && (
+          <div className="orden-alerta orden-alerta-error" role="alert" style={{ marginTop: '1rem' }}>
+            <div>
+              <strong>Atención:</strong> Este pedido incluye al menos un producto que fue eliminado del catálogo.
+              No se puede aprobar hasta resolverlo: <strong>recordá llamar al cliente</strong>
+              {pedido.telefono ? ` (${pedido.telefono})` : ''} para avisarle o cancelar el pedido.
+            </div>
+          </div>
+        )}
 
         <div style={{ marginTop: '1.25rem' }}>
           <h4 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: '0.75rem' }}>

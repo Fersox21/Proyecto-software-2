@@ -7,6 +7,7 @@ const router = Router();
 
 router.get('/', controller.listar);
 router.get('/catalogo', controller.listarCatalogo);
+router.get('/historial', verificarToken, controller.listarHistorial);
 router.get('/:id', controller.obtener);
 router.post('/', verificarToken, recibirImagen, controller.crear);
 router.put('/:id', verificarToken, recibirImagen, controller.actualizar);

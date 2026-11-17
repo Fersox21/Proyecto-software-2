@@ -46,9 +46,12 @@ function DetallePedidoItems({ items = [], total = 0 }) {
                 const subtotal = item.subtotal != null ? item.subtotal : precio * cantidad
 
                 return (
-                  <tr key={item.id || item.producto_id || index}>
+                  <tr key={item.id || item.producto_id || index} className={item.eliminado ? 'hist-fila-eliminada' : ''}>
                     <td>
-                      <div>{nombre}</div>
+                      <div>
+                        {nombre}
+                        {item.eliminado && <span className="hist-item-eliminado-tag">Eliminado</span>}
+                      </div>
                       {Array.isArray(item.lotesUsados) && item.lotesUsados.length > 0 && (
                         <div style={{ fontSize: '0.75rem', color: '#4b5563', marginTop: '0.2rem' }}>
                           Lotes:{' '}

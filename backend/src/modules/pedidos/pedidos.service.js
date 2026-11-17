@@ -87,8 +87,12 @@ export const listarPedidos = async () => {
   return await repository.findAll();
 };
 
-export const obtenerPedidoPorId = async (id) => {
-  const pedido = await repository.findByIdConItems(id);
+export const listarHistorialPedidos = async () => {
+  return await repository.findHistorial();
+};
+
+export const obtenerPedidoPorId = async (id, incluirInactivos = false) => {
+  const pedido = await repository.findByIdConItems(id, incluirInactivos);
   if (!pedido) {
     throw crearError('Pedido no encontrado', 404);
   }

@@ -5,6 +5,7 @@ import { verificarToken } from '../../middlewares/verificarToken.js';
 const router = Router();
 
 router.get('/', verificarToken, controller.listar);
+router.get('/historial', verificarToken, controller.listarHistorial);
 router.post('/', verificarToken, controller.crear);
 router.get('/:id/productos', verificarToken, controller.obtenerProductos);
 router.get('/:id', verificarToken, controller.obtener);

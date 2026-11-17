@@ -43,8 +43,13 @@ export function obtenerOrdenesCompra() {
   return pedir(`${URL_BASE}/ordenesCompra`)
 }
 
-export function obtenerOrdenCompraPorId(id) {
-  return pedir(`${URL_BASE}/ordenesCompra/${id}`)
+export function obtenerHistorialOrdenesCompra() {
+  return pedir(`${URL_BASE}/ordenesCompra/historial`)
+}
+
+export function obtenerOrdenCompraPorId(id, { historial = false } = {}) {
+  const query = historial ? '?historial=true' : ''
+  return pedir(`${URL_BASE}/ordenesCompra/${id}${query}`)
 }
 
 function asegurarFormData(datos) {

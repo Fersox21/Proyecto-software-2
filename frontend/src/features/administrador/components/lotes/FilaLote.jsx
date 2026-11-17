@@ -43,7 +43,7 @@ function FilaLote({ lote, numeroFila, esUltimoDeSuOrden, onEditar, onEliminar })
     <tr>
       <td>
         <div className="lotes-celda-doble">
-          <span className="lotes-codigo">#{numeroFila}</span>
+          <span className="lotes-codigo">#{lote.id}</span>
           <span className="lotes-subtexto">
             {lote.ordenCompra?.id != null ? `Orden: #${lote.ordenCompra.id}` : 'Sin orden'}
           </span>

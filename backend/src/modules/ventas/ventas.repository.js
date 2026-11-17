@@ -57,6 +57,25 @@ export const listar = async () => {
   return rows.map(mapearVenta);
 };
 
+export const listarHistorial = async () => {
+  const { rows } = await pool.query(
+    `SELECT v.*,
+            p.comercio AS pedido_comercio,
+            p.estado AS pedido_estado,
+            COALESCE(v.total_modificado, p.total_modificado) AS total_modificado,
+            COALESCE(v.motivo_modificacion, p.motivo_modificacion) AS motivo_modificacion
+     FROM ventas v
+     LEFT JOIN pedidos p ON p.id = v.pedido_id
+     ORDER BY v.fecha DESC, v.id DESC`
+  );
+  return rows.map((row) => ({
+    ...mapearVenta(row),
+    comercio: row.pedido_comercio ?? null,
+    estadoPedido: row.pedido_estado ?? null,
+    eliminada: row.activo === false,
+  }));
+};
+
 export const obtener = async (id) => {
   const { rows } = await pool.query(
     `SELECT v.*,

@@ -59,7 +59,7 @@ function calcularPorcentajeInicial(producto) {
   return String(redondear2(100 - ((precioPromo * 100) / precioVenta)))
 }
 
-function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }) {
+function ModalFormProducto({ producto, visible, guardando, soloLectura = false, onGuardar, onCerrar }) {
   const editando = Boolean(producto)
   const tieneLotesVigentes = Boolean(producto?.tieneLoteVigente) && Number(producto?.stock) > 0
 
@@ -327,12 +327,19 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
 
   return (
     <Modal
-      titulo={editando ? `Editar Producto: ${producto.nombre}` : 'Nuevo Producto'}
+      titulo={
+        soloLectura
+          ? `Detalle del Producto: ${producto?.nombre || ''}`
+          : editando
+            ? `Editar Producto: ${producto.nombre}`
+            : 'Nuevo Producto'
+      }
       onCerrar={onCerrar}
       tamanio="normal"
     >
       <form className="orden-form" onSubmit={manejarEnvio} noValidate>
-        <div className="orden-modal-cuerpo prod-modal-cuerpo">
+        <fieldset disabled={soloLectura} style={{ border: 'none', padding: 0, margin: 0 }}>
+          <div className="orden-modal-cuerpo prod-modal-cuerpo">
           {errorServidor && (
             <div className="orden-alerta orden-alerta-error prod-modal-span-2" role="alert">
               <span>{errorServidor}</span>
@@ -685,7 +692,8 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
               </CampoFormulario>
             </>
           )}
-        </div>
+          </div>
+        </fieldset>
 
         <div className="orden-modal-acciones prod-modal-acciones">
           <button
@@ -694,15 +702,17 @@ function ModalFormProducto({ producto, visible, guardando, onGuardar, onCerrar }
             onClick={onCerrar}
             disabled={guardando}
           >
-            Cancelar
+            {soloLectura ? 'Cerrar' : 'Cancelar'}
           </button>
-          <button
-            type="submit"
-            className="orden-btn prod-btn-primario"
-            disabled={guardando}
-          >
-            {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : 'Crear producto'}
-          </button>
+          {!soloLectura && (
+            <button
+              type="submit"
+              className="orden-btn prod-btn-primario"
+              disabled={guardando}
+            >
+              {guardando ? 'Guardando...' : editando ? 'Guardar cambios' : 'Crear producto'}
+            </button>
+          )}
         </div>
       </form>
     </Modal>

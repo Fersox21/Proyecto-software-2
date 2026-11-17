@@ -228,7 +228,7 @@ const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
   return calculado;
 };
 
-const validarLote = async (lote, indice, archivosPorCampo) => {
+const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) => {
   if (!lote || typeof lote !== 'object') {
     throw crearError('Los datos del lote no son válidos', 400);
   }
@@ -247,6 +247,10 @@ const validarLote = async (lote, indice, archivosPorCampo) => {
 
   const fechaArribo = validarFecha(fArriboRaw, 'La fecha de arribo');
   const fechaVencimiento = validarFecha(fVenciRaw, 'La fecha de vencimiento');
+
+  if (fechaOrden && fechaArribo < fechaOrden) {
+    throw crearError('La fecha de arribo no puede ser menor a la fecha de pedido de la orden', 400);
+  }
 
   if (fechaVencimiento < fechaArribo) {
     throw crearError('La fecha de vencimiento no puede ser anterior a la fecha de arribo', 400);
@@ -297,8 +301,12 @@ export const listarOrdenesCompra = async () => {
   return await repository.findAll();
 };
 
-export const obtenerOrdenCompraPorId = async (id) => {
-  const ordenCompra = await repository.findById(id);
+export const listarHistorialOrdenesCompra = async () => {
+  return await repository.findHistorial();
+};
+
+export const obtenerOrdenCompraPorId = async (id, incluirInactivos = false) => {
+  const ordenCompra = await repository.findById(id, incluirInactivos);
   if (!ordenCompra) {
     throw crearError('Orden de compra no encontrada', 404);
   }
@@ -354,7 +362,7 @@ export const crearOrdenCompra = async (data, archivos = []) => {
     const archivosPorCampo = mapearArchivosPorCampo(archivos);
     const lotesValidados = [];
     for (let i = 0; i < lotes.length; i += 1) {
-      lotesValidados.push(await validarLote(lotes[i], i, archivosPorCampo));
+      lotesValidados.push(await validarLote(lotes[i], i, archivosPorCampo, fecha));
     }
 
     return await repository.create({
@@ -425,7 +433,7 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       const archivosPorCampo = mapearArchivosPorCampo(archivos);
       lotesValidados = [];
       for (let i = 0; i < data.lotes.length; i += 1) {
-        lotesValidados.push(await validarLote(data.lotes[i], i, archivosPorCampo));
+        lotesValidados.push(await validarLote(data.lotes[i], i, archivosPorCampo, fecha));
       }
     }
 

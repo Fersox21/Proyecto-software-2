@@ -12,7 +12,7 @@ function FilaVencimiento({ fila, numeroFila, abierta, onAlternarDetalle, onEdita
           <div className="venc-prod-celda">
             <span className="venc-prod-nombre">{fila.productoNombre}</span>
             <span className="venc-prod-meta">
-              Lote #{numeroFila} · {fila.proveedorNombre}
+              Lote #{fila.id} · {fila.proveedorNombre}
             </span>
           </div>
         </td>

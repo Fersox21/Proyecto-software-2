@@ -6,8 +6,10 @@ import FilaPedido from '../components/pedidos/FilaPedido'
 import DetallePedidoModal from '../components/pedidos/DetallePedidoModal'
 import ModalConfirmarCancelacion from '../components/pedidos/ModalConfirmarCancelacion'
 import ModalConfirmarAceptacion from '../components/pedidos/ModalConfirmarAceptacion'
+import HistorialPedidos from '../components/pedidos/HistorialPedidos'
 import '../../../styles/panelAdmin/ordenesCompra.css'
 import '../../../styles/panelAdmin/adminPedidos.css'
+import '../../../styles/panelAdmin/historial.css'
 
 function PedidosPage() {
   const {
@@ -25,6 +27,7 @@ function PedidosPage() {
     cancelarPedido
   } = usePedidosAdmin()
 
+  const [vistaHistorial, setVistaHistorial] = useState(false)
   const [pedidoParaAceptar, setPedidoParaAceptar] = useState(null)
   const [modificacionParaAceptar, setModificacionParaAceptar] = useState(null)
   const [pedidoParaCancelar, setPedidoParaCancelar] = useState(null)
@@ -85,6 +88,24 @@ function PedidosPage() {
     }
   }
 
+  if (vistaHistorial) {
+    return (
+      <section className="main-admin" id="main-pedidos">
+        <header className="header-admin">
+          <h1 className="h1-admin">Historial de Pedidos</h1>
+          <button
+            type="button"
+            className="orden-btn"
+            onClick={() => setVistaHistorial(false)}
+          >
+            Volver al listado
+          </button>
+        </header>
+        <HistorialPedidos />
+      </section>
+    )
+  }
+
   if (cargando) return <Spinner texto="Cargando pedidos..." />
   if (error) return <MensajeVacio titulo="No pudimos cargar los pedidos" texto={error.message} />
 
@@ -97,6 +118,13 @@ function PedidosPage() {
     <section className="main-admin" id="main-pedidos">
       <header className="header-admin">
         <h1 className="h1-admin">Gestión de Pedidos</h1>
+        <button
+          type="button"
+          className="orden-btn"
+          onClick={() => setVistaHistorial(true)}
+        >
+          Ver historial
+        </button>
       </header>
 
       {mensaje && (

@@ -140,6 +140,16 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
     if (errores[name]) {
       setErrores((prev) => ({ ...prev, [name]: null }))
     }
+    if (name === 'fecha') {
+      // Si cambia la fecha de pedido, limpiamos errores de arribo que dependan de ella
+      setErrores((prev) => {
+        const siguiente = { ...prev }
+        Object.keys(siguiente).forEach((k) => {
+          if (k.endsWith('-arribo')) delete siguiente[k]
+        })
+        return siguiente
+      })
+    }
   }
 
   function cambiarLote(indice, campo, valor) {
@@ -281,6 +291,9 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       }
       if (!lote.fechaArribo) {
         nuevosErrores[`lote-${indice}-arribo`] = 'La fecha de arribo es obligatoria'
+      } else if (valores.fecha && lote.fechaArribo < valores.fecha) {
+        nuevosErrores[`lote-${indice}-arribo`] =
+          'La fecha de arribo no puede ser menor a la fecha de pedido'
       }
       if (!lote.fechaVencimiento) {
         nuevosErrores[`lote-${indice}-vencimiento`] = 'La fecha de vencimiento es obligatoria'
@@ -503,6 +516,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                 errores={errores}
                 puedeEliminar={!tieneLotesConsumidos && valores.lotes.length > 1}
                 deshabilitado={tieneLotesConsumidos}
+                fechaPedidoMinima={valores.fecha}
                 onCambiar={cambiarLote}
                 onCambiarProductoNuevo={cambiarProductoNuevo}
                 onCategoriaCreada={agregarCategoria}
