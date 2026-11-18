@@ -1,4 +1,6 @@
 # Proyecto-software-2
+URL: distribuidoralafe.site
+
 Explicacion como ejecutar el programa en local:
 -Ejecucion front:
 cd frontend
