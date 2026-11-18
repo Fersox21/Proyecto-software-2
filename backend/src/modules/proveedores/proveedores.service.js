@@ -1,6 +1,6 @@
 import * as repository from './proveedores.repository.js';
 
-const REGEX_TELEFONO = /^\+?\d+$/;
+const REGEX_TELEFONO = /^\+?\d{7,22}$/;
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -33,11 +33,19 @@ export const validarTelefonoProveedor = (valor) => {
   }
   if (!REGEX_TELEFONO.test(telefono)) {
     throw crearError(
-      'El teléfono del proveedor solo puede contener dígitos y un + opcional al inicio (sin espacios ni guiones)',
+      'El teléfono del proveedor debe tener entre 7 y 22 números (puede incluir + al inicio, sin espacios ni guiones)',
       400
     );
   }
   return telefono;
+};
+
+const validarId = (id) => {
+  const num = Number(id);
+  if (!Number.isInteger(num) || num <= 0) {
+    throw crearError('El ID del proveedor no es válido', 400);
+  }
+  return num;
 };
 
 export const listarProveedores = async () => {
@@ -45,7 +53,8 @@ export const listarProveedores = async () => {
 };
 
 export const obtenerProveedorPorId = async (id) => {
-  const proveedor = await repository.findById(id);
+  const idValido = validarId(id);
+  const proveedor = await repository.findById(idValido);
   if (!proveedor) {
     throw crearError('Proveedor no encontrado', 404);
   }
@@ -60,7 +69,8 @@ export const crearProveedor = async (data) => {
 };
 
 export const actualizarProveedor = async (id, data) => {
-  const proveedorExistente = await repository.findById(id);
+  const idValido = validarId(id);
+  const proveedorExistente = await repository.findById(idValido);
   if (!proveedorExistente) {
     throw crearError('Proveedor no encontrado', 404);
   }
@@ -74,11 +84,12 @@ export const actualizarProveedor = async (id, data) => {
       ? validarTelefonoProveedor(data.telefono)
       : proveedorExistente.telefono;
 
-  return await repository.update(id, { nombre, telefono });
+  return await repository.update(idValido, { nombre, telefono });
 };
 
 export const eliminarProveedor = async (id) => {
-  const rowCount = await repository.remove(id);
+  const idValido = validarId(id);
+  const rowCount = await repository.remove(idValido);
   if (rowCount === 0) {
     throw crearError('Proveedor no encontrado', 404);
   }

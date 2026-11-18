@@ -36,7 +36,7 @@ async function pedir(url, opciones = {}) {
 }
 
 export function obtenerLotes() {
-  return pedir(`${URL_BASE}/lotes`)
+  return pedir(`${URL_BASE}/lotes?vigentes=true`)
 }
 
 export function obtenerHistorialLotes() {

@@ -47,24 +47,12 @@ function ResumenPedido({
                             {descuentos > 0 ? `- ${formatearPrecio(descuentos)}` : formatearPrecio(0)}
                         </dd>
 
-                        {esEnvio && (
-                            <>
-                                <dt className="col-7 fw-normal">Envío</dt>
-                                <dd className="col-5 text-end fuente-titulos">{formatearPrecio(envio)}</dd>
-                            </>
-                        )}
-
                         <hr className="my-3 text-secondary opacity-25" />
                                     
                         <div className="d-flex align-items-center pt-2">
                             <dt className="col-7 fw-bold fuente-titulos">Total</dt>
                             <dd className="col-5 text-end h2 fuente-titulos">{formatearPrecio(total)}</dd>
                         </div>
-                        {esEnvio && faltaParaEnvioGratis > 0 && (
-                            <p className="small text-body-secondary fuente-titulos m-auto">
-                                Te faltan {formatearPrecio(faltaParaEnvioGratis)} para el envío gratis.
-                            </p>
-                        )}
                     </dl>
                 </div>
             </div>

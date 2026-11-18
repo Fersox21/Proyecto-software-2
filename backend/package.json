@@ -9,7 +9,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch --watch-path=src src/server.js",
-    "start": "node src/server.js"
+    "start": "node src/server.js",
+    "db:export": "node scripts/exportarSeed.js",
+    "db:import": "node scripts/cargarSeed.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -6,6 +6,7 @@ import * as productosRepo from '../productos/productos.repository.js';
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
 const SQL_DETALLE = `
   SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
+         (l.fecha_vencimiento < CURRENT_DATE) AS esta_vencido,
          (SELECT COUNT(*) FROM lotes l2 WHERE l2.orden_compra_id = l.orden_compra_id AND l2.activo = true)::int AS total_lotes_orden,
          p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca,
          p.activo AS producto_activo,
@@ -73,9 +74,10 @@ const mapearLoteConDetalle = (row) => {
   };
 };
 
-export const findAll = async () => {
+export const findAll = async ({ soloVigentes = false } = {}) => {
+  const filtroVigentes = soloVigentes ? 'AND l.fecha_vencimiento >= CURRENT_DATE' : '';
   const { rows } = await pool.query(
-    `${SQL_DETALLE} WHERE l.activo = true AND l.cantidad > 0 AND p.activo = true ORDER BY l.fecha_vencimiento ASC, l.id ASC`
+    `${SQL_DETALLE} WHERE l.activo = true AND l.cantidad > 0 AND p.activo = true ${filtroVigentes} ORDER BY l.fecha_vencimiento ASC, l.id ASC`
   );
   return rows.map(mapearLoteConDetalle);
 };
@@ -107,17 +109,14 @@ export const findHistorial = async () => {
     });
   }
 
-  const hoyISO = new Date().toISOString().slice(0, 10);
-
   return rows.map((row) => {
     const lote = mapearLoteConDetalle(row);
-    const fVenci = String(lote.fechaVencimiento ?? '').slice(0, 10);
     let situacion = 'vigente';
     if (lote.activo === false) {
       situacion = 'eliminado';
     } else if (Number(lote.cantidad) === 0) {
       situacion = 'agotado';
-    } else if (fVenci && fVenci < hoyISO) {
+    } else if (row.esta_vencido) {
       situacion = 'vencido';
     }
 
@@ -203,11 +202,24 @@ export const update = async (id, data) => {
 // Actualiza únicamente la fecha de vencimiento, sin reemplazar el lote ni
 // tocar sus demás columnas.
 export const updateFechaVencimiento = async (id, fechaVencimiento) => {
-  const { rowCount } = await pool.query(
-    'UPDATE lotes SET fecha_vencimiento = $1 WHERE id = $2',
-    [fechaVencimiento, id]
-  );
-  return rowCount > 0;
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const { rows, rowCount } = await client.query(
+      'UPDATE lotes SET fecha_vencimiento = $1 WHERE id = $2 RETURNING producto_id',
+      [fechaVencimiento, id]
+    );
+    if (rowCount > 0) {
+      await productosRepo.recalcularStock(rows[0].producto_id, client);
+    }
+    await client.query('COMMIT');
+    return rowCount > 0;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
 };
 
 export const remove = async (id) => {
@@ -235,6 +247,16 @@ export const removeSiNoEsElUltimoLote = async (id) => {
   const client = await pool.connect();
   try {
     await client.query('BEGIN');
+    const { rows: checkRows } = await client.query(
+      'SELECT cantidad, cantidad_inicial FROM lotes WHERE id = $1 AND activo = true FOR UPDATE',
+      [id]
+    );
+    if (checkRows.length > 0 && Number(checkRows[0].cantidad) < Number(checkRows[0].cantidad_inicial)) {
+      const error = new Error('No se puede dar de baja un lote que ya registró ventas o salidas');
+      error.status = 409;
+      throw error;
+    }
+
     const { rows, rowCount } = await client.query(
       `UPDATE lotes
       SET activo = false

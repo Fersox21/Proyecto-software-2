@@ -26,10 +26,21 @@ export const verificarToken = (req, res, next) => {
     const payload = jwt.verify(token, env.JWT_SECRET);
 
     
-    req.usuario = { id: payload.id, correo: payload.correo };
+    req.usuario = { id: payload.id, correo: payload.correo, rol: payload.rol };
     next(); 
   } catch (err) {
     const mensaje = err.name === 'TokenExpiredError' ? 'Token vencido' : 'Token inválido';
     return responderNoAutorizado(res, mensaje);
   }
+};
+
+export const requerirAdmin = (req, res, next) => {
+  if (String(req.usuario?.rol || '').toLowerCase() !== 'admin') {
+    return res.status(403).json({
+      success: false,
+      error: 'Acceso denegado: se requiere rol administrador',
+      statusCode: 403
+    });
+  }
+  next();
 };

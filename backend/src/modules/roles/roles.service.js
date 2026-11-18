@@ -3,12 +3,23 @@ import * as repository from './roles.repository.js';
 
 const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const validarId = (id) => {
+  const num = Number(id);
+  if (!Number.isInteger(num) || num <= 0) {
+    const error = new Error('El ID del usuario no es válido');
+    error.status = 400;
+    throw error;
+  }
+  return num;
+};
+
 export const listarRoles = async () => {
   return await repository.findAll();
 };
 
 export const obtenerRolPorId = async (id) => {
-  const rol = await repository.findById(id);
+  const idValido = validarId(id);
+  const rol = await repository.findById(idValido);
   if (!rol) {
     const error = new Error('Rol no encontrado');
     error.status = 404;
@@ -50,7 +61,8 @@ export const crearRol = async (data) => {
 };
 
 export const actualizarRol = async (id, data) => {
-  const rolExistente = await repository.findById(id);
+  const idValido = validarId(id);
+  const rolExistente = await repository.findById(idValido);
   if (!rolExistente) {
     const error = new Error('Rol no encontrado');
     error.status = 404;
@@ -78,12 +90,13 @@ export const actualizarRol = async (id, data) => {
     datosAActualizar.password = await bcrypt.hash(data.password, saltRounds);
   }
 
-  const rolActualizado = await repository.update(id, datosAActualizar);
+  const rolActualizado = await repository.update(idValido, datosAActualizar);
   return rolActualizado;
 };
 
 export const eliminarRol = async (id) => {
-  const rowCount = await repository.remove(id);
+  const idValido = validarId(id);
+  const rowCount = await repository.remove(idValido);
   if (rowCount === 0) {
     const error = new Error('Rol no encontrado');
     error.status = 404;

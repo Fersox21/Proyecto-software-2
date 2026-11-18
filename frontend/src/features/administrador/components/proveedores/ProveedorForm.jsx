@@ -1,6 +1,12 @@
 import { useState } from 'react'
 import CampoFormulario from '../comunes/CampoFormulario'
 
+const REGEX_TELEFONO = /^\+?\d{7,22}$/
+
+function sanitizarTelefono(valor) {
+  return valor.replace(/(?!^\+)[^\d]/g, '').slice(0, 23)
+}
+
 function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
   const editando = Boolean(proveedor)
 
@@ -14,7 +20,8 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
   const [guardando, setGuardando] = useState(false)
 
   const actualizarCampo = (campo, valor) => {
-    setValores((prev) => ({ ...prev, [campo]: valor }))
+    const valorFinal = campo === 'telefono' ? sanitizarTelefono(valor) : valor
+    setValores((prev) => ({ ...prev, [campo]: valorFinal }))
     if (errores[campo]) {
       setErrores((prev) => ({ ...prev, [campo]: null }))
     }
@@ -25,8 +32,11 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
     if (!valores.nombre.trim()) {
       nuevosErrores.nombre = 'El nombre del proveedor es obligatorio'
     }
-    if (!valores.telefono.trim()) {
+    const tel = valores.telefono.trim()
+    if (!tel) {
       nuevosErrores.telefono = 'El teléfono de contacto es obligatorio'
+    } else if (!REGEX_TELEFONO.test(tel)) {
+      nuevosErrores.telefono = 'El teléfono debe tener entre 7 y 22 números (puede incluir + al inicio)'
     }
     setErrores(nuevosErrores)
     return Object.keys(nuevosErrores).length === 0
@@ -76,7 +86,9 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
           <input
             id="proveedor-telefono"
             type="tel"
-            placeholder="Ej. 011 4567-8901 o +54 9 11..."
+            inputMode="tel"
+            maxLength={23}
+            placeholder="Ej. +5491145678901"
             value={valores.telefono}
             onChange={(e) => actualizarCampo('telefono', e.target.value)}
             disabled={guardando}

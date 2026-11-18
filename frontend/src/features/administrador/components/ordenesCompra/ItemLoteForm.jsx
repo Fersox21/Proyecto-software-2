@@ -1,6 +1,8 @@
 import { formatearPrecio } from '../../../../shared/utils/formato'
+import { hoyISO } from '../../utils/vencimientos'
 import {
   bloquearTeclasNoNumericas,
+  sanitizarDecimalPositivo,
   sanitizarEnteroPositivo,
 } from '../../../../shared/utils/validaciones'
 import NuevoProductoInlineForm from './NuevoProductoInlineForm'
@@ -31,7 +33,7 @@ function ItemLoteForm({
     : Number(productoSeleccionado?.precioCosto)
 
   const cantidad = Number(lote.cantidad)
-  const totalLote =
+  const totalSugerido =
     Number.isFinite(precioCosto) && precioCosto > 0 && Number.isFinite(cantidad) && cantidad > 0
       ? Number((precioCosto * cantidad).toFixed(2))
       : null
@@ -106,7 +108,7 @@ function ItemLoteForm({
           <input
             id={`orden-lote-vencimiento-${indice}`}
             type="date"
-            min={lote.fechaArribo || undefined}
+            min={[lote.fechaArribo, hoyISO()].filter(Boolean).sort().pop()}
             value={lote.fechaVencimiento}
             disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'fechaVencimiento', e.target.value)}
@@ -139,12 +141,32 @@ function ItemLoteForm({
         />
       )}
 
-      <div className="orden-lote-resumen">
-        <span className="orden-lote-total-etiqueta">Total lote:</span>
+      <div className="orden-lote-resumen" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+        <div className="orden-campo" style={{ minWidth: '180px', maxWidth: '240px', margin: 0 }}>
+          <label htmlFor={`orden-lote-total-${indice}`}>Precio total del lote ($)</label>
+          <input
+            id={`orden-lote-total-${indice}`}
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputMode="decimal"
+            placeholder={totalSugerido != null ? String(totalSugerido) : '0.00'}
+            value={lote.total ?? ''}
+            disabled={deshabilitado}
+            onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+            onChange={(e) => onCambiar(indice, 'total', sanitizarDecimalPositivo(e.target.value))}
+            aria-invalid={Boolean(errores[`lote-${indice}-total`])}
+          />
+          {errores[`lote-${indice}-total`] && (
+            <p className="orden-campo-error">{errores[`lote-${indice}-total`]}</p>
+          )}
+        </div>
+
         <span
-          className={`orden-lote-total-valor${totalLote === null ? ' orden-lote-total-vacio' : ''}`}
+          className="orden-campo-ayuda"
+          style={{ alignSelf: 'center', margin: 0 }}
         >
-          {totalLote !== null ? formatearPrecio(totalLote) : '—'}
+          {totalSugerido !== null ? `Sugerido (costo × cant.): ${formatearPrecio(totalSugerido)}` : ''}
         </span>
       </div>
     </div>

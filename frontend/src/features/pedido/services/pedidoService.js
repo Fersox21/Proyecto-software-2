@@ -2,10 +2,13 @@ const URL_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
 
 function headers() {
   const token = sessionStorage.getItem('token')
-  return {
+  const base = {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
   }
+  if (token) {
+    base.Authorization = `Bearer ${token}`
+  }
+  return base
 }
 
 async function procesarRespuesta(respuesta, mensajeErrorPorDefecto) {

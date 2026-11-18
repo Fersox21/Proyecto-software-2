@@ -187,11 +187,10 @@ const validarDisponibilidadItem = async (cliente, item) => {
   if (
     !producto ||
     producto.activo !== true ||
-    producto.visible_catalogo !== true ||
-    Number(producto.stock ?? 0) < item.cantidad
+    producto.visible_catalogo !== true
   ) {
     throw crearError(
-      `El producto ${nombreProducto} ya no se encuentra disponible o no tiene stock suficiente.`,
+      `El producto ${nombreProducto} ya no se encuentra disponible.`,
       400
     );
   }
@@ -301,6 +300,12 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
       throw error;
     }
 
+    if (pedido.activo === false) {
+      const error = new Error('No se puede aprobar un pedido eliminado');
+      error.status = 409;
+      throw error;
+    }
+
     const estadoActual = String(pedido.estado ?? '').trim().toLowerCase();
     if (!['pendiente', 'nuevo'].includes(estadoActual)) {
       const error = new Error('Solo se puede aprobar un pedido pendiente');
@@ -349,16 +354,36 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
       let restante = Number(item.cantidad);
 
       const asig = mapaAsignaciones.get(prodId);
-      const modoManual = asig && asig.modo === 'manual' && Array.isArray(asig.lotes) && asig.lotes.length > 0;
+      const modoManual = asig && asig.modo === 'manual';
 
       let lotesParaConsumir = [];
 
       if (modoManual) {
-        // En modo manual, el admin seleccionó una lista ordenada de IDs de lotes
+        if (!Array.isArray(asig.lotes) || asig.lotes.length === 0) {
+          const error = new Error(`Debe seleccionar al menos un lote en modo manual para "${item.nombre}"`);
+          error.status = 400;
+          throw error;
+        }
+        // En modo manual, el admin seleccionó una lista ordenada de IDs de lotes válidos y únicos
+        const lotesUnicos = [];
+        const vistos = new Set();
         for (const loteIdRaw of asig.lotes) {
           const loteId = Number(loteIdRaw);
+          if (!Number.isInteger(loteId) || loteId <= 0 || loteId > 2147483647) {
+            const error = new Error('El identificador de lote indicado no es válido');
+            error.status = 400;
+            throw error;
+          }
+          if (!vistos.has(loteId)) {
+            vistos.add(loteId);
+            lotesUnicos.push(loteId);
+          }
+        }
+
+        for (const loteId of lotesUnicos) {
           const { rows: loteRows } = await cliente.query(
-            `SELECT id, cantidad, cantidad_inicial, fecha_vencimiento
+            `SELECT id, cantidad, cantidad_inicial, fecha_vencimiento,
+                    (fecha_vencimiento >= CURRENT_DATE) AS vigente
              FROM lotes
              WHERE id = $1 AND producto_id = $2 AND activo = true
              FOR UPDATE`,
@@ -372,9 +397,7 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
           }
 
           const l = loteRows[0];
-          const hoyISO = new Date().toISOString().slice(0, 10);
-          const fVenci = String(l.fecha_vencimiento).slice(0, 10);
-          if (fVenci < hoyISO) {
+          if (!l.vigente) {
             const error = new Error(`El lote #${loteId} de "${item.nombre}" se encuentra vencido`);
             error.status = 409;
             throw error;

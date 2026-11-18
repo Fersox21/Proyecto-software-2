@@ -2,7 +2,8 @@ import * as service from './lotes.service.js';
 
 export const listar = async (req, res, next) => {
   try {
-    const lotes = await service.listarLotes();
+    const soloVigentes = req.query.vigentes === 'true';
+    const lotes = await service.listarLotes({ soloVigentes });
     res.json(lotes);
   } catch (err) {
     next(err);

@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { crearProveedor } from '../../services/ordenesCompraService'
 
-const REGEX_TELEFONO = /^\+?\d+$/
+const REGEX_TELEFONO = /^\+?\d{7,22}$/
 
 function sanitizarTelefono(valor) {
-  return valor.replace(/(?!^\+)[^\d]/g, '')
+  return valor.replace(/(?!^\+)[^\d]/g, '').slice(0, 23)
 }
 
 function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
@@ -31,7 +31,7 @@ function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
       nuevosErrores.telefono = 'El teléfono es obligatorio'
     } else if (!REGEX_TELEFONO.test(telefono)) {
       nuevosErrores.telefono =
-        'El teléfono solo puede contener dígitos y un + opcional al inicio (sin espacios ni guiones)'
+        'El teléfono debe tener entre 7 y 22 números (puede incluir + al inicio)'
     }
     setErrores(nuevosErrores)
     return Object.keys(nuevosErrores).length === 0
