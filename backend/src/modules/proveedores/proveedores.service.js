@@ -9,7 +9,13 @@ const crearError = (mensaje, status) => {
 };
 
 export const validarNombreProveedor = (valor) => {
-  const nombre = typeof valor === 'string' ? valor.trim() : '';
+  if (typeof valor !== 'string') {
+    throw crearError('El nombre del proveedor es obligatorio', 400);
+  }
+  if (valor.includes('\u0000')) {
+    throw crearError('El nombre del proveedor contiene caracteres inválidos', 400);
+  }
+  const nombre = valor.trim();
   if (!nombre) {
     throw crearError('El nombre del proveedor es obligatorio', 400);
   }
@@ -65,6 +71,11 @@ export const crearProveedor = async (data) => {
   const nombre = validarNombreProveedor(data?.nombre);
   const telefono = validarTelefonoProveedor(data?.telefono);
 
+  const existente = await repository.findByNombreInsensitive(nombre);
+  if (existente) {
+    throw crearError('Ya existe un proveedor con ese nombre', 409);
+  }
+
   return await repository.create({ nombre, telefono });
 };
 
@@ -83,6 +94,13 @@ export const actualizarProveedor = async (id, data) => {
     data?.telefono !== undefined
       ? validarTelefonoProveedor(data.telefono)
       : proveedorExistente.telefono;
+
+  if (data?.nombre !== undefined) {
+    const duplicado = await repository.findByNombreInsensitive(nombre);
+    if (duplicado && duplicado.id !== idValido) {
+      throw crearError('Ya existe un proveedor con ese nombre', 409);
+    }
+  }
 
   return await repository.update(idValido, { nombre, telefono });
 };

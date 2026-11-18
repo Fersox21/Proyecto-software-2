@@ -141,7 +141,7 @@ export const findLotesDisponiblesParaPedido = async (pedidoId) => {
        WHERE l.producto_id = $1
          AND l.activo = true
          AND l.cantidad > 0
-         AND l.fecha_vencimiento >= CURRENT_DATE
+         AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
        ORDER BY l.fecha_vencimiento ASC, l.id ASC`,
       [item.producto_id]
     );
@@ -201,7 +201,7 @@ const validarDisponibilidadItem = async (cliente, item) => {
      WHERE producto_id = $1
        AND activo = true
        AND cantidad > 0
-       AND fecha_vencimiento >= CURRENT_DATE`,
+       AND fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date`,
     [item.productoId]
   );
 
@@ -242,7 +242,7 @@ export const createConItems = async (pedido, items) => {
       `INSERT INTO pedidos
         (fecha, subtotal, envio, total, metodo_pago, telefono, comercio, persona_contacto,
          modalidad_entrega, direccion, descripcion_direccion, observaciones, estado, motivo_rechazo, usuario_id)
-       VALUES (COALESCE($1, CURRENT_DATE), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+       VALUES (COALESCE($1, (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date), $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
        RETURNING *`,
       [
         fecha ?? null,
@@ -317,7 +317,8 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
       `SELECT t.producto_id, t.cantidad, p.nombre, p.activo AS producto_activo
        FROM tiene t
        JOIN productos p ON p.id = t.producto_id
-       WHERE t.pedido_id = $1 AND t.activo`,
+       WHERE t.pedido_id = $1 AND t.activo
+       ORDER BY t.producto_id ASC`,
       [id]
     );
 
@@ -383,7 +384,7 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
         for (const loteId of lotesUnicos) {
           const { rows: loteRows } = await cliente.query(
             `SELECT id, cantidad, cantidad_inicial, fecha_vencimiento,
-                    (fecha_vencimiento >= CURRENT_DATE) AS vigente
+                    (fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date) AS vigente
              FROM lotes
              WHERE id = $1 AND producto_id = $2 AND activo = true
              FOR UPDATE`,
@@ -419,7 +420,7 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
            WHERE producto_id = $1
              AND activo = true
              AND cantidad > 0
-             AND fecha_vencimiento >= CURRENT_DATE
+             AND fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
            ORDER BY fecha_vencimiento ASC, id ASC
            FOR UPDATE`,
           [prodId]
@@ -488,7 +489,7 @@ export const aprobarPedido = async (id, modificacion = {}, asignacionesLotes = n
 
     await cliente.query(
       `INSERT INTO ventas (fecha, total, total_modificado, motivo_modificacion, pedido_id)
-       SELECT CURRENT_DATE, $1, $2, $3, $4
+       SELECT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date, $1, $2, $3, $4
        WHERE NOT EXISTS (
          SELECT 1 FROM ventas WHERE pedido_id = $4 AND activo = true
        )`,
@@ -564,6 +565,55 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('UPDATE pedidos SET activo = false WHERE id = $1', [id]);
-  return rowCount;
+  return await conTransaccion(async (cliente) => {
+    const { rows: pedidoRows } = await cliente.query(
+      'SELECT id FROM pedidos WHERE id = $1 AND activo = true FOR UPDATE',
+      [id]
+    );
+    if (pedidoRows.length === 0) {
+      return 0;
+    }
+
+    const { rowCount } = await cliente.query(
+      'UPDATE pedidos SET activo = false WHERE id = $1 AND activo = true',
+      [id]
+    );
+
+    if (rowCount > 0) {
+      const { rows: asignaciones } = await cliente.query(
+        `SELECT lote_id, producto_id, cantidad
+         FROM pedido_lotes
+         WHERE pedido_id = $1
+         ORDER BY lote_id ASC
+         FOR UPDATE`,
+        [id]
+      );
+
+      const productosAfectados = new Set();
+      for (const asig of asignaciones) {
+        await cliente.query(
+          `UPDATE lotes
+           SET cantidad = LEAST(cantidad + $1, cantidad_inicial)
+           WHERE id = $2`,
+          [asig.cantidad, asig.lote_id]
+        );
+        productosAfectados.add(Number(asig.producto_id));
+      }
+
+      if (asignaciones.length > 0) {
+        await cliente.query('DELETE FROM pedido_lotes WHERE pedido_id = $1', [id]);
+      }
+
+      for (const prodId of productosAfectados) {
+        await productosRepo.recalcularStock(prodId, cliente);
+      }
+
+      await cliente.query(
+        'UPDATE ventas SET activo = false WHERE pedido_id = $1 AND activo = true',
+        [id]
+      );
+    }
+
+    return rowCount;
+  });
 };

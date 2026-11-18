@@ -68,10 +68,13 @@ export const normalizarProducto = (producto) => {
 
   const esValido = precioPromocionalValido(precioVenta, precioPromo, enPromocion);
   const porcentaje = esValido ? porcentajeDescuento(precioVenta, precioPromo) : null;
+  const promoNormalizada = esValido && porcentaje !== null
+    ? precioConDescuento(precioVenta, porcentaje)
+    : precioPromo;
 
   return {
     ...producto,
-    precioPromo: esValido ? redondear2(precioPromo) : precioPromo,
+    precioPromo: promoNormalizada,
     descuento: porcentaje
   };
 };
@@ -81,7 +84,10 @@ export const precioVigente = (producto = {}) => {
   const precioVenta = normalizado.precioVenta ?? normalizado.precio_venta;
   const enPromocion = normalizado.enPromocion ?? normalizado.en_promocion;
 
-  if (precioPromocionalValido(precioVenta, normalizado.precioPromo, enPromocion)) {
+  if (
+    precioPromocionalValido(precioVenta, normalizado.precioPromo, enPromocion) &&
+    normalizado.descuento !== null
+  ) {
     return Number(normalizado.precioPromo);
   }
 

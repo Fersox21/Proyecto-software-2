@@ -12,8 +12,8 @@ export const findByPedido = async (pedido_id) => {
 
 export const findByPedidoYProducto = async (pedido_id, producto_id) => {
   const { rows } = await pool.query(`
-    SELECT pedido_id, producto_id 
-    FROM tiene 
+    SELECT pedido_id, producto_id, cantidad, precio, activo
+    FROM tiene
     WHERE pedido_id = $1 AND producto_id = $2;
   `, [pedido_id, producto_id]);
   return rows[0];
@@ -23,8 +23,10 @@ export const findByPedidoYProducto = async (pedido_id, producto_id) => {
 export const create = async (data) => {
   const { cantidad, precio, producto_id, pedido_id } = data;
   const { rows } = await pool.query(
-    `INSERT INTO tiene (cantidad, precio, producto_id, pedido_id)
-    VALUES ($1, $2, $3, $4)
+    `INSERT INTO tiene (cantidad, precio, producto_id, pedido_id, activo)
+    VALUES ($1, $2, $3, $4, true)
+    ON CONFLICT (pedido_id, producto_id)
+    DO UPDATE SET cantidad = EXCLUDED.cantidad, precio = EXCLUDED.precio, activo = true
     RETURNING *`,
     [cantidad, precio, producto_id, pedido_id]
   );
@@ -37,7 +39,7 @@ export const update = async (data) => {
   const { rows } = await pool.query(
     `UPDATE tiene
      SET cantidad = $1, precio = $2
-     WHERE pedido_id = $3 AND producto_id = $4
+     WHERE pedido_id = $3 AND producto_id = $4 AND activo = true
      RETURNING *`,
     [cantidad, precio, pedido_id, producto_id]
   );

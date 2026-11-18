@@ -1,7 +1,11 @@
 import * as repository from './tiene.repository.js';
 import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryVenta from '../ventas/ventas.repository.js';
-import * as repositoryPedido from '../pedidos/pedidos.repository.js'
+import * as repositoryPedido from '../pedidos/pedidos.repository.js';
+import { precioVigente } from '../productos/productos.precio.js';
+
+const MAX_INT4 = 2147483647;
+const DECIMAL_10_2_MAX = 99999999.99;
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -11,7 +15,7 @@ const crearError = (mensaje, status) => {
 
 const validarEnteroPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isInteger(valor) || valor <= 0) {
+    if (!Number.isInteger(valor) || valor <= 0 || valor > MAX_INT4) {
       throw crearError(mensaje, 400);
     }
     return valor;
@@ -23,7 +27,7 @@ const validarEnteroPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isSafeInteger(numero) || numero <= 0) {
+    if (!Number.isSafeInteger(numero) || numero <= 0 || numero > MAX_INT4) {
       throw crearError(mensaje, 400);
     }
     return numero;
@@ -34,10 +38,11 @@ const validarEnteroPositivo = (valor, mensaje) => {
 
 const validarDecimalPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isFinite(valor) || valor <= 0) {
+    const redondeado = Number(valor.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return valor;
+    return redondeado;
   }
 
   if (typeof valor === 'string') {
@@ -46,10 +51,11 @@ const validarDecimalPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isFinite(numero) || numero <= 0) {
+    const redondeado = Number(numero.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return numero;
+    return redondeado;
   }
 
   throw crearError(mensaje, 400);
@@ -84,7 +90,13 @@ const recalcularTotalPedido = async (pedido) => {
     items.reduce((acc, i) => acc + Number(i.precio) * Number(i.cantidad), 0).toFixed(2)
   );
   const total = Number((subtotal + Number(pedido.envio ?? 0)).toFixed(2));
-  await repositoryPedido.update(pedido.id, { ...pedido, subtotal, total });
+  await repositoryPedido.update(pedido.id, {
+    ...pedido,
+    subtotal,
+    total,
+    totalModificado: null,
+    motivoModificacion: null
+  });
 };
 
 export const listarTiene = async () => {
@@ -115,20 +127,37 @@ export const crearTiene = async (data) => {
     repository.findByPedidoYProducto(pedidoId, productoId)
   ]);
 
-  if (itemExistente) {
+  if (itemExistente && itemExistente.activo !== false) {
     const error = new Error('El producto ya se encuentra agregado en este pedido');
     error.status = 409;
     throw error;
   }
 
-  if (data.cantidad === undefined || data.cantidad === null || data.precio === undefined || data.precio === null || !productoExistente) {
+  if (data.cantidad === undefined || data.cantidad === null) {
     throw crearError('Faltan datos obligatorios para crear item', 400);
   }
 
-  const cantidad = validarEnteroPositivo(data.cantidad, 'La cantidad de item debe ser un entero mayor a 0');
-  const precio = validarDecimalPositivo(data.precio, 'El precio de item debe ser mayor a 0');
+  if (!productoExistente || productoExistente.activo === false) {
+    throw crearError('El producto indicado no existe o está inactivo', 404);
+  }
 
-  const creado = await repository.create({ ...data, producto_id: productoId, pedido_id: pedidoId, cantidad, precio });
+  const cantidad = validarEnteroPositivo(data.cantidad, 'La cantidad de item debe ser un entero mayor a 0');
+  if (Number(productoExistente.stock ?? 0) < cantidad) {
+    throw crearError('Stock insuficiente para agregar este producto al pedido', 409);
+  }
+
+  const precioCalculado = precioVigente(productoExistente);
+  if (!Number.isFinite(precioCalculado) || precioCalculado <= 0) {
+    throw crearError('El producto indicado no tiene un precio vigente válido', 400);
+  }
+
+  const creado = await repository.create({
+    ...data,
+    producto_id: productoId,
+    pedido_id: pedidoId,
+    cantidad,
+    precio: precioCalculado
+  });
   await recalcularTotalPedido(pedidoExistente);
   return creado;
 };
@@ -148,20 +177,33 @@ export const actualizarTiene = async (data) => {
   const productoId = validarId(data.producto_id, 'El ID del producto no es válido');
 
   const pedidoExistente = await asegurarPedidoModificable(pedidoId);
-  const tieneExistente = await repository.findByPedidoYProducto(pedidoId, productoId);
-  if (!tieneExistente) {
+  const [tieneExistente, productoExistente] = await Promise.all([
+    repository.findByPedidoYProducto(pedidoId, productoId),
+    repositoryProducto.findById(productoId)
+  ]);
+
+  if (!tieneExistente || tieneExistente.activo === false) {
     const error = new Error('item no encontrado');
     error.status = 404;
     throw error;
   }
-  
+
+  if (!productoExistente || productoExistente.activo === false) {
+    throw crearError('El producto indicado no existe o está inactivo', 404);
+  }
+
   const cantidadValidada = data.cantidad !== undefined
     ? validarEnteroPositivo(data.cantidad, 'La cantidad de item debe ser un entero mayor a 0')
-    : tieneExistente.cantidad;
+    : validarEnteroPositivo(tieneExistente.cantidad, 'La cantidad de item debe ser un entero mayor a 0');
 
-  const precioValidado = data.precio !== undefined
-    ? validarDecimalPositivo(data.precio, 'El precio de item debe ser mayor a 0')
-    : tieneExistente.precio;
+  if (Number(productoExistente.stock ?? 0) < cantidadValidada) {
+    throw crearError('Stock insuficiente para actualizar este ítem', 409);
+  }
+
+  const precioValidado = precioVigente(productoExistente);
+  if (!Number.isFinite(precioValidado) || precioValidado <= 0) {
+    throw crearError('El producto indicado no tiene un precio vigente válido', 400);
+  }
 
   const tieneActualizado = await repository.update({
     ...data,

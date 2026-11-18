@@ -154,6 +154,9 @@ const normalizarItems = async (items) => {
     const existente = acumulados.get(producto.id);
 
     if (existente) {
+      if (existente.cantidad + cantidad > MAX_INT4) {
+        throw crearError(`La cantidad acumulada para el producto #${productoId} supera el límite permitido`, 400);
+      }
       existente.cantidad += cantidad;
     } else {
       acumulados.set(producto.id, { productoId: producto.id, cantidad, precio });

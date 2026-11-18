@@ -77,7 +77,7 @@ function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
           <input
             id="orden-nuevo-proveedor-nombre"
             type="text"
-            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
+            maxLength={100}
             placeholder="Ej. Distribuidora Central"
             value={nombre}
             onChange={(e) => {

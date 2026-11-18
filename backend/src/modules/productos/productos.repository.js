@@ -8,11 +8,11 @@ const SQL_BASE = `
            FROM lotes l
            WHERE l.producto_id = p.id
              AND l.activo = true
-             AND l.fecha_vencimiento >= CURRENT_DATE
+             AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
          ), 0) AS stock_calculado,
          c.nombre AS categoria_nombre,
          tp.nombre AS tipo_promocion_nombre,
-         EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) AS tiene_lote_vigente
+         EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date) AS tiene_lote_vigente
   FROM productos p
   LEFT JOIN categorias c ON c.id = p.categoria_id
   LEFT JOIN tipos_promocion tp ON tp.id = p.tipo_promocion_id
@@ -58,18 +58,13 @@ export const findHistorial = async (client = pool) => {
 
 export const findAllCatalogo = async (client = pool) => {
   const { rows } = await client.query(
-    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) ORDER BY p.nombre ASC`
+    `${SQL_BASE} WHERE p.activo = true AND p.visible_catalogo = true AND EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date) ORDER BY p.nombre ASC`
   );
   return rows.map(mapearProducto);
 };
 
-export const findById = async (id, optionsOrClient = pool) => {
-  const esOpciones =
-    optionsOrClient &&
-    typeof optionsOrClient === 'object' &&
-    typeof optionsOrClient.query !== 'function';
-  const client = esOpciones ? (optionsOrClient.client ?? pool) : (optionsOrClient ?? pool);
-  const { rows } = await client.query(`${SQL_BASE} WHERE p.id = $1`, [id]);
+export const findById = async (id, client = pool) => {
+  const { rows } = await client.query(`${SQL_BASE} WHERE p.id = $1 AND p.activo = true`, [id]);
   return mapearProducto(rows[0]);
 };
 
@@ -249,7 +244,10 @@ export const findHistorialPreciosByProductoId = async (productoId, client = pool
 };
 
 export const remove = async (id) => {
-  const { rowCount } = await pool.query('UPDATE productos SET activo = false WHERE id = $1', [id]);
+  const { rowCount } = await pool.query(
+    'UPDATE productos SET activo = false, visible_catalogo = false WHERE id = $1 AND activo = true',
+    [id]
+  );
   return rowCount;
 };
 
@@ -269,13 +267,17 @@ export const updateImagen = async (id, imagen, visibleCatalogo) => {
 export const recalcularStock = async (id, client = pool) => {
   const { rows } = await client.query(
     `UPDATE productos
-     SET stock = COALESCE((
-       SELECT SUM(cantidad)
-       FROM lotes
-       WHERE producto_id = $1
-         AND activo = true
-         AND fecha_vencimiento >= CURRENT_DATE
-     ), 0)
+     SET stock = sub.nuevo_stock,
+         visible_catalogo = CASE WHEN sub.nuevo_stock = 0 THEN false ELSE visible_catalogo END
+     FROM (
+       SELECT COALESCE((
+         SELECT SUM(cantidad)
+         FROM lotes
+         WHERE producto_id = $1
+           AND activo = true
+           AND fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
+       ), 0) AS nuevo_stock
+     ) sub
      WHERE id = $1
      RETURNING id, stock`,
     [id]

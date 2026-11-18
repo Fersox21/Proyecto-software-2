@@ -5,10 +5,12 @@ import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryCategoria from '../categorias/categorias.repository.js';
 import * as repositoryTipoPromocion from '../tiposPromocion/tiposPromocion.repository.js';
 import { eliminarImagenFisica } from '../productos/productos.imagen.js';
-import { porcentajeDescuento } from '../productos/productos.precio.js';
+import { porcentajeDescuento, precioConDescuento } from '../productos/productos.precio.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
 const DEFAULT_TIPO_PROMOCION_ID = 1;
+const INT4_MAX = 2147483647;
+const DECIMAL_10_2_MAX = 99999999.99;
 
 const resolverTipoPromocionDefecto = async () => {
   if (typeof repositoryTipoPromocion.findByNombreInsensitive === 'function') {
@@ -16,7 +18,7 @@ const resolverTipoPromocionDefecto = async () => {
     if (descuento?.activo) return descuento.id;
 
     const descuentoDirecto = await repositoryTipoPromocion.findByNombreInsensitive('Descuento directo');
-    if (descuentoDirecto) return descuentoDirecto.id;
+    if (descuentoDirecto?.activo) return descuentoDirecto.id;
   }
 
   if (typeof repositoryTipoPromocion.findAll === 'function') {
@@ -43,6 +45,15 @@ const limpiarArchivos = (archivos = []) => {
   }
 };
 
+const limpiarArchivosNoUsados = (archivos = [], nombresUsados = new Set()) => {
+  if (!Array.isArray(archivos)) return;
+  for (const archivo of archivos) {
+    if (archivo?.filename && !nombresUsados.has(archivo.filename)) {
+      eliminarImagenFisica(archivo.filename);
+    }
+  }
+};
+
 const mapearArchivosPorCampo = (archivos = []) => {
   const mapa = new Map();
   if (!Array.isArray(archivos)) return mapa;
@@ -54,9 +65,31 @@ const mapearArchivosPorCampo = (archivos = []) => {
   return mapa;
 };
 
+const validarTexto = (valor, campo, { requerido = false, max = null } = {}) => {
+  if (valor === undefined || valor === null) {
+    if (requerido) throw crearError(`${campo} es obligatorio`, 400);
+    return null;
+  }
+  if (typeof valor !== 'string') {
+    throw crearError(`${campo} debe ser un texto válido`, 400);
+  }
+  if (valor.includes('\u0000')) {
+    throw crearError(`${campo} contiene caracteres inválidos`, 400);
+  }
+  const limpio = valor.trim();
+  if (!limpio) {
+    if (requerido) throw crearError(`${campo} es obligatorio`, 400);
+    return null;
+  }
+  if (max !== null && limpio.length > max) {
+    throw crearError(`${campo} no puede superar los ${max} caracteres`, 400);
+  }
+  return limpio;
+};
+
 const validarEnteroPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isInteger(valor) || valor <= 0) {
+    if (!Number.isInteger(valor) || valor <= 0 || valor > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return valor;
@@ -68,7 +101,7 @@ const validarEnteroPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isSafeInteger(numero) || numero <= 0) {
+    if (!Number.isSafeInteger(numero) || numero <= 0 || numero > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return numero;
@@ -79,10 +112,11 @@ const validarEnteroPositivo = (valor, mensaje) => {
 
 const validarDecimalPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isFinite(valor) || valor <= 0) {
+    const redondeado = Number(valor.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return valor;
+    return redondeado;
   }
 
   if (typeof valor === 'string') {
@@ -91,10 +125,11 @@ const validarDecimalPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isFinite(numero) || numero <= 0) {
+    const redondeado = Number(numero.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return numero;
+    return redondeado;
   }
 
   throw crearError(mensaje, 400);
@@ -126,10 +161,10 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     throw crearError('Los datos del producto nuevo no son válidos', 400);
   }
 
-  const nombre = typeof productoNuevo.nombre === 'string' ? productoNuevo.nombre.trim() : '';
-  if (!nombre) {
-    throw crearError('El nombre del producto nuevo es obligatorio', 400);
-  }
+  const nombre = validarTexto(productoNuevo.nombre, 'El nombre del producto nuevo', {
+    requerido: true,
+    max: 100
+  });
 
   const precioCosto = validarDecimalPositivo(
     productoNuevo.precioCosto,
@@ -144,21 +179,20 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
   let categoriaNuevaNombre = null;
 
   const rawCatId = productoNuevo.categoriaId ?? productoNuevo.categoria_id;
-  const rawCatNueva = typeof productoNuevo.categoriaNuevaNombre === 'string'
-    ? productoNuevo.categoriaNuevaNombre.trim()
-    : '';
-  const rawCatTexto = typeof productoNuevo.categoria === 'string'
-    ? productoNuevo.categoria.trim()
-    : '';
+  const rawCatNueva = validarTexto(productoNuevo.categoriaNuevaNombre, 'El nombre de la nueva categoría', {
+    requerido: false,
+    max: 100
+  });
+  const rawCatTexto = validarTexto(productoNuevo.categoria, 'El nombre de la categoría', {
+    requerido: false,
+    max: 100
+  });
 
   if (rawCatNueva) {
-    if (rawCatNueva.length > 100) {
-      throw crearError('El nombre de la nueva categoría no puede superar los 100 caracteres', 400);
-    }
     categoriaNuevaNombre = rawCatNueva;
   } else if (rawCatId !== undefined && rawCatId !== null && rawCatId !== '') {
     const idCat = Number(rawCatId);
-    if (!Number.isInteger(idCat) || idCat <= 0) {
+    if (!Number.isInteger(idCat) || idCat <= 0 || idCat > INT4_MAX) {
       throw crearError('La categoría indicada para el producto nuevo no es válida', 400);
     }
     const catExistente = await repositoryCategoria.findById(idCat);
@@ -170,9 +204,6 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     }
     categoriaId = catExistente.id;
   } else if (rawCatTexto) {
-    if (rawCatTexto.length > 100) {
-      throw crearError('El nombre de la categoría no puede superar los 100 caracteres', 400);
-    }
     categoriaNuevaNombre = rawCatTexto;
   } else {
     throw crearError('Debe indicar una categoría para el producto nuevo', 400);
@@ -195,31 +226,31 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     if (precioPromo >= precioVenta) {
       throw crearError('El precio promocional debe ser menor al precio de venta', 400);
     }
-    if (porcentajeDescuento(precioVenta, precioPromo) === null) {
+    const pct = porcentajeDescuento(precioVenta, precioPromo);
+    if (pct === null) {
       throw crearError('El descuento promocional debe ser un porcentaje entero entre 1% y 99%', 400);
     }
+    precioPromo = precioConDescuento(precioVenta, pct);
 
     const rawTipoId = productoNuevo.tipoPromocionId ?? productoNuevo.tipo_promocion_id;
-    const rawTipoNuevo =
-      typeof (productoNuevo.tipoPromocionNuevaNombre ?? productoNuevo.tipoPromocionNombre) === 'string'
-        ? (productoNuevo.tipoPromocionNuevaNombre ?? productoNuevo.tipoPromocionNombre).trim()
-        : '';
+    const rawTipoNuevo = validarTexto(
+      productoNuevo.tipoPromocionNuevaNombre ?? productoNuevo.tipoPromocionNombre,
+      'El nombre del nuevo tipo de promoción',
+      { requerido: false, max: 100 }
+    );
 
     if (rawTipoNuevo) {
-      if (rawTipoNuevo.length > 100) {
-        throw crearError('El nombre del nuevo tipo de promoción no puede superar los 100 caracteres', 400);
-      }
       tipoPromocionNuevaNombre = rawTipoNuevo;
     } else if (rawTipoId !== undefined && rawTipoId !== null && rawTipoId !== '') {
       const idTipo = Number(rawTipoId);
-      if (!Number.isInteger(idTipo) || idTipo <= 0) {
+      if (!Number.isInteger(idTipo) || idTipo <= 0 || idTipo > INT4_MAX) {
         throw crearError('El tipo de promoción indicado para el producto nuevo no es válido', 400);
       }
       const tipoExistente = await repositoryTipoPromocion.findById(idTipo);
       if (!tipoExistente) {
         throw crearError('El tipo de promoción indicado para el producto nuevo no existe', 400);
       }
-      if (tipoExistente.activo === false && idTipo !== DEFAULT_TIPO_PROMOCION_ID) {
+      if (tipoExistente.activo === false) {
         throw crearError('El tipo de promoción indicado para el producto nuevo está inactivo', 400);
       }
       tipoPromocionId = tipoExistente.id;
@@ -228,15 +259,15 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     }
   }
 
-  const marca =
-    productoNuevo.marca !== undefined && productoNuevo.marca !== null
-      ? String(productoNuevo.marca).trim() || null
-      : null;
+  const marca = validarTexto(productoNuevo.marca, 'La marca del producto nuevo', {
+    requerido: false,
+    max: 25
+  });
 
-  const descripcion =
-    productoNuevo.descripcion !== undefined && productoNuevo.descripcion !== null
-      ? String(productoNuevo.descripcion).trim() || null
-      : null;
+  const descripcion = validarTexto(productoNuevo.descripcion, 'La descripción del producto nuevo', {
+    requerido: false,
+    max: 2000
+  });
 
   return {
     nombre,
@@ -266,7 +297,11 @@ const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
     return Number(enviado.toFixed(2));
   }
 
-  return Number((Number(precioCosto) * cantidad).toFixed(2));
+  const calculado = Number((Number(precioCosto) * cantidad).toFixed(2));
+  if (!Number.isFinite(calculado) || calculado <= 0 || calculado > DECIMAL_10_2_MAX) {
+    throw crearError('El total calculado del lote supera el límite permitido', 400);
+  }
+  return calculado;
 };
 
 const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) => {
@@ -289,13 +324,8 @@ const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) =>
   const fechaArribo = validarFecha(fArriboRaw, 'La fecha de arribo');
   const fechaVencimiento = validarFecha(fVenciRaw, 'La fecha de vencimiento');
 
-const obtenerHoyLocalISO = () => {
-  const ahora = new Date();
-  const anio = ahora.getFullYear();
-  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-  const dia = String(ahora.getDate()).padStart(2, '0');
-  return `${anio}-${mes}-${dia}`;
-};
+const obtenerHoyLocalISO = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
 
   if (fechaOrden && fechaArribo < fechaOrden) {
     throw crearError('La fecha de arribo no puede ser menor a la fecha de pedido de la orden', 400);
@@ -327,7 +357,14 @@ const obtenerHoyLocalISO = () => {
 
   const rawProdId = lote.productoId ?? lote.producto;
   const prodId = Number(rawProdId);
-  if (rawProdId === undefined || rawProdId === null || rawProdId === '' || !Number.isInteger(prodId) || prodId <= 0) {
+  if (
+    rawProdId === undefined ||
+    rawProdId === null ||
+    rawProdId === '' ||
+    !Number.isInteger(prodId) ||
+    prodId <= 0 ||
+    prodId > INT4_MAX
+  ) {
     throw crearError('Cada lote debe indicar un producto existente válido o un producto nuevo', 400);
   }
 
@@ -385,7 +422,7 @@ const obtenerHoyLocalISO = () => {
 
 const validarId = (id, mensaje = 'El ID de la orden de compra no es válido') => {
   const num = Number(id);
-  if (!Number.isInteger(num) || num <= 0) {
+  if (!Number.isInteger(num) || num <= 0 || num > INT4_MAX) {
     throw crearError(mensaje, 400);
   }
   return num;
@@ -417,15 +454,21 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
         throw crearError('Los datos del proveedor nuevo no son válidos', 400);
       }
+      const nombreProveedor = validarNombreProveedor(data.proveedorNuevo.nombre);
+      const telefonoProveedor = validarTelefonoProveedor(data.proveedorNuevo.telefono);
+      const proveedorDuplicado = await repositoryProveedor.findByNombreInsensitive(nombreProveedor);
+      if (proveedorDuplicado) {
+        throw crearError('Ya existe un proveedor con ese nombre', 409);
+      }
       proveedorNuevo = {
-        nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
-        telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
+        nombre: nombreProveedor,
+        telefono: telefonoProveedor
       };
     } else {
       const proveedorIdRaw = data?.proveedor_id ?? data?.proveedorId ?? data?.proveedor;
       const parsedId = Number(proveedorIdRaw);
 
-      if (!proveedorIdRaw || !Number.isInteger(parsedId) || parsedId <= 0) {
+      if (!proveedorIdRaw || !Number.isInteger(parsedId) || parsedId <= 0 || parsedId > INT4_MAX) {
         throw crearError('Debe indicar un proveedor válido para la orden de compra', 400);
       }
 
@@ -458,14 +501,11 @@ export const crearOrdenCompra = async (data, archivos = []) => {
     const total = Number(
       lotesValidados.reduce((acc, l) => acc + Number(l.total), 0).toFixed(2)
     );
+    if (!Number.isFinite(total) || total <= 0 || total > DECIMAL_10_2_MAX) {
+      throw crearError('El total de la orden de compra supera el límite permitido', 400);
+    }
 
-    const usuarioIdRaw = data?.usuarioId ?? data?.usuario_id;
-    const usuarioId =
-      usuarioIdRaw !== undefined && usuarioIdRaw !== null && Number.isInteger(Number(usuarioIdRaw)) && Number(usuarioIdRaw) > 0
-        ? Number(usuarioIdRaw)
-        : null;
-
-    return await repository.create({
+    const resultado = await repository.create({
       total,
       fecha,
       ...(proveedorId !== null && { proveedor_id: proveedorId }),
@@ -473,6 +513,11 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       ...(usuarioId !== null && { usuarioId }),
       lotes: lotesValidados
     });
+    const nombresUsados = new Set(
+      lotesValidados.map((l) => l.productoNuevo?.imagen).filter(Boolean)
+    );
+    limpiarArchivosNoUsados(archivos, nombresUsados);
+    return resultado;
   } catch (err) {
     limpiarArchivos(archivos);
     throw err;
@@ -483,17 +528,11 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
   try {
     const idValido = validarId(id);
     const ordenCompraExistente = await repository.findById(idValido);
-    if (!ordenCompraExistente) {
+    if (!ordenCompraExistente || ordenCompraExistente.activo === false) {
       throw crearError('Orden de compra no encontrada', 404);
     }
 
     let total = ordenCompraExistente.total;
-    if (data.total !== undefined) {
-      total = validarDecimalPositivo(
-        data.total,
-        'El total de la orden de compra debe ser mayor a 0'
-      );
-    }
 
     let fecha = ordenCompraExistente.fecha;
     if (data.fecha !== undefined) {
@@ -508,20 +547,26 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       if (typeof data.proveedorNuevo !== 'object' || Array.isArray(data.proveedorNuevo)) {
         throw crearError('Los datos del proveedor nuevo no son válidos', 400);
       }
+      const nombreProveedor = validarNombreProveedor(data.proveedorNuevo.nombre);
+      const telefonoProveedor = validarTelefonoProveedor(data.proveedorNuevo.telefono);
+      const proveedorDuplicado = await repositoryProveedor.findByNombreInsensitive(nombreProveedor);
+      if (proveedorDuplicado) {
+        throw crearError('Ya existe un proveedor con ese nombre', 409);
+      }
       proveedorNuevo = {
-        nombre: validarNombreProveedor(data.proveedorNuevo.nombre),
-        telefono: validarTelefonoProveedor(data.proveedorNuevo.telefono)
+        nombre: nombreProveedor,
+        telefono: telefonoProveedor
       };
     } else if (proveedorIdRaw !== undefined) {
       proveedorId = Number(proveedorIdRaw);
-      if (!Number.isInteger(proveedorId) || proveedorId <= 0) {
+      if (!Number.isInteger(proveedorId) || proveedorId <= 0 || proveedorId > INT4_MAX) {
         throw crearError('El proveedor indicado no es válido', 400);
       }
       const proveedorExistente = await repositoryProveedor.findById(proveedorId);
       if (!proveedorExistente) {
         throw crearError('Proveedor no encontrado', 404);
       }
-      if (proveedorExistente.activo === false) {
+      if (proveedorExistente.activo === false && proveedorId !== ordenCompraExistente.proveedor?.id) {
         throw crearError('El proveedor indicado está inactivo', 400);
       }
     }
@@ -540,6 +585,9 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       total = Number(
         lotesValidados.reduce((acc, l) => acc + Number(l.total), 0).toFixed(2)
       );
+      if (!Number.isFinite(total) || total <= 0 || total > DECIMAL_10_2_MAX) {
+        throw crearError('El total de la orden de compra supera el límite permitido', 400);
+      }
     }
 
     const usuarioIdRaw = data?.usuarioId ?? data?.usuario_id;
@@ -557,7 +605,12 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       ...(lotesValidados !== undefined && { lotes: lotesValidados })
     };
 
-    return await repository.update(idValido, datosActualizar);
+    const resultado = await repository.update(idValido, datosActualizar);
+    const nombresUsados = new Set(
+      (lotesValidados || []).map((l) => l.productoNuevo?.imagen).filter(Boolean)
+    );
+    limpiarArchivosNoUsados(archivos, nombresUsados);
+    return resultado;
   } catch (err) {
     limpiarArchivos(archivos);
     throw err;

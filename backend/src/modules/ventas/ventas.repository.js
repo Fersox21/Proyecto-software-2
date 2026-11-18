@@ -1,4 +1,5 @@
 import { pool } from '../../config/db.js'; // Ajusta la ruta a tu conexión de pool
+import * as productosRepo from '../productos/productos.repository.js';
 
 const mapearVenta = (row) => {
   if (!row) return null;
@@ -51,6 +52,7 @@ export const listar = async () => {
      FROM ventas v
      INNER JOIN pedidos p ON p.id = v.pedido_id
      WHERE v.activo = true
+       AND p.activo = true
        AND LOWER(p.estado) IN ('aprobado', 'aceptado', 'completado', 'entregado')
      ORDER BY v.fecha ASC`
   );
@@ -214,12 +216,63 @@ export const create = async (data) => {
 };
  
 export const remove = async (id) => {
-  const { rowCount } = await pool.query(`
-    UPDATE ventas
-    SET activo = false
-    WHERE id = $1;
-  `, [id]);
-  return rowCount;
+  return await conTransaccion(async (cliente) => {
+    const { rows: ventaRows } = await cliente.query(
+      'SELECT id, pedido_id FROM ventas WHERE id = $1 AND activo = true FOR UPDATE',
+      [id]
+    );
+    if (ventaRows.length === 0) {
+      return 0;
+    }
+
+    const pedidoId = ventaRows[0].pedido_id;
+    const { rowCount } = await cliente.query(
+      'UPDATE ventas SET activo = false WHERE id = $1 AND activo = true',
+      [id]
+    );
+
+    if (rowCount > 0 && pedidoId != null) {
+      const { rows: asignaciones } = await cliente.query(
+        `SELECT lote_id, producto_id, cantidad
+         FROM pedido_lotes
+         WHERE pedido_id = $1
+         ORDER BY lote_id ASC
+         FOR UPDATE`,
+        [pedidoId]
+      );
+
+      const productosAfectados = new Set();
+      for (const asig of asignaciones) {
+        await cliente.query(
+          `UPDATE lotes
+           SET cantidad = LEAST(cantidad + $1, cantidad_inicial)
+           WHERE id = $2`,
+          [asig.cantidad, asig.lote_id]
+        );
+        productosAfectados.add(Number(asig.producto_id));
+      }
+
+      if (asignaciones.length > 0) {
+        await cliente.query('DELETE FROM pedido_lotes WHERE pedido_id = $1', [pedidoId]);
+      }
+
+      for (const prodId of productosAfectados) {
+        await productosRepo.recalcularStock(prodId, cliente);
+      }
+
+      await cliente.query(
+        `UPDATE pedidos
+         SET estado = 'rechazado',
+             motivo_rechazo = COALESCE(motivo_rechazo, 'Venta eliminada')
+         WHERE id = $1
+           AND activo = true
+           AND LOWER(estado) IN ('aprobado', 'aceptado', 'entregado', 'completado')`,
+        [pedidoId]
+      );
+    }
+
+    return rowCount;
+  });
 };
 
 
