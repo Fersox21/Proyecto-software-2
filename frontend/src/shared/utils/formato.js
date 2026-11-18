@@ -105,8 +105,7 @@ export function formatearFecha(fechaISO) {
   return new Intl.DateTimeFormat('es-AR').format(new Date(`${soloFecha}T00:00:00`))
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api'
-const BASE_BACKEND = API_URL.replace(/\/api\/?$/, '')
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '')
 
 export const IMAGEN_PRODUCTO_DEFAULT =
   "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none'%3E%3Crect width='200' height='200' fill='%23F3F4F6'/%3E%3Crect x='55' y='55' width='90' height='90' rx='10' stroke='%23D1D5DB' stroke-width='4'/%3E%3Ccircle cx='82' cy='84' r='8' fill='%23D1D5DB'/%3E%3Cpath d='M65 130l24-24 18 18 12-12 16 18H65z' fill='%23D1D5DB'/%3E%3C/svg%3E"
@@ -118,13 +117,17 @@ export function obtenerUrlImagenProducto(imagen) {
   if (/^https?:\/\//i.test(limpia) || limpia.startsWith('blob:') || limpia.startsWith('data:')) {
     return limpia
   }
+  if (limpia.startsWith('/api/uploads/')) {
+    const baseSinApi = API_URL.replace(/\/api$/i, '')
+    return `${baseSinApi}${limpia}`
+  }
   if (limpia.startsWith('/uploads/')) {
-    return `${BASE_BACKEND}${limpia}`
+    return `${API_URL}${limpia}`
   }
   if (limpia.startsWith('uploads/')) {
-    return `${BASE_BACKEND}/${limpia}`
+    return `${API_URL}/${limpia}`
   }
-  return `${BASE_BACKEND}/uploads/productos/${limpia}`
+  return `${API_URL}/uploads/productos/${limpia}`
 }
 
 export function manejarErrorImagenProducto(e) {

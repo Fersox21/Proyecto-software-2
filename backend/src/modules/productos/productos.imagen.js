@@ -26,9 +26,14 @@ fs.mkdirSync(CARPETA_UPLOADS, { recursive: true });
 // Extensión de archivo según el tipo MIME aceptado.
 const EXTENSIONES = {
   'image/jpeg': '.jpg',
+  'image/jpg': '.jpg',
+  'image/pjpeg': '.jpg',
+  'image/jfif': '.jpg',
   'image/png': '.png',
   'image/webp': '.webp',
-  'image/avif': '.avif'
+  'image/avif': '.avif',
+  'image/gif': '.gif',
+  'image/svg+xml': '.svg'
 };
 
 const crearError = (mensaje) => {
@@ -38,7 +43,14 @@ const crearError = (mensaje) => {
 };
 
 const almacenamiento = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, CARPETA_UPLOADS),
+  destination: (req, file, cb) => {
+    try {
+      fs.mkdirSync(CARPETA_UPLOADS, { recursive: true });
+      cb(null, CARPETA_UPLOADS);
+    } catch (err) {
+      cb(err);
+    }
+  },
   filename: (req, file, cb) => {
     const extension = EXTENSIONES[file.mimetype] || '.jpg';
     cb(
@@ -50,10 +62,10 @@ const almacenamiento = multer.diskStorage({
 
 const upload = multer({
   storage: almacenamiento,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: 15 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (!EXTENSIONES[file.mimetype]) {
-      return cb(crearError('Formato de imagen no permitido. Usá JPG, PNG, WEBP o AVIF'));
+      return cb(crearError('Formato de imagen no permitido. Usá JPG, PNG, WEBP, AVIF, GIF o SVG'));
     }
     cb(null, true);
   }
@@ -66,7 +78,7 @@ const manejarMiddlewareUpload = (middleware) => (req, res, next) => {
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         err.status = 400;
-        err.message = 'La imagen no puede superar los 5 MB';
+        err.message = 'La imagen no puede superar los 15 MB';
       } else {
         err.status = 400;
       }
@@ -106,7 +118,7 @@ export const eliminarImagenFisica = (url) => {
 
   try {
     fs.unlinkSync(ruta);
-  } catch (err) {
-    if (err.code !== 'ENOENT') throw err;
+  } catch {
+    // Ignorar errores al limpiar archivos antiguos o inexistentes
   }
 };
