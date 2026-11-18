@@ -75,7 +75,9 @@ const mapearLoteConDetalle = (row) => {
 };
 
 export const findAll = async ({ soloVigentes = false } = {}) => {
-  const filtroVigentes = soloVigentes ? 'AND l.fecha_vencimiento >= CURRENT_DATE' : '';
+  const filtroVigentes = soloVigentes
+    ? "AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date"
+    : '';
   const { rows } = await pool.query(
     `${SQL_DETALLE} WHERE l.activo = true AND l.cantidad > 0 AND p.activo = true ${filtroVigentes} ORDER BY l.fecha_vencimiento ASC, l.id ASC`
   );
@@ -134,6 +136,16 @@ export const findById = async (id) => {
   return mapearLoteConDetalle(rows[0]);
 };
 
+const recalcularTotalOrden = async (ordenCompraId, client) => {
+  if (ordenCompraId == null) return;
+  await client.query(
+    `UPDATE ordenes_compra
+     SET total = COALESCE((SELECT SUM(total) FROM lotes WHERE orden_compra_id = $1 AND activo = true), 0)
+     WHERE id = $1`,
+    [ordenCompraId]
+  );
+};
+
 export const create = async (data) => {
   const { cantidad, total, fechaArribo, fechaVencimiento, ordenCompra, producto } = data;
   const client = await pool.connect();
@@ -146,6 +158,7 @@ export const create = async (data) => {
       [cantidad, total, fechaArribo, fechaVencimiento, ordenCompra, producto]
     );
     await productosRepo.recalcularStock(producto, client);
+    await recalcularTotalOrden(ordenCompra, client);
     await client.query('COMMIT');
     return await findById(rows[0].id);
   } catch (error) {
@@ -162,7 +175,7 @@ export const update = async (id, data) => {
   try {
     await client.query('BEGIN');
     const { rows: loteRows } = await client.query(
-      'SELECT cantidad, cantidad_inicial, producto_id FROM lotes WHERE id = $1 AND activo = true FOR UPDATE',
+      'SELECT cantidad, cantidad_inicial, producto_id, orden_compra_id FROM lotes WHERE id = $1 AND activo = true FOR UPDATE',
       [id]
     );
     if (loteRows.length === 0) {
@@ -170,7 +183,12 @@ export const update = async (id, data) => {
       error.status = 404;
       throw error;
     }
-    const { cantidad: cantidadAnterior, cantidad_inicial: cantidadInicial, producto_id: productoId } = loteRows[0];
+    const {
+      cantidad: cantidadAnterior,
+      cantidad_inicial: cantidadInicial,
+      producto_id: productoId,
+      orden_compra_id: ordenCompraId
+    } = loteRows[0];
 
     if (cantidad !== undefined && Number(cantidad) !== Number(cantidadAnterior)) {
       if (Number(cantidadAnterior) < Number(cantidadInicial)) {
@@ -192,6 +210,7 @@ export const update = async (id, data) => {
     );
 
     await productosRepo.recalcularStock(productoId, client);
+    await recalcularTotalOrden(ordenCompraId, client);
 
     await client.query('COMMIT');
     return await findById(id);
@@ -210,7 +229,7 @@ export const updateFechaVencimiento = async (id, fechaVencimiento) => {
   try {
     await client.query('BEGIN');
     const { rows, rowCount } = await client.query(
-      'UPDATE lotes SET fecha_vencimiento = $1 WHERE id = $2 RETURNING producto_id',
+      'UPDATE lotes SET fecha_vencimiento = $1 WHERE id = $2 AND activo = true RETURNING producto_id',
       [fechaVencimiento, id]
     );
     if (rowCount > 0) {
@@ -231,11 +250,12 @@ export const remove = async (id) => {
   try {
     await client.query('BEGIN');
     const { rows, rowCount } = await client.query(
-      'UPDATE lotes SET activo = false WHERE id = $1 AND activo = true RETURNING producto_id, cantidad',
+      'UPDATE lotes SET activo = false WHERE id = $1 AND activo = true RETURNING producto_id, cantidad, orden_compra_id',
       [id]
     );
     if (rowCount > 0) {
       await productosRepo.recalcularStock(rows[0].producto_id, client);
+      await recalcularTotalOrden(rows[0].orden_compra_id, client);
     }
     await client.query('COMMIT');
     return rowCount;
@@ -273,11 +293,12 @@ export const removeSiNoEsElUltimoLote = async (id) => {
             WHERE l2.orden_compra_id = lotes.orden_compra_id AND l2.activo = true
           ) > 1
         )
-      RETURNING producto_id, cantidad`,
+      RETURNING producto_id, cantidad, orden_compra_id`,
       [id]
     );
     if (rowCount > 0) {
       await productosRepo.recalcularStock(rows[0].producto_id, client);
+      await recalcularTotalOrden(rows[0].orden_compra_id, client);
     }
     await client.query('COMMIT');
     return rowCount;

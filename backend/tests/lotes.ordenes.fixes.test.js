@@ -46,11 +46,17 @@ import * as ordenesController from '../src/modules/ordenesCompra/ordenesCompra.c
 import * as ordenesService from '../src/modules/ordenesCompra/ordenesCompra.service.js';
 import * as ordenesRepo from '../src/modules/ordenesCompra/ordenesCompra.repository.js';
 import * as productosRepo from '../src/modules/productos/productos.repository.js';
+import * as productosService from '../src/modules/productos/productos.service.js';
 import * as proveedoresRepo from '../src/modules/proveedores/proveedores.repository.js';
 import * as proveedoresService from '../src/modules/proveedores/proveedores.service.js';
 import * as categoriasRepo from '../src/modules/categorias/categorias.repository.js';
 import * as tiposPromocionRepo from '../src/modules/tiposPromocion/tiposPromocion.repository.js';
+import * as ventasRepo from '../src/modules/ventas/ventas.repository.js';
+import * as pedidosRepo from '../src/modules/pedidos/pedidos.repository.js';
+import * as tieneRepo from '../src/modules/tiene/tiene.repository.js';
+import * as tieneService from '../src/modules/tiene/tiene.service.js';
 import { eliminarImagenFisica } from '../src/modules/productos/productos.imagen.js';
+import { precioVigente } from '../src/modules/productos/productos.precio.js';
 import { errorHandler } from '../src/middlewares/errorHandler.js';
 
 describe('Fixes 1, 3, 4 y 5 en lotes y órdenes de compra', () => {
@@ -256,7 +262,20 @@ describe('Fixes 1, 3, 4 y 5 en lotes y órdenes de compra', () => {
     });
 
     await expect(lotesService.actualizarLote(1, { total: 0.001 })).rejects.toMatchObject({ status: 400 });
-    await expect(ordenesService.actualizarOrdenCompra(1, { total: 0.001 })).rejects.toMatchObject({ status: 400 });
+    productosRepo.findById.mockResolvedValue({ id: 2, activo: true, precioCosto: 10 });
+    await expect(
+      ordenesService.actualizarOrdenCompra(1, {
+        lotes: [
+          {
+            cantidad: 1,
+            total: 0.001,
+            fechaArribo: '2026-11-18',
+            fechaVencimiento: '2027-01-01',
+            productoId: 2,
+          },
+        ],
+      })
+    ).rejects.toMatchObject({ status: 400 });
   });
 
   it('Fix 10: rechaza tipoPromocionId inactivo aunque sea el id por defecto', async () => {
@@ -360,5 +379,128 @@ describe('Fixes 1, 3, 4 y 5 en lotes y órdenes de compra', () => {
         lotes: [{ cantidad: 1, fechaArribo: '2026-11-18', fechaVencimiento: '2027-01-01', productoId: 2 }],
       })
     ).rejects.toMatchObject({ status: 409 });
+  });
+
+  it('Audit Fix 1: eliminar venta o pedido restaura stock en lotes desde pedido_lotes', async () => {
+    const client = {
+      query: vi.fn(async (sql) => {
+        if (sql.includes('FROM ventas WHERE id = $1')) {
+          return { rows: [{ id: 10, pedido_id: 20 }] };
+        }
+        if (sql.includes('UPDATE ventas SET activo = false')) {
+          return { rowCount: 1 };
+        }
+        if (sql.includes('FROM pedido_lotes')) {
+          return { rows: [{ lote_id: 5, producto_id: 2, cantidad: 4 }] };
+        }
+        return { rows: [], rowCount: 1 };
+      }),
+      release: vi.fn(),
+    };
+    mockPool.connect.mockResolvedValueOnce(client);
+
+    const borrada = await ventasRepo.remove(10);
+    expect(borrada).toBe(1);
+    expect(client.query.mock.calls.some(([sql]) => sql.includes('LEAST(cantidad + $1, cantidad_inicial)'))).toBe(true);
+    expect(client.query.mock.calls.some(([sql]) => sql.includes('DELETE FROM pedido_lotes WHERE pedido_id = $1'))).toBe(true);
+    expect(productosRepo.recalcularStock).toHaveBeenCalledWith(2, client);
+
+    const clientPedido = {
+      query: vi.fn(async (sql) => {
+        if (sql.includes('FROM pedidos WHERE id = $1')) {
+          return { rows: [{ id: 20 }] };
+        }
+        if (sql.includes('UPDATE pedidos SET activo = false')) {
+          return { rowCount: 1 };
+        }
+        if (sql.includes('FROM pedido_lotes')) {
+          return { rows: [{ lote_id: 5, producto_id: 2, cantidad: 4 }] };
+        }
+        return { rows: [], rowCount: 1 };
+      }),
+      release: vi.fn(),
+    };
+    mockPool.connect.mockResolvedValueOnce(clientPedido);
+
+    const pedidoBorrado = await pedidosRepo.remove(20);
+    expect(pedidoBorrado).toBe(1);
+    expect(clientPedido.query.mock.calls.some(([sql]) => sql.includes('UPDATE ventas SET activo = false WHERE pedido_id = $1'))).toBe(true);
+    expect(productosRepo.recalcularStock).toHaveBeenCalledWith(2, clientPedido);
+  });
+
+  it('Audit Fix 2: tiene.service usa precioVigente, valida stock y rechaza productos inactivos', async () => {
+    vi.spyOn(pedidosRepo, 'findById').mockResolvedValue({
+      id: 1,
+      activo: true,
+      estado: 'pendiente',
+      envio: 0,
+    });
+    vi.spyOn(pedidosRepo, 'update').mockResolvedValue({});
+    vi.spyOn(tieneRepo, 'findByPedido').mockResolvedValue([{ precio: 801, cantidad: 2, activo: true }]);
+    vi.spyOn(tieneRepo, 'findByPedidoYProducto').mockResolvedValue({
+      pedido_id: 1,
+      producto_id: 2,
+      cantidad: 2,
+      precio: 801,
+      activo: true,
+    });
+    const updateSpy = vi.spyOn(tieneRepo, 'update').mockResolvedValue({ pedido_id: 1, producto_id: 2, cantidad: 3, precio: 801 });
+
+    productosRepo.findById.mockResolvedValue({
+      id: 2,
+      activo: true,
+      stock: 5,
+      precioVenta: 900,
+      precioPromo: 800,
+      enPromocion: true,
+    });
+
+    await tieneService.actualizarTiene({ pedido_id: 1, producto_id: 2, cantidad: 3 });
+    expect(updateSpy).toHaveBeenCalledWith(expect.objectContaining({ cantidad: 3, precio: 801 }));
+
+    await expect(
+      tieneService.actualizarTiene({ pedido_id: 1, producto_id: 2, cantidad: 10 })
+    ).rejects.toMatchObject({ status: 409 });
+  });
+
+  it('Audit Fix 4: actualizarOrdenCompra sin lotes conserva total existente; lotes.repository recalcula total de la orden', async () => {
+    ordenesRepo.findById.mockResolvedValue({ id: 1, activo: true, total: 1500, fecha: '2026-11-18' });
+    ordenesRepo.update.mockResolvedValue({ id: 1, total: 1500 });
+
+    await ordenesService.actualizarOrdenCompra(1, { total: 0.01, fecha: '2026-11-18' });
+    expect(ordenesRepo.update).toHaveBeenCalledWith(1, expect.objectContaining({ total: 1500 }));
+  });
+
+  it('Audit Fix 5 y 6: precioVigente normaliza promo igual que frontend y productos.service valida ID/longitudes en PUT e imagen', async () => {
+    expect(precioVigente({ precioVenta: 900, precioPromo: 800, enPromocion: true })).toBe(801);
+
+    await expect(productosService.subirImagenProducto('abc', { filename: 'x.jpg' })).rejects.toMatchObject({ status: 400 });
+    expect(eliminarImagenFisica).toHaveBeenCalledWith('x.jpg');
+
+    productosRepo.findById.mockResolvedValueOnce({ id: 1, activo: true, nombre: 'Ok', precioCosto: 10, precioVenta: 20 });
+    await expect(productosService.actualizarProducto(1, { nombre: 'A'.repeat(101) })).rejects.toMatchObject({ status: 400 });
+
+    productosRepo.findById.mockResolvedValueOnce({ id: 1, activo: true, nombre: 'Ok', precioCosto: 10, precioVenta: 20 });
+    await expect(productosService.actualizarProducto(1, { marca: 'B'.repeat(26) })).rejects.toMatchObject({ status: 400 });
+  });
+
+  it('Audit Fix 8: crearPedido rechaza suma de ítems duplicados que excede MAX_INT4', async () => {
+    productosRepo.findById.mockResolvedValue({ id: 2, activo: true, precioVenta: 10, enPromocion: false });
+    vi.doMock('../src/modules/roles/roles.repository.js', () => ({
+      findById: vi.fn(async () => ({ id: 2 })),
+    }));
+    const { crearPedido } = await import('../src/modules/pedidos/pedidos.service.js');
+
+    await expect(
+      crearPedido({
+        nombreComercio: 'Comercio',
+        telefono: '1234567',
+        modalidadEntrega: 'retiro',
+        items: [
+          { productoId: 2, cantidad: 2147483647 },
+          { productoId: 2, cantidad: 1 },
+        ],
+      })
+    ).rejects.toMatchObject({ status: 400 });
   });
 });

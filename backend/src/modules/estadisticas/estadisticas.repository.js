@@ -17,7 +17,7 @@ export const gananciasMensuales = async () => {
       GROUP BY t.pedido_id
     ) costos_pedido ON costos_pedido.pedido_id = v.pedido_id
     WHERE v.activo = true
-      AND v.fecha >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
+      AND v.fecha >= DATE_TRUNC('month', (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date - INTERVAL '12 months')
     GROUP BY DATE_TRUNC('month', v.fecha)
     ORDER BY DATE_TRUNC('month', v.fecha) ASC;
   `);
@@ -33,10 +33,10 @@ export const productosVencidos = async () => {
       p.marca,
       p.categoria,
       l.fecha_vencimiento,
-      (CURRENT_DATE - l.fecha_vencimiento) AS dias_vencido
+      ((CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date - l.fecha_vencimiento) AS dias_vencido
     FROM lotes l
     JOIN productos p ON p.id = l.producto_id
-    WHERE l.fecha_vencimiento < CURRENT_DATE
+    WHERE l.fecha_vencimiento < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
       AND l.activo = true
       AND l.cantidad > 0
       AND p.activo = true
@@ -76,7 +76,7 @@ export const promedioDiario = async () => {
     FROM ventas v
     LEFT JOIN pedidos p ON p.id = v.pedido_id
     WHERE v.activo = true
-      AND v.fecha >= CURRENT_DATE - INTERVAL '30 days';
+      AND v.fecha >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date - INTERVAL '30 days';
   `);
   return rows[0];
 };

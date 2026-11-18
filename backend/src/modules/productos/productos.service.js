@@ -2,9 +2,11 @@ import * as repository from './productos.repository.js';
 import * as categoriasRepository from '../categorias/categorias.repository.js';
 import * as tiposPromocionRepository from '../tiposPromocion/tiposPromocion.repository.js';
 import { URL_BASE_IMAGENES, eliminarImagenFisica } from './productos.imagen.js';
-import { porcentajeDescuento } from './productos.precio.js';
+import { porcentajeDescuento, precioConDescuento } from './productos.precio.js';
 
 const DEFAULT_TIPO_PROMOCION_ID = 1;
+const INT4_MAX = 2147483647;
+const DECIMAL_10_2_MAX = 99999999.99;
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -22,10 +24,16 @@ const normalizarBooleano = (valor) => {
   return Boolean(valor);
 };
 
-const normalizarTextoOpcional = (valor) => {
+const normalizarTextoOpcional = (valor, campo = 'El campo') => {
   if (valor === undefined) return undefined;
   if (valor === null) return null;
-  const limpio = String(valor).trim();
+  if (typeof valor !== 'string') {
+    throw crearError(`${campo} debe ser un texto válido`, 400);
+  }
+  if (valor.includes('\u0000')) {
+    throw crearError(`${campo} contiene caracteres inválidos`, 400);
+  }
+  const limpio = valor.trim();
   if (!limpio || limpio === 'null' || limpio === 'undefined') return null;
   return limpio;
 };
@@ -37,7 +45,7 @@ const esVacio = (valor) =>
 
 const validarEnteroNoNegativo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isInteger(valor) || valor < 0) {
+    if (!Number.isInteger(valor) || valor < 0 || valor > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return valor;
@@ -49,7 +57,7 @@ const validarEnteroNoNegativo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isSafeInteger(numero) || numero < 0) {
+    if (!Number.isSafeInteger(numero) || numero < 0 || numero > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return numero;
@@ -60,10 +68,11 @@ const validarEnteroNoNegativo = (valor, mensaje) => {
 
 const validarDecimalPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isFinite(valor) || valor <= 0) {
+    const redondeado = Number(valor.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return valor;
+    return redondeado;
   }
 
   if (typeof valor === 'string') {
@@ -72,10 +81,11 @@ const validarDecimalPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isFinite(numero) || numero <= 0) {
+    const redondeado = Number(numero.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return numero;
+    return redondeado;
   }
 
   throw crearError(mensaje, 400);
@@ -93,11 +103,12 @@ const resolverPrecioPromo = (rawPromo, precioVenta) => {
     throw crearError('El precio promocional debe ser menor al precio de venta', 400);
   }
 
-  if (porcentajeDescuento(precioVenta, precioPromo) === null) {
+  const porcentaje = porcentajeDescuento(precioVenta, precioPromo);
+  if (porcentaje === null) {
     throw crearError('El descuento promocional debe ser un porcentaje entero entre 1% y 99%', 400);
   }
 
-  return precioPromo;
+  return precioConDescuento(precioVenta, porcentaje);
 };
 
 const resolverCategoria = async (data, fallback = null) => {
@@ -111,14 +122,22 @@ const resolverCategoria = async (data, fallback = null) => {
     if (!cat) {
       throw crearError('La categoría indicada no existe', 400);
     }
+    if (cat.activo === false) {
+      throw crearError('La categoría indicada está inactiva', 400);
+    }
     return { categoriaId: cat.id, categoria: cat.nombre };
   }
 
-  const nombreCategoria = normalizarTextoOpcional(data.categoria) ?? '';
+  const nombreCategoria = normalizarTextoOpcional(data.categoria, 'La categoría') ?? '';
   if (nombreCategoria) {
+    if (nombreCategoria.length > 100) {
+      throw crearError('El nombre de la categoría no puede superar los 100 caracteres', 400);
+    }
     let cat = await categoriasRepository.findByNombreInsensitive(nombreCategoria);
     if (!cat) {
       cat = await categoriasRepository.create(nombreCategoria);
+    } else if (cat.activo === false && typeof categoriasRepository.reactivar === 'function') {
+      cat = await categoriasRepository.reactivar(cat.id, nombreCategoria);
     }
     return { categoriaId: cat.id, categoria: cat.nombre };
   }
@@ -139,7 +158,7 @@ const resolverTipoPromocionDefecto = async () => {
     if (descuento?.activo) return descuento.id;
 
     const descuentoDirecto = await tiposPromocionRepository.findByNombreInsensitive('Descuento directo');
-    if (descuentoDirecto) return descuentoDirecto.id;
+    if (descuentoDirecto?.activo) return descuentoDirecto.id;
   }
 
   if (typeof tiposPromocionRepository.findAll === 'function') {
@@ -164,17 +183,26 @@ const resolverTipoPromocion = async (data, fallback = undefined) => {
     if (!tipo) {
       throw crearError('El tipo de promoción indicado no existe', 400);
     }
+    if (tipo.activo === false) {
+      throw crearError('El tipo de promoción indicado está inactivo', 400);
+    }
 
     return tipo.id;
   }
 
   const nombreTipo = normalizarTextoOpcional(
-    data.tipoPromocionNombre ?? data.tipo_promocion_nombre
+    data.tipoPromocionNombre ?? data.tipo_promocion_nombre,
+    'El tipo de promoción'
   );
   if (nombreTipo && typeof tiposPromocionRepository.findByNombreInsensitive === 'function') {
+    if (nombreTipo.length > 100) {
+      throw crearError('El nombre del tipo de promoción no puede superar los 100 caracteres', 400);
+    }
     let tipo = await tiposPromocionRepository.findByNombreInsensitive(nombreTipo);
     if (!tipo && typeof tiposPromocionRepository.create === 'function') {
       tipo = await tiposPromocionRepository.create(nombreTipo);
+    } else if (tipo?.activo === false && typeof tiposPromocionRepository.reactivar === 'function') {
+      tipo = await tiposPromocionRepository.reactivar(tipo.id, nombreTipo);
     }
     if (tipo) return tipo.id;
   }
@@ -198,7 +226,7 @@ export const listarCatalogo = async () => await repository.findAllCatalogo();
 
 const validarId = (id, mensaje = 'El ID del producto no es válido') => {
   const num = Number(id);
-  if (!Number.isInteger(num) || num <= 0) {
+  if (!Number.isInteger(num) || num <= 0 || num > INT4_MAX) {
     throw crearError(mensaje, 400);
   }
   return num;
@@ -215,9 +243,9 @@ export const obtenerProductoPorId = async (id) => {
 
 export const crearProducto = async (data, archivo) => {
   try {
-    const nombre = normalizarTextoOpcional(data?.nombre) ?? '';
-    const marca = normalizarTextoOpcional(data?.marca) ?? null;
-    const descripcion = normalizarTextoOpcional(data?.descripcion) ?? null;
+    const nombre = normalizarTextoOpcional(data?.nombre, 'El nombre del producto') ?? '';
+    const marca = normalizarTextoOpcional(data?.marca, 'La marca del producto') ?? null;
+    const descripcion = normalizarTextoOpcional(data?.descripcion, 'La descripción del producto') ?? null;
 
     if (!nombre || esVacio(data?.precioCosto) || esVacio(data?.precioVenta)) {
       throw crearError('Faltan datos obligatorios para crear el producto', 400);
@@ -229,6 +257,10 @@ export const crearProducto = async (data, archivo) => {
 
     if (marca && marca.length > 25) {
       throw crearError('La marca del producto no puede superar los 25 caracteres', 400);
+    }
+
+    if (descripcion && descripcion.length > 2000) {
+      throw crearError('La descripción del producto no puede superar los 2000 caracteres', 400);
     }
 
     const rawVisibleCatalogo = data?.visibleCatalogo ?? data?.visible_catalogo;
@@ -293,7 +325,7 @@ export const actualizarProducto = async (id, data, archivo) => {
   try {
     const idValido = validarId(id);
     const productoExistente = await repository.findById(idValido);
-    if (!productoExistente) {
+    if (!productoExistente || productoExistente.activo === false) {
       throw crearError('Producto no encontrado', 404);
     }
 
@@ -336,21 +368,30 @@ export const actualizarProducto = async (id, data, archivo) => {
 
     const nombre =
       data.nombre !== undefined
-        ? (normalizarTextoOpcional(data.nombre) ?? '')
+        ? (normalizarTextoOpcional(data.nombre, 'El nombre del producto') ?? '')
         : productoExistente.nombre;
     if (!nombre) {
       throw crearError('El nombre del producto es obligatorio', 400);
     }
+    if (nombre.length > 100) {
+      throw crearError('El nombre del producto no puede superar los 100 caracteres', 400);
+    }
 
     const descripcion =
       data.descripcion !== undefined
-        ? normalizarTextoOpcional(data.descripcion)
+        ? normalizarTextoOpcional(data.descripcion, 'La descripción del producto')
         : (productoExistente.descripcion ?? null);
+    if (descripcion && descripcion.length > 2000) {
+      throw crearError('La descripción del producto no puede superar los 2000 caracteres', 400);
+    }
 
     const marca =
       data.marca !== undefined
-        ? normalizarTextoOpcional(data.marca)
+        ? normalizarTextoOpcional(data.marca, 'La marca del producto')
         : productoExistente.marca;
+    if (marca && marca.length > 25) {
+      throw crearError('La marca del producto no puede superar los 25 caracteres', 400);
+    }
 
     const destacado =
       data.destacado !== undefined
@@ -373,7 +414,7 @@ export const actualizarProducto = async (id, data, archivo) => {
       throw crearError('Debe cargar una imagen para publicar el producto en el catálogo', 400);
     }
 
-    const actualizado = await repository.update(id, {
+    const actualizado = await repository.update(idValido, {
       nombre,
       descripcion,
       precioCosto,
@@ -417,14 +458,22 @@ export const subirImagenProducto = async (id, archivo) => {
     throw crearError('Debe adjuntar una imagen', 400);
   }
 
-  const productoExistente = await repository.findById(id);
-  if (!productoExistente) {
-    await eliminarImagenFisica(`${URL_BASE_IMAGENES}/${archivo.filename}`);
+  let idValido;
+  try {
+    idValido = validarId(id);
+  } catch (err) {
+    await eliminarImagenFisica(archivo.filename);
+    throw err;
+  }
+
+  const productoExistente = await repository.findById(idValido);
+  if (!productoExistente || productoExistente.activo === false) {
+    await eliminarImagenFisica(archivo.filename);
     throw crearError('Producto no encontrado', 404);
   }
 
-  const rutaNueva = `${URL_BASE_IMAGENES}/${archivo.filename}`;
-  const actualizado = await repository.updateImagen(id, rutaNueva);
+  const rutaNueva = archivo.filename;
+  const actualizado = await repository.updateImagen(idValido, rutaNueva);
 
   if (productoExistente.imagen && productoExistente.imagen !== rutaNueva) {
     await eliminarImagenFisica(productoExistente.imagen);
@@ -434,12 +483,13 @@ export const subirImagenProducto = async (id, archivo) => {
 };
 
 export const quitarImagenProducto = async (id) => {
-  const productoExistente = await repository.findById(id);
-  if (!productoExistente) {
+  const idValido = validarId(id);
+  const productoExistente = await repository.findById(idValido);
+  if (!productoExistente || productoExistente.activo === false) {
     throw crearError('Producto no encontrado', 404);
   }
 
-  const actualizado = await repository.updateImagen(id, null, false);
+  const actualizado = await repository.updateImagen(idValido, null, false);
 
   if (productoExistente.imagen) {
     await eliminarImagenFisica(productoExistente.imagen);

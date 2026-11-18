@@ -5,7 +5,7 @@ import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryCategoria from '../categorias/categorias.repository.js';
 import * as repositoryTipoPromocion from '../tiposPromocion/tiposPromocion.repository.js';
 import { eliminarImagenFisica } from '../productos/productos.imagen.js';
-import { porcentajeDescuento } from '../productos/productos.precio.js';
+import { porcentajeDescuento, precioConDescuento } from '../productos/productos.precio.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
 const DEFAULT_TIPO_PROMOCION_ID = 1;
@@ -226,9 +226,11 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     if (precioPromo >= precioVenta) {
       throw crearError('El precio promocional debe ser menor al precio de venta', 400);
     }
-    if (porcentajeDescuento(precioVenta, precioPromo) === null) {
+    const pct = porcentajeDescuento(precioVenta, precioPromo);
+    if (pct === null) {
       throw crearError('El descuento promocional debe ser un porcentaje entero entre 1% y 99%', 400);
     }
+    precioPromo = precioConDescuento(precioVenta, pct);
 
     const rawTipoId = productoNuevo.tipoPromocionId ?? productoNuevo.tipo_promocion_id;
     const rawTipoNuevo = validarTexto(
@@ -441,7 +443,7 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       if (!proveedorExistente) {
         throw crearError('Proveedor no encontrado', 404);
       }
-      if (proveedorExistente.activo === false && proveedorId !== ordenCompraExistente.proveedor?.id) {
+      if (proveedorExistente.activo === false) {
         throw crearError('El proveedor indicado está inactivo', 400);
       }
       proveedorId = parsedId;
@@ -497,12 +499,6 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
     }
 
     let total = ordenCompraExistente.total;
-    if (data.total !== undefined) {
-      total = validarDecimalPositivo(
-        data.total,
-        'El total de la orden de compra debe ser mayor a 0'
-      );
-    }
 
     let fecha = ordenCompraExistente.fecha;
     if (data.fecha !== undefined) {
