@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { LuPlus, LuSearch } from 'react-icons/lu'
+import { LuSearch } from 'react-icons/lu'
 import { useProductosAdmin } from '../hooks/useProductosAdmin'
 import Spinner from '../../../shared/components/Spinner'
 import MensajeVacio from '../../../shared/components/MensajeVacio'
@@ -60,11 +60,6 @@ function AdministradorPage() {
   const mostrarMensaje = (texto, tipo = 'exito') => {
     setAlerta({ texto, tipo })
     setTimeout(() => setAlerta(null), 4000)
-  }
-
-  const handleAbrirCrear = () => {
-    setProductoSeleccionado(null)
-    setModalFormAbierto(true)
   }
 
   const handleAbrirEditar = (producto) => {
@@ -184,15 +179,6 @@ function AdministradorPage() {
               ))}
             </select>
           </div>
-
-          <button
-            type="button"
-            className="prod-btn-nuevo"
-            onClick={handleAbrirCrear}
-          >
-            <LuPlus size={18} aria-hidden="true" />
-            <span>Nuevo Producto</span>
-          </button>
         </div>
 
         <section id="sec-prod-admin" className="sec-prod-admin" aria-live="polite">
