@@ -2,16 +2,24 @@ import { useEffect, useState } from 'react'
 import { LuImagePlus } from 'react-icons/lu'
 import Modal from '../comunes/Modal'
 import CampoFormulario from '../comunes/CampoFormulario'
-import { obtenerCategorias } from '../../services/productosServices'
+import { obtenerCategorias, obtenerHistorialPreciosProducto } from '../../services/productosServices'
 import {
   bloquearTeclasNoNumericas,
   sanitizarDecimalPositivo,
-  sanitizarEnteroPositivo,
 } from '../../../../shared/utils/validaciones'
 import {
+  formatearFecha,
+  formatearPrecio,
   manejarErrorImagenProducto,
   obtenerUrlImagenProducto,
 } from '../../../../shared/utils/formato'
+
+const ETIQUETAS_ORIGEN_HISTORIAL = {
+  ALTA_PRODUCTO: 'Alta inicial',
+  INGRESO_LOTE: 'Ingreso de lote',
+  EDICION_ORDEN: 'Edición de orden',
+  EDICION_MANUAL: 'Edición manual',
+}
 
 const CATEGORIAS_DISPONIBLES = [
   'Almacén',
@@ -52,7 +60,13 @@ function calcularPorcentajeInicial(producto) {
 
 function ModalFormProducto({ producto, visible, guardando, soloLectura = false, onGuardar, onCerrar }) {
   const editando = Boolean(producto)
+  const tieneIdProducto = producto?.id != null
   const tieneLotesVigentes = Boolean(producto?.tieneLoteVigente) && Number(producto?.stock) > 0
+
+  const [pestanaActiva, setPestanaActiva] = useState('datos')
+  const [historialPrecios, setHistorialPrecios] = useState([])
+  const [cargandoHistorial, setCargandoHistorial] = useState(() => Boolean(producto?.id != null))
+  const [errorHistorial, setErrorHistorial] = useState(null)
 
   const [categorias, setCategorias] = useState([])
 
@@ -82,14 +96,9 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
   const [errorServidor, setErrorServidor] = useState(null)
 
   useEffect(() => {
-    if (!imagenArchivo) {
-      setVistaPrevia(producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '')
-      return
-    }
-    const objectUrl = URL.createObjectURL(imagenArchivo)
-    setVistaPrevia(objectUrl)
-    return () => URL.revokeObjectURL(objectUrl)
-  }, [imagenArchivo, producto])
+    if (!vistaPrevia || !vistaPrevia.startsWith('blob:')) return undefined
+    return () => URL.revokeObjectURL(vistaPrevia)
+  }, [vistaPrevia])
 
   useEffect(() => {
     if (!visible) return
@@ -121,6 +130,32 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       ignorar = true
     }
   }, [visible, producto])
+
+  useEffect(() => {
+    if (!visible || producto?.id == null) return
+    let ignorar = false
+
+    obtenerHistorialPreciosProducto(producto.id)
+      .then((registros) => {
+        if (ignorar) return
+        setHistorialPrecios(Array.isArray(registros) ? registros : [])
+        setErrorHistorial(null)
+      })
+      .catch((err) => {
+        if (!ignorar) {
+          setErrorHistorial(err.message || 'No se pudo cargar el historial de costos')
+        }
+      })
+      .finally(() => {
+        if (!ignorar) {
+          setCargandoHistorial(false)
+        }
+      })
+
+    return () => {
+      ignorar = true
+    }
+  }, [visible, producto?.id])
 
   if (!visible) return null
 
@@ -303,6 +338,65 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     }
   }
 
+  const ultimoCambioFecha = historialPrecios.length > 0
+    ? formatearFecha(historialPrecios[0]?.fechaRegistro)
+    : 'Sin cambios'
+
+  const renderVariacionCosto = (item) => {
+    if (item.precioCostoAnterior == null) {
+      return (
+        <span>
+          <strong>{formatearPrecio(item.precioCostoNuevo)}</strong>{' '}
+          <span className="prod-historial-badge prod-historial-badge-neutro">(Inicial)</span>
+        </span>
+      )
+    }
+
+    const anterior = Number(item.precioCostoAnterior)
+    const nuevo = Number(item.precioCostoNuevo)
+    const diffPct = Number.isFinite(anterior) && anterior > 0
+      ? ((nuevo - anterior) / anterior) * 100
+      : null
+
+    let claseBadge = 'prod-historial-badge-neutro'
+    let textoBadge = '0.0%'
+    if (diffPct !== null && Math.abs(diffPct) >= 0.05) {
+      claseBadge = diffPct > 0 ? 'prod-historial-badge-suba' : 'prod-historial-badge-baja'
+      textoBadge = `${diffPct > 0 ? '+' : ''}${diffPct.toFixed(1)}%`
+    }
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
+        <span>
+          {formatearPrecio(item.precioCostoAnterior)} → <strong>{formatearPrecio(item.precioCostoNuevo)}</strong>
+        </span>
+        {diffPct !== null && (
+          <span className={`prod-historial-badge ${claseBadge}`}>{textoBadge}</span>
+        )}
+      </div>
+    )
+  }
+
+  const renderPrecioVentaHistorial = (item) => {
+    const ventaAnt = item.precioVentaAnterior != null ? Number(item.precioVentaAnterior) : null
+    const ventaNva = Number(item.precioVentaNuevo)
+    if (ventaAnt !== null && Number.isFinite(ventaAnt) && Math.abs(ventaAnt - ventaNva) >= 0.01) {
+      return (
+        <span>
+          {formatearPrecio(ventaAnt)} → <strong>{formatearPrecio(ventaNva)}</strong>
+        </span>
+      )
+    }
+    return <span>{formatearPrecio(ventaNva)}</span>
+  }
+
+  const renderReferenciaHistorial = (item) => {
+    if (item.proveedorNombre || item.cantidadLote != null || item.ordenCompraId != null || item.loteId != null) {
+      return `${item.proveedorNombre || 'Orden de compra'}${item.cantidadLote ? ` · ${item.cantidadLote} u.` : ''}`
+    }
+    return 'Catálogo admin'
+  }
+
   return (
     <Modal
       titulo={
@@ -314,10 +408,125 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       }
       onCerrar={onCerrar}
       tamanio="normal"
+      headerExtra={
+        tieneIdProducto ? (
+          <div className="prod-modal-tabs flex-shrink-0" role="tablist" aria-label="Secciones del producto">
+            <button
+              type="button"
+              role="tab"
+              aria-selected={pestanaActiva === 'datos'}
+              className={`prod-modal-tab${pestanaActiva === 'datos' ? ' prod-modal-tab-activa' : ''}`}
+              onClick={() => setPestanaActiva('datos')}
+            >
+              Datos del Producto
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={pestanaActiva === 'historial'}
+              className={`prod-modal-tab${pestanaActiva === 'historial' ? ' prod-modal-tab-activa' : ''}`}
+              onClick={() => setPestanaActiva('historial')}
+            >
+              Historial de Costos
+            </button>
+          </div>
+        ) : null
+      }
     >
-      <form className="orden-form" onSubmit={manejarEnvio} noValidate>
-        <fieldset disabled={soloLectura} style={{ border: 'none', padding: 0, margin: 0 }}>
-          <div className="orden-modal-cuerpo prod-modal-cuerpo">
+      {tieneIdProducto && pestanaActiva === 'historial' ? (
+        <div className="orden-form flex flex-col max-h-[90vh] flex-1 min-h-0 overflow-hidden">
+          <div className="orden-modal-cuerpo prod-modal-scroll-body prod-historial-contenedor flex-1 overflow-y-auto p-6">
+            <div className="prod-historial-resumen">
+              <div className="prod-historial-tarjeta">
+                <span className="prod-historial-tarjeta-etiqueta">Costo Actual</span>
+                <span className="prod-historial-tarjeta-valor">
+                  {formatearPrecio(producto.precioCosto)}
+                </span>
+                <span className="prod-historial-tarjeta-sub">
+                  Precio de Venta actual: {formatearPrecio(producto.precioVenta)}
+                </span>
+              </div>
+
+              <div className="prod-historial-tarjeta">
+                <span className="prod-historial-tarjeta-etiqueta">Registros en Historial</span>
+                <span className="prod-historial-tarjeta-valor">
+                  {historialPrecios.length} {historialPrecios.length === 1 ? 'movimiento' : 'movimientos'}
+                </span>
+                <span className="prod-historial-tarjeta-sub">
+                  Último cambio: {ultimoCambioFecha}
+                </span>
+              </div>
+            </div>
+
+            {cargandoHistorial ? (
+              <p className="orden-form-cargando" role="status">
+                Cargando historial de costos...
+              </p>
+            ) : errorHistorial ? (
+              <div className="orden-alerta orden-alerta-error" role="alert">
+                <span>{errorHistorial}</span>
+              </div>
+            ) : historialPrecios.length === 0 ? (
+              <p className="orden-lotes-vacio">
+                Aún no hay movimientos de costos registrados para este producto.
+              </p>
+            ) : (
+              <div className="prod-historial-tabla-scroll max-h-80 overflow-y-auto">
+                <table className="orden-tabla-lotes" style={{ border: 'none', borderRadius: 0 }}>
+                  <thead>
+                    <tr>
+                      <th>Fecha y Origen</th>
+                      <th>Costo Unitario</th>
+                      <th>Precio de Venta</th>
+                      <th>Referencia</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {historialPrecios.map((item) => (
+                      <tr key={item.id}>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.2rem' }}>
+                            <span>{formatearFecha(item.fechaRegistro)}</span>
+                            <span className="prod-historial-badge prod-historial-badge-origen">
+                              {ETIQUETAS_ORIGEN_HISTORIAL[item.origen] || item.origen || 'Movimiento'}
+                            </span>
+                          </div>
+                        </td>
+                        <td>{renderVariacionCosto(item)}</td>
+                        <td>{renderPrecioVentaHistorial(item)}</td>
+                        <td>{renderReferenciaHistorial(item)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          <div className="orden-modal-acciones prod-modal-acciones flex-shrink-0 bg-slate-800 border-t border-slate-700 p-4 flex justify-end gap-3">
+            <button
+              type="button"
+              className="orden-btn prod-btn-secundario border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600 hover:text-white dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 dark:hover:text-white"
+              onClick={() => setPestanaActiva('datos')}
+            >
+              Volver a datos
+            </button>
+            <button
+              type="button"
+              className="orden-btn prod-btn-primario"
+              onClick={onCerrar}
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      ) : (
+      <form className="orden-form flex flex-col max-h-[90vh] flex-1 min-h-0 overflow-hidden" onSubmit={manejarEnvio} noValidate>
+        <div className="orden-modal-cuerpo prod-modal-scroll-body flex-1 overflow-y-auto p-6">
+          <div
+            className="prod-modal-cuerpo"
+            style={soloLectura ? { pointerEvents: 'none', opacity: 0.85 } : undefined}
+          >
           {errorServidor && (
             <div className="orden-alerta orden-alerta-error prod-modal-span-2" role="alert">
               <span>{errorServidor}</span>
@@ -329,6 +538,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
               <input
                 id="prod-nombre"
                 type="text"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 placeholder="Ej. Alfajor de Chocolate"
                 value={valores.nombre}
                 onChange={(e) => actualizarCampo('nombre', e.target.value)}
@@ -342,6 +552,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
             <input
               id="prod-marca"
               type="text"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               placeholder="Ej. Havanna"
               value={valores.marca}
               onChange={(e) => actualizarCampo('marca', e.target.value)}
@@ -353,6 +564,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
             {categorias.length > 0 ? (
               <select
                 id="prod-categoria"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.categoriaId}
                 onChange={(e) => actualizarCampo('categoriaId', e.target.value)}
                 disabled={guardando}
@@ -367,6 +579,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
             ) : (
               <select
                 id="prod-categoria"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.categoria}
                 onChange={(e) => actualizarCampo('categoria', e.target.value)}
                 disabled={guardando}
@@ -388,6 +601,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                 min="0.01"
                 step="0.01"
                 inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.precioCosto}
                 onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
                 onChange={(e) => actualizarCampo('precioCosto', sanitizarDecimalPositivo(e.target.value))}
@@ -402,6 +616,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                 min="0.01"
                 step="0.01"
                 inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.precioVenta}
                 onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
                 onChange={(e) => actualizarPrecioVenta(e.target.value)}
@@ -413,11 +628,12 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
               <input
                 id="prod-stock"
                 type="number"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.stock}
                 readOnly
                 disabled
                 title="El stock se calcula automáticamente como la suma de sus lotes activos y vigentes"
-                style={{ backgroundColor: '#f3f4f6', cursor: 'not-allowed' }}
+                style={{ cursor: 'not-allowed' }}
               />
             </CampoFormulario>
           </div>
@@ -427,6 +643,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
               <textarea
                 id="prod-descripcion"
                 rows={2}
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 placeholder="Descripción del producto"
                 value={valores.descripcion}
                 onChange={(e) => actualizarCampo('descripcion', e.target.value)}
@@ -450,6 +667,11 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                 onChange={(e) => {
                   const archivo = e.target.files?.[0] || null
                   setImagenArchivo(archivo)
+                  setVistaPrevia(
+                    archivo
+                      ? URL.createObjectURL(archivo)
+                      : (producto?.imagen ? obtenerUrlImagenProducto(producto.imagen) : '')
+                  )
                   if (errores.imagen || errores.visibleCatalogo) {
                     setErrores((prev) => ({ ...prev, imagen: null, visibleCatalogo: null }))
                   }
@@ -598,6 +820,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                   max="99.99"
                   step="0.01"
                   inputMode="decimal"
+                  className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                   placeholder="Ej. 15"
                   value={valores.porcentajeDescuento}
                   onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -617,6 +840,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                   min="0.01"
                   step="0.01"
                   inputMode="decimal"
+                  className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                   placeholder="Precio con descuento"
                   value={valores.precioPromo}
                   onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -627,12 +851,12 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
             </>
           )}
           </div>
-        </fieldset>
+        </div>
 
-        <div className="orden-modal-acciones prod-modal-acciones">
+        <div className="orden-modal-acciones prod-modal-acciones flex-shrink-0 bg-slate-800 border-t border-slate-700 p-4 flex justify-end gap-3">
           <button
             type="button"
-            className="orden-btn prod-btn-secundario"
+            className="orden-btn prod-btn-secundario border border-slate-600 bg-slate-700 text-slate-200 hover:bg-slate-600 hover:text-white dark:border-slate-600 dark:bg-slate-700 dark:text-slate-200 dark:hover:bg-slate-600 dark:hover:text-white"
             onClick={onCerrar}
             disabled={guardando}
           >
@@ -649,6 +873,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
           )}
         </div>
       </form>
+      )}
     </Modal>
   )
 }

@@ -196,13 +196,15 @@ export const listarHistorialProductos = async () => {
 
 export const listarCatalogo = async () => await repository.findAllCatalogo();
 
-const validarId = (id, mensaje = 'El ID del producto no es válido') => {
+const validarIdEnteroPositivo = (id, mensaje = 'El ID del producto no es válido') => {
   const num = Number(id);
   if (!Number.isInteger(num) || num <= 0) {
     throw crearError(mensaje, 400);
   }
   return num;
 };
+
+const validarId = validarIdEnteroPositivo;
 
 export const obtenerProductoPorId = async (id) => {
   const idValido = validarId(id);
@@ -211,6 +213,15 @@ export const obtenerProductoPorId = async (id) => {
     throw crearError('Producto no encontrado', 404);
   }
   return producto;
+};
+
+export const obtenerHistorialPrecios = async (id) => {
+  const idValido = validarIdEnteroPositivo(id);
+  const producto = await repository.findById(idValido, { incluirInactivos: true });
+  if (!producto) {
+    throw crearError('Producto no encontrado', 404);
+  }
+  return await repository.findHistorialPreciosByProductoId(idValido);
 };
 
 export const crearProducto = async (data, archivo) => {

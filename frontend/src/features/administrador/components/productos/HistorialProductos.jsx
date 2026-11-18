@@ -127,52 +127,58 @@ function HistorialProductos() {
           texto="Probá cambiando el filtro de estado o la búsqueda."
         />
       ) : (
-        <section className="sec-prod-admin" aria-live="polite">
+        <section
+          className="sec-prod-admin dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          aria-live="polite"
+        >
           <table className="tabla-prod-admin">
-            <thead>
-              <tr>
-                <th>
+            <thead className="dark:bg-slate-900/50 dark:text-slate-400 dark:border-slate-700">
+              <tr className="dark:border-slate-700">
+                <th className="dark:text-slate-400 dark:border-slate-700">
                   <button type="button" className="hist-ordenar-btn" onClick={() => alternarOrden('nombre')}>
                     Producto {orden.campo === 'nombre' ? (orden.dir === 'asc' ? '↑' : '↓') : '↕'}
                   </button>
                 </th>
-                <th>Categoría</th>
-                <th>
+                <th className="dark:text-slate-400 dark:border-slate-700">Categoría</th>
+                <th className="dark:text-slate-400 dark:border-slate-700">
                   <button type="button" className="hist-ordenar-btn" onClick={() => alternarOrden('stock')}>
                     Stock {orden.campo === 'stock' ? (orden.dir === 'asc' ? '↑' : '↓') : '↕'}
                   </button>
                 </th>
-                <th>
+                <th className="dark:text-slate-400 dark:border-slate-700">
                   <button type="button" className="hist-ordenar-btn" onClick={() => alternarOrden('precio')}>
                     Precio venta {orden.campo === 'precio' ? (orden.dir === 'asc' ? '↑' : '↓') : '↕'}
                   </button>
                 </th>
-                <th>Estado</th>
-                <th className="col-acciones-header">Detalle</th>
+                <th className="dark:text-slate-400 dark:border-slate-700">Estado</th>
+                <th className="col-acciones-header dark:text-slate-400 dark:border-slate-700">Detalle</th>
               </tr>
             </thead>
             <tbody>
               {visibles.map((producto) => {
                 const esEliminado = Boolean(producto.eliminado || producto.activo === false)
                 return (
-                  <tr key={producto.id} className={esEliminado ? 'hist-fila-eliminada' : ''}>
-                    <td>
+                  <tr
+                    key={producto.id}
+                    className={`${esEliminado ? 'hist-fila-eliminada ' : ''}dark:hover:bg-slate-700/50 dark:border-slate-700`}
+                  >
+                    <td className="dark:text-slate-200 dark:border-slate-700">
                       <div className="lotes-celda-doble">
-                        <span className="lotes-principal">{producto.nombre}</span>
-                        {producto.marca && <span className="lotes-subtexto">{producto.marca}</span>}
+                        <span className="lotes-principal dark:text-slate-200">{producto.nombre}</span>
+                        {producto.marca && <span className="lotes-subtexto dark:text-slate-400">{producto.marca}</span>}
                       </div>
                     </td>
-                    <td>{producto.categoria || '—'}</td>
-                    <td>{producto.stock ?? 0}</td>
-                    <td>{formatearPrecio(producto.precioVenta ?? 0)}</td>
-                    <td>
+                    <td className="dark:text-slate-200 dark:border-slate-700">{producto.categoria || '—'}</td>
+                    <td className="dark:text-slate-200 dark:border-slate-700">{producto.stock ?? 0}</td>
+                    <td className="dark:text-slate-200 dark:border-slate-700">{formatearPrecio(producto.precioVenta ?? 0)}</td>
+                    <td className="dark:text-slate-200 dark:border-slate-700">
                       {esEliminado ? (
                         <span className="hist-badge hist-badge-eliminado">Eliminado</span>
                       ) : (
                         <span className="hist-badge hist-badge-vigente">Activo</span>
                       )}
                     </td>
-                    <td className="orden-col-acciones">
+                    <td className="orden-col-acciones dark:border-slate-700">
                       <button
                         type="button"
                         className="venc-btn-icono venc-btn-ver"

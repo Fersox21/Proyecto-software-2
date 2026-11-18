@@ -50,47 +50,27 @@ function ConfiguracionPage() {
                     )}
                 </section>
 
-                <section className="config-tarjeta" aria-labelledby="config-titulo-tema" style={{ opacity: 0.7 }}>
-                    <h2 className="config-tarjeta-titulo" id="config-titulo-tema">
-                        Apariencia{' '}
-                        <span
-                            style={{
-                                marginLeft: '0.5rem',
-                                padding: '0.15rem 0.5rem',
-                                borderRadius: '999px',
-                                fontSize: '0.75rem',
-                                fontWeight: 600,
-                                backgroundColor: '#fef3c7',
-                                color: '#92400e',
-                                verticalAlign: 'middle',
-                            }}
-                        >
-                            Desactivada momentáneamente
-                        </span>
-                    </h2>
+                <section className="config-tarjeta" aria-labelledby="config-titulo-tema">
+                    <h2 className="config-tarjeta-titulo" id="config-titulo-tema">Apariencia</h2>
                     <p className="config-tarjeta-desc">
-                        Esta opción se encuentra desactivada momentáneamente.
+                        Elige entre tema claro, oscuro o el predeterminado del sistema.
                     </p>
 
-                    <div className="config-opciones" role="radiogroup" aria-label="Modo de tema" aria-disabled="true">
+                    <div className="config-opciones" role="radiogroup" aria-label="Modo de tema">
                         {OPCIONES_TEMA.map((opcion) => (
                             <button
                                 key={opcion.valor}
                                 type="button"
                                 role="radio"
                                 aria-checked={tema === opcion.valor}
-                                disabled
                                 className={`config-opcion ${tema === opcion.valor ? 'activa' : ''}`}
-                                style={{ cursor: 'not-allowed' }}
+                                onClick={() => cambiarTema(opcion.valor)}
                             >
                                 <span className="config-opcion-icono" aria-hidden="true">{opcion.icono}</span>
                                 <span>{opcion.texto}</span>
                             </button>
                         ))}
                     </div>
-                    <p className="config-nota">
-                        El cambio de tema está deshabilitado temporalmente.
-                    </p>
                 </section>
 
                 <section className="config-tarjeta" aria-labelledby="config-titulo-fuente">

@@ -74,6 +74,7 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
           <input
             id="proveedor-nombre"
             type="text"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Ej. Distribuidora Central S.A."
             value={valores.nombre}
             onChange={(e) => actualizarCampo('nombre', e.target.value)}
@@ -88,6 +89,7 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
             type="tel"
             inputMode="tel"
             maxLength={23}
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Ej. +5491145678901"
             value={valores.telefono}
             onChange={(e) => actualizarCampo('telefono', e.target.value)}
@@ -99,7 +101,7 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
       <div className="orden-modal-acciones">
         <button
           type="button"
-          className="orden-btn"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
           onClick={onCerrar}
           disabled={guardando}
         >

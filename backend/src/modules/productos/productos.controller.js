@@ -36,6 +36,15 @@ export const obtener = async (req, res, next) => {
   }
 };
 
+export const obtenerHistorialPrecios = async (req, res, next) => {
+  try {
+    const historial = await service.obtenerHistorialPrecios(req.params.id);
+    res.json(historial);
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const crear = async (req, res, next) => {
   try {
     const nuevoProducto = await service.crearProducto(req.body, req.file);

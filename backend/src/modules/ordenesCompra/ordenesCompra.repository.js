@@ -4,6 +4,22 @@ import * as tiposPromocionRepo from '../tiposPromocion/tiposPromocion.repository
 import * as productosRepo from '../productos/productos.repository.js';
 import * as proveedoresRepo from '../proveedores/proveedores.repository.js';
 
+let capacidadesCache = null;
+
+const obtenerCapacidades = async (client = pool) => {
+  if (capacidadesCache) return capacidadesCache;
+  const { rows } = await client.query(`
+    SELECT EXISTS (
+      SELECT 1 FROM information_schema.tables
+      WHERE table_schema = 'public' AND table_name = 'historial_precios_producto'
+    ) AS tiene_historial_precios
+  `);
+  capacidadesCache = {
+    tieneHistorialPrecios: Boolean(rows[0]?.tiene_historial_precios)
+  };
+  return capacidadesCache;
+};
+
 const resolverProductoEnTransaccion = async (lote, client) => {
   if (!lote.productoNuevo) {
     return lote.productoId ?? lote.producto;
@@ -60,12 +76,106 @@ const resolverProductoEnTransaccion = async (lote, client) => {
       tipoPromocionId,
       destacado: Boolean(nuevo.destacado),
       visibleCatalogo: false,
-      imagen: nuevo.imagen ?? null
+      imagen: nuevo.imagen ?? null,
+      omitirHistorialInicial: true
     },
     client
   );
 
   return productoCreado.id;
+};
+
+const insertarLoteEnTransaccion = async ({ lote, ordenId, prodId, origenExistente = 'INGRESO_LOTE', usuarioId = null, client }) => {
+  const { tieneHistorialPrecios } = await obtenerCapacidades(client);
+  const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
+  const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
+
+  let productoPrevio = null;
+  if (!lote.productoNuevo) {
+    const { rows: prodRows } = await client.query(
+      'SELECT id, precio_costo, precio_venta FROM productos WHERE id = $1 FOR UPDATE',
+      [prodId]
+    );
+    productoPrevio = prodRows[0] ?? null;
+  }
+
+  const { rows } = await client.query(
+    `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
+     VALUES ($1, $2, $3, $3, $4, $5, true, $6)
+     RETURNING id`,
+    [fArribo, fVenci, lote.cantidad, ordenId, prodId, lote.total]
+  );
+  const loteId = rows[0].id;
+
+  if (lote.productoNuevo) {
+    if (tieneHistorialPrecios) {
+      await client.query(
+        `INSERT INTO historial_precios_producto (
+           producto_id, lote_id, orden_compra_id,
+           precio_costo_anterior, precio_costo_nuevo,
+           precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
+         )
+         VALUES ($1, $2, $3, NULL, $4, NULL, $5, 'ALTA_PRODUCTO', $6)`,
+        [prodId, loteId, ordenId, lote.productoNuevo.precioCosto, lote.productoNuevo.precioVenta, usuarioId]
+      );
+    }
+  } else if (productoPrevio) {
+    const precioCostoAnterior = Number(productoPrevio.precio_costo);
+    const precioVentaAnterior = Number(productoPrevio.precio_venta);
+
+    const nuevoCostoRaw =
+      lote.nuevoPrecioCostoProducto ??
+      lote.precioCostoUnitario ??
+      lote.precioCosto ??
+      precioCostoAnterior;
+    const nuevoPrecioCostoProducto = Number(Number(nuevoCostoRaw).toFixed(2));
+
+    const nuevaVentaRaw =
+      lote.nuevoPrecioVentaProducto ??
+      lote.precioVenta ??
+      lote.precio_venta ??
+      precioVentaAnterior;
+    const nuevoPrecioVentaProducto = Number(Number(nuevaVentaRaw).toFixed(2));
+
+    const cambioCosto =
+      nuevoPrecioCostoProducto > 0 && Math.abs(nuevoPrecioCostoProducto - precioCostoAnterior) > 0.009;
+    const cambioVenta =
+      nuevoPrecioVentaProducto > 0 && Math.abs(nuevoPrecioVentaProducto - precioVentaAnterior) > 0.009;
+
+    if (cambioCosto || cambioVenta) {
+      const costoFinal = cambioCosto ? nuevoPrecioCostoProducto : precioCostoAnterior;
+      const ventaFinal = cambioVenta ? nuevoPrecioVentaProducto : precioVentaAnterior;
+
+      await client.query(
+        'UPDATE productos SET precio_costo = $1, precio_venta = $2 WHERE id = $3',
+        [costoFinal, ventaFinal, prodId]
+      );
+
+      if (tieneHistorialPrecios) {
+        await client.query(
+          `INSERT INTO historial_precios_producto (
+             producto_id, lote_id, orden_compra_id,
+             precio_costo_anterior, precio_costo_nuevo,
+             precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
+           )
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+          [
+            prodId,
+            loteId,
+            ordenId,
+            precioCostoAnterior,
+            costoFinal,
+            precioVentaAnterior,
+            ventaFinal,
+            origenExistente,
+            usuarioId
+          ]
+        );
+      }
+    }
+  }
+
+  return loteId;
 };
 
 export const findAll = async () => {
@@ -179,7 +289,7 @@ export const findById = async (id, incluirInactivos = false) => {
 };
 
 export const create = async (data) => {
-  const { total, fecha, proveedor_id, proveedorNuevo, lotes = [] } = data;
+  const { total, fecha, proveedor_id, proveedorNuevo, usuarioId = null, lotes = [] } = data;
   const client = await pool.connect();
 
   try {
@@ -202,15 +312,14 @@ export const create = async (data) => {
 
     for (const lote of lotes) {
       const prodId = await resolverProductoEnTransaccion(lote, client);
-      const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
-      const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
-
-      await client.query(
-        `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
-         VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
-        [fArribo, fVenci, lote.cantidad, nuevaOrden.id, prodId, lote.total]
-      );
-
+      await insertarLoteEnTransaccion({
+        lote,
+        ordenId: nuevaOrden.id,
+        prodId,
+        origenExistente: 'INGRESO_LOTE',
+        usuarioId: lote.usuarioId ?? usuarioId ?? null,
+        client
+      });
       await productosRepo.recalcularStock(prodId, client);
     }
 
@@ -225,7 +334,7 @@ export const create = async (data) => {
 };
 
 export const update = async (id, data) => {
-  const { total, fecha, proveedor_id, proveedorNuevo, lotes } = data;
+  const { total, fecha, proveedor_id, proveedorNuevo, usuarioId = null, lotes } = data;
   const client = await pool.connect();
 
   try {
@@ -259,7 +368,6 @@ export const update = async (id, data) => {
         [id]
       );
 
-      // Si algún lote ya fue consumido (cantidad < cantidad_inicial), no se permite reescribir los lotes
       const loteConsumido = lotesPrevios.find((l) => Number(l.cantidad) < Number(l.cantidad_inicial));
       if (loteConsumido) {
         const error = new Error('No se pueden modificar los lotes de esta orden porque algunos ya registraron salidas o ventas');
@@ -267,7 +375,6 @@ export const update = async (id, data) => {
         throw error;
       }
 
-      // Desactivamos los lotes anteriores de esta orden
       await client.query(
         `UPDATE lotes SET activo = false WHERE orden_compra_id = $1 AND activo = true`,
         [id]
@@ -275,18 +382,17 @@ export const update = async (id, data) => {
 
       const productosAfectados = new Set(lotesPrevios.map((l) => l.producto_id));
 
-      // Insertamos los lotes actualizados
       for (const lote of lotes) {
         const prodId = await resolverProductoEnTransaccion(lote, client);
         productosAfectados.add(prodId);
-        const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
-        const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
-
-        await client.query(
-          `INSERT INTO lotes (fecha_arribo, fecha_vencimiento, cantidad_inicial, cantidad, orden_compra_id, producto_id, activo, total)
-           VALUES ($1, $2, $3, $3, $4, $5, true, $6)`,
-          [fArribo, fVenci, lote.cantidad, id, prodId, lote.total]
-        );
+        await insertarLoteEnTransaccion({
+          lote,
+          ordenId: id,
+          prodId,
+          origenExistente: 'INGRESO_LOTE',
+          usuarioId: lote.usuarioId ?? usuarioId ?? null,
+          client
+        });
       }
 
       for (const prodId of productosAfectados) {
@@ -303,6 +409,9 @@ export const update = async (id, data) => {
     client.release();
   }
 };
+
+export const crearOrdenCompraConLotes = create;
+export const actualizarOrdenCompraConLotes = update;
 
 export const remove = async (id) => {
   const client = await pool.connect();

@@ -13,9 +13,12 @@
     box-shadow: 4px 0 20px rgba(10, 19, 49, 0.08);
 }
 
+html.dark #sidebar-admin,
+html[data-tema="oscuro"] #sidebar-admin,
+html.dark .sidebar-admin,
 html[data-tema="oscuro"] .sidebar-admin {
-    background-color: var(--admin-barra-fondo-oscuro);
-    border-right-color: var(--admin-barra-borde-oscuro);
+    background-color: #0f172a;
+    border-right: 1px solid #1e293b;
 }
 
 .btn-hamburguesa-admin,
@@ -29,6 +32,14 @@ html[data-tema="oscuro"] .sidebar-admin {
     flex-direction: column;
     padding: 1.25rem 1.15rem 1.75rem;
     min-height: 100%;
+    background-color: #FFFFFF;
+}
+
+html.dark #sidebar-admin .nav-admin,
+html[data-tema="oscuro"] #sidebar-admin .nav-admin,
+html.dark .nav-admin,
+html[data-tema="oscuro"] .nav-admin {
+    background-color: #0f172a;
 }
 
 .sidebar-marca-admin {
@@ -38,6 +49,11 @@ html[data-tema="oscuro"] .sidebar-admin {
     padding-bottom: 1rem;
     margin-bottom: 0.5rem;
     border-bottom: 1px solid var(--admin-barra-borde);
+}
+
+html[data-tema="oscuro"] .sidebar-marca-admin,
+html.dark .sidebar-marca-admin {
+    border-bottom-color: #334155;
 }
 
 .marca-admin-link {
@@ -59,8 +75,9 @@ html[data-tema="oscuro"] .sidebar-admin {
     letter-spacing: -0.02em;
 }
 
-html[data-tema="oscuro"] .marca-admin-lafe {
-    color: var(--admin-barra-texto);
+html[data-tema="oscuro"] .marca-admin-lafe,
+html.dark .marca-admin-lafe {
+    color: #FFFFFF;
 }
 
 .marca-admin-distri {
@@ -73,6 +90,11 @@ html[data-tema="oscuro"] .marca-admin-lafe {
     margin-top: 0.2rem;
 }
 
+html[data-tema="oscuro"] .marca-admin-distri,
+html.dark .marca-admin-distri {
+    color: #e2e8f0;
+}
+
 .p-nav {
     font-weight: 700;
     font-size: 0.7rem;
@@ -82,8 +104,9 @@ html[data-tema="oscuro"] .marca-admin-lafe {
     margin: 1rem 0 0.5rem 0.35rem;
 }
 
-html[data-tema="oscuro"] .p-nav {
-    color: var(--admin-barra-texto-secundario);
+html[data-tema="oscuro"] .p-nav,
+html.dark .p-nav {
+    color: #94a3b8;
 }
 
 #p-cuenta-nav {
@@ -130,8 +153,10 @@ html[data-tema="oscuro"] .p-nav {
 }
 
 html[data-tema="oscuro"] .a-nav-admin,
-html[data-tema="oscuro"] .link-admin {
-    color: var(--admin-barra-texto);
+html[data-tema="oscuro"] .link-admin,
+html.dark .a-nav-admin,
+html.dark .link-admin {
+    color: #cbd5e1;
 }
 
 .link-admin-contenido {
@@ -166,9 +191,11 @@ html[data-tema="oscuro"] .link-admin {
 }
 
 html[data-tema="oscuro"] .a-nav-admin:hover,
-html[data-tema="oscuro"] .link-admin:hover {
-    background-color: var(--admin-barra-hover);
-    color: var(--admin-barra-texto);
+html[data-tema="oscuro"] .link-admin:hover,
+html.dark .a-nav-admin:hover,
+html.dark .link-admin:hover {
+    background-color: #1e293b;
+    color: #ffffff;
 }
 
 .a-nav-admin:hover .icono-flecha-admin,
@@ -184,7 +211,23 @@ html[data-tema="oscuro"] .link-admin:hover {
 .a-nav-admin.activo:hover,
 .link-admin.activo:hover,
 .a-nav-admin[aria-current="page"]:hover,
-.link-admin[aria-current="page"]:hover {
+.link-admin[aria-current="page"]:hover,
+html[data-tema="oscuro"] .a-nav-admin.activo,
+html[data-tema="oscuro"] .link-admin.activo,
+html[data-tema="oscuro"] .a-nav-admin[aria-current="page"],
+html[data-tema="oscuro"] .link-admin[aria-current="page"],
+html[data-tema="oscuro"] .a-nav-admin.activo:hover,
+html[data-tema="oscuro"] .link-admin.activo:hover,
+html[data-tema="oscuro"] .a-nav-admin[aria-current="page"]:hover,
+html[data-tema="oscuro"] .link-admin[aria-current="page"]:hover,
+html.dark .a-nav-admin.activo,
+html.dark .link-admin.activo,
+html.dark .a-nav-admin[aria-current="page"],
+html.dark .link-admin[aria-current="page"],
+html.dark .a-nav-admin.activo:hover,
+html.dark .link-admin.activo:hover,
+html.dark .a-nav-admin[aria-current="page"]:hover,
+html.dark .link-admin[aria-current="page"]:hover {
     background-color: #872b38;
     color: #FFFFFF;
     font-weight: 600;
@@ -224,8 +267,10 @@ html[data-tema="oscuro"] .link-admin:hover {
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
-html[data-tema="oscuro"] .btn-CerrarSesion {
-    color: var(--admin-barra-texto);
+html[data-tema="oscuro"] .btn-CerrarSesion,
+html.dark .btn-CerrarSesion {
+    color: #cbd5e1;
+    border-color: #334155;
 }
 
 .btn-CerrarSesion:hover {
@@ -234,9 +279,11 @@ html[data-tema="oscuro"] .btn-CerrarSesion {
     color: #1E293B;
 }
 
-html[data-tema="oscuro"] .btn-CerrarSesion:hover {
-    background-color: var(--admin-barra-hover);
-    color: var(--admin-barra-texto);
+html[data-tema="oscuro"] .btn-CerrarSesion:hover,
+html.dark .btn-CerrarSesion:hover {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #ffffff;
 }
 
 .btn-CerrarSesion:focus-visible {
@@ -261,6 +308,19 @@ html[data-tema="oscuro"] .btn-CerrarSesion:hover {
         cursor: pointer;
         z-index: 900;
         box-shadow: 0 4px 12px rgba(10, 19, 49, 0.18);
+    }
+
+    html[data-tema="oscuro"] .btn-hamburguesa-admin,
+    html.dark .btn-hamburguesa-admin {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-color: #334155;
+    }
+
+    html[data-tema="oscuro"] .btn-hamburguesa-admin:hover,
+    html.dark .btn-hamburguesa-admin:hover {
+        background: #1e293b;
+        color: #ffffff;
     }
 
     .btn-hamburguesa-admin:focus-visible {
@@ -304,5 +364,16 @@ html[data-tema="oscuro"] .btn-CerrarSesion:hover {
 
     .btn-cerrar-admin:hover {
         background-color: var(--admin-barra-hover);
+    }
+
+    html[data-tema="oscuro"] .btn-cerrar-admin,
+    html.dark .btn-cerrar-admin {
+        color: #cbd5e1;
+    }
+
+    html[data-tema="oscuro"] .btn-cerrar-admin:hover,
+    html.dark .btn-cerrar-admin:hover {
+        background-color: #1e293b;
+        color: #ffffff;
     }
 }

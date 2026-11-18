@@ -195,6 +195,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               <input
                 id="lote-producto"
                 type="text"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={productoActual ? `${productoActual.nombre}${productoActual.marca ? ` · ${productoActual.marca}` : ''}` : 'Sin producto'}
                 readOnly
                 disabled
@@ -203,6 +204,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               <select
                 id="lote-producto"
                 name="productoId"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.productoId}
                 onChange={handleChange}
                 aria-invalid={Boolean(errores.productoId)}
@@ -222,6 +224,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               <input
                 id="lote-orden"
                 type="text"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={ordenActual ? `Orden #${ordenActual.id}${ordenActual.proveedor?.nombre ? ` · ${ordenActual.proveedor.nombre}` : ''}` : 'Sin orden'}
                 readOnly
                 disabled
@@ -230,6 +233,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               <select
                 id="lote-orden"
                 name="ordenCompraId"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.ordenCompraId}
                 onChange={handleChange}
                 aria-invalid={Boolean(errores.ordenCompraId)}
@@ -254,6 +258,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               min="1"
               step="1"
               inputMode="numeric"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               value={valores.cantidad}
               onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
               onChange={handleChange}
@@ -270,6 +275,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
                 min="0.01"
                 step="0.01"
                 inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 value={valores.total}
                 onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
                 onChange={handleChange}
@@ -283,6 +289,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               id="lote-arribo"
               name="fechaArribo"
               type="date"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               min={fechaOrdenMinima || undefined}
               value={valores.fechaArribo}
               onChange={handleChange}
@@ -295,6 +302,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               id="lote-vencimiento"
               name="fechaVencimiento"
               type="date"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               min={[valores.fechaArribo, hoyISO()].filter(Boolean).sort().pop()}
               value={valores.fechaVencimiento}
               onChange={handleChange}
@@ -305,7 +313,12 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
       </div>
 
       <div className="orden-modal-acciones">
-        <button type="button" className="orden-btn" onClick={onCerrar} disabled={guardando}>
+        <button
+          type="button"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+          onClick={onCerrar}
+          disabled={guardando}
+        >
           Cancelar
         </button>
         <button type="submit" className="orden-btn orden-btn-primario" disabled={guardando}>

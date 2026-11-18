@@ -153,17 +153,18 @@
     --admin-barra-texto-secundario: #334155;
     --admin-barra-hover: #EFEBE2;
     --admin-barra-activo: #872b38;
-    --admin-barra-fondo-oscuro: #1B2233;
-    --admin-barra-borde-oscuro: #2F3A52;
+    --admin-barra-fondo-oscuro: #0f172a;
+    --admin-barra-borde-oscuro: #1e293b;
 }
 
 /* Tema oscuro: se activa con data-tema="oscuro" en <html>. El selector :has()
    lo limita al panel de administración (el sitio público queda en claro). */
-html[data-tema="oscuro"]:has(.layout-admin-contenedor) {
+html[data-tema="oscuro"]:has(.layout-admin-contenedor),
+html.dark:has(.layout-admin-contenedor) {
     --admin-fondo: #12141A;
     --admin-superficie: #1C1F26;
-    --admin-barra-fondo: #1B2233;
-    --admin-barra-borde: #2F3A52;
+    --admin-barra-fondo: #0f172a;
+    --admin-barra-borde: #1e293b;
     --admin-barra-texto: #E5E7EB;
     --admin-barra-texto-secundario: #9CA3AF;
     --admin-barra-hover: #232833;
@@ -199,13 +200,15 @@ html[data-tema="oscuro"]:has(.layout-admin-contenedor) {
     color-scheme: dark;
 }
 
-html[data-tema="oscuro"]:has(.layout-admin-contenedor) body {
+html[data-tema="oscuro"]:has(.layout-admin-contenedor) body,
+html.dark:has(.layout-admin-contenedor) body {
     background-color: #12141A;
 }
 
 /* Componentes compartidos de Bootstrap (Spinner, MensajeVacio, bordes)
    dentro del panel en tema oscuro. */
-html[data-tema="oscuro"] .layout-admin-contenedor {
+html[data-tema="oscuro"] .layout-admin-contenedor,
+html.dark .layout-admin-contenedor {
     --bs-body-bg: #12141A;
     --bs-body-color: #E5E7EB;
     --bs-secondary-color: rgba(229, 231, 235, 0.75);
@@ -216,7 +219,8 @@ html[data-tema="oscuro"] .layout-admin-contenedor {
 }
 
 /* .text-dark de Bootstrap usa !important y valor fijo: se anula solo en el panel. */
-html[data-tema="oscuro"] .layout-admin-contenedor .text-dark {
+html[data-tema="oscuro"] .layout-admin-contenedor .text-dark,
+html.dark .layout-admin-contenedor .text-dark {
     color: #E5E7EB !important;
 }
 

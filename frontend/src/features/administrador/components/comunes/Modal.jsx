@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react'
 const SELECTOR_ENFOCABLES =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-function Modal({ titulo, onCerrar, children, tamanio = 'normal' }) {
+function Modal({ titulo, onCerrar, children, tamanio = 'normal', headerExtra = null }) {
   const cajaRef = useRef(null)
   const alCerrarRef = useRef(onCerrar)
 
@@ -63,19 +63,27 @@ function Modal({ titulo, onCerrar, children, tamanio = 'normal' }) {
     <div className="orden-modal-overlay" onMouseDown={cerrarAlClicFuera}>
       <div
         ref={cajaRef}
-        className={`orden-modal orden-modal-${tamanio}`}
+        className={`orden-modal orden-modal-${tamanio} flex flex-col max-h-[90vh] overflow-hidden dark:bg-slate-800 dark:border dark:border-slate-700 dark:text-slate-200`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="orden-modal-titulo"
       >
-        <header className="orden-modal-cabecera">
-          <h2 className="orden-modal-titulo" id="orden-modal-titulo">
-            {titulo}
-          </h2>
-          <button type="button" className="orden-modal-cerrar" onClick={onCerrar} aria-label="Cerrar">
-            ×
-          </button>
-        </header>
+        <div className="orden-modal-header-fijo flex-shrink-0 border-b border-slate-700 dark:bg-slate-800">
+          <header className="orden-modal-cabecera flex-shrink-0 dark:border-slate-700">
+            <h2 className="orden-modal-titulo dark:text-white" id="orden-modal-titulo">
+              {titulo}
+            </h2>
+            <button
+              type="button"
+              className="orden-modal-cerrar dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white"
+              onClick={onCerrar}
+              aria-label="Cerrar"
+            >
+              ×
+            </button>
+          </header>
+          {headerExtra}
+        </div>
 
         {children}
       </div>

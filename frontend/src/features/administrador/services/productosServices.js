@@ -37,6 +37,20 @@ export async function obtenerHistorialProductos() {
   return respuesta.json()
 }
 
+export async function obtenerHistorialPreciosProducto(id) {
+  const respuesta = await fetch(`${URL_BASE}/productos/${id}/historial-precios`, {
+    headers: headers()
+  })
+
+  if (!respuesta.ok) {
+    const errorData = await respuesta.json().catch(() => ({}))
+    throw new Error(errorData.error || 'No se pudo obtener el historial de precios del producto')
+  }
+
+  const datos = await respuesta.json()
+  return Array.isArray(datos) ? datos : (Array.isArray(datos?.datos) ? datos.datos : [])
+}
+
 export async function obtenerProductoPorId(id) {
   const respuesta = await fetch(`${URL_BASE}/productos/${id}`, {
     headers: headers()

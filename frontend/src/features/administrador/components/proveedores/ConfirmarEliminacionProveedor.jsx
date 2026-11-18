@@ -21,7 +21,7 @@ function ConfirmarEliminacionProveedor({
       <div className="orden-modal-acciones">
         <button
           type="button"
-          className="orden-btn"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
           onClick={onCancelar}
           disabled={eliminando}
         >

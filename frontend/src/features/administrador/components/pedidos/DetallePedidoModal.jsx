@@ -138,7 +138,7 @@ function DetallePedidoModal({
                   <label htmlFor="modificar-precio-final">Modificar Precio Final</label>
                   <input
                     id="modificar-precio-final"
-                    className="detalle-input-precio"
+                    className="detalle-input-precio dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                     type="number"
                     min="0.01"
                     step="0.01"
@@ -158,7 +158,7 @@ function DetallePedidoModal({
                     <label htmlFor="motivo-modificacion-precio">Motivo de la modificación</label>
                     <input
                       id="motivo-modificacion-precio"
-                      className="detalle-input-motivo"
+                      className="detalle-input-motivo dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                       type="text"
                       placeholder="Explicá el motivo del ajuste..."
                       value={motivoModificacion}
@@ -175,7 +175,7 @@ function DetallePedidoModal({
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <button
                     type="button"
-                    className="orden-btn detalle-btn-neutral"
+                    className="orden-btn detalle-btn-neutral dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
                     disabled={procesandoAccion}
                     onClick={handleGuardar}
                   >
@@ -207,7 +207,11 @@ function DetallePedidoModal({
                 </button>
               </>
             )}
-            <button type="button" className="orden-btn detalle-btn-neutral" onClick={onCerrar}>
+            <button
+              type="button"
+              className="orden-btn detalle-btn-neutral dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+              onClick={onCerrar}
+            >
               Cerrar
             </button>
           </div>

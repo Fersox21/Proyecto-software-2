@@ -49,13 +49,14 @@ function NavBarAdmin({ enlaces }) {
         navigate('/login');
     };
 
-    const claseEnlace = ({ isActive }) => `link-admin${isActive ? ' activo' : ''}`;
+    const claseEnlace = ({ isActive }) =>
+        `link-admin dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white${isActive ? ' activo dark:text-white' : ''}`;
 
     return (
         <>
             <button
                 type="button"
-                className="btn-hamburguesa-admin"
+                className="btn-hamburguesa-admin dark:bg-slate-900 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
                 onClick={toggleMenu}
                 aria-label="Abrir menú de administración"
                 aria-expanded={menuAbierto}
@@ -65,16 +66,19 @@ function NavBarAdmin({ enlaces }) {
 
             <div className={`menu-overlay ${menuAbierto ? 'activo' : ''}`} onClick={cerrarMenu}></div>
 
-            <header className={`sidebar-admin ${menuAbierto ? 'abierto' : ''}`} id="sidebar-admin">
-                <nav className="nav-admin" aria-label="Navegación de administración">
-                    <div className="sidebar-marca-admin">
+            <header
+                className={`sidebar-admin dark:bg-slate-900 border-r dark:border-slate-800 ${menuAbierto ? 'abierto' : ''}`}
+                id="sidebar-admin"
+            >
+                <nav className="nav-admin dark:bg-slate-900" aria-label="Navegación de administración">
+                    <div className="sidebar-marca-admin dark:border-slate-700">
                         <NavLink to="/administrador" end className="marca-admin-link" onClick={cerrarMenu}>
-                            <span className="marca-admin-lafe">LaFe</span>
-                            <span className="marca-admin-distri">DISTRIBUIDORA</span>
+                            <span className="marca-admin-lafe dark:text-white">LaFe</span>
+                            <span className="marca-admin-distri dark:text-slate-200">DISTRIBUIDORA</span>
                         </NavLink>
                         <button
                             type="button"
-                            className="btn-cerrar-admin"
+                            className="btn-cerrar-admin dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
                             onClick={cerrarMenu}
                             aria-label="Cerrar menú de administración"
                         >
@@ -82,7 +86,7 @@ function NavBarAdmin({ enlaces }) {
                         </button>
                     </div>
 
-                    <p className="p-nav">GENERAL</p>
+                    <p className="p-nav dark:text-slate-400">GENERAL</p>
                     <ul className="ul-nav-admin">
                         {enlaces.map((enlace) => {
                             const IconoEnlace = ICONOS_ENLACES[enlace.destino] || LuChevronRight;
@@ -105,11 +109,13 @@ function NavBarAdmin({ enlaces }) {
                         })}
                     </ul>
 
-                    <p className="p-nav" id="p-cuenta-nav">CUENTA</p>
+                    <p className="p-nav dark:text-slate-400" id="p-cuenta-nav">CUENTA</p>
                     <ul className="ul-nav-admin">
                         <li className="li-nav">
                             <NavLink
-                                className={({ isActive }) => `a-nav-admin${isActive ? ' activo' : ''}`}
+                                className={({ isActive }) =>
+                                    `a-nav-admin dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white${isActive ? ' activo dark:text-white' : ''}`
+                                }
                                 to="/administrador/configuracion"
                                 onClick={cerrarMenu}
                             >
@@ -123,7 +129,7 @@ function NavBarAdmin({ enlaces }) {
                         <li className="li-nav li-nav-sesion">
                             <button
                                 type="button"
-                                className="btn-CerrarSesion"
+                                className="btn-CerrarSesion dark:text-slate-300 dark:border-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
                                 onClick={handleCerrarSesion}
                             >
                                 <LuLogOut className="icono-nav-admin" aria-hidden="true" />

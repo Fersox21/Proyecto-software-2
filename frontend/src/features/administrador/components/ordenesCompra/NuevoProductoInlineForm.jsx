@@ -110,7 +110,7 @@ function NuevoProductoInlineForm({
 
   return (
     <div
-      className="orden-producto-inline"
+      className="orden-producto-inline dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
       role="group"
       aria-label={`Nuevo producto para lote ${indice + 1}`}
     >
@@ -124,6 +124,7 @@ function NuevoProductoInlineForm({
           <input
             id={`orden-lote-${indice}-prod-nombre`}
             type="text"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Ej. Aceite de girasol 900ml"
             value={producto.nombre}
             onChange={(e) => onCambiarCampo(indice, 'nombre', e.target.value)}
@@ -139,6 +140,7 @@ function NuevoProductoInlineForm({
           <input
             id={`orden-lote-${indice}-prod-marca`}
             type="text"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Ej. Cocinero"
             value={producto.marca}
             onChange={(e) => onCambiarCampo(indice, 'marca', e.target.value)}
@@ -153,6 +155,7 @@ function NuevoProductoInlineForm({
           <label htmlFor={`orden-lote-${indice}-prod-categoria`}>Categoría *</label>
           <select
             id={`orden-lote-${indice}-prod-categoria`}
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             value={producto.categoriaId}
             onChange={(e) => {
               setErrorCategoriaRapida(null)
@@ -178,6 +181,7 @@ function NuevoProductoInlineForm({
                 <input
                   id={`orden-lote-${indice}-prod-categoria-nueva`}
                   type="text"
+                  className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                   placeholder="Nombre de la nueva categoría"
                   aria-label="Nombre de la nueva categoría"
                   value={producto.categoriaNuevaNombre}
@@ -214,6 +218,7 @@ function NuevoProductoInlineForm({
             min="0.01"
             step="0.01"
             inputMode="decimal"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="0.00"
             value={producto.precioCosto}
             onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -233,6 +238,7 @@ function NuevoProductoInlineForm({
             min="0.01"
             step="0.01"
             inputMode="decimal"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="0.00"
             value={producto.precioVenta}
             onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -245,7 +251,7 @@ function NuevoProductoInlineForm({
         </div>
 
         <div className="orden-campo orden-producto-inline-full">
-          <div className="orden-producto-inline-switch">
+          <div className="orden-producto-inline-switch dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
             <label className="prod-switch-label" htmlFor={`orden-lote-${indice}-prod-en-promo`}>
               <span className="prod-switch-control">
                 <input
@@ -283,6 +289,7 @@ function NuevoProductoInlineForm({
                 max="99.99"
                 step="0.01"
                 inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 placeholder="Ej. 15"
                 value={producto.porcentajeDescuento ?? ''}
                 onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -304,6 +311,7 @@ function NuevoProductoInlineForm({
                 min="0.01"
                 step="0.01"
                 inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
                 placeholder="Precio con descuento"
                 value={producto.precioPromo ?? ''}
                 onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
@@ -318,7 +326,7 @@ function NuevoProductoInlineForm({
         )}
 
         <div className="orden-campo orden-producto-inline-full">
-          <div className="orden-producto-inline-switch">
+          <div className="orden-producto-inline-switch dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
             <label className="prod-switch-label" htmlFor={`orden-lote-${indice}-prod-destacado`}>
               <span className="prod-switch-control">
                 <input
@@ -351,7 +359,7 @@ function NuevoProductoInlineForm({
           />
           <label
             htmlFor={`orden-lote-${indice}-prod-imagen`}
-            className="prod-dropzone"
+            className="prod-dropzone dark:bg-slate-800 dark:border-slate-600 dark:text-slate-200"
           >
             <div className="prod-dropzone-info">
               <span className="prod-dropzone-icono" aria-hidden="true">
@@ -384,6 +392,7 @@ function NuevoProductoInlineForm({
           <textarea
             id={`orden-lote-${indice}-prod-descripcion`}
             rows={2}
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Descripción del producto"
             value={producto.descripcion}
             onChange={(e) => onCambiarCampo(indice, 'descripcion', e.target.value)}

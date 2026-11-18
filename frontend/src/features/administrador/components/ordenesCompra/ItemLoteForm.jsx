@@ -28,9 +28,35 @@ function ItemLoteForm({
     ? productos.find((p) => String(p.id) === String(lote.productoId))
     : null
 
+  const nuevoCostoIngresado = Number(lote.nuevoPrecioCostoProducto)
+  const costoCatalogo = Number(productoSeleccionado?.precioCosto)
+
+  const nuevoVentaIngresado = Number(lote.nuevoPrecioVentaProducto)
+  const ventaCatalogo = Number(productoSeleccionado?.precioVenta)
+
   const precioCosto = esProductoNuevo
     ? Number(lote.productoNuevo?.precioCosto)
-    : Number(productoSeleccionado?.precioCosto)
+    : Number.isFinite(nuevoCostoIngresado) && nuevoCostoIngresado > 0
+      ? nuevoCostoIngresado
+      : costoCatalogo
+
+  const cambioCosto =
+    !esProductoNuevo &&
+    Boolean(productoSeleccionado) &&
+    lote.nuevoPrecioCostoProducto !== '' &&
+    Number.isFinite(nuevoCostoIngresado) &&
+    nuevoCostoIngresado > 0 &&
+    Number.isFinite(costoCatalogo) &&
+    Math.abs(nuevoCostoIngresado - costoCatalogo) >= 0.01
+
+  const cambioVenta =
+    !esProductoNuevo &&
+    Boolean(productoSeleccionado) &&
+    lote.nuevoPrecioVentaProducto !== '' &&
+    Number.isFinite(nuevoVentaIngresado) &&
+    nuevoVentaIngresado > 0 &&
+    Number.isFinite(ventaCatalogo) &&
+    Math.abs(nuevoVentaIngresado - ventaCatalogo) >= 0.01
 
   const cantidad = Number(lote.cantidad)
   const totalSugerido =
@@ -40,7 +66,7 @@ function ItemLoteForm({
 
   return (
     <div
-      className="orden-lote-bloque"
+      className="orden-lote-bloque dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
       role="group"
       aria-label={`Lote ${indice + 1}`}
     >
@@ -49,6 +75,7 @@ function ItemLoteForm({
           <label htmlFor={`orden-lote-producto-${indice}`}>Producto</label>
           <select
             id={`orden-lote-producto-${indice}`}
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             value={lote.productoId}
             disabled={deshabilitado}
             onChange={(e) => onCambiar(indice, 'productoId', e.target.value)}
@@ -76,6 +103,7 @@ function ItemLoteForm({
             min="1"
             step="1"
             inputMode="numeric"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             value={lote.cantidad}
             disabled={deshabilitado}
             onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
@@ -92,6 +120,7 @@ function ItemLoteForm({
           <input
             id={`orden-lote-arribo-${indice}`}
             type="date"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             min={fechaPedidoMinima || undefined}
             value={lote.fechaArribo}
             disabled={deshabilitado}
@@ -108,6 +137,7 @@ function ItemLoteForm({
           <input
             id={`orden-lote-vencimiento-${indice}`}
             type="date"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             min={[lote.fechaArribo, hoyISO()].filter(Boolean).sort().pop()}
             value={lote.fechaVencimiento}
             disabled={deshabilitado}
@@ -121,7 +151,7 @@ function ItemLoteForm({
 
         <button
           type="button"
-          className="orden-btn orden-btn-peligro orden-btn-quitar"
+          className="orden-btn orden-btn-peligro orden-btn-quitar dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
           onClick={() => onQuitar(indice)}
           disabled={!puedeEliminar || deshabilitado}
           aria-label={`Quitar lote ${indice + 1}`}
@@ -142,6 +172,70 @@ function ItemLoteForm({
       )}
 
       <div className="orden-lote-resumen" style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+        {!esProductoNuevo && lote.productoId && (
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-3"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+              gap: '0.75rem',
+              flex: '2 1 420px',
+            }}
+          >
+            <div className="orden-campo" style={{ margin: 0 }}>
+              <label htmlFor={`orden-lote-nuevo-costo-${indice}`}>Nuevo precio de costo para el catálogo ($)</label>
+              <input
+                id={`orden-lote-nuevo-costo-${indice}`}
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
+                placeholder={Number.isFinite(costoCatalogo) && costoCatalogo > 0 ? String(costoCatalogo) : '0.00'}
+                value={lote.nuevoPrecioCostoProducto ?? ''}
+                disabled={deshabilitado}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onChange={(e) => onCambiar(indice, 'nuevoPrecioCostoProducto', sanitizarDecimalPositivo(e.target.value))}
+                aria-invalid={Boolean(errores[`lote-${indice}-nuevoPrecioCostoProducto`])}
+              />
+              {cambioCosto && (
+                <p className="orden-campo-ayuda">
+                  Costo actual: {formatearPrecio(productoSeleccionado.precioCosto)} → Se actualizará y guardará en el historial
+                </p>
+              )}
+              {errores[`lote-${indice}-nuevoPrecioCostoProducto`] && (
+                <p className="orden-campo-error">{errores[`lote-${indice}-nuevoPrecioCostoProducto`]}</p>
+              )}
+            </div>
+
+            <div className="orden-campo" style={{ margin: 0 }}>
+              <label htmlFor={`orden-lote-nuevo-venta-${indice}`}>Nuevo precio de venta ($)</label>
+              <input
+                id={`orden-lote-nuevo-venta-${indice}`}
+                type="number"
+                min="0.01"
+                step="0.01"
+                inputMode="decimal"
+                className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
+                placeholder={Number.isFinite(ventaCatalogo) && ventaCatalogo > 0 ? String(ventaCatalogo) : '0.00'}
+                value={lote.nuevoPrecioVentaProducto ?? ''}
+                disabled={deshabilitado}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onChange={(e) => onCambiar(indice, 'nuevoPrecioVentaProducto', sanitizarDecimalPositivo(e.target.value))}
+                aria-invalid={Boolean(errores[`lote-${indice}-nuevoPrecioVentaProducto`])}
+              />
+              {cambioVenta && (
+                <p className="orden-campo-ayuda">
+                  Venta actual: {formatearPrecio(productoSeleccionado.precioVenta)} → Se actualizará en el catálogo
+                </p>
+              )}
+              {errores[`lote-${indice}-nuevoPrecioVentaProducto`] && (
+                <p className="orden-campo-error">{errores[`lote-${indice}-nuevoPrecioVentaProducto`]}</p>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="orden-campo" style={{ minWidth: '180px', maxWidth: '240px', margin: 0 }}>
           <label htmlFor={`orden-lote-total-${indice}`}>Precio total del lote ($)</label>
           <input
@@ -150,6 +244,7 @@ function ItemLoteForm({
             min="0.01"
             step="0.01"
             inputMode="decimal"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder={totalSugerido != null ? String(totalSugerido) : '0.00'}
             value={lote.total ?? ''}
             disabled={deshabilitado}

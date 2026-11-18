@@ -156,7 +156,10 @@ function HistorialLotes() {
           texto="Probá cambiando el filtro de estado o la búsqueda."
         />
       ) : (
-        <section className="sec-prod-admin lotes-tabla-contenedor" aria-live="polite">
+        <section
+          className="sec-prod-admin lotes-tabla-contenedor dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          aria-live="polite"
+        >
           <table className="tabla-prod-admin lotes-tabla">
             <thead>
               <tr>

@@ -53,6 +53,8 @@ export function resolverTema(tema = leerTema()) {
 // (main.jsx) para evitar un destello del tema incorrecto al cargar.
 export function aplicarPreferencias(tema = leerTema(), fuente = leerFuente()) {
   const html = document.documentElement
-  html.dataset.tema = resolverTema(tema)
+  const temaResuelto = resolverTema(tema)
+  html.dataset.tema = temaResuelto
+  html.classList.toggle('dark', temaResuelto === 'oscuro')
   html.dataset.fuente = fuente
 }

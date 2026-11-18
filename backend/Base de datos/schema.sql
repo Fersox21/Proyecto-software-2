@@ -139,3 +139,20 @@ CREATE TABLE pedido_lotes (
     cantidad INTEGER NOT NULL CHECK (cantidad > 0),
     consumido_entero BOOLEAN NOT NULL DEFAULT false
 );
+
+-- 12. Historial de Precios por Producto
+CREATE TABLE historial_precios_producto (
+    id SERIAL PRIMARY KEY,
+    producto_id INTEGER NOT NULL REFERENCES productos(id) ON DELETE RESTRICT,
+    lote_id INTEGER REFERENCES lotes(id) ON DELETE SET NULL,
+    orden_compra_id INTEGER REFERENCES ordenes_compra(id) ON DELETE SET NULL,
+    precio_costo_anterior DECIMAL(10, 2) CHECK (precio_costo_anterior IS NULL OR precio_costo_anterior > 0),
+    precio_costo_nuevo DECIMAL(10, 2) NOT NULL CHECK (precio_costo_nuevo > 0),
+    precio_venta_anterior DECIMAL(10, 2) CHECK (precio_venta_anterior IS NULL OR precio_venta_anterior > 0),
+    precio_venta_nuevo DECIMAL(10, 2) NOT NULL CHECK (precio_venta_nuevo > 0),
+    origen VARCHAR(30) NOT NULL CHECK (origen IN ('ALTA_PRODUCTO', 'INGRESO_LOTE', 'EDICION_MANUAL', 'EDICION_ORDEN')),
+    fecha_registro TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    usuario_id INTEGER REFERENCES usuarios(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_historial_precios_producto_fecha ON historial_precios_producto (producto_id, fecha_registro DESC, id DESC);
