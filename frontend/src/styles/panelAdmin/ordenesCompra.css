@@ -421,12 +421,12 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
 
 .orden-modal {
   width: 100%;
-  max-height: calc(100vh - 3rem);
+  max-height: 90vh;
   display: flex;
   flex-direction: column;
-  background-color: var(--admin-superficie);
-  color: var(--admin-texto);
-  border: 1px solid var(--admin-borde-suave);
+  background-color: #ffffff;
+  color: var(--admin-texto, #0f172a);
+  border: 1px solid var(--admin-borde-suave, #e2e8f0);
   border-radius: 16px;
   box-shadow: 0 18px 45px rgba(10, 19, 49, 0.22);
   font-family: var(--fuente-base);
@@ -441,6 +441,15 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
   max-width: 440px;
 }
 
+.orden-modal-header-fijo {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--admin-superficie, #ffffff);
+  border-bottom: 1px solid var(--admin-borde, #e2e8f0);
+}
+
 .orden-modal-cabecera {
   display: flex;
   align-items: center;
@@ -448,6 +457,16 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
   gap: 1rem;
   padding: 1.1rem 1.4rem;
   border-bottom: 1px solid var(--admin-borde);
+  flex-shrink: 0;
+}
+
+.orden-modal-header-fijo .orden-modal-cabecera {
+  border-bottom: none;
+}
+
+.orden-modal-header-fijo .prod-modal-tabs {
+  border-bottom: none;
+  padding-top: 0;
 }
 
 .orden-modal-titulo {
@@ -471,21 +490,31 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
   color: var(--admin-texto);
 }
 
-.orden-modal-cuerpo {
-  padding: 1.4rem;
+.orden-modal-cuerpo,
+.prod-modal-scroll-body {
+  padding: 1.5rem;
   overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  flex: 1 1 0%;
+  min-height: 0;
 }
 
-.orden-modal-acciones {
+.orden-modal-acciones,
+.prod-modal-acciones {
+  flex: 0 0 auto;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
   gap: 0.75rem;
-  padding: 1rem 1.4rem;
-  border-top: 1px solid var(--admin-borde);
-  background-color: var(--admin-fondo);
+  padding: 1.25rem 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  background-color: #ffffff;
 }
 
 .orden-confirmar-texto,
@@ -506,7 +535,8 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  flex: 1;
+  flex: 1 1 0%;
+  overflow: hidden;
 }
 
 .orden-form-grilla {
@@ -814,8 +844,12 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
 .prod-modal-cuerpo {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
   gap: 0.9rem;
-  padding: 1.25rem 1.4rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
 }
 
 .prod-modal-span-2 {
@@ -1013,7 +1047,7 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
 }
 
 .prod-modal-acciones {
-  padding: 0.9rem 1.4rem;
+  padding: 1.25rem 1.5rem;
 }
 
 .prod-btn-secundario {
@@ -1053,6 +1087,474 @@ html[data-tema="oscuro"] .orden-btn-eliminar:hover {
 
   .prod-modal-grilla-3,
   .prod-switches-fila {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Modo oscuro para formularios, contenedores y botones secundarios en modales */
+
+html[data-tema="oscuro"] .orden-modal,
+html.dark .orden-modal {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-modal-header-fijo,
+html.dark .orden-modal-header-fijo {
+  background-color: #1e293b !important;
+  border-bottom: 1px solid #334155 !important;
+}
+
+html[data-tema="oscuro"] .orden-modal-cabecera,
+html.dark .orden-modal-cabecera {
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .orden-modal-titulo,
+html.dark .orden-modal-titulo {
+  color: #ffffff;
+}
+
+html[data-tema="oscuro"] .orden-modal-cerrar,
+html.dark .orden-modal-cerrar {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] .orden-modal-cerrar:hover,
+html.dark .orden-modal-cerrar:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+html[data-tema="oscuro"] .orden-modal-acciones,
+html[data-tema="oscuro"] .prod-modal-acciones,
+html[data-tema="oscuro"] .orden-modal-pie,
+html.dark .orden-modal-acciones,
+html.dark .prod-modal-acciones,
+html.dark .orden-modal-pie {
+  background-color: #1e293b !important;
+  border-top: 1px solid #334155 !important;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-lotes,
+html.dark .orden-lotes {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-lotes-titulo,
+html.dark .orden-lotes-titulo {
+  color: #f8fafc;
+}
+
+html[data-tema="oscuro"] .orden-lote-bloque,
+html[data-tema="oscuro"] .orden-lote-tarjeta,
+html.dark .orden-lote-bloque,
+html.dark .orden-lote-tarjeta {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-lote-resumen,
+html.dark .orden-lote-resumen {
+  border-top-color: #334155;
+}
+
+html[data-tema="oscuro"] .orden-producto-inline,
+html.dark .orden-producto-inline {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-proveedor-inline,
+html.dark .orden-proveedor-inline {
+  background-color: #1e293b;
+  border-color: #334155;
+  border-left-color: #3b82f6;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .orden-campo label,
+html[data-tema="oscuro"] .orden-lote-total-etiqueta,
+html.dark .orden-campo label,
+html.dark .orden-lote-total-etiqueta {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] .orden-campo-ayuda,
+html[data-tema="oscuro"] .orden-lotes-vacio,
+html[data-tema="oscuro"] .orden-form-cargando,
+html[data-tema="oscuro"] .orden-confirmar-detalle,
+html.dark .orden-campo-ayuda,
+html.dark .orden-lotes-vacio,
+html.dark .orden-form-cargando,
+html.dark .orden-confirmar-detalle {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .orden-modal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html[data-tema="oscuro"] .orden-modal select,
+html[data-tema="oscuro"] .orden-modal textarea,
+html[data-tema="oscuro"] .orden-modal input[type="date"],
+html[data-tema="oscuro"] .orden-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html[data-tema="oscuro"] .orden-form select,
+html[data-tema="oscuro"] .orden-form textarea,
+html[data-tema="oscuro"] .orden-form input[type="date"],
+html[data-tema="oscuro"] .orden-campo input,
+html[data-tema="oscuro"] .orden-campo select,
+html[data-tema="oscuro"] .orden-campo textarea,
+html[data-tema="oscuro"] .orden-campo input[type="date"],
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo input,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo select,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo textarea,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo input,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo select,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo textarea,
+html.dark .orden-modal input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark .orden-modal select,
+html.dark .orden-modal textarea,
+html.dark .orden-modal input[type="date"],
+html.dark .orden-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+html.dark .orden-form select,
+html.dark .orden-form textarea,
+html.dark .orden-form input[type="date"],
+html.dark .orden-campo input,
+html.dark .orden-campo select,
+html.dark .orden-campo textarea,
+html.dark .orden-campo input[type="date"],
+html.dark .orden-producto-inline .orden-campo input,
+html.dark .orden-producto-inline .orden-campo select,
+html.dark .orden-producto-inline .orden-campo textarea,
+html.dark .prod-modal-cuerpo .orden-campo input,
+html.dark .prod-modal-cuerpo .orden-campo select,
+html.dark .prod-modal-cuerpo .orden-campo textarea {
+  background-color: #334155;
+  color: #ffffff;
+  border-color: #475569;
+  color-scheme: dark;
+}
+
+html[data-tema="oscuro"] .orden-campo input::placeholder,
+html[data-tema="oscuro"] .orden-campo textarea::placeholder,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo input::placeholder,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo textarea::placeholder,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo input::placeholder,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo textarea::placeholder,
+html.dark .orden-campo input::placeholder,
+html.dark .orden-campo textarea::placeholder,
+html.dark .orden-producto-inline .orden-campo input::placeholder,
+html.dark .orden-producto-inline .orden-campo textarea::placeholder,
+html.dark .prod-modal-cuerpo .orden-campo input::placeholder,
+html.dark .prod-modal-cuerpo .orden-campo textarea::placeholder {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .orden-campo input:focus,
+html[data-tema="oscuro"] .orden-campo select:focus,
+html[data-tema="oscuro"] .orden-campo textarea:focus,
+html[data-tema="oscuro"] .orden-campo input:focus-visible,
+html[data-tema="oscuro"] .orden-campo select:focus-visible,
+html[data-tema="oscuro"] .orden-campo textarea:focus-visible,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo input:focus,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo select:focus,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo textarea:focus,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo input:focus-visible,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo select:focus-visible,
+html[data-tema="oscuro"] .orden-producto-inline .orden-campo textarea:focus-visible,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo input:focus,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo select:focus,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo textarea:focus,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo input:focus-visible,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo select:focus-visible,
+html[data-tema="oscuro"] .prod-modal-cuerpo .orden-campo textarea:focus-visible,
+html.dark .orden-campo input:focus,
+html.dark .orden-campo select:focus,
+html.dark .orden-campo textarea:focus,
+html.dark .orden-campo input:focus-visible,
+html.dark .orden-campo select:focus-visible,
+html.dark .orden-campo textarea:focus-visible,
+html.dark .orden-producto-inline .orden-campo input:focus,
+html.dark .orden-producto-inline .orden-campo select:focus,
+html.dark .orden-producto-inline .orden-campo textarea:focus,
+html.dark .orden-producto-inline .orden-campo input:focus-visible,
+html.dark .orden-producto-inline .orden-campo select:focus-visible,
+html.dark .orden-producto-inline .orden-campo textarea:focus-visible,
+html.dark .prod-modal-cuerpo .orden-campo input:focus,
+html.dark .prod-modal-cuerpo .orden-campo select:focus,
+html.dark .prod-modal-cuerpo .orden-campo textarea:focus,
+html.dark .prod-modal-cuerpo .orden-campo input:focus-visible,
+html.dark .prod-modal-cuerpo .orden-campo select:focus-visible,
+html.dark .prod-modal-cuerpo .orden-campo textarea:focus-visible {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+html[data-tema="oscuro"] .prod-btn-secundario,
+html.dark .prod-btn-secundario {
+  background-color: #334155;
+  color: #e2e8f0;
+  border: 1px solid #475569;
+}
+
+html[data-tema="oscuro"] .prod-btn-secundario:hover:not(:disabled),
+html.dark .prod-btn-secundario:hover:not(:disabled) {
+  background-color: #475569;
+  border-color: #64748b;
+  color: #ffffff;
+}
+
+html[data-tema="oscuro"] .orden-btn:not(.orden-btn-primario):not(.orden-btn-peligro):not(.prod-btn-primario),
+html[data-tema="oscuro"] .orden-btn-secundario,
+html[data-tema="oscuro"] .orden-btn-quitar,
+html.dark .orden-btn:not(.orden-btn-primario):not(.orden-btn-peligro):not(.prod-btn-primario),
+html.dark .orden-btn-secundario,
+html.dark .orden-btn-quitar {
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+html[data-tema="oscuro"] .orden-btn:not(.orden-btn-primario):not(.orden-btn-peligro):not(.prod-btn-primario):hover:not(:disabled),
+html[data-tema="oscuro"] .orden-btn-secundario:hover:not(:disabled),
+html[data-tema="oscuro"] .prod-btn-secundario:hover:not(:disabled),
+html[data-tema="oscuro"] .orden-btn-quitar:hover:not(:disabled),
+html.dark .orden-btn:not(.orden-btn-primario):not(.orden-btn-peligro):not(.prod-btn-primario):hover:not(:disabled),
+html.dark .orden-btn-secundario:hover:not(:disabled),
+html.dark .prod-btn-secundario:hover:not(:disabled),
+html.dark .orden-btn-quitar:hover:not(:disabled) {
+  background-color: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}
+
+html[data-tema="oscuro"] .orden-producto-inline-switch,
+html[data-tema="oscuro"] .prod-switches-fila,
+html[data-tema="oscuro"] .prod-dropzone,
+html.dark .orden-producto-inline-switch,
+html.dark .prod-switches-fila,
+html.dark .prod-dropzone {
+  background-color: #1e293b;
+  border-color: #475569;
+}
+
+html[data-tema="oscuro"] .prod-dropzone:hover:not(.prod-dropzone-deshabilitada),
+html.dark .prod-dropzone:hover:not(.prod-dropzone-deshabilitada) {
+  background-color: #334155;
+  border-color: #3b82f6;
+}
+
+html[data-tema="oscuro"] .prod-switch-label,
+html[data-tema="oscuro"] .prod-dropzone-titulo,
+html.dark .prod-switch-label,
+html.dark .prod-dropzone-titulo {
+  color: #f8fafc;
+}
+
+html[data-tema="oscuro"] .prod-dropzone-icono,
+html.dark .prod-dropzone-icono {
+  background-color: #334155;
+  color: #f8fafc;
+}
+
+/* Pestañas (Tabs) e Historial de Costos en ModalFormProducto */
+
+.prod-modal-tabs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0;
+  margin-bottom: -1.25rem;
+  border-bottom: none;
+  background-color: transparent;
+  flex-shrink: 0;
+}
+
+.prod-modal-tab {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--admin-texto-secundario, #64748b);
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px 8px 0 0;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.prod-modal-tab:hover {
+  color: var(--admin-texto, #0f172a);
+  background-color: var(--admin-hover, #f8fafc);
+}
+
+.prod-modal-tab-activa {
+  color: var(--admin-primario, #102055);
+  border-bottom-color: var(--admin-primario, #102055);
+}
+
+.prod-historial-contenedor {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.prod-historial-resumen {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.prod-historial-tarjeta {
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--admin-borde, #e2e8f0);
+  background-color: var(--admin-fondo, #f8fafc);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.prod-historial-tarjeta-etiqueta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-texto-secundario, #64748b);
+}
+
+.prod-historial-tarjeta-valor {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--admin-texto, #0f172a);
+  font-variant-numeric: tabular-nums;
+}
+
+.prod-historial-tarjeta-sub {
+  font-size: 0.78rem;
+  color: var(--admin-texto-secundario, #64748b);
+}
+
+.prod-historial-tabla-scroll {
+  max-height: 20rem;
+  overflow-y: auto;
+  border: 1px solid var(--admin-borde, #e2e8f0);
+  border-radius: 10px;
+  background-color: var(--admin-superficie, #ffffff);
+}
+
+.prod-historial-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.prod-historial-badge-origen {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.prod-historial-badge-suba {
+  background-color: #fff7ed;
+  color: #c2410c;
+}
+
+.prod-historial-badge-baja {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.prod-historial-badge-neutro {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+html[data-tema="oscuro"] .prod-modal-tabs,
+html.dark .prod-modal-tabs {
+  background-color: #1e293b;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .prod-modal-tab,
+html.dark .prod-modal-tab {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .prod-modal-tab:hover,
+html.dark .prod-modal-tab:hover {
+  color: #f8fafc;
+  background-color: #334155;
+}
+
+html[data-tema="oscuro"] .prod-modal-tab-activa,
+html.dark .prod-modal-tab-activa {
+  color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+
+html[data-tema="oscuro"] .prod-historial-tarjeta,
+html.dark .prod-historial-tarjeta {
+  background-color: #0f172a;
+  border-color: #334155;
+}
+
+html[data-tema="oscuro"] .prod-historial-tarjeta-valor,
+html.dark .prod-historial-tarjeta-valor {
+  color: #f8fafc;
+}
+
+html[data-tema="oscuro"] .prod-historial-tarjeta-etiqueta,
+html[data-tema="oscuro"] .prod-historial-tarjeta-sub,
+html.dark .prod-historial-tarjeta-etiqueta,
+html.dark .prod-historial-tarjeta-sub {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .prod-historial-tabla-scroll,
+html.dark .prod-historial-tabla-scroll {
+  background-color: #1e293b;
+  border-color: #334155;
+}
+
+html[data-tema="oscuro"] .prod-historial-badge-origen,
+html.dark .prod-historial-badge-origen {
+  background-color: rgba(59, 130, 246, 0.2);
+  color: #93c5fd;
+}
+
+html[data-tema="oscuro"] .prod-historial-badge-suba,
+html.dark .prod-historial-badge-suba {
+  background-color: rgba(234, 88, 12, 0.2);
+  color: #fdba74;
+}
+
+html[data-tema="oscuro"] .prod-historial-badge-baja,
+html.dark .prod-historial-badge-baja {
+  background-color: rgba(22, 163, 74, 0.2);
+  color: #86efac;
+}
+
+html[data-tema="oscuro"] .prod-historial-badge-neutro,
+html.dark .prod-historial-badge-neutro {
+  background-color: #334155;
+  color: #cbd5e1;
+}
+
+@media (max-width: 760px) {
+  .prod-historial-resumen {
     grid-template-columns: 1fr;
   }
 }

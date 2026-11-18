@@ -19,7 +19,12 @@ function ConfirmarEliminacionLote({ lote, eliminando, onConfirmar, onCancelar })
       </div>
 
       <div className="orden-modal-acciones">
-        <button type="button" className="orden-btn" onClick={onCancelar} disabled={eliminando}>
+        <button
+          type="button"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+          onClick={onCancelar}
+          disabled={eliminando}
+        >
           Cancelar
         </button>
         <button

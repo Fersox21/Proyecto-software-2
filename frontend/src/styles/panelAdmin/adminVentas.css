@@ -354,6 +354,151 @@ a:hover {
   color: var(--admin-acento-hover);
 }
 
+/* Modo Oscuro */
+html[data-tema="oscuro"] .sec-tabla-admin,
+html.dark .sec-tabla-admin,
+html[data-tema="oscuro"] .sec-tabla-ventas,
+html.dark .sec-tabla-ventas,
+html[data-tema="oscuro"] #main-ventas .sec-tabla-admin,
+html.dark #main-ventas .sec-tabla-admin,
+html[data-tema="oscuro"] #main-ventas .sec-tabla-ventas,
+html.dark #main-ventas .sec-tabla-ventas {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] #main-ventas .tabla-ventas,
+html.dark #main-ventas .tabla-ventas {
+  background-color: transparent;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .tabla-ventas thead,
+html.dark .tabla-ventas thead,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas thead,
+html.dark #main-ventas .tabla-ventas thead {
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+html[data-tema="oscuro"] .tabla-ventas th,
+html.dark .tabla-ventas th,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas th,
+html.dark #main-ventas .tabla-ventas th {
+  background-color: rgba(15, 23, 42, 0.5);
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .tabla-ventas tbody tr,
+html.dark .tabla-ventas tbody tr,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas tbody tr,
+html.dark #main-ventas .tabla-ventas tbody tr {
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .tabla-ventas td,
+html.dark .tabla-ventas td,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas td,
+html.dark #main-ventas .tabla-ventas td {
+  color: #e2e8f0;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .tabla-ventas tbody tr:hover,
+html.dark .tabla-ventas tbody tr:hover,
+html[data-tema="oscuro"] .tabla-ventas tbody tr:hover td,
+html.dark .tabla-ventas tbody tr:hover td,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas tbody tr:hover,
+html.dark #main-ventas .tabla-ventas tbody tr:hover,
+html[data-tema="oscuro"] #main-ventas .tabla-ventas tbody tr:hover td,
+html.dark #main-ventas .tabla-ventas tbody tr:hover td {
+  background-color: rgba(51, 65, 85, 0.5);
+}
+
+html[data-tema="oscuro"] .venta-id,
+html.dark .venta-id,
+html[data-tema="oscuro"] .venta-total-final,
+html.dark .venta-total-final {
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .venta-fecha,
+html.dark .venta-fecha,
+html[data-tema="oscuro"] .venta-total-motivo,
+html.dark .venta-total-motivo {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .venta-btn-ver,
+html.dark .venta-btn-ver {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] .venta-btn-ver:hover,
+html.dark .venta-btn-ver:hover {
+  background-color: #334155;
+}
+
+html[data-tema="oscuro"] .venta-btn-editar,
+html.dark .venta-btn-editar {
+  color: #60a5fa;
+}
+
+html[data-tema="oscuro"] .venta-btn-editar:hover,
+html.dark .venta-btn-editar:hover {
+  background-color: rgba(59, 130, 246, 0.18);
+}
+
+html[data-tema="oscuro"] .venta-btn-eliminar,
+html.dark .venta-btn-eliminar {
+  color: #f87171;
+}
+
+html[data-tema="oscuro"] .venta-btn-eliminar:hover,
+html.dark .venta-btn-eliminar:hover {
+  background-color: rgba(239, 68, 68, 0.18);
+}
+
+html[data-tema="oscuro"] .tabla-admin-pie,
+html.dark .tabla-admin-pie,
+html[data-tema="oscuro"] #main-ventas .tabla-admin-pie,
+html.dark #main-ventas .tabla-admin-pie {
+  background-color: #1e293b;
+  border-top-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .tabla-admin-pie .info-pag,
+html.dark .tabla-admin-pie .info-pag,
+html[data-tema="oscuro"] #main-ventas .tabla-admin-pie .info-pag,
+html.dark #main-ventas .tabla-admin-pie .info-pag {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] .btn-pag,
+html.dark .btn-pag,
+html[data-tema="oscuro"] #main-ventas .btn-pag,
+html.dark #main-ventas .btn-pag {
+  background-color: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .btn-pag:hover:not(:disabled),
+html.dark .btn-pag:hover:not(:disabled),
+html[data-tema="oscuro"] #main-ventas .btn-pag:hover:not(:disabled),
+html.dark #main-ventas .btn-pag:hover:not(:disabled) {
+  background-color: #475569;
+}
+
+html[data-tema="oscuro"] .nums-pag,
+html.dark .nums-pag,
+html[data-tema="oscuro"] #main-ventas .nums-pag,
+html.dark #main-ventas .nums-pag {
+  color: #e2e8f0;
+}
+
 /* Adaptación Responsive */
 @media (max-width: 1020px) {
   .layout-admin-principal,

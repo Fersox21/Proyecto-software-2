@@ -83,7 +83,8 @@ export const create = async (data, client = pool) => {
     tipoPromocionId = null,
     destacado = false,
     visibleCatalogo = false,
-    imagen = null
+    imagen = null,
+    omitirHistorialInicial = false
   } = data;
 
   const promoActiva = Boolean(enPromocion);
@@ -116,7 +117,21 @@ export const create = async (data, client = pool) => {
     ]
   );
 
-  return await findById(rows[0].id, client);
+  const nuevoId = rows[0].id;
+
+  if (!omitirHistorialInicial) {
+    await client.query(
+      `INSERT INTO historial_precios_producto (
+         producto_id, lote_id, orden_compra_id,
+         precio_costo_anterior, precio_costo_nuevo,
+         precio_venta_anterior, precio_venta_nuevo, origen
+       )
+       VALUES ($1, NULL, NULL, NULL, $2, NULL, $3, 'ALTA_PRODUCTO')`,
+      [nuevoId, precioCosto, precioVenta]
+    );
+  }
+
+  return await findById(nuevoId, client);
 };
 
 export const update = async (id, data, client = pool) => {
@@ -140,6 +155,12 @@ export const update = async (id, data, client = pool) => {
   const promoActiva = Boolean(enPromocion);
   const precioPromoFinal = promoActiva ? precioPromo : null;
   const tipoPromocionIdFinal = promoActiva ? (tipoPromocionId ?? null) : null;
+
+  const { rows: prevRows } = await client.query(
+    'SELECT precio_costo, precio_venta FROM productos WHERE id = $1',
+    [id]
+  );
+  const previo = prevRows[0] ?? null;
 
   await client.query(
     `UPDATE productos
@@ -166,7 +187,60 @@ export const update = async (id, data, client = pool) => {
     ]
   );
 
+  if (
+    previo &&
+    (Number(previo.precio_costo) !== Number(precioCosto) ||
+      Number(previo.precio_venta) !== Number(precioVenta))
+  ) {
+    await client.query(
+      `INSERT INTO historial_precios_producto (
+         producto_id, lote_id, orden_compra_id,
+         precio_costo_anterior, precio_costo_nuevo,
+         precio_venta_anterior, precio_venta_nuevo, origen
+       )
+       VALUES ($1, NULL, NULL, $2, $3, $4, $5, 'EDICION_MANUAL')`,
+      [
+        id,
+        Number(previo.precio_costo),
+        Number(precioCosto),
+        Number(previo.precio_venta),
+        Number(precioVenta)
+      ]
+    );
+  }
+
   return await findById(id, client);
+};
+
+export const findHistorialPreciosByProductoId = async (productoId, client = pool) => {
+  const { rows } = await client.query(
+    `SELECT hp.*,
+            COALESCE(hp.orden_compra_id, l.orden_compra_id) AS orden_compra_id_resuelta,
+            COALESCE(l.cantidad_inicial, l.cantidad) AS cantidad_lote,
+            prov.nombre AS proveedor_nombre
+     FROM historial_precios_producto hp
+     LEFT JOIN lotes l ON l.id = hp.lote_id
+     LEFT JOIN ordenes_compra oc ON oc.id = COALESCE(hp.orden_compra_id, l.orden_compra_id)
+     LEFT JOIN proveedores prov ON prov.id = oc.proveedor_id
+     WHERE hp.producto_id = $1
+     ORDER BY hp.fecha_registro DESC, hp.id DESC`,
+    [productoId]
+  );
+
+  return rows.map((row) => ({
+    id: row.id,
+    productoId: row.producto_id,
+    loteId: row.lote_id,
+    ordenCompraId: row.orden_compra_id ?? row.orden_compra_id_resuelta ?? null,
+    precioCostoAnterior: row.precio_costo_anterior != null ? Number(row.precio_costo_anterior) : null,
+    precioCostoNuevo: Number(row.precio_costo_nuevo),
+    precioVentaAnterior: row.precio_venta_anterior != null ? Number(row.precio_venta_anterior) : null,
+    precioVentaNuevo: Number(row.precio_venta_nuevo),
+    origen: row.origen,
+    fechaRegistro: row.fecha_registro,
+    cantidadLote: row.cantidad_lote != null ? Number(row.cantidad_lote) : null,
+    proveedorNombre: row.proveedor_nombre ?? null,
+  }));
 };
 
 export const remove = async (id) => {

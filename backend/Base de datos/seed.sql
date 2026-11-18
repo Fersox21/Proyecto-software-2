@@ -4,6 +4,7 @@
 BEGIN;
 
 TRUNCATE TABLE
+  historial_precios_producto,
   pedido_lotes,
   tiene,
   ventas,
@@ -77,5 +78,13 @@ INSERT INTO tiene (cantidad, precio, activo, producto_id, pedido_id) VALUES
 INSERT INTO pedido_lotes (id, pedido_id, producto_id, lote_id, cantidad, consumido_entero) VALUES
   (1, 1, 1, 1, 1, false);
 SELECT setval(pg_get_serial_sequence('pedido_lotes', 'id'), COALESCE((SELECT MAX(id) FROM pedido_lotes), 1), (SELECT COUNT(*) > 0 FROM pedido_lotes));
+
+-- historial_precios_producto (4 registros)
+INSERT INTO historial_precios_producto (id, producto_id, lote_id, orden_compra_id, precio_costo_anterior, precio_costo_nuevo, precio_venta_anterior, precio_venta_nuevo, origen, fecha_registro, usuario_id) VALUES
+  (1, 1, 1, 1, NULL, 900.00, NULL, 1500.00, 'ALTA_PRODUCTO', '2026-11-10 09:00:00', 1),
+  (2, 1, 1, 1, 900.00, 1000.00, 1500.00, 1600.00, 'INGRESO_LOTE', '2026-11-10 10:30:00', 1),
+  (3, 7, 2, 7, NULL, 500.00, NULL, 1000.00, 'ALTA_PRODUCTO', '2026-11-12 09:15:00', 1),
+  (4, 8, 3, 7, NULL, 20000.00, NULL, 25000.00, 'ALTA_PRODUCTO', '2026-11-12 09:20:00', 1);
+SELECT setval(pg_get_serial_sequence('historial_precios_producto', 'id'), COALESCE((SELECT MAX(id) FROM historial_precios_producto), 1), (SELECT COUNT(*) > 0 FROM historial_precios_producto));
 
 COMMIT;

@@ -218,13 +218,13 @@ function VentasPage() {
         </div>
       )}
 
-      <section className="sec-tabla-admin sec-tabla-ventas" aria-live="polite">
+      <section className="sec-tabla-admin sec-tabla-ventas dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200" aria-live="polite">
         <table className="tabla-admin tabla-ventas">
-          <thead>
-            <tr>
-              <th>Venta y Fecha</th>
-              <th>Total y Auditoría</th>
-              <th className="col-acciones">Acciones</th>
+          <thead className="dark:bg-slate-900/50">
+            <tr className="dark:border-slate-700">
+              <th className="dark:text-slate-400 dark:border-slate-700">Venta y Fecha</th>
+              <th className="dark:text-slate-400 dark:border-slate-700">Total y Auditoría</th>
+              <th className="col-acciones dark:text-slate-400 dark:border-slate-700">Acciones</th>
             </tr>
           </thead>
 
@@ -238,33 +238,33 @@ function VentasPage() {
                 const precioFinal = tieneModificacion ? totalModificado : totalOriginal;
 
                 return (
-                  <tr key={venta.id}>
-                    <td className="col-admin">
+                  <tr key={venta.id} className="dark:border-slate-700 dark:hover:bg-slate-700/50">
+                    <td className="col-admin dark:text-slate-200 dark:border-slate-700">
                       <div className="venta-id-fecha">
-                        <span className="venta-id">#{index + 1}</span>
-                        <span className="venta-fecha">
+                        <span className="venta-id dark:text-slate-200">#{index + 1}</span>
+                        <span className="venta-fecha dark:text-slate-400">
                           {venta.fecha ? formatearFecha(venta.fecha) : '-'}
                         </span>
                       </div>
                     </td>
-                    <td className="col-admin col-monto">
+                    <td className="col-admin col-monto dark:text-slate-200 dark:border-slate-700">
                       <div className="venta-total-bloque">
                         <div className="venta-total-linea">
-                          <span className="venta-total-final">
+                          <span className="venta-total-final dark:text-slate-200">
                             {formatearPrecio(precioFinal)}
                           </span>
                           {tieneModificacion && (
-                            <span className="venta-total-original">
+                            <span className="venta-total-original dark:text-slate-400">
                               {formatearPrecio(totalOriginal)}
                             </span>
                           )}
                         </div>
                         {motivoModificacion && (
-                          <div className="venta-total-motivo">{motivoModificacion}</div>
+                          <div className="venta-total-motivo dark:text-slate-400">{motivoModificacion}</div>
                         )}
                       </div>
                     </td>
-                    <td className="col-admin col-acciones">
+                    <td className="col-admin col-acciones dark:border-slate-700">
                       <div className="venta-acciones">
                         <button
                           type="button"
@@ -299,8 +299,8 @@ function VentasPage() {
                 );
               })
             ) : (
-              <tr>
-                <td colSpan="3" className="col-vacia">
+              <tr className="dark:border-slate-700">
+                <td colSpan="3" className="col-vacia dark:text-slate-400 dark:border-slate-700">
                   No hay ventas registradas.
                 </td>
               </tr>
@@ -308,14 +308,28 @@ function VentasPage() {
           </tbody>
         </table>
 
-        <div className="tabla-admin-pie">
-          <span className="info-pag">
+        <div className="tabla-admin-pie dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+          <span className="info-pag dark:text-slate-300">
             Mostrando {totalVentas > 0 ? 1 : 0}–{totalVentas} de {totalVentas}
           </span>
           <div className="control-pag">
-            <button type="button" className="btn-pag" id="anterior-pag">‹</button>
-            <span className="nums-pag">1</span>
-            <button type="button" className="btn-pag" id="siguiente-pag">›</button>
+            <button
+              type="button"
+              className="btn-pag dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+              id="anterior-pag"
+              aria-label="Página anterior"
+            >
+              ‹
+            </button>
+            <span className="nums-pag dark:text-slate-200">1</span>
+            <button
+              type="button"
+              className="btn-pag dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+              id="siguiente-pag"
+              aria-label="Página siguiente"
+            >
+              ›
+            </button>
           </div>
         </div>
       </section>

@@ -99,6 +99,7 @@ function EditarVencimientoForm({ lote, onGuardar, onCerrar }) {
             id="venc-nueva-fecha"
             data-autofocus
             type="date"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             value={fecha}
             min={fechaArribo || undefined}
             onChange={(evento) => cambiarFecha(evento.target.value)}
@@ -121,7 +122,12 @@ function EditarVencimientoForm({ lote, onGuardar, onCerrar }) {
       </div>
 
       <div className="orden-modal-acciones">
-        <button type="button" className="orden-btn" onClick={onCerrar} disabled={guardando}>
+        <button
+          type="button"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+          onClick={onCerrar}
+          disabled={guardando}
+        >
           Cancelar
         </button>
         <button

@@ -146,15 +146,15 @@ function PedidosPage() {
         </div>
       )}
 
-      <section className="sec-prod-admin" aria-live="polite">
+      <section className="sec-prod-admin dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200" aria-live="polite">
         <table className="tabla-prod-admin">
-          <thead>
-            <tr>
-              <th>Cliente / Comercio</th>
-              <th>Fecha</th>
-              <th>Total</th>
-              <th>Estado</th>
-              <th className="col-acciones-header">Acciones</th>
+          <thead className="dark:bg-slate-900/50">
+            <tr className="dark:border-slate-700">
+              <th className="dark:text-slate-400 dark:border-slate-700">Cliente / Comercio</th>
+              <th className="dark:text-slate-400 dark:border-slate-700">Fecha</th>
+              <th className="dark:text-slate-400 dark:border-slate-700">Total</th>
+              <th className="dark:text-slate-400 dark:border-slate-700">Estado</th>
+              <th className="col-acciones-header dark:text-slate-400 dark:border-slate-700">Acciones</th>
             </tr>
           </thead>
 
@@ -171,8 +171,8 @@ function PedidosPage() {
                 />
               ))
             ) : (
-              <tr>
-                <td colSpan="5" className="pedido-tabla-vacia">
+              <tr className="dark:border-slate-700">
+                <td colSpan="5" className="pedido-tabla-vacia dark:text-slate-400 dark:border-slate-700">
                   No hay pedidos registrados.
                 </td>
               </tr>
@@ -180,14 +180,28 @@ function PedidosPage() {
           </tbody>
         </table>
 
-        <div className="tabla-admin-pie">
-          <span id="info-pag">
+        <div className="tabla-admin-pie dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200">
+          <span id="info-pag" className="info-pag dark:text-slate-300">
             Mostrando {totalPedidos > 0 ? 1 : 0}–{totalPedidos} de {totalPedidos}
           </span>
           <div className="control-pag">
-            <button type="button" id="anterior-pag">‹</button>
-            <span id="nums-pag">1</span>
-            <button type="button" id="siguiente-pag">›</button>
+            <button
+              type="button"
+              id="anterior-pag"
+              className="btn-pag dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+              aria-label="Página anterior"
+            >
+              ‹
+            </button>
+            <span id="nums-pag" className="nums-pag dark:text-slate-200">1</span>
+            <button
+              type="button"
+              id="siguiente-pag"
+              className="btn-pag dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+              aria-label="Página siguiente"
+            >
+              ›
+            </button>
           </div>
         </div>
       </section>

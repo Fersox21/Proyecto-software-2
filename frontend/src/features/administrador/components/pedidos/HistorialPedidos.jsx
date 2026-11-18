@@ -168,7 +168,10 @@ function HistorialPedidos() {
           texto="Probá con otro estado, búsqueda o rango de fechas."
         />
       ) : (
-        <section className="sec-prod-admin" aria-live="polite">
+        <section
+          className="sec-prod-admin dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          aria-live="polite"
+        >
           <table className="tabla-prod-admin">
             <thead>
               <tr>

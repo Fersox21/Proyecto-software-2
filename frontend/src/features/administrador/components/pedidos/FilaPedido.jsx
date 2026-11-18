@@ -7,36 +7,38 @@ function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onInic
   const esAlertaEstado = estadoNormalizado === 'pendiente' || estadoNormalizado === 'nuevo'
 
   return (
-    <tr>
-      <td className="col-admin">
+    <tr className="dark:border-slate-700 dark:hover:bg-slate-700/50">
+      <td className="col-admin dark:text-slate-200 dark:border-slate-700">
         <div className="pedido-cliente-celda">
-          <span className="pedido-comercio-nombre">{pedido.comercio || 'N/A'}</span>
-          <span className="pedido-id-subtitulo">Pedido #{numeroFila}</span>
+          <span className="pedido-comercio-nombre dark:text-slate-200">{pedido.comercio || 'N/A'}</span>
+          <span className="pedido-id-subtitulo dark:text-slate-400">Pedido #{numeroFila}</span>
         </div>
       </td>
-      <td className="col-admin">{pedido.fecha ? formatearFecha(pedido.fecha) : 'N/A'}</td>
-      <td className="col-admin">
+      <td className="col-admin dark:text-slate-200 dark:border-slate-700">
+        {pedido.fecha ? formatearFecha(pedido.fecha) : 'N/A'}
+      </td>
+      <td className="col-admin dark:text-slate-200 dark:border-slate-700">
         {pedido.totalModificado != null ? (
           <div className="pedido-total-modificado">
-            <span className="pedido-total-destacado">
+            <span className="pedido-total-destacado dark:text-slate-200">
               {formatearPrecio(pedido.totalModificado)}
             </span>
-            <span className="pedido-total-original">
+            <span className="pedido-total-original dark:text-slate-400">
               Original: {formatearPrecio(pedido.total || 0)}
             </span>
             {pedido.motivoModificacion && (
-              <span className="detalle-etiqueta">
+              <span className="detalle-etiqueta dark:text-slate-400">
                 Motivo: {pedido.motivoModificacion}
               </span>
             )}
           </div>
         ) : (
-          <span className="pedido-total-destacado">
+          <span className="pedido-total-destacado dark:text-slate-200">
             {pedido.total != null ? formatearPrecio(pedido.total) : '$0.00'}
           </span>
         )}
       </td>
-      <td className="col-admin">
+      <td className="col-admin dark:text-slate-200 dark:border-slate-700">
         <span
           className={`pedido-estado-chip ${
             esAlertaEstado ? 'pedido-estado-pendiente' : 'pedido-estado-neutro'
@@ -45,7 +47,7 @@ function FilaPedido({ pedido, numeroFila, onVerDetalle, onIniciarAceptar, onInic
           {pedido.estado || 'Desconocido'}
         </span>
       </td>
-      <td className="col-admin col-acciones">
+      <td className="col-admin col-acciones dark:border-slate-700">
         <div className="pedido-acciones">
           {esPendiente ? (
             <button

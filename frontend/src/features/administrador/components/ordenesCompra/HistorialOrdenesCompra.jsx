@@ -162,7 +162,10 @@ function HistorialOrdenesCompra({ productosPorId = {} }) {
           texto="Probá con otro filtro o rango de fechas."
         />
       ) : (
-        <section className="sec-prod-admin orden-tabla-contenedor" aria-live="polite">
+        <section
+          className="sec-prod-admin orden-tabla-contenedor dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          aria-live="polite"
+        >
           <table className="tabla-prod-admin orden-tabla">
             <thead>
               <tr>

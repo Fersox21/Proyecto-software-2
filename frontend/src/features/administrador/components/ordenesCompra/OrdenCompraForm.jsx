@@ -32,6 +32,8 @@ function crearLoteVacio() {
   return {
     idTemporal: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
     productoId: '',
+    nuevoPrecioCostoProducto: '',
+    nuevoPrecioVentaProducto: '',
     cantidad: '',
     total: '',
     totalManual: false,
@@ -45,9 +47,21 @@ function mapearLotes(orden) {
   return (orden?.lotes ?? []).map((lote) => ({
     idTemporal: lote.id ? String(lote.id) : (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)),
     productoId: lote.producto?.id != null ? String(lote.producto.id) : '',
+    nuevoPrecioCostoProducto:
+      lote.nuevoPrecioCostoProducto != null
+        ? String(lote.nuevoPrecioCostoProducto)
+        : lote.producto?.precioCosto != null
+          ? String(lote.producto.precioCosto)
+          : '',
+    nuevoPrecioVentaProducto:
+      lote.nuevoPrecioVentaProducto != null
+        ? String(lote.nuevoPrecioVentaProducto)
+        : lote.producto?.precioVenta != null
+          ? String(lote.producto.precioVenta)
+          : '',
     cantidad: lote.cantidad != null ? String(lote.cantidad) : '',
     total: lote.total != null ? String(lote.total) : '',
-    totalManual: lote.total != null,
+    totalManual: false,
     fechaArribo: normalizarFecha(lote.fechaArribo),
     fechaVencimiento: normalizarFecha(lote.fechaVencimiento),
     productoNuevo: crearProductoNuevoVacio(),
@@ -68,8 +82,13 @@ function calcularPrecioTotalLote(lote, productos) {
   if (lote.productoId === '__nuevo__') {
     precioCosto = Number(lote.productoNuevo?.precioCosto)
   } else if (lote.productoId) {
-    const prod = productos.find((p) => String(p.id) === String(lote.productoId))
-    precioCosto = Number(prod?.precioCosto)
+    const costoLote = Number(lote.nuevoPrecioCostoProducto)
+    if (Number.isFinite(costoLote) && costoLote > 0) {
+      precioCosto = costoLote
+    } else {
+      const prod = productos.find((p) => String(p.id) === String(lote.productoId))
+      precioCosto = Number(prod?.precioCosto)
+    }
   }
 
   if (!Number.isFinite(precioCosto) || precioCosto <= 0) return null
@@ -155,9 +174,21 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       lotes: prev.lotes.map((lote, pos) => {
         if (pos !== indice) return lote
         const actualizado = { ...lote, [campo]: valor }
-        if (campo === 'total') {
+        if (campo === 'productoId') {
+          if (valor && valor !== '__nuevo__') {
+            const prod = productos.find((p) => String(p.id) === String(valor))
+            actualizado.nuevoPrecioCostoProducto = prod?.precioCosto != null ? String(prod.precioCosto) : ''
+            actualizado.nuevoPrecioVentaProducto = prod?.precioVenta != null ? String(prod.precioVenta) : ''
+          } else {
+            actualizado.nuevoPrecioCostoProducto = ''
+            actualizado.nuevoPrecioVentaProducto = ''
+          }
+          actualizado.totalManual = false
+          const sugerido = calcularPrecioTotalLote(actualizado, productos)
+          actualizado.total = sugerido !== null ? String(sugerido) : ''
+        } else if (campo === 'total') {
           actualizado.totalManual = valor !== ''
-        } else if ((campo === 'productoId' || campo === 'cantidad') && !actualizado.totalManual) {
+        } else if ((campo === 'nuevoPrecioCostoProducto' || campo === 'cantidad') && !actualizado.totalManual) {
           const sugerido = calcularPrecioTotalLote(actualizado, productos)
           actualizado.total = sugerido !== null ? String(sugerido) : ''
         }
@@ -168,11 +199,23 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
     const sufijo = MAPA_CLAVE_ERROR_LOTE[campo] || campo
     const clave = `lote-${indice}-${sufijo}`
-    if (errores[clave] || (campo === 'fechaArribo' && errores[`lote-${indice}-vencimiento`])) {
+    if (
+      errores[clave] ||
+      (campo === 'fechaArribo' && errores[`lote-${indice}-vencimiento`]) ||
+      (campo === 'productoId' &&
+        (errores[`lote-${indice}-nuevoPrecioCostoProducto`] ||
+          errores[`lote-${indice}-nuevoPrecioVentaProducto`]))
+    ) {
       setErrores((prev) => ({
         ...prev,
         [clave]: null,
         ...(campo === 'fechaArribo' ? { [`lote-${indice}-vencimiento`]: null } : {}),
+        ...(campo === 'productoId'
+          ? {
+              [`lote-${indice}-nuevoPrecioCostoProducto`]: null,
+              [`lote-${indice}-nuevoPrecioVentaProducto`]: null,
+            }
+          : {}),
       }))
     }
   }
@@ -317,6 +360,15 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
         }
       } else if (!lote.productoId) {
         nuevosErrores[`lote-${indice}-producto`] = 'Elegí un producto'
+      } else {
+        const nuevoCosto = Number(lote.nuevoPrecioCostoProducto)
+        if (lote.nuevoPrecioCostoProducto === '' || Number.isNaN(nuevoCosto) || nuevoCosto <= 0) {
+          nuevosErrores[`lote-${indice}-nuevoPrecioCostoProducto`] = 'El nuevo precio de costo debe ser mayor a 0'
+        }
+        const nuevaVenta = Number(lote.nuevoPrecioVentaProducto)
+        if (lote.nuevoPrecioVentaProducto === '' || Number.isNaN(nuevaVenta) || nuevaVenta <= 0) {
+          nuevosErrores[`lote-${indice}-nuevoPrecioVentaProducto`] = 'El nuevo precio de venta debe ser mayor a 0'
+        }
       }
 
       const cantidad = Number(lote.cantidad)
@@ -362,6 +414,8 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       return {
         ...base,
         productoId: Number(lote.productoId),
+        nuevoPrecioCostoProducto: Number(Number(lote.nuevoPrecioCostoProducto).toFixed(2)),
+        nuevoPrecioVentaProducto: Number(Number(lote.nuevoPrecioVentaProducto).toFixed(2)),
       }
     }
 
@@ -487,6 +541,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
             <select
               id="orden-proveedor"
               name="proveedorId"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               value={valores.proveedorId}
               onChange={handleChange}
               aria-invalid={Boolean(errores.proveedorId)}
@@ -506,6 +561,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
               id="orden-fecha"
               name="fecha"
               type="date"
+              className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
               value={valores.fecha}
               onChange={handleChange}
               aria-invalid={Boolean(errores.fecha)}
@@ -515,11 +571,10 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
           <div className="orden-campo">
             <label>Total de la orden (calculado)</label>
             <div
+              className="bg-gray-100 border border-gray-300 text-slate-900 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
               style={{
                 padding: '0.55rem 0.75rem',
                 borderRadius: '6px',
-                backgroundColor: '#f3f4f6',
-                border: '1px solid #d1d5db',
                 fontWeight: 700,
                 fontSize: '1rem',
               }}
@@ -539,18 +594,22 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
           />
         )}
 
-        <section className="orden-lotes" aria-labelledby="orden-lotes-titulo">
+        <section className="orden-lotes dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200" aria-labelledby="orden-lotes-titulo">
           <div className="orden-lotes-cabecera">
-            <h3 className="orden-lotes-titulo" id="orden-lotes-titulo">Lotes</h3>
+            <h3 className="orden-lotes-titulo dark:text-white" id="orden-lotes-titulo">Lotes</h3>
             {!tieneLotesConsumidos && (
-              <button type="button" className="orden-btn" onClick={agregarLote}>
+              <button
+                type="button"
+                className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+                onClick={agregarLote}
+              >
                 + Agregar lote
               </button>
             )}
           </div>
 
           {tieneLotesConsumidos && (
-            <div className="orden-alerta" style={{ marginBottom: '1rem', backgroundColor: '#eff6ff', color: '#1e40af', border: '1px solid #bfdbfe' }}>
+            <div className="orden-alerta bg-blue-50 text-blue-800 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-200 dark:border-blue-800" style={{ marginBottom: '1rem' }}>
               Los lotes de esta orden ya registraron ventas o salidas de stock, por lo que su configuración permanece fija para preservar la trazabilidad histórica.
             </div>
           )}
@@ -584,7 +643,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       </div>
 
       <div className="orden-modal-acciones">
-        <button type="button" className="orden-btn" onClick={onCerrar} disabled={guardando}>
+        <button
+          type="button"
+          className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
+          onClick={onCerrar}
+          disabled={guardando}
+        >
           Cancelar
         </button>
         <button type="submit" className="orden-btn orden-btn-primario" disabled={guardando}>

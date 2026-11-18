@@ -384,3 +384,219 @@
   line-height: 1.5;
   color: var(--admin-texto, #2d3748);
 }
+
+/* Paginación de tabla en Pedidos */
+#main-pedidos .tabla-admin-pie {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--admin-borde, #e2e8f0);
+  color: var(--admin-texto-secundario, #64748b);
+  font-size: 0.85rem;
+}
+
+#main-pedidos .control-pag {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#main-pedidos .btn-pag {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--admin-borde, #e2e8f0);
+  background-color: var(--admin-superficie, #ffffff);
+  border-radius: 10px;
+  color: var(--admin-texto-btn, #102055);
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+#main-pedidos .btn-pag:hover:not(:disabled) {
+  background-color: var(--admin-hover-btn, #efebe2);
+}
+
+#main-pedidos .nums-pag {
+  padding: 0 0.5rem;
+  font-weight: 600;
+  color: var(--admin-acento, #102055);
+}
+
+/* Modo Oscuro */
+html[data-tema="oscuro"] .sec-prod-admin,
+html.dark .sec-prod-admin,
+html[data-tema="oscuro"] #main-pedidos .sec-prod-admin,
+html.dark #main-pedidos .sec-prod-admin {
+  background-color: #1e293b;
+  border: 1px solid #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin,
+html.dark #main-pedidos .tabla-prod-admin {
+  background-color: transparent;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin thead,
+html.dark #main-pedidos .tabla-prod-admin thead {
+  background-color: rgba(15, 23, 42, 0.5);
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin thead th,
+html.dark #main-pedidos .tabla-prod-admin thead th {
+  background-color: rgba(15, 23, 42, 0.5);
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin tbody tr,
+html.dark #main-pedidos .tabla-prod-admin tbody tr {
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin td,
+html.dark #main-pedidos .tabla-prod-admin td {
+  color: #e2e8f0;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin tbody tr:hover,
+html.dark #main-pedidos .tabla-prod-admin tbody tr:hover,
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin tbody tr:hover td,
+html.dark #main-pedidos .tabla-prod-admin tbody tr:hover td {
+  background-color: rgba(51, 65, 85, 0.5);
+}
+
+html[data-tema="oscuro"] .pedido-comercio-nombre,
+html.dark .pedido-comercio-nombre,
+html[data-tema="oscuro"] .pedido-total-destacado,
+html.dark .pedido-total-destacado {
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .pedido-tabla-vacia,
+html.dark .pedido-tabla-vacia,
+html[data-tema="oscuro"] .pedido-id-subtitulo,
+html.dark .pedido-id-subtitulo,
+html[data-tema="oscuro"] .pedido-total-original,
+html.dark .pedido-total-original,
+html[data-tema="oscuro"] #main-pedidos .tabla-prod-admin .detalle-etiqueta,
+html.dark #main-pedidos .tabla-prod-admin .detalle-etiqueta {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .pedido-btn-aceptar,
+html.dark .pedido-btn-aceptar {
+  color: #4ade80;
+}
+
+html[data-tema="oscuro"] .pedido-btn-aceptar:hover,
+html.dark .pedido-btn-aceptar:hover {
+  background-color: rgba(34, 197, 94, 0.16);
+}
+
+html[data-tema="oscuro"] .pedido-btn-detalle,
+html.dark .pedido-btn-detalle {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] .pedido-btn-detalle:hover,
+html.dark .pedido-btn-detalle:hover {
+  background-color: #334155;
+}
+
+html[data-tema="oscuro"] .pedido-btn-cancelar,
+html.dark .pedido-btn-cancelar {
+  color: #f87171;
+}
+
+html[data-tema="oscuro"] .pedido-btn-cancelar:hover,
+html.dark .pedido-btn-cancelar:hover {
+  background-color: rgba(239, 68, 68, 0.16);
+}
+
+html[data-tema="oscuro"] #main-pedidos .tabla-admin-pie,
+html.dark #main-pedidos .tabla-admin-pie {
+  background-color: #1e293b;
+  border-top-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] #main-pedidos .info-pag,
+html.dark #main-pedidos .info-pag,
+html[data-tema="oscuro"] #main-pedidos #info-pag,
+html.dark #main-pedidos #info-pag {
+  color: #cbd5e1;
+}
+
+html[data-tema="oscuro"] #main-pedidos .btn-pag,
+html.dark #main-pedidos .btn-pag {
+  background-color: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] #main-pedidos .btn-pag:hover:not(:disabled),
+html.dark #main-pedidos .btn-pag:hover:not(:disabled) {
+  background-color: #475569;
+}
+
+html[data-tema="oscuro"] #main-pedidos .nums-pag,
+html.dark #main-pedidos .nums-pag,
+html[data-tema="oscuro"] #main-pedidos #nums-pag,
+html.dark #main-pedidos #nums-pag {
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-precio,
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-motivo,
+html[data-tema="oscuro"] .form-confirmacion-accion textarea,
+html.dark .detalle-pedido-modal-contenido .detalle-input-precio,
+html.dark .detalle-pedido-modal-contenido .detalle-input-motivo,
+html.dark .form-confirmacion-accion textarea {
+  background-color: #334155;
+  color: #ffffff;
+  border-color: #475569;
+  color-scheme: dark;
+}
+
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-precio::placeholder,
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-motivo::placeholder,
+html[data-tema="oscuro"] .form-confirmacion-accion textarea::placeholder,
+html.dark .detalle-pedido-modal-contenido .detalle-input-precio::placeholder,
+html.dark .detalle-pedido-modal-contenido .detalle-input-motivo::placeholder,
+html.dark .form-confirmacion-accion textarea::placeholder {
+  color: #94a3b8;
+}
+
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-precio:focus,
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-motivo:focus,
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-precio:focus-visible,
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-input-motivo:focus-visible,
+html[data-tema="oscuro"] .form-confirmacion-accion textarea:focus,
+html[data-tema="oscuro"] .form-confirmacion-accion textarea:focus-visible,
+html.dark .detalle-pedido-modal-contenido .detalle-input-precio:focus,
+html.dark .detalle-pedido-modal-contenido .detalle-input-motivo:focus,
+html.dark .detalle-pedido-modal-contenido .detalle-input-precio:focus-visible,
+html.dark .detalle-pedido-modal-contenido .detalle-input-motivo:focus-visible,
+html.dark .form-confirmacion-accion textarea:focus,
+html.dark .form-confirmacion-accion textarea:focus-visible {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-btn-neutral,
+html.dark .detalle-pedido-modal-contenido .detalle-btn-neutral {
+  color: #cbd5e1;
+  border-color: #475569;
+}
+
+html[data-tema="oscuro"] .detalle-pedido-modal-contenido .detalle-btn-neutral:hover:not(:disabled),
+html.dark .detalle-pedido-modal-contenido .detalle-btn-neutral:hover:not(:disabled) {
+  background-color: #334155;
+  border-color: #475569;
+  color: #ffffff;
+}

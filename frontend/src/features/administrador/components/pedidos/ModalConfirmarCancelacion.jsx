@@ -38,6 +38,7 @@ function ModalConfirmarCancelacion({ pedido, visible, cargando, onConfirmar, onC
           <textarea
             id="motivo-rechazo"
             rows="3"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             value={motivo}
             onChange={(e) => {
               setMotivo(e.target.value)
@@ -70,7 +71,7 @@ function ModalConfirmarCancelacion({ pedido, visible, cargando, onConfirmar, onC
           </button>
           <button
             type="button"
-            className="orden-btn"
+            className="orden-btn dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
             onClick={handleCerrar}
             disabled={cargando}
           >

@@ -69,7 +69,11 @@ export const obtener = async (req, res, next) => {
 export const crear = async (req, res, next) => {
   try {
     const datos = parsearPayloadOrden(req);
-    const nuevaOrdenCompra = await service.crearOrdenCompra(datos, req.files);
+    const usuarioId = req.usuario?.id ?? req.user?.id ?? datos?.usuarioId ?? null;
+    const nuevaOrdenCompra = await service.crearOrdenCompra(
+      usuarioId != null ? { ...datos, usuarioId } : datos,
+      req.files
+    );
     res.status(201).json(nuevaOrdenCompra);
   } catch (err) {
     limpiarImagenesSubidas(req.files);
@@ -80,7 +84,12 @@ export const crear = async (req, res, next) => {
 export const actualizar = async (req, res, next) => {
   try {
     const datos = parsearPayloadOrden(req);
-    const ordenCompraActualizada = await service.actualizarOrdenCompra(req.params.id, datos, req.files);
+    const usuarioId = req.usuario?.id ?? req.user?.id ?? datos?.usuarioId ?? null;
+    const ordenCompraActualizada = await service.actualizarOrdenCompra(
+      req.params.id,
+      usuarioId != null ? { ...datos, usuarioId } : datos,
+      req.files
+    );
     res.json(ordenCompraActualizada);
   } catch (err) {
     limpiarImagenesSubidas(req.files);

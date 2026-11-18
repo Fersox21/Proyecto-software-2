@@ -57,7 +57,7 @@ function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
 
   return (
     <div
-      className="orden-proveedor-inline"
+      className="orden-proveedor-inline dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
       role="group"
       aria-label="Nuevo proveedor"
     >
@@ -96,6 +96,7 @@ function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
             id="orden-nuevo-proveedor-telefono"
             type="tel"
             inputMode="tel"
+            className="dark:bg-slate-700 dark:text-white dark:border-slate-600 dark:placeholder-slate-400 dark:focus:border-blue-500 dark:focus:ring-blue-500/50"
             placeholder="Ej. +5491122334455"
             value={telefono}
             onChange={manejarCambioTelefono}
@@ -109,7 +110,7 @@ function NuevoProveedorInlineForm({ onProveedorCreado, onCancelar }) {
       <div className="orden-proveedor-inline-acciones">
         <button
           type="button"
-          className="orden-btn orden-btn-chico"
+          className="orden-btn orden-btn-chico dark:text-slate-300 dark:border-slate-600 dark:hover:bg-slate-700"
           onClick={onCancelar}
           disabled={guardando}
         >

@@ -188,7 +188,10 @@ function HistorialVentas() {
           texto="Probá con otro filtro o rango de fechas."
         />
       ) : (
-        <section className="sec-tabla-admin sec-tabla-ventas" aria-live="polite">
+        <section
+          className="sec-tabla-admin sec-tabla-ventas dark:bg-slate-800 dark:border-slate-700 dark:text-slate-200"
+          aria-live="polite"
+        >
           <table className="tabla-admin tabla-ventas">
             <thead>
               <tr>

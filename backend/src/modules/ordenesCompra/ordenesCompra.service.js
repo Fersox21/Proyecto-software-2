@@ -376,10 +376,43 @@ const obtenerHoyLocalISO = () =>
     throw crearError('El producto indicado en el lote está inactivo', 400);
   }
 
-  const totalLote = calcularYValidarTotalLote(lote, productoExistente.precioCosto, cantidad);
+  const rawCosto =
+    lote.nuevoPrecioCostoProducto ??
+    lote.precioCostoUnitario ??
+    lote.precioCosto ??
+    lote.precio_costo_unitario;
+  const nuevoPrecioCostoProducto =
+    rawCosto !== undefined && rawCosto !== null && String(rawCosto).trim() !== ''
+      ? validarDecimalPositivo(rawCosto, 'El nuevo precio de costo para el catálogo debe ser mayor a 0')
+      : Number(productoExistente.precioCosto);
+
+  const rawVenta =
+    lote.nuevoPrecioVentaProducto ??
+    lote.precioVenta ??
+    lote.precio_venta;
+  const nuevoPrecioVentaProducto =
+    rawVenta !== undefined && rawVenta !== null && String(rawVenta).trim() !== ''
+      ? validarDecimalPositivo(rawVenta, 'El nuevo precio de venta para el catálogo debe ser mayor a 0')
+      : Number(productoExistente.precioVenta);
+
+  if (
+    productoExistente.enPromocion === true &&
+    productoExistente.precioPromo !== null &&
+    productoExistente.precioPromo !== undefined &&
+    nuevoPrecioVentaProducto <= Number(productoExistente.precioPromo)
+  ) {
+    throw crearError(
+      `El nuevo precio de venta debe ser mayor al precio promocional activo ($${Number(productoExistente.precioPromo).toFixed(2)})`,
+      400
+    );
+  }
+
+  const totalLote = calcularYValidarTotalLote(lote, nuevoPrecioCostoProducto, cantidad);
 
   return {
     cantidad,
+    nuevoPrecioCostoProducto,
+    nuevoPrecioVentaProducto,
     total: totalLote,
     fechaArribo,
     fechaVencimiento,
@@ -477,6 +510,7 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       fecha,
       ...(proveedorId !== null && { proveedor_id: proveedorId }),
       ...(proveedorNuevo !== null && { proveedorNuevo }),
+      ...(usuarioId !== null && { usuarioId }),
       lotes: lotesValidados
     });
     const nombresUsados = new Set(
@@ -556,11 +590,18 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       }
     }
 
+    const usuarioIdRaw = data?.usuarioId ?? data?.usuario_id;
+    const usuarioId =
+      usuarioIdRaw !== undefined && usuarioIdRaw !== null && Number.isInteger(Number(usuarioIdRaw)) && Number(usuarioIdRaw) > 0
+        ? Number(usuarioIdRaw)
+        : null;
+
     const datosActualizar = {
       total,
       fecha,
       ...(proveedorId !== undefined && { proveedor_id: proveedorId }),
       ...(proveedorNuevo !== undefined && { proveedorNuevo }),
+      ...(usuarioId !== null && { usuarioId }),
       ...(lotesValidados !== undefined && { lotes: lotesValidados })
     };
 

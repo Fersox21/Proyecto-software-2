@@ -337,18 +337,61 @@
   outline-offset: 2px;
 }
 
-html[data-tema="oscuro"] .tabla-prod-admin thead th {
-  background-color: #232833;
-  color: #9ca3af;
+html[data-tema="oscuro"] .sec-tabla-admin,
+html.dark .sec-tabla-admin,
+html[data-tema="oscuro"] .sec-prod-admin,
+html.dark .sec-prod-admin,
+html[data-tema="oscuro"] .sec-ventas-admin,
+html.dark .sec-ventas-admin {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .tabla-admin thead th,
+html.dark .tabla-admin thead th,
+html[data-tema="oscuro"] .tabla-prod-admin thead th,
+html.dark .tabla-prod-admin thead th,
+html[data-tema="oscuro"] .tabla-ventas-admin thead th,
+html.dark .tabla-ventas-admin thead th {
+  background-color: rgba(15, 23, 42, 0.5);
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .tabla-admin td,
+html.dark .tabla-admin td,
+html[data-tema="oscuro"] .tabla-prod-admin td,
+html.dark .tabla-prod-admin td,
+html[data-tema="oscuro"] .tabla-ventas-admin td,
+html.dark .tabla-ventas-admin td {
+  color: #e2e8f0;
+  border-bottom-color: #334155;
+}
+
+html[data-tema="oscuro"] .tabla-admin-pie,
+html.dark .tabla-admin-pie {
+  background-color: #1e293b;
+  border-top-color: #334155;
+  color: #e2e8f0;
+}
+
+html[data-tema="oscuro"] .tabla-admin-pie .info-pag,
+html.dark .tabla-admin-pie .info-pag {
+  color: #cbd5e1;
 }
 
 html[data-tema="oscuro"] .prod-nombre,
-html[data-tema="oscuro"] .prod-precio-venta {
+html.dark .prod-nombre,
+html[data-tema="oscuro"] .prod-precio-venta,
+html.dark .prod-precio-venta {
   color: #e5e7eb;
 }
 
 html[data-tema="oscuro"] .prod-marca,
-html[data-tema="oscuro"] .prod-precio-costo {
+html.dark .prod-marca,
+html[data-tema="oscuro"] .prod-precio-costo,
+html.dark .prod-precio-costo {
   color: #9ca3af;
 }
 
