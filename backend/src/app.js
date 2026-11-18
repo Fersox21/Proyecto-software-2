@@ -25,8 +25,12 @@ app.use(express.json());
 
 // Imágenes subidas desde el panel de administración. Se sirven como archivos
 // estáticos, sin autenticación, porque las consume el catálogo público.
+// Se exponen tanto en /uploads como en /api/uploads para que funcionen detrás
+// de proxies inversos (Nginx/Apache) que solo redirigen /api al backend Node.
 const DIRECTORIO_APP = path.dirname(fileURLToPath(import.meta.url));
-app.use('/uploads', express.static(path.resolve(DIRECTORIO_APP, '../uploads')));
+const RUTA_UPLOADS = path.resolve(DIRECTORIO_APP, '../uploads');
+app.use('/uploads', express.static(RUTA_UPLOADS));
+app.use('/api/uploads', express.static(RUTA_UPLOADS));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/lotes', lotesRoutes);

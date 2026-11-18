@@ -89,6 +89,9 @@ export async function actualizarProducto(id, datos) {
   })
 
   if (!respuesta.ok) {
+    if (respuesta.status === 413) {
+      throw new Error('La imagen supera el tamaño máximo permitido por el servidor (Error 413)')
+    }
     const errorData = await respuesta.json().catch(() => ({}))
     throw new Error(errorData.error || 'No se pudo actualizar el producto')
   }
