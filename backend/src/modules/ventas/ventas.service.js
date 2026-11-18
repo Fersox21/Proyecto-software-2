@@ -49,21 +49,44 @@ export const listarHistorialVentas = async () => {
   return await ventasRepository.listarHistorial();
 };
 
+const validarId = (id, mensaje = 'El ID indicado no es válido') => {
+  const numero = Number(id);
+  if (!Number.isInteger(numero) || numero <= 0) {
+    throw crearError(mensaje, 400);
+  }
+  return numero;
+};
+
+const validarFechaISO = (valor) => {
+  const fecha = typeof valor === 'string' ? valor.trim() : '';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+    throw crearError('La fecha debe tener el formato YYYY-MM-DD', 400);
+  }
+  const [anio, mes, dia] = fecha.split('-').map(Number);
+  const comp = new Date(Date.UTC(anio, mes - 1, dia));
+  if (comp.getUTCFullYear() !== anio || comp.getUTCMonth() !== mes - 1 || comp.getUTCDate() !== dia) {
+    throw crearError('La fecha indicada no es válida', 400);
+  }
+  return fecha;
+};
+
 export const obtenerVenta = async (id) => {
-  const venta = await ventasRepository.obtenerDetalle(id);
+  const idValido = validarId(id, 'El ID de la venta no es válido');
+  const venta = await ventasRepository.obtenerDetalle(idValido);
 
   if (!venta) {
-    throw crearError(`La venta con ID ${id} no existe`, 404);
+    throw crearError(`La venta con ID ${idValido} no existe`, 404);
   }
 
   return venta;
 };
 
 export const obtenerProductosVenta = async (id) => {
-  const rows = await ventasRepository.obtener(id);
+  const idValido = validarId(id, 'El ID de la venta no es válido');
+  const rows = await ventasRepository.obtener(idValido);
 
   if (!rows || rows.length === 0) {
-    throw crearError(`La venta con ID ${id} no existe`, 404);
+    throw crearError(`La venta con ID ${idValido} no existe`, 404);
   }
 
   const venta = rows[0];
@@ -75,15 +98,25 @@ export const obtenerProductosVenta = async (id) => {
 };
 
 export const crearVenta = async (data) => {
-  const pedidoId = data.pedido_id ?? data.pedidoId;
+  const rawPedidoId = data.pedido_id ?? data.pedidoId;
 
-  if (!pedidoId) {
+  if (!rawPedidoId) {
     throw crearError('Faltan datos obligatorios para crear venta', 400);
   }
+  const pedidoId = validarId(rawPedidoId, 'El ID del pedido no es válido');
 
   const pedidoExistente = await repositoryPedidos.findById(pedidoId);
   if (!pedidoExistente) {
     throw crearError('No existe pedido con ese id', 404);
+  }
+
+  if (pedidoExistente.activo === false) {
+    throw crearError('No se puede crear una venta para un pedido eliminado', 409);
+  }
+
+  const estadoPedido = String(pedidoExistente.estado ?? '').trim().toLowerCase();
+  if (!['aprobado', 'aceptado', 'entregado', 'completado'].includes(estadoPedido)) {
+    throw crearError('Solo se puede crear una venta para un pedido ya aprobado', 409);
   }
 
   const ventaExistente = await ventasRepository.obtenerPorPedidoId(pedidoId);
@@ -95,13 +128,15 @@ export const crearVenta = async (data) => {
     throw crearError('Faltan datos obligatorios para crear venta', 400);
   }
 
+  const fecha = validarFechaISO(data.fecha);
   const total = validarDecimalPositivo(data.total, 'El total de la venta debe ser mayor a 0');
 
-  return await ventasRepository.create({ ...data, pedido_id: pedidoId, total });
+  return await ventasRepository.create({ ...data, fecha, pedido_id: pedidoId, total });
 };
 
 export const update = async (id, data) => {
-  const rows = await ventasRepository.obtener(id);
+  const idValido = validarId(id, 'El ID de la venta no es válido');
+  const rows = await ventasRepository.obtener(idValido);
 
   if (!rows || rows.length === 0) {
     throw crearError('No existe venta con ese id', 404);
@@ -109,7 +144,7 @@ export const update = async (id, data) => {
 
   const ventaActual = rows[0];
   const fecha = data.fecha !== undefined && data.fecha !== null && data.fecha !== ''
-    ? data.fecha
+    ? validarFechaISO(String(data.fecha).slice(0, 10))
     : ventaActual.fecha;
 
   const rawTotalModificado = data.totalModificado !== undefined
@@ -133,12 +168,15 @@ export const update = async (id, data) => {
     }
 
     motivoModificacion = rawMotivoModificacion.trim();
+    if (motivoModificacion.length > 500) {
+      throw crearError('El motivo de modificación no puede superar los 500 caracteres', 400);
+    }
   } else if (rawTotalModificado === null || rawTotalModificado === '') {
     totalModificado = null;
     motivoModificacion = null;
   }
 
-  return await ventasRepository.update(id, {
+  return await ventasRepository.update(idValido, {
     fecha,
     totalModificado,
     motivoModificacion
@@ -146,7 +184,8 @@ export const update = async (id, data) => {
 };
 
 export const remove = async (id) => {
-  const rowCount = await ventasRepository.remove(id);
+  const idValido = validarId(id, 'El ID de la venta no es válido');
+  const rowCount = await ventasRepository.remove(idValido);
   if (rowCount === 0) {
     throw crearError('Venta no encontrada', 404);
   }

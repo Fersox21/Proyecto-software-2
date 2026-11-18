@@ -19,7 +19,13 @@ const resolverTipoPromocionDefecto = async () => {
     if (descuentoDirecto) return descuentoDirecto.id;
   }
 
-  return DEFAULT_TIPO_PROMOCION_ID;
+  if (typeof repositoryTipoPromocion.findAll === 'function') {
+    const todos = await repositoryTipoPromocion.findAll();
+    const primeroActivo = todos.find((tp) => tp?.activo !== false);
+    if (primeroActivo) return primeroActivo.id;
+  }
+
+  return null;
 };
 
 const crearError = (mensaje, status) => {
@@ -250,7 +256,6 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
 };
 
 const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
-  const calculado = Number((Number(precioCosto) * cantidad).toFixed(2));
   const rawTotal = lote.total ?? lote.precioTotal;
 
   if (rawTotal !== undefined && rawTotal !== null && rawTotal !== '') {
@@ -258,12 +263,10 @@ const calcularYValidarTotalLote = (lote, precioCosto, cantidad) => {
       rawTotal,
       'El total del lote debe ser un número mayor a 0'
     );
-    if (Math.abs(enviado - calculado) > 0.01) {
-      throw crearError('El total del lote no coincide con el precio de costo por cantidad', 400);
-    }
+    return Number(enviado.toFixed(2));
   }
 
-  return calculado;
+  return Number((Number(precioCosto) * cantidad).toFixed(2));
 };
 
 const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) => {
@@ -286,12 +289,24 @@ const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) =>
   const fechaArribo = validarFecha(fArriboRaw, 'La fecha de arribo');
   const fechaVencimiento = validarFecha(fVenciRaw, 'La fecha de vencimiento');
 
+const obtenerHoyLocalISO = () => {
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+};
+
   if (fechaOrden && fechaArribo < fechaOrden) {
     throw crearError('La fecha de arribo no puede ser menor a la fecha de pedido de la orden', 400);
   }
 
   if (fechaVencimiento < fechaArribo) {
     throw crearError('La fecha de vencimiento no puede ser anterior a la fecha de arribo', 400);
+  }
+
+  if (fechaVencimiento < obtenerHoyLocalISO()) {
+    throw crearError('No se puede registrar ni editar un lote con fecha de vencimiento ya vencida', 400);
   }
 
   if (lote.productoNuevo) {
@@ -335,6 +350,14 @@ const validarLote = async (lote, indice, archivosPorCampo, fechaOrden = null) =>
   };
 };
 
+const validarId = (id, mensaje = 'El ID de la orden de compra no es válido') => {
+  const num = Number(id);
+  if (!Number.isInteger(num) || num <= 0) {
+    throw crearError(mensaje, 400);
+  }
+  return num;
+};
+
 export const listarOrdenesCompra = async () => {
   return await repository.findAll();
 };
@@ -344,7 +367,8 @@ export const listarHistorialOrdenesCompra = async () => {
 };
 
 export const obtenerOrdenCompraPorId = async (id, incluirInactivos = false) => {
-  const ordenCompra = await repository.findById(id, incluirInactivos);
+  const idValido = validarId(id);
+  const ordenCompra = await repository.findById(idValido, incluirInactivos);
   if (!ordenCompra) {
     throw crearError('Orden de compra no encontrada', 404);
   }
@@ -382,11 +406,6 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       proveedorId = parsedId;
     }
 
-    const total = validarDecimalPositivo(
-      data?.total,
-      'El total de la orden de compra debe ser mayor a 0'
-    );
-
     if (!data?.fecha) {
       throw crearError('La fecha de la orden de compra es obligatoria', 400);
     }
@@ -403,6 +422,10 @@ export const crearOrdenCompra = async (data, archivos = []) => {
       lotesValidados.push(await validarLote(lotes[i], i, archivosPorCampo, fecha));
     }
 
+    const total = Number(
+      lotesValidados.reduce((acc, l) => acc + Number(l.total), 0).toFixed(2)
+    );
+
     return await repository.create({
       total,
       fecha,
@@ -418,7 +441,8 @@ export const crearOrdenCompra = async (data, archivos = []) => {
 
 export const actualizarOrdenCompra = async (id, data, archivos = []) => {
   try {
-    const ordenCompraExistente = await repository.findById(id);
+    const idValido = validarId(id);
+    const ordenCompraExistente = await repository.findById(idValido);
     if (!ordenCompraExistente) {
       throw crearError('Orden de compra no encontrada', 404);
     }
@@ -473,6 +497,9 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       for (let i = 0; i < data.lotes.length; i += 1) {
         lotesValidados.push(await validarLote(data.lotes[i], i, archivosPorCampo, fecha));
       }
+      total = Number(
+        lotesValidados.reduce((acc, l) => acc + Number(l.total), 0).toFixed(2)
+      );
     }
 
     const datosActualizar = {
@@ -483,7 +510,7 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       ...(lotesValidados !== undefined && { lotes: lotesValidados })
     };
 
-    return await repository.update(id, datosActualizar);
+    return await repository.update(idValido, datosActualizar);
   } catch (err) {
     limpiarArchivos(archivos);
     throw err;
@@ -491,7 +518,8 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
 };
 
 export const eliminarOrdenCompra = async (id) => {
-  const rowCount = await repository.remove(id);
+  const idValido = validarId(id);
+  const rowCount = await repository.remove(idValido);
   if (rowCount === 0) {
     throw crearError('Orden de compra no encontrada', 404);
   }

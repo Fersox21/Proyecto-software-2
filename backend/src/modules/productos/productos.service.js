@@ -142,7 +142,13 @@ const resolverTipoPromocionDefecto = async () => {
     if (descuentoDirecto) return descuentoDirecto.id;
   }
 
-  return DEFAULT_TIPO_PROMOCION_ID;
+  if (typeof tiposPromocionRepository.findAll === 'function') {
+    const tipos = await tiposPromocionRepository.findAll();
+    const activo = tipos.find((t) => t.activo !== false);
+    if (activo) return activo.id;
+  }
+
+  return null;
 };
 
 const resolverTipoPromocion = async (data, fallback = undefined) => {
@@ -190,8 +196,17 @@ export const listarHistorialProductos = async () => {
 
 export const listarCatalogo = async () => await repository.findAllCatalogo();
 
+const validarId = (id, mensaje = 'El ID del producto no es válido') => {
+  const num = Number(id);
+  if (!Number.isInteger(num) || num <= 0) {
+    throw crearError(mensaje, 400);
+  }
+  return num;
+};
+
 export const obtenerProductoPorId = async (id) => {
-  const producto = await repository.findById(id);
+  const idValido = validarId(id);
+  const producto = await repository.findById(idValido);
   if (!producto) {
     throw crearError('Producto no encontrado', 404);
   }
@@ -206,6 +221,14 @@ export const crearProducto = async (data, archivo) => {
 
     if (!nombre || esVacio(data?.precioCosto) || esVacio(data?.precioVenta)) {
       throw crearError('Faltan datos obligatorios para crear el producto', 400);
+    }
+
+    if (nombre.length > 100) {
+      throw crearError('El nombre del producto no puede superar los 100 caracteres', 400);
+    }
+
+    if (marca && marca.length > 25) {
+      throw crearError('La marca del producto no puede superar los 25 caracteres', 400);
     }
 
     const rawVisibleCatalogo = data?.visibleCatalogo ?? data?.visible_catalogo;
@@ -268,7 +291,8 @@ export const crearProducto = async (data, archivo) => {
 
 export const actualizarProducto = async (id, data, archivo) => {
   try {
-    const productoExistente = await repository.findById(id);
+    const idValido = validarId(id);
+    const productoExistente = await repository.findById(idValido);
     if (!productoExistente) {
       throw crearError('Producto no encontrado', 404);
     }
@@ -380,7 +404,8 @@ export const actualizarProducto = async (id, data, archivo) => {
 };
 
 export const eliminarProducto = async (id) => {
-  const rowCount = await repository.remove(id);
+  const idValido = validarId(id);
+  const rowCount = await repository.remove(idValido);
   if (rowCount === 0) {
     throw crearError('Producto no encontrado', 404);
   }

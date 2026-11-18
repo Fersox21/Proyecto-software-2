@@ -111,8 +111,22 @@ const validarOrdenDeFechas = (fechaArribo, fechaVencimiento) => {
   }
 };
 
-export const listarLotes = async () => {
-  return await repository.findAll();
+const obtenerHoyLocalISO = () => {
+  const ahora = new Date();
+  const anio = ahora.getFullYear();
+  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+  const dia = String(ahora.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+};
+
+const validarNoVencido = (fechaVencimiento) => {
+  if (fechaVencimiento && fechaVencimiento < obtenerHoyLocalISO()) {
+    throw crearError('No se puede registrar ni editar un lote con fecha de vencimiento ya vencida', 400);
+  }
+};
+
+export const listarLotes = async (opciones = {}) => {
+  return await repository.findAll(opciones);
 };
 
 export const listarHistorialLotes = async () => {
@@ -167,7 +181,13 @@ export const crearLote = async (data) => {
   const fechaArribo = validarFecha(data.fechaArribo, 'La fecha de arribo');
   const fechaVencimiento = validarFecha(data.fechaVencimiento, 'La fecha de vencimiento');
 
+  const fechaOrden = normalizarFecha(ordenCompraExistente.fecha);
+  if (fechaOrden && fechaArribo < fechaOrden) {
+    throw crearError('La fecha de arribo no puede ser anterior a la fecha de pedido de la orden de compra', 400);
+  }
+
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+  validarNoVencido(fechaVencimiento);
 
   const total = Number((Number(productoExistente.precioCosto) * cantidad).toFixed(2));
 
@@ -193,6 +213,7 @@ export const actualizarVencimiento = async (id, data) => {
 
   const fechaArribo = normalizarFecha(loteExistente.fechaArribo);
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+  validarNoVencido(fechaVencimiento);
 
   const actualizado = await repository.updateFechaVencimiento(idLote, fechaVencimiento);
   if (!actualizado) {
@@ -221,7 +242,13 @@ export const actualizarLote = async (id, data) => {
       ? validarFecha(data.fechaVencimiento, 'La fecha de vencimiento')
       : normalizarFecha(loteExistente.fechaVencimiento);
 
+  const fechaOrden = normalizarFecha(loteExistente.ordenCompra?.fecha);
+  if (fechaOrden && fechaArribo < fechaOrden) {
+    throw crearError('La fecha de arribo no puede ser anterior a la fecha de pedido de la orden de compra', 400);
+  }
+
   validarOrdenDeFechas(fechaArribo, fechaVencimiento);
+  validarNoVencido(fechaVencimiento);
 
   const total =
     data?.total !== undefined

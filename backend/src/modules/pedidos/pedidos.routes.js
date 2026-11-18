@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import * as controller from './pedidos.controller.js';
-import { verificarToken } from '../../middlewares/verificarToken.js';
+import { verificarToken, requerirAdmin } from '../../middlewares/verificarToken.js';
 
 const router = Router();
 
@@ -8,12 +8,12 @@ const router = Router();
 router.post('/', controller.crear);
 
 // La gestión de pedidos es exclusiva del panel administrador.
-router.get('/', verificarToken, controller.listar);
-router.get('/historial', verificarToken, controller.listarHistorial);
-router.get('/:id/lotes-disponibles', verificarToken, controller.obtenerLotesDisponibles);
-router.delete('/:pedido_id/items/:producto_id', verificarToken, controller.eliminarItem);
-router.get('/:id', verificarToken, controller.obtener);
-router.put('/:id', verificarToken, controller.actualizar)
-router.delete('/:id', verificarToken, controller.eliminar);
+router.use(verificarToken, requerirAdmin);
+router.get('/', controller.listar);
+router.get('/historial', controller.listarHistorial);
+router.get('/:id/lotes-disponibles', controller.obtenerLotesDisponibles);
+router.get('/:id', controller.obtener);
+router.put('/:id', controller.actualizar);
+router.delete('/:id', controller.eliminar);
 
 export default router;

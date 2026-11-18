@@ -4,17 +4,20 @@ export const gananciasMensuales = async () => {
   const { rows } = await pool.query(`
     SELECT
       TO_CHAR(DATE_TRUNC('month', v.fecha), 'YYYY-MM') AS periodo,
-      COALESCE(SUM(v.total), 0)::numeric(10,2) AS ingresos,
+      COALESCE(SUM(COALESCE(v.total_modificado, p.total_modificado, v.total)), 0)::numeric(10,2) AS ingresos,
       COALESCE(SUM(costos_pedido.costo_total), 0)::numeric(10,2) AS costos,
-      (COALESCE(SUM(v.total), 0) - COALESCE(SUM(costos_pedido.costo_total), 0))::numeric(10,2) AS ganancia
+      (COALESCE(SUM(COALESCE(v.total_modificado, p.total_modificado, v.total)), 0) - COALESCE(SUM(costos_pedido.costo_total), 0))::numeric(10,2) AS ganancia
     FROM ventas v
+    LEFT JOIN pedidos p ON p.id = v.pedido_id
     LEFT JOIN (
-      SELECT t.pedido_id, SUM(t.cantidad * p.precio_costo) AS costo_total
+      SELECT t.pedido_id, SUM(t.cantidad * prod.precio_costo) AS costo_total
       FROM tiene t
-      JOIN productos p ON p.id = t.producto_id
+      JOIN productos prod ON prod.id = t.producto_id
+      WHERE t.activo = true
       GROUP BY t.pedido_id
     ) costos_pedido ON costos_pedido.pedido_id = v.pedido_id
-    WHERE v.fecha >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
+    WHERE v.activo = true
+      AND v.fecha >= DATE_TRUNC('month', CURRENT_DATE - INTERVAL '12 months')
     GROUP BY DATE_TRUNC('month', v.fecha)
     ORDER BY DATE_TRUNC('month', v.fecha) ASC;
   `);
@@ -36,6 +39,7 @@ export const productosVencidos = async () => {
     WHERE l.fecha_vencimiento < CURRENT_DATE
       AND l.activo = true
       AND l.cantidad > 0
+      AND p.activo = true
     ORDER BY l.fecha_vencimiento ASC;
   `);
   return rows;
@@ -54,7 +58,9 @@ export const masVendidosPorMes = async (mes) => {
     FROM ventas v
     JOIN tiene t ON t.pedido_id = v.pedido_id
     JOIN productos p ON p.id = t.producto_id
-    WHERE TO_CHAR(v.fecha, 'YYYY-MM') = $1
+    WHERE v.activo = true
+      AND t.activo = true
+      AND TO_CHAR(v.fecha, 'YYYY-MM') = $1
     GROUP BY p.id, p.nombre, p.marca, p.categoria
     ORDER BY total_unidades DESC
     LIMIT 10;
@@ -65,10 +71,12 @@ export const masVendidosPorMes = async (mes) => {
 export const promedioDiario = async () => {
   const { rows } = await pool.query(`
     SELECT
-      COALESCE(SUM(total), 0)::numeric(10,2) AS total_30_dias,
-      (COALESCE(SUM(total), 0) / 30.0)::numeric(10,2) AS promedio_diario
-    FROM ventas
-    WHERE fecha >= CURRENT_DATE - INTERVAL '30 days';
+      COALESCE(SUM(COALESCE(v.total_modificado, p.total_modificado, v.total)), 0)::numeric(10,2) AS total_30_dias,
+      (COALESCE(SUM(COALESCE(v.total_modificado, p.total_modificado, v.total)), 0) / 30.0)::numeric(10,2) AS promedio_diario
+    FROM ventas v
+    LEFT JOIN pedidos p ON p.id = v.pedido_id
+    WHERE v.activo = true
+      AND v.fecha >= CURRENT_DATE - INTERVAL '30 days';
   `);
   return rows[0];
 };

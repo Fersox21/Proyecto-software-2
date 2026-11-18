@@ -6,10 +6,7 @@ import {
   obtenerProveedores,
 } from '../../services/ordenesCompraService'
 import { formatearPrecio } from '../../../../shared/utils/formato'
-import {
-  bloquearTeclasNoNumericas,
-  sanitizarDecimalPositivo,
-} from '../../../../shared/utils/validaciones'
+import { hoyISO } from '../../utils/vencimientos'
 import ItemLoteForm from './ItemLoteForm'
 import NuevoProveedorInlineForm from './NuevoProveedorInlineForm'
 import CampoFormulario from '../comunes/CampoFormulario'
@@ -36,6 +33,8 @@ function crearLoteVacio() {
     idTemporal: crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2),
     productoId: '',
     cantidad: '',
+    total: '',
+    totalManual: false,
     fechaArribo: '',
     fechaVencimiento: '',
     productoNuevo: crearProductoNuevoVacio(),
@@ -47,6 +46,8 @@ function mapearLotes(orden) {
     idTemporal: lote.id ? String(lote.id) : (crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2)),
     productoId: lote.producto?.id != null ? String(lote.producto.id) : '',
     cantidad: lote.cantidad != null ? String(lote.cantidad) : '',
+    total: lote.total != null ? String(lote.total) : '',
+    totalManual: lote.total != null,
     fechaArribo: normalizarFecha(lote.fechaArribo),
     fechaVencimiento: normalizarFecha(lote.fechaVencimiento),
     productoNuevo: crearProductoNuevoVacio(),
@@ -132,8 +133,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
   function handleChange(e) {
     const { name, value } = e.target
-    const valorFinal = name === 'total' ? sanitizarDecimalPositivo(value) : value
-    setValores((prev) => ({ ...prev, [name]: valorFinal }))
+    setValores((prev) => ({ ...prev, [name]: value }))
     if (errores[name]) {
       setErrores((prev) => ({ ...prev, [name]: null }))
     }
@@ -152,9 +152,17 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   function cambiarLote(indice, campo, valor) {
     setValores((prev) => ({
       ...prev,
-      lotes: prev.lotes.map((lote, pos) =>
-        pos === indice ? { ...lote, [campo]: valor } : lote,
-      ),
+      lotes: prev.lotes.map((lote, pos) => {
+        if (pos !== indice) return lote
+        const actualizado = { ...lote, [campo]: valor }
+        if (campo === 'total') {
+          actualizado.totalManual = valor !== ''
+        } else if ((campo === 'productoId' || campo === 'cantidad') && !actualizado.totalManual) {
+          const sugerido = calcularPrecioTotalLote(actualizado, productos)
+          actualizado.total = sugerido !== null ? String(sugerido) : ''
+        }
+        return actualizado
+      }),
     }))
     setLotesModificados(true)
 
@@ -172,17 +180,21 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   function cambiarProductoNuevo(indice, campo, valor) {
     setValores((prev) => ({
       ...prev,
-      lotes: prev.lotes.map((lote, pos) =>
-        pos === indice
-          ? {
-              ...lote,
-              productoNuevo: {
-                ...lote.productoNuevo,
-                [campo]: valor,
-              },
-            }
-          : lote,
-      ),
+      lotes: prev.lotes.map((lote, pos) => {
+        if (pos !== indice) return lote
+        const actualizado = {
+          ...lote,
+          productoNuevo: {
+            ...lote.productoNuevo,
+            [campo]: valor,
+          },
+        }
+        if (campo === 'precioCosto' && !actualizado.totalManual) {
+          const sugerido = calcularPrecioTotalLote(actualizado, productos)
+          actualizado.total = sugerido !== null ? String(sugerido) : ''
+        }
+        return actualizado
+      }),
     }))
     setLotesModificados(true)
 
@@ -234,11 +246,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
   function validar() {
     const nuevosErrores = {}
-    const total = Number(valores.total)
 
-    if (!valores.total || Number.isNaN(total) || total <= 0) {
-      nuevosErrores.total = 'El total debe ser mayor a 0'
-    }
     if (!valores.fecha) nuevosErrores.fecha = 'La fecha de pedido es obligatoria'
     if (!valores.proveedorId) {
       nuevosErrores.proveedorId = 'Elegí un proveedor'
@@ -303,17 +311,25 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       if (!lote.cantidad || !Number.isInteger(cantidad) || cantidad <= 0) {
         nuevosErrores[`lote-${indice}-cantidad`] = 'La cantidad debe ser un entero mayor a 0'
       }
+      const totalLote = Number(lote.total)
+      if (!lote.total || Number.isNaN(totalLote) || totalLote <= 0) {
+        nuevosErrores[`lote-${indice}-total`] = 'El precio total del lote debe ser mayor a 0'
+      }
       if (!lote.fechaArribo) {
         nuevosErrores[`lote-${indice}-arribo`] = 'La fecha de arribo es obligatoria'
       } else if (valores.fecha && lote.fechaArribo < valores.fecha) {
         nuevosErrores[`lote-${indice}-arribo`] =
           'La fecha de arribo no puede ser menor a la fecha de pedido'
       }
+      const hoy = hoyISO()
       if (!lote.fechaVencimiento) {
         nuevosErrores[`lote-${indice}-vencimiento`] = 'La fecha de vencimiento es obligatoria'
       } else if (lote.fechaArribo && lote.fechaVencimiento < lote.fechaArribo) {
         nuevosErrores[`lote-${indice}-vencimiento`] =
           'La fecha de vencimiento debe ser igual o posterior a la fecha de arribo'
+      } else if (lote.fechaVencimiento < hoy) {
+        nuevosErrores[`lote-${indice}-vencimiento`] =
+          'La fecha de vencimiento no puede estar ya vencida'
       }
     })
 
@@ -322,12 +338,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   }
 
   function armarPayloadLote(lote) {
-    const totalLote = calcularPrecioTotalLote(lote, productos)
+    const totalLote = Number(Number(lote.total).toFixed(2))
     const base = {
       cantidad: Number(lote.cantidad),
       fechaArribo: lote.fechaArribo,
       fechaVencimiento: lote.fechaVencimiento,
-      ...(totalLote !== null ? { total: totalLote, precioTotal: totalLote } : {}),
+      ...(Number.isFinite(totalLote) && totalLote > 0 ? { total: totalLote, precioTotal: totalLote } : {}),
     }
 
     if (lote.productoId !== '__nuevo__') {
@@ -355,7 +371,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
     if (prod.enPromocion) {
       productoNuevo.enPromocion = true
-      productoNuevo.tipoPromocionId = 1
       productoNuevo.precioPromo = Number(prod.precioPromo)
     } else {
       productoNuevo.enPromocion = false
@@ -369,6 +384,17 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
     }
   }
 
+  const calcularTotalOrden = () => {
+    if (editando && tieneLotesConsumidos) {
+      return Number(orden?.total ?? 0)
+    }
+    const suma = valores.lotes.reduce((acc, lote) => {
+      const val = Number(lote.total)
+      return acc + (Number.isFinite(val) && val > 0 ? val : 0)
+    }, 0)
+    return Number(suma.toFixed(2))
+  }
+
   async function manejarEnvio(e) {
     e.preventDefault()
     setErrorServidor(null)
@@ -376,7 +402,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
     setGuardando(true)
     const datos = {
-      total: Number(valores.total),
+      total: calcularTotalOrden(),
       fecha: valores.fecha,
       proveedorId: Number(valores.proveedorId),
       lotes: valores.lotes.map(armarPayloadLote),
@@ -424,13 +450,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   }
 
   const proveedoresActivos = proveedores.filter((p) => p?.activo !== false)
-  const totalesLotes = valores.lotes
-    .map((lote) => calcularPrecioTotalLote(lote, productos))
-    .filter((valor) => valor !== null)
-  const sumaSugeridaLotes =
-    totalesLotes.length > 0
-      ? Number(totalesLotes.reduce((acc, val) => acc + val, 0).toFixed(2))
-      : null
+  const totalOrdenCalculado = calcularTotalOrden()
 
   return (
     <form className="orden-form" onSubmit={manejarEnvio} noValidate>
@@ -471,25 +491,24 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
             />
           </CampoFormulario>
 
-          <CampoFormulario label="Total" id="orden-total" error={errores.total}>
-            <input
-              id="orden-total"
-              name="total"
-              type="number"
-              min="0.01"
-              step="0.01"
-              inputMode="decimal"
-              value={valores.total}
-              onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
-              onChange={handleChange}
-              aria-invalid={Boolean(errores.total)}
-            />
-            {sumaSugeridaLotes !== null && (
-              <p className="orden-campo-ayuda">
-                Suma estimada de lotes: {formatearPrecio(sumaSugeridaLotes)}
-              </p>
-            )}
-          </CampoFormulario>
+          <div className="orden-campo">
+            <label>Total de la orden (calculado)</label>
+            <div
+              style={{
+                padding: '0.55rem 0.75rem',
+                borderRadius: '6px',
+                backgroundColor: '#f3f4f6',
+                border: '1px solid #d1d5db',
+                fontWeight: 700,
+                fontSize: '1rem',
+              }}
+            >
+              {formatearPrecio(totalOrdenCalculado)}
+            </div>
+            <p className="orden-campo-ayuda">
+              Se calcula automáticamente sumando el precio total de los lotes.
+            </p>
+          </div>
         </div>
 
         {valores.proveedorId === '__nuevo__' && (

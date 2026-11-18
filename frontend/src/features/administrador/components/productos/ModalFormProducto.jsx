@@ -278,7 +278,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     formData.append('stock', String(Number(valores.stock)))
     formData.append('enPromocion', String(valores.enPromocion))
     if (valores.enPromocion) {
-      formData.append('tipoPromocionId', '1')
       formData.append('precioPromo', String(Number(valores.precioPromo)))
     } else {
       formData.append('tipoPromocionId', '')

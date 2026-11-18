@@ -81,9 +81,11 @@ export async function getVentasUltimoMes(req, res) {
     const ventas = await ventasService.listarVentas(periodo)
     return res.status(200).json(ventas)
   } catch (error) {
-    const status = error.statusCode || 500
+    const status = error.status || error.statusCode || 500
     return res.status(status).json({
-      error: error.message || 'Error interno al obtener las ventas'
+      success: false,
+      error: error.message || 'Error interno al obtener las ventas',
+      statusCode: status
     })
   }
 }

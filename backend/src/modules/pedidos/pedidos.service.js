@@ -2,13 +2,14 @@ import * as repository from './pedidos.repository.js';
 import * as repositoryRol from '../roles/roles.repository.js';
 import * as repositoryTiene from '../tiene/tiene.repository.js';
 import * as repositoryProducto from '../productos/productos.repository.js';
-import { precioVigente } from '../productos/productos.precio.js';
+import { precioVigente, redondear2 } from '../productos/productos.precio.js';
 
 // Usuario con el que se registran los pedidos anónimos del checkout.
 // En el seed corresponde a cliente1@gmail.com.
 const USUARIO_PUBLICO_ID = 2;
 
-const ESTADOS_VALIDOS = ['pendiente', 'aprobado', 'rechazado', 'entregado', 'eliminado'];
+const MAX_INT4 = 2147483647;
+const ESTADOS_TRANSICION_PENDIENTE = ['pendiente', 'aprobado', 'rechazado'];
 
 const ALIAS_ESTADOS = {
   aceptado: 'aprobado',
@@ -28,9 +29,23 @@ const crearError = (mensaje, status) => {
   return error;
 };
 
+const asegurarObjeto = (data, mensaje = 'El cuerpo de la petición debe ser un objeto JSON válido') => {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    throw crearError(mensaje, 400);
+  }
+};
+
+const leerStringOpcional = (valor, campo) => {
+  if (valor === undefined || valor === null) return '';
+  if (typeof valor !== 'string') {
+    throw crearError(`El campo ${campo} debe ser texto`, 400);
+  }
+  return valor.trim();
+};
+
 const validarEnteroPositivo = (valor, mensaje) => {
   if (typeof valor === 'number') {
-    if (!Number.isInteger(valor) || valor <= 0) {
+    if (!Number.isInteger(valor) || valor <= 0 || valor > MAX_INT4) {
       throw crearError(mensaje, 400);
     }
     return valor;
@@ -42,7 +57,7 @@ const validarEnteroPositivo = (valor, mensaje) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isSafeInteger(numero) || numero <= 0) {
+    if (!Number.isInteger(numero) || numero <= 0 || numero > MAX_INT4) {
       throw crearError(mensaje, 400);
     }
     return numero;
@@ -71,6 +86,14 @@ const validarDecimal = (valor, { min = 0, exclusivo = false }, mensaje) => {
   return numero;
 };
 
+const validarId = (id, mensaje = 'El ID del pedido no es válido') => {
+  const num = Number(id);
+  if (!Number.isInteger(num) || num <= 0 || num > MAX_INT4) {
+    throw crearError(mensaje, 400);
+  }
+  return num;
+};
+
 const normalizarEstado = (valor) => {
   if (!valor) return null;
   const estado = String(valor).trim().toLowerCase();
@@ -80,7 +103,7 @@ const normalizarEstado = (valor) => {
 const normalizarModalidad = (valor) => {
   if (!valor) return null;
   const clave = String(valor).trim().toLowerCase();
-  return MODALIDADES_ENTREGA[clave] || valor;
+  return MODALIDADES_ENTREGA[clave] || null;
 };
 
 export const listarPedidos = async () => {
@@ -92,7 +115,8 @@ export const listarHistorialPedidos = async () => {
 };
 
 export const obtenerPedidoPorId = async (id, incluirInactivos = false) => {
-  const pedido = await repository.findByIdConItems(id, incluirInactivos);
+  const idValido = validarId(id);
+  const pedido = await repository.findByIdConItems(idValido, incluirInactivos);
   if (!pedido) {
     throw crearError('Pedido no encontrado', 404);
   }
@@ -107,11 +131,10 @@ const normalizarItems = async (items) => {
   const acumulados = new Map();
 
   for (const item of items) {
-    const productoId = Number(item.productoId ?? item.producto_id);
-
-    if (!Number.isInteger(productoId) || productoId <= 0) {
-      throw crearError('Cada ítem debe indicar un producto válido', 400);
+    if (!item || typeof item !== 'object' || Array.isArray(item)) {
+      throw crearError('Cada ítem del pedido debe ser un objeto válido', 400);
     }
+    const productoId = validarId(item.productoId ?? item.producto_id, 'Cada ítem debe indicar un producto válido');
 
     const cantidad = validarEnteroPositivo(
       item.cantidad,
@@ -141,30 +164,32 @@ const normalizarItems = async (items) => {
 };
 
 export const obtenerLotesDisponibles = async (id) => {
-  const pedido = await repository.findById(id);
+  const idValido = validarId(id);
+  const pedido = await repository.findById(idValido);
   if (!pedido) {
     throw crearError('Pedido no encontrado', 404);
   }
-  return await repository.findLotesDisponiblesParaPedido(id);
+  return await repository.findLotesDisponiblesParaPedido(idValido);
 };
 
 export const crearPedido = async (data) => {
+  asegurarObjeto(data);
   const usuario = await repositoryRol.findById(USUARIO_PUBLICO_ID);
   if (!usuario) {
     throw crearError('No existe el usuario por defecto para registrar pedidos', 500);
   }
 
-  const comercio = String(data.nombreComercio ?? data.comercio ?? '').trim();
-  const telefono = String(data.telefono ?? '').trim();
-  const personaContacto = String(data.personaContacto ?? '').trim();
-  const descripcionDireccion = String(data.descripcionDireccion ?? '').trim();
-  const observaciones = String(data.observacionesPedido ?? data.observaciones ?? '').trim();
-  const metodoEntrega = data.metodoEntrega ?? data.modalidadEntrega;
-  const modalidadEntrega = normalizarModalidad(metodoEntrega);
-  const esRetiro = String(metodoEntrega ?? '').trim().toLowerCase() === 'retiro';
+  const comercio = leerStringOpcional(data.nombreComercio ?? data.comercio, 'nombreComercio');
+  const telefono = leerStringOpcional(data.telefono, 'telefono');
+  const personaContacto = leerStringOpcional(data.personaContacto, 'personaContacto');
+  const descripcionDireccion = leerStringOpcional(data.descripcionDireccion, 'descripcionDireccion');
+  const observaciones = leerStringOpcional(data.observacionesPedido ?? data.observaciones, 'observaciones');
+  const metodoEntregaRaw = leerStringOpcional(data.metodoEntrega ?? data.modalidadEntrega, 'metodoEntrega');
+  const modalidadEntrega = normalizarModalidad(metodoEntregaRaw);
+  const esRetiro = metodoEntregaRaw.toLowerCase() === 'retiro';
   const direccion = esRetiro
     ? 'Retiro en local'
-    : String(data.direccion ?? '').trim() || null;
+    : leerStringOpcional(data.direccion, 'direccion') || null;
 
   if (!comercio) {
     throw crearError('El nombre del comercio es obligatorio', 400);
@@ -174,12 +199,18 @@ export const crearPedido = async (data) => {
     throw crearError('El nombre del comercio no puede superar los 100 caracteres', 400);
   }
 
-  if (!telefono) {
-    throw crearError('El teléfono de contacto es obligatorio', 400);
+  if (!/^\+?[0-9]{7,15}$/.test(telefono)) {
+    throw crearError('El teléfono debe contener entre 7 y 15 dígitos numéricos', 400);
   }
 
   if (!modalidadEntrega) {
-    throw crearError('El método de entrega es obligatorio', 400);
+    throw crearError('El método de entrega es obligatorio o no es válido', 400);
+  }
+
+  const metodoPagoRaw = leerStringOpcional(data.metodoPago, 'metodoPago');
+  const metodoPagoFinal = metodoPagoRaw || METODO_PAGO_POR_DEFECTO;
+  if (metodoPagoFinal.length > 30) {
+    throw crearError('El método de pago no puede superar los 30 caracteres', 400);
   }
 
   if (!esRetiro && !direccion) {
@@ -204,12 +235,9 @@ export const crearPedido = async (data) => {
 
   const items = await normalizarItems(data.items);
 
-  const envio = data.envio === undefined
-    ? 0
-    : validarDecimal(data.envio, { min: 0, exclusivo: false }, 'El costo de envío no es válido');
-
-  const subtotal = items.reduce((total, item) => total + item.precio * item.cantidad, 0);
-  const total = subtotal + envio;
+  const envio = 0;
+  const subtotal = redondear2(items.reduce((acc, item) => acc + item.precio * item.cantidad, 0));
+  const total = subtotal;
 
   if (!(total > 0)) {
     throw crearError('El total del pedido debe ser mayor a 0', 400);
@@ -220,7 +248,7 @@ export const crearPedido = async (data) => {
     subtotal,
     envio,
     total,
-    metodoPago: String(data.metodoPago ?? METODO_PAGO_POR_DEFECTO).trim() || METODO_PAGO_POR_DEFECTO,
+    metodoPago: metodoPagoFinal,
     telefono,
     comercio,
     personaContacto: personaContacto || null,
@@ -254,38 +282,47 @@ const validarModificacionTotal = (data) => {
     'El total modificado del pedido debe ser mayor a 0'
   );
 
-  const motivoModificacion = rawMotivo !== undefined && rawMotivo !== null
-    ? String(rawMotivo).trim()
-    : '';
+  const motivoModificacion = leerStringOpcional(rawMotivo, 'motivoModificacion');
 
   if (!motivoModificacion) {
     throw crearError('El motivo de modificación del total es obligatorio', 400);
+  }
+
+  if (motivoModificacion.length > 500) {
+    throw crearError('El motivo de modificación no puede superar los 500 caracteres', 400);
   }
 
   return { totalModificado, motivoModificacion };
 };
 
 export const actualizarPedido = async (id, data) => {
-  const pedidoExistente = await repository.findById(id);
+  asegurarObjeto(data);
+  const idValido = validarId(id);
+  const pedidoExistente = await repository.findById(idValido);
   if (!pedidoExistente) {
     throw crearError('Pedido no encontrado', 404);
   }
 
+  if (pedidoExistente.activo === false) {
+    throw crearError('No se puede modificar un pedido eliminado', 409);
+  }
+
+  const estadoActual = String(pedidoExistente.estado ?? '').trim().toLowerCase();
+  if (!['pendiente', 'nuevo'].includes(estadoActual)) {
+    throw crearError('Solo se pueden modificar pedidos pendientes', 409);
+  }
+
   const modificacionTotal = validarModificacionTotal(data);
 
-  const estadoSolicitado = normalizarEstado(data.estado);
-  const motivoRechazo = data.motivoRechazo === undefined
-    ? undefined
-    : String(data.motivoRechazo).trim();
+  const estadoRaw = data.estado !== undefined ? leerStringOpcional(data.estado, 'estado') : undefined;
+  const estadoSolicitado = estadoRaw ? normalizarEstado(estadoRaw) : null;
+  const motivoRechazo = data.motivoRechazo !== undefined
+    ? leerStringOpcional(data.motivoRechazo, 'motivoRechazo')
+    : undefined;
 
   if (data.estado !== undefined) {
-    if (!ESTADOS_VALIDOS.includes(estadoSolicitado)) {
-      throw crearError('El estado del pedido no es válido', 400);
-    }
-
-    const estadoActual = String(pedidoExistente.estado ?? '').trim().toLowerCase();
-    if (!['pendiente', 'nuevo'].includes(estadoActual)) {
-      throw crearError('Solo se pueden modificar pedidos pendientes', 409);
+    if (!estadoSolicitado || !ESTADOS_TRANSICION_PENDIENTE.includes(estadoSolicitado)) {
+      throw crearError('El estado del pedido no es válido o no está permitido desde pendiente', 400);
     }
 
     if (estadoSolicitado === 'rechazado') {
@@ -304,7 +341,31 @@ export const actualizarPedido = async (id, data) => {
         : Array.isArray(data.lotes)
           ? data.lotes
           : null;
-      return await repository.aprobarPedido(id, modificacionTotal, asignaciones);
+      return await repository.aprobarPedido(idValido, modificacionTotal, asignaciones);
+    }
+  }
+
+  let direccionActualizada;
+  if (data.direccion !== undefined) {
+    direccionActualizada = leerStringOpcional(data.direccion, 'direccion');
+    if (direccionActualizada.length > 150) {
+      throw crearError('La dirección no puede superar los 150 caracteres', 400);
+    }
+  }
+
+  let metodoPagoActualizado;
+  if (data.metodoPago !== undefined) {
+    metodoPagoActualizado = leerStringOpcional(data.metodoPago, 'metodoPago');
+    if (!metodoPagoActualizado || metodoPagoActualizado.length > 30) {
+      throw crearError('El método de pago es obligatorio y no puede superar los 30 caracteres', 400);
+    }
+  }
+
+  let telefonoActualizado;
+  if (data.telefono !== undefined) {
+    telefonoActualizado = leerStringOpcional(data.telefono, 'telefono');
+    if (!/^\+?[0-9]{7,15}$/.test(telefonoActualizado)) {
+      throw crearError('El teléfono debe contener entre 7 y 15 dígitos numéricos', 400);
     }
   }
 
@@ -312,68 +373,24 @@ export const actualizarPedido = async (id, data) => {
     ...pedidoExistente,
     ...(estadoSolicitado ? { estado: estadoSolicitado } : {}),
     ...(motivoRechazo !== undefined ? { motivoRechazo } : {}),
-    ...(data.direccion !== undefined ? { direccion: data.direccion } : {}),
-    ...(data.metodoPago !== undefined ? { metodoPago: data.metodoPago } : {}),
-    ...(data.telefono !== undefined ? { telefono: data.telefono } : {}),
+    ...(direccionActualizada !== undefined ? { direccion: direccionActualizada } : {}),
+    ...(metodoPagoActualizado !== undefined ? { metodoPago: metodoPagoActualizado } : {}),
+    ...(telefonoActualizado !== undefined ? { telefono: telefonoActualizado } : {}),
     ...modificacionTotal
   };
 
-  return await repository.update(id, pedidoActualizado);
+  return await repository.update(idValido, pedidoActualizado);
 };
 
 export const eliminarPedido = async (id) => {
-  const rowCount = await repository.remove(id);
+  const idValido = validarId(id);
+  const rowCount = await repository.remove(idValido);
   if (rowCount === 0) {
     throw crearError('Pedido no encontrado', 404);
   }
   return true;
 };
 
-export const eliminarItemDePedido = async (pedido_id, producto_id) => {
-  // 1. Eliminación lógica del ítem
-  const rowCount = await repositoryTiene.remove(pedido_id, producto_id);
-
-  if (rowCount === 0) {
-    throw crearError('Ítem no encontrado en el pedido', 404);
-  }
-
-  // 2. Verificación de ítems restantes (ignora los dados de baja)
-  const itemsRestantes = (await repositoryTiene.findByPedido(pedido_id)).filter(
-    (item) => item.activo !== false
-  );
-  let pedidoEliminado = false;
-  let nuevoTotal = 0;
-
-  if (itemsRestantes.length > 0) {
-    nuevoTotal = itemsRestantes.reduce(
-      (acc, item) => acc + parseFloat(item.precio) * item.cantidad,
-      0
-    );
-  }
-
-  // 3. Actualizar el pedido
-  const pedido = await repository.findById(pedido_id);
-  if (pedido) {
-    const dataActualizacion = { ...pedido };
-
-    if (itemsRestantes.length === 0) {
-      dataActualizacion.estado = 'eliminado';
-      pedidoEliminado = true;
-    } else {
-      dataActualizacion.total = nuevoTotal;
-    }
-
-    await repository.update(pedido_id, dataActualizacion);
-  }
-
-  return {
-    success: true,
-    message: pedidoEliminado
-      ? 'Ítem eliminado y pedido marcado como eliminado'
-      : 'Ítem eliminado y total del pedido actualizado',
-    pedido_id,
-    producto_id,
-    pedido_eliminado: pedidoEliminado,
-    nuevo_total: nuevoTotal
-  };
+export const eliminarItemDePedido = async () => {
+  throw crearError('No está permitido eliminar ítems de un pedido', 400);
 };

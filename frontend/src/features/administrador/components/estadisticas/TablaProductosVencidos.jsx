@@ -34,11 +34,11 @@ function TablaProductosVencidos({ vencidos, listaVencidos }) {
               </tr>
             </thead>
             <tbody>
-              {listaVencidos.map((item, index) => (
+              {listaVencidos.map((item) => (
                 <tr key={item.lote_id}>
                   <td className="col-id">{item.nombre}</td>
                   <td>{item.marca || '-'}</td>
-                  <td>#{index + 1}</td>
+                  <td>#{item.lote_id}</td>
                   <td>{etiquetaFecha(item.fecha_vencimiento)}</td>
                   <td>
                     <span className="badge-estado estado-cancelado">{item.dias_vencido} días</span>

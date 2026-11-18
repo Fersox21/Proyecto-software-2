@@ -41,7 +41,7 @@ const resolverProductoEnTransaccion = async (lote, client) => {
     } else if (nuevo.tipoPromocionId != null) {
       tipoPromocionId = nuevo.tipoPromocionId;
     } else {
-      tipoPromocionId = 1;
+      tipoPromocionId = null;
     }
   }
 
@@ -74,7 +74,8 @@ export const findAll = async () => {
            p.id AS proveedor_id, p.nombre AS proveedor_nombre, p.telefono AS proveedor_telefono
     FROM ordenes_compra oc
     LEFT JOIN proveedores p ON p.id = oc.proveedor_id
-    ORDER BY oc.activo DESC, oc.fecha ASC;
+    WHERE oc.activo = true
+    ORDER BY oc.fecha ASC, oc.id ASC;
   `);
 
   return rows.map((row) => ({

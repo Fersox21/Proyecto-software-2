@@ -261,7 +261,8 @@ export const obtenerVentasMes = async () => {
            COALESCE(v.motivo_modificacion, p.motivo_modificacion) AS motivo_modificacion
     FROM ventas v
     LEFT JOIN pedidos p ON p.id = v.pedido_id
-    WHERE v.fecha >= NOW() - INTERVAL '1 month'
+    WHERE v.activo = true
+      AND v.fecha >= NOW() - INTERVAL '1 month'
     ORDER BY v.fecha DESC
   `;
   const { rows } = await pool.query(query);

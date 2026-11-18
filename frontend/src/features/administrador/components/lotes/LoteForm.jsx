@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { formatearFecha } from '../../../../shared/utils/formato'
+import { hoyISO } from '../../utils/vencimientos'
 import {
   bloquearTeclasNoNumericas,
   sanitizarDecimalPositivo,
@@ -65,6 +66,13 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
     [ordenesCompra],
   )
 
+  const ordenSeleccionada = !editando && valores.ordenCompraId
+    ? ordenesDisponibles.find((o) => String(o.id) === String(valores.ordenCompraId))
+    : null
+  const fechaOrdenMinima = normalizarFecha(
+    editando ? lote?.ordenCompra?.fecha : ordenSeleccionada?.fecha,
+  )
+
   function handleChange(e) {
     const { name, value } = e.target
     let valorFinal = value
@@ -100,11 +108,18 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
       }
     }
 
-    if (!valores.fechaArribo) nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
+    if (!valores.fechaArribo) {
+      nuevosErrores.fechaArribo = 'La fecha de arribo es obligatoria'
+    } else if (fechaOrdenMinima && valores.fechaArribo < fechaOrdenMinima) {
+      nuevosErrores.fechaArribo = 'La fecha de arribo no puede ser anterior a la fecha de pedido de la orden'
+    }
+    const hoy = hoyISO()
     if (!valores.fechaVencimiento) {
       nuevosErrores.fechaVencimiento = 'La fecha de vencimiento es obligatoria'
     } else if (valores.fechaArribo && valores.fechaVencimiento < valores.fechaArribo) {
       nuevosErrores.fechaVencimiento = 'La fecha de vencimiento no puede ser anterior a la fecha de arribo'
+    } else if (valores.fechaVencimiento < hoy) {
+      nuevosErrores.fechaVencimiento = 'La fecha de vencimiento no puede estar ya vencida'
     }
 
     setErrores(nuevosErrores)
@@ -268,6 +283,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               id="lote-arribo"
               name="fechaArribo"
               type="date"
+              min={fechaOrdenMinima || undefined}
               value={valores.fechaArribo}
               onChange={handleChange}
               aria-invalid={Boolean(errores.fechaArribo)}
@@ -279,7 +295,7 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               id="lote-vencimiento"
               name="fechaVencimiento"
               type="date"
-              min={valores.fechaArribo || undefined}
+              min={[valores.fechaArribo, hoyISO()].filter(Boolean).sort().pop()}
               value={valores.fechaVencimiento}
               onChange={handleChange}
               aria-invalid={Boolean(errorFechaVencimiento)}
