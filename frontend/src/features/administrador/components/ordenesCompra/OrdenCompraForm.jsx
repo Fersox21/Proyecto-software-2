@@ -4,7 +4,6 @@ import {
   obtenerCategorias,
   obtenerProductos,
   obtenerProveedores,
-  obtenerTiposPromocion,
 } from '../../services/ordenesCompraService'
 import { formatearPrecio } from '../../../../shared/utils/formato'
 import {
@@ -24,8 +23,9 @@ function crearProductoNuevoVacio() {
     descripcion: '',
     precioVenta: '',
     precioCosto: '',
-    tipoPromocionId: '',
-    tipoPromocionNuevaNombre: '',
+    enPromocion: false,
+    porcentajeDescuento: '',
+    precioPromo: '',
     destacado: false,
     imagenArchivo: null,
   }
@@ -86,7 +86,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   const [proveedores, setProveedores] = useState([])
   const [productos, setProductos] = useState([])
   const [categorias, setCategorias] = useState([])
-  const [tiposPromocion, setTiposPromocion] = useState([])
   const [cargandoCatalogos, setCargandoCatalogos] = useState(true)
   const [errorCatalogos, setErrorCatalogos] = useState(null)
 
@@ -112,14 +111,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       obtenerProveedores(),
       obtenerProductos(),
       obtenerCategorias(),
-      obtenerTiposPromocion(),
     ])
-      .then(([listaProveedores, listaProductos, listaCategorias, listaTiposPromo]) => {
+      .then(([listaProveedores, listaProductos, listaCategorias]) => {
         if (ignorar) return
         setProveedores(Array.isArray(listaProveedores) ? listaProveedores : [])
         setProductos(Array.isArray(listaProductos) ? listaProductos : [])
         setCategorias(Array.isArray(listaCategorias) ? listaCategorias : [])
-        setTiposPromocion(Array.isArray(listaTiposPromo) ? listaTiposPromo : [])
       })
       .catch((err) => {
         if (!ignorar) setErrorCatalogos(err.message)
@@ -191,10 +188,13 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
 
     const clave = `lote-${indice}-prod-${campo}`
     setErrores((prev) => {
-      if (!prev[clave] && campo !== 'categoriaId' && campo !== 'tipoPromocionId') return prev
+      if (!prev[clave] && campo !== 'categoriaId' && campo !== 'enPromocion') return prev
       const siguiente = { ...prev, [clave]: null }
       if (campo === 'categoriaId') siguiente[`lote-${indice}-prod-categoriaNuevaNombre`] = null
-      if (campo === 'tipoPromocionId') siguiente[`lote-${indice}-prod-tipoPromocionNuevaNombre`] = null
+      if (campo === 'enPromocion' && !valor) {
+        siguiente[`lote-${indice}-prod-porcentajeDescuento`] = null
+        siguiente[`lote-${indice}-prod-precioPromo`] = null
+      }
       return siguiente
     })
   }
@@ -202,11 +202,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   function agregarCategoria(nueva) {
     if (!nueva || nueva.id == null) return
     setCategorias((prev) => (prev.some((c) => c.id === nueva.id) ? prev : [...prev, nueva]))
-  }
-
-  function agregarTipoPromocion(nuevo) {
-    if (!nuevo || nuevo.id == null) return
-    setTiposPromocion((prev) => (prev.some((tp) => tp.id === nuevo.id) ? prev : [...prev, nuevo]))
   }
 
   function agregarProveedorCreado(nuevo) {
@@ -270,9 +265,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
         } else if (prod.categoriaId === '__nueva__' && !prod.categoriaNuevaNombre?.trim()) {
           nuevosErrores[`lote-${indice}-prod-categoriaNuevaNombre`] = 'Ingresá el nombre de la nueva categoría'
         }
-        if (prod.tipoPromocionId === '__nueva__' && !prod.tipoPromocionNuevaNombre?.trim()) {
-          nuevosErrores[`lote-${indice}-prod-tipoPromocionNuevaNombre`] = 'Ingresá el nombre del tipo de promoción'
-        }
         const precioCosto = Number(prod.precioCosto)
         if (prod.precioCosto === '' || Number.isNaN(precioCosto) || precioCosto <= 0) {
           nuevosErrores[`lote-${indice}-prod-precioCosto`] = 'El precio al costo debe ser mayor a 0'
@@ -280,6 +272,28 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
         const precioVenta = Number(prod.precioVenta)
         if (prod.precioVenta === '' || Number.isNaN(precioVenta) || precioVenta <= 0) {
           nuevosErrores[`lote-${indice}-prod-precioVenta`] = 'El precio de venta debe ser mayor a 0'
+        }
+        if (prod.enPromocion) {
+          const porcentajeNum = Number(prod.porcentajeDescuento)
+          if (
+            prod.porcentajeDescuento === '' ||
+            Number.isNaN(porcentajeNum) ||
+            porcentajeNum <= 0 ||
+            porcentajeNum >= 100
+          ) {
+            nuevosErrores[`lote-${indice}-prod-porcentajeDescuento`] =
+              'El porcentaje debe ser mayor a 0 y menor a 100'
+          }
+          const precioPromoNum = Number(prod.precioPromo)
+          if (
+            prod.precioPromo === '' ||
+            Number.isNaN(precioPromoNum) ||
+            precioPromoNum <= 0 ||
+            (!Number.isNaN(precioVenta) && precioVenta > 0 && precioPromoNum >= precioVenta)
+          ) {
+            nuevosErrores[`lote-${indice}-prod-precioPromo`] =
+              'El precio en promoción debe ser mayor a 0 y menor al precio de venta'
+          }
         }
       } else if (!lote.productoId) {
         nuevosErrores[`lote-${indice}-producto`] = 'Elegí un producto'
@@ -339,12 +353,14 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
       productoNuevo.categoriaId = Number(prod.categoriaId)
     }
 
-    if (prod.tipoPromocionId === '__nueva__') {
-      productoNuevo.tipoPromocionNuevaNombre = prod.tipoPromocionNuevaNombre.trim()
-    } else if (prod.tipoPromocionId) {
-      productoNuevo.tipoPromocionId = Number(prod.tipoPromocionId)
+    if (prod.enPromocion) {
+      productoNuevo.enPromocion = true
+      productoNuevo.tipoPromocionId = 1
+      productoNuevo.precioPromo = Number(prod.precioPromo)
     } else {
+      productoNuevo.enPromocion = false
       productoNuevo.tipoPromocionId = null
+      productoNuevo.precioPromo = null
     }
 
     return {
@@ -512,7 +528,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                 lote={lote}
                 productos={productos}
                 categorias={categorias}
-                tiposPromocion={tiposPromocion}
                 errores={errores}
                 puedeEliminar={!tieneLotesConsumidos && valores.lotes.length > 1}
                 deshabilitado={tieneLotesConsumidos}
@@ -520,7 +535,6 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                 onCambiar={cambiarLote}
                 onCambiarProductoNuevo={cambiarProductoNuevo}
                 onCategoriaCreada={agregarCategoria}
-                onTipoPromocionCreado={agregarTipoPromocion}
                 onQuitar={quitarLote}
               />
             ))

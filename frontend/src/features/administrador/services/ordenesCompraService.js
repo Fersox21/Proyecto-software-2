@@ -107,17 +107,6 @@ export function crearCategoria(nombre) {
   })
 }
 
-export function obtenerTiposPromocion() {
-  return pedir(`${URL_BASE}/tipos-promocion`).then(filtrarActivos)
-}
-
-export function crearTipoPromocion(nombre) {
-  return pedir(`${URL_BASE}/tipos-promocion`, {
-    method: 'POST',
-    body: JSON.stringify({ nombre }),
-  })
-}
-
 export function normalizarFecha(valor) {
   return String(valor ?? '').slice(0, 10)
 }

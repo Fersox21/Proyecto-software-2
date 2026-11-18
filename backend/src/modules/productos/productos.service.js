@@ -2,6 +2,9 @@ import * as repository from './productos.repository.js';
 import * as categoriasRepository from '../categorias/categorias.repository.js';
 import * as tiposPromocionRepository from '../tiposPromocion/tiposPromocion.repository.js';
 import { URL_BASE_IMAGENES, eliminarImagenFisica } from './productos.imagen.js';
+import { porcentajeDescuento } from './productos.precio.js';
+
+const DEFAULT_TIPO_PROMOCION_ID = 1;
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -90,6 +93,10 @@ const resolverPrecioPromo = (rawPromo, precioVenta) => {
     throw crearError('El precio promocional debe ser menor al precio de venta', 400);
   }
 
+  if (porcentajeDescuento(precioVenta, precioPromo) === null) {
+    throw crearError('El descuento promocional debe ser un porcentaje entero entre 1% y 99%', 400);
+  }
+
   return precioPromo;
 };
 
@@ -126,28 +133,51 @@ const resolverCategoria = async (data, fallback = null) => {
   return null;
 };
 
+const resolverTipoPromocionDefecto = async () => {
+  if (typeof tiposPromocionRepository.findByNombreInsensitive === 'function') {
+    const descuento = await tiposPromocionRepository.findByNombreInsensitive('Descuento');
+    if (descuento?.activo) return descuento.id;
+
+    const descuentoDirecto = await tiposPromocionRepository.findByNombreInsensitive('Descuento directo');
+    if (descuentoDirecto) return descuentoDirecto.id;
+  }
+
+  return DEFAULT_TIPO_PROMOCION_ID;
+};
+
 const resolverTipoPromocion = async (data, fallback = undefined) => {
   const rawId = data.tipoPromocionId ?? data.tipo_promocion_id;
 
-  if (rawId === undefined) {
-    return fallback !== undefined ? fallback : null;
+  if (!esVacio(rawId)) {
+    const idNum = validarEnteroNoNegativo(rawId, 'El tipo de promoción indicado no es válido');
+    if (idNum <= 0) {
+      throw crearError('El tipo de promoción indicado no es válido', 400);
+    }
+
+    const tipo = await tiposPromocionRepository.findById(idNum);
+    if (!tipo) {
+      throw crearError('El tipo de promoción indicado no existe', 400);
+    }
+
+    return tipo.id;
   }
 
-  if (esVacio(rawId)) {
-    return null;
+  const nombreTipo = normalizarTextoOpcional(
+    data.tipoPromocionNombre ?? data.tipo_promocion_nombre
+  );
+  if (nombreTipo && typeof tiposPromocionRepository.findByNombreInsensitive === 'function') {
+    let tipo = await tiposPromocionRepository.findByNombreInsensitive(nombreTipo);
+    if (!tipo && typeof tiposPromocionRepository.create === 'function') {
+      tipo = await tiposPromocionRepository.create(nombreTipo);
+    }
+    if (tipo) return tipo.id;
   }
 
-  const idNum = validarEnteroNoNegativo(rawId, 'El tipo de promoción indicado no es válido');
-  if (idNum <= 0) {
-    throw crearError('El tipo de promoción indicado no es válido', 400);
+  if (fallback !== undefined && fallback !== null) {
+    return fallback;
   }
 
-  const tipo = await tiposPromocionRepository.findById(idNum);
-  if (!tipo) {
-    throw crearError('El tipo de promoción indicado no existe', 400);
-  }
-
-  return tipo.id;
+  return await resolverTipoPromocionDefecto();
 };
 
 export const listarProductos = async () => {

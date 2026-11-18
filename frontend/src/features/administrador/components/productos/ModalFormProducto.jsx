@@ -2,10 +2,7 @@ import { useEffect, useState } from 'react'
 import { LuImagePlus } from 'react-icons/lu'
 import Modal from '../comunes/Modal'
 import CampoFormulario from '../comunes/CampoFormulario'
-import {
-  obtenerCategorias,
-  obtenerTiposPromocion,
-} from '../../services/productosServices'
+import { obtenerCategorias } from '../../services/productosServices'
 import {
   bloquearTeclasNoNumericas,
   sanitizarDecimalPositivo,
@@ -35,12 +32,6 @@ function obtenerCategoriaInicialId(producto) {
   return ''
 }
 
-function obtenerTipoPromocionInicialId(producto) {
-  if (producto?.tipoPromocionId != null) return String(producto.tipoPromocionId)
-  if (producto?.tipoPromocion?.id != null) return String(producto.tipoPromocion.id)
-  return ''
-}
-
 function redondear2(valor) {
   return Math.round((valor + Number.EPSILON) * 100) / 100
 }
@@ -64,7 +55,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
   const tieneLotesVigentes = Boolean(producto?.tieneLoteVigente) && Number(producto?.stock) > 0
 
   const [categorias, setCategorias] = useState([])
-  const [tiposPromocion, setTiposPromocion] = useState([])
 
   const [valores, setValores] = useState({
     nombre: producto?.nombre ?? '',
@@ -74,7 +64,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     categoria: typeof producto?.categoria === 'string'
       ? producto.categoria
       : producto?.categoria?.nombre ?? CATEGORIAS_DISPONIBLES[0],
-    tipoPromocionId: obtenerTipoPromocionInicialId(producto),
     precioVenta: producto?.precioVenta !== undefined && producto?.precioVenta !== null ? String(producto.precioVenta) : '',
     precioCosto: producto?.precioCosto !== undefined && producto?.precioCosto !== null ? String(producto.precioCosto) : '',
     stock: producto?.stock !== undefined && producto?.stock !== null ? String(producto.stock) : '0',
@@ -106,13 +95,11 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     if (!visible) return
     let ignorar = false
 
-    Promise.all([obtenerCategorias(), obtenerTiposPromocion()])
-      .then(([listaCats, listaPromos]) => {
+    obtenerCategorias()
+      .then((listaCats) => {
         if (ignorar) return
         const cats = (Array.isArray(listaCats) ? listaCats : []).filter((c) => c?.activo !== false)
-        const promos = (Array.isArray(listaPromos) ? listaPromos : []).filter((p) => p?.activo !== false)
         setCategorias(cats)
-        setTiposPromocion(promos)
 
         setValores((prev) => {
           if (prev.categoriaId || cats.length === 0) return prev
@@ -137,13 +124,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
 
   if (!visible) return null
 
-  const tipoPromocionSeleccionado = tiposPromocion.find(
-    (tp) => String(tp.id) === String(valores.tipoPromocionId),
-  )
-  const esTipoDescuento = Boolean(
-    tipoPromocionSeleccionado?.nombre?.toLowerCase().includes('descuento'),
-  )
-
   const actualizarCampo = (campo, valor) => {
     setValores((prev) => ({ ...prev, [campo]: valor }))
     if (errores[campo]) {
@@ -160,7 +140,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       const siguiente = { ...prev, precioVenta: limpio }
       if (
         prev.enPromocion &&
-        esTipoDescuento &&
         prev.porcentajeDescuento !== '' &&
         Number.isFinite(precioVentaNum) &&
         precioVentaNum > 0 &&
@@ -252,7 +231,7 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
       nuevosErrores.stock = 'El stock debe ser un número entero mayor o igual a 0'
     }
 
-    if (valores.enPromocion && esTipoDescuento) {
+    if (valores.enPromocion) {
       const porcentajeNum = Number(valores.porcentajeDescuento)
       if (
         valores.porcentajeDescuento === '' ||
@@ -299,8 +278,8 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
     formData.append('stock', String(Number(valores.stock)))
     formData.append('enPromocion', String(valores.enPromocion))
     if (valores.enPromocion) {
-      formData.append('tipoPromocionId', valores.tipoPromocionId ? String(Number(valores.tipoPromocionId)) : '')
-      formData.append('precioPromo', esTipoDescuento ? String(Number(valores.precioPromo)) : '')
+      formData.append('tipoPromocionId', '1')
+      formData.append('precioPromo', String(Number(valores.precioPromo)))
     } else {
       formData.append('tipoPromocionId', '')
       formData.append('precioPromo', '')
@@ -524,7 +503,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                         ...(check
                           ? {}
                           : {
-                              tipoPromocionId: '',
                               porcentajeDescuento: '',
                               precioPromo: '',
                             }),
@@ -532,7 +510,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
                       if (!check) {
                         setErrores((prev) => ({
                           ...prev,
-                          tipoPromocionId: null,
                           porcentajeDescuento: null,
                           precioPromo: null,
                         }))
@@ -609,48 +586,6 @@ function ModalFormProducto({ producto, visible, guardando, soloLectura = false, 
           </div>
 
           {valores.enPromocion && (
-            <div className="prod-modal-span-2">
-              <CampoFormulario label="Tipo de promoción" id="prod-tipo-promo" error={errores.tipoPromocionId}>
-                <select
-                  id="prod-tipo-promo"
-                  value={valores.tipoPromocionId}
-                  onChange={(e) => {
-                    const nuevoTipoId = e.target.value
-                    const nuevoTipo = tiposPromocion.find((tp) => String(tp.id) === String(nuevoTipoId))
-                    const nuevoEsDescuento = Boolean(
-                      nuevoTipo?.nombre?.toLowerCase().includes('descuento'),
-                    )
-                    setValores((prev) => ({
-                      ...prev,
-                      tipoPromocionId: nuevoTipoId,
-                      ...(nuevoEsDescuento
-                        ? {}
-                        : {
-                            porcentajeDescuento: '',
-                            precioPromo: '',
-                          }),
-                    }))
-                    setErrores((prev) => ({
-                      ...prev,
-                      tipoPromocionId: null,
-                      porcentajeDescuento: null,
-                      precioPromo: null,
-                    }))
-                  }}
-                  disabled={guardando}
-                >
-                  <option value="">Ninguna</option>
-                  {tiposPromocion.map((tp) => (
-                    <option key={tp.id} value={tp.id}>
-                      {tp.nombre}
-                    </option>
-                  ))}
-                </select>
-              </CampoFormulario>
-            </div>
-          )}
-
-          {valores.enPromocion && esTipoDescuento && (
             <>
               <CampoFormulario
                 label="Porcentaje de descuento (%)"

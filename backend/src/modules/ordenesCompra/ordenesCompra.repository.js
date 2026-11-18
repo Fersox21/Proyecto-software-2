@@ -27,15 +27,22 @@ const resolverProductoEnTransaccion = async (lote, client) => {
     throw error;
   }
 
+  const enPromocion = Boolean(nuevo.enPromocion);
+  const precioPromo = enPromocion ? (nuevo.precioPromo ?? null) : null;
+
   let tipoPromocionId = null;
-  if (nuevo.tipoPromocionNuevaNombre) {
-    let tipo = await tiposPromocionRepo.findByNombreInsensitive(nuevo.tipoPromocionNuevaNombre, client);
-    if (!tipo) {
-      tipo = await tiposPromocionRepo.create(nuevo.tipoPromocionNuevaNombre, client);
+  if (enPromocion) {
+    if (nuevo.tipoPromocionNuevaNombre) {
+      let tipo = await tiposPromocionRepo.findByNombreInsensitive(nuevo.tipoPromocionNuevaNombre, client);
+      if (!tipo) {
+        tipo = await tiposPromocionRepo.create(nuevo.tipoPromocionNuevaNombre, client);
+      }
+      tipoPromocionId = tipo.id;
+    } else if (nuevo.tipoPromocionId != null) {
+      tipoPromocionId = nuevo.tipoPromocionId;
+    } else {
+      tipoPromocionId = 1;
     }
-    tipoPromocionId = tipo.id;
-  } else if (nuevo.tipoPromocionId != null) {
-    tipoPromocionId = nuevo.tipoPromocionId;
   }
 
   const productoCreado = await productosRepo.create(
@@ -45,8 +52,8 @@ const resolverProductoEnTransaccion = async (lote, client) => {
       descripcion: nuevo.descripcion ?? null,
       precioCosto: nuevo.precioCosto,
       precioVenta: nuevo.precioVenta,
-      enPromocion: false,
-      precioPromo: null,
+      enPromocion,
+      precioPromo,
       stock: 0,
       categoria: categoria.nombre,
       categoriaId: categoria.id,

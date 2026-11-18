@@ -9,7 +9,6 @@ const enlacesAdmin = [
   { id: 2, texto: 'Catálogo', destino: '/catalogo' },
   { id: 3, texto: 'Estadisticas', destino: '/administrador/estadisticas'},
   { id: 4, texto: 'Lotes', destino: '/administrador/lotes'},
-  { id: 5, texto: 'Promociones', destino: '/administrador/promociones'},
   { id: 6, texto: 'Proveedores', destino: '/administrador/proveedores'},
   { id: 7, texto: 'Vencimientos', destino: '/administrador/vencimientos'},
   { id: 8, texto: 'Pedidos', destino: '/administrador/pedidos'},

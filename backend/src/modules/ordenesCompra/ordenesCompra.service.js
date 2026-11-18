@@ -5,8 +5,22 @@ import * as repositoryProducto from '../productos/productos.repository.js';
 import * as repositoryCategoria from '../categorias/categorias.repository.js';
 import * as repositoryTipoPromocion from '../tiposPromocion/tiposPromocion.repository.js';
 import { eliminarImagenFisica } from '../productos/productos.imagen.js';
+import { porcentajeDescuento } from '../productos/productos.precio.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
+const DEFAULT_TIPO_PROMOCION_ID = 1;
+
+const resolverTipoPromocionDefecto = async () => {
+  if (typeof repositoryTipoPromocion.findByNombreInsensitive === 'function') {
+    const descuento = await repositoryTipoPromocion.findByNombreInsensitive('Descuento');
+    if (descuento?.activo) return descuento.id;
+
+    const descuentoDirecto = await repositoryTipoPromocion.findByNombreInsensitive('Descuento directo');
+    if (descuentoDirecto) return descuentoDirecto.id;
+  }
+
+  return DEFAULT_TIPO_PROMOCION_ID;
+};
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -158,32 +172,54 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     throw crearError('Debe indicar una categoría para el producto nuevo', 400);
   }
 
+  const enPromocion =
+    productoNuevo.enPromocion === true ||
+    ['true', '1'].includes(String(productoNuevo.enPromocion ?? '').trim().toLowerCase());
+
+  let precioPromo = null;
   let tipoPromocionId = null;
   let tipoPromocionNuevaNombre = null;
 
-  const rawTipoId = productoNuevo.tipoPromocionId ?? productoNuevo.tipo_promocion_id;
-  const rawTipoNuevo = typeof productoNuevo.tipoPromocionNuevaNombre === 'string'
-    ? productoNuevo.tipoPromocionNuevaNombre.trim()
-    : '';
+  if (enPromocion) {
+    const rawPrecioPromo = productoNuevo.precioPromo ?? productoNuevo.precio_promo;
+    precioPromo = validarDecimalPositivo(
+      rawPrecioPromo,
+      'El precio del producto en promoción debe ser mayor a 0'
+    );
+    if (precioPromo >= precioVenta) {
+      throw crearError('El precio promocional debe ser menor al precio de venta', 400);
+    }
+    if (porcentajeDescuento(precioVenta, precioPromo) === null) {
+      throw crearError('El descuento promocional debe ser un porcentaje entero entre 1% y 99%', 400);
+    }
 
-  if (rawTipoNuevo) {
-    if (rawTipoNuevo.length > 100) {
-      throw crearError('El nombre del nuevo tipo de promoción no puede superar los 100 caracteres', 400);
+    const rawTipoId = productoNuevo.tipoPromocionId ?? productoNuevo.tipo_promocion_id;
+    const rawTipoNuevo =
+      typeof (productoNuevo.tipoPromocionNuevaNombre ?? productoNuevo.tipoPromocionNombre) === 'string'
+        ? (productoNuevo.tipoPromocionNuevaNombre ?? productoNuevo.tipoPromocionNombre).trim()
+        : '';
+
+    if (rawTipoNuevo) {
+      if (rawTipoNuevo.length > 100) {
+        throw crearError('El nombre del nuevo tipo de promoción no puede superar los 100 caracteres', 400);
+      }
+      tipoPromocionNuevaNombre = rawTipoNuevo;
+    } else if (rawTipoId !== undefined && rawTipoId !== null && rawTipoId !== '') {
+      const idTipo = Number(rawTipoId);
+      if (!Number.isInteger(idTipo) || idTipo <= 0) {
+        throw crearError('El tipo de promoción indicado para el producto nuevo no es válido', 400);
+      }
+      const tipoExistente = await repositoryTipoPromocion.findById(idTipo);
+      if (!tipoExistente) {
+        throw crearError('El tipo de promoción indicado para el producto nuevo no existe', 400);
+      }
+      if (tipoExistente.activo === false && idTipo !== DEFAULT_TIPO_PROMOCION_ID) {
+        throw crearError('El tipo de promoción indicado para el producto nuevo está inactivo', 400);
+      }
+      tipoPromocionId = tipoExistente.id;
+    } else {
+      tipoPromocionId = await resolverTipoPromocionDefecto();
     }
-    tipoPromocionNuevaNombre = rawTipoNuevo;
-  } else if (rawTipoId !== undefined && rawTipoId !== null && rawTipoId !== '') {
-    const idTipo = Number(rawTipoId);
-    if (!Number.isInteger(idTipo) || idTipo <= 0) {
-      throw crearError('El tipo de promoción indicado para el producto nuevo no es válido', 400);
-    }
-    const tipoExistente = await repositoryTipoPromocion.findById(idTipo);
-    if (!tipoExistente) {
-      throw crearError('El tipo de promoción indicado para el producto nuevo no existe', 400);
-    }
-    if (tipoExistente.activo === false) {
-      throw crearError('El tipo de promoción indicado para el producto nuevo está inactivo', 400);
-    }
-    tipoPromocionId = tipoExistente.id;
   }
 
   const marca =
@@ -202,6 +238,8 @@ const validarProductoNuevo = async (productoNuevo, imagen) => {
     descripcion,
     precioCosto,
     precioVenta,
+    enPromocion,
+    precioPromo,
     destacado: Boolean(productoNuevo.destacado),
     categoriaId,
     categoriaNuevaNombre,

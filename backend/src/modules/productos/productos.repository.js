@@ -88,7 +88,7 @@ export const create = async (data, client = pool) => {
 
   const promoActiva = Boolean(enPromocion);
   const precioPromoFinal = promoActiva ? precioPromo : null;
-  const tipoPromocionIdFinal = promoActiva ? tipoPromocionId : null;
+  const tipoPromocionIdFinal = promoActiva ? (tipoPromocionId ?? 1) : null;
 
   const { rows } = await client.query(
     `INSERT INTO productos (
@@ -139,7 +139,7 @@ export const update = async (id, data, client = pool) => {
 
   const promoActiva = Boolean(enPromocion);
   const precioPromoFinal = promoActiva ? precioPromo : null;
-  const tipoPromocionIdFinal = promoActiva ? tipoPromocionId : null;
+  const tipoPromocionIdFinal = promoActiva ? (tipoPromocionId ?? 1) : null;
 
   await client.query(
     `UPDATE productos

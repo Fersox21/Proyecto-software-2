@@ -10,7 +10,6 @@ function ItemLoteForm({
   lote,
   productos,
   categorias,
-  tiposPromocion,
   errores,
   puedeEliminar,
   deshabilitado = false,
@@ -18,7 +17,6 @@ function ItemLoteForm({
   onCambiar,
   onCambiarProductoNuevo,
   onCategoriaCreada,
-  onTipoPromocionCreado,
   onQuitar,
 }) {
   const esProductoNuevo = lote.productoId === '__nuevo__'
@@ -135,11 +133,9 @@ function ItemLoteForm({
           indice={indice}
           producto={lote.productoNuevo}
           categorias={categorias}
-          tiposPromocion={tiposPromocion}
           errores={errores}
           onCambiarCampo={onCambiarProductoNuevo}
           onCategoriaCreada={onCategoriaCreada}
-          onTipoPromocionCreado={onTipoPromocionCreado}
         />
       )}
 
