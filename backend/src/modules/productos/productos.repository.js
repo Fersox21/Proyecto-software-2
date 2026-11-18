@@ -63,8 +63,15 @@ export const findAllCatalogo = async (client = pool) => {
   return rows.map(mapearProducto);
 };
 
-export const findById = async (id, client = pool) => {
-  const { rows } = await client.query(`${SQL_BASE} WHERE p.id = $1 AND p.activo = true`, [id]);
+export const findById = async (id, options = {}, client = pool) => {
+  const db = typeof options?.query === 'function' ? options : client;
+  const incluirInactivos = options?.incluirInactivos === true;
+
+  const condicionActivo = incluirInactivos ? '' : 'AND p.activo = true';
+  const { rows } = await db.query(
+    `${SQL_BASE} WHERE p.id = $1 ${condicionActivo}`,
+    [id]
+  );
   return mapearProducto(rows[0]);
 };
 
