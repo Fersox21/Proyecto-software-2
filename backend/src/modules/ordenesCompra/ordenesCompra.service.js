@@ -445,6 +445,16 @@ export const obtenerOrdenCompraPorId = async (id, incluirInactivos = false) => {
   return ordenCompra;
 };
 
+const normalizarUsuarioId = (data) => {
+  const usuarioIdRaw = data?.usuarioId ?? data?.usuario_id;
+  return usuarioIdRaw !== undefined &&
+    usuarioIdRaw !== null &&
+    Number.isInteger(Number(usuarioIdRaw)) &&
+    Number(usuarioIdRaw) > 0
+    ? Number(usuarioIdRaw)
+    : null;
+};
+
 export const crearOrdenCompra = async (data, archivos = []) => {
   try {
     let proveedorId = null;
@@ -504,6 +514,8 @@ export const crearOrdenCompra = async (data, archivos = []) => {
     if (!Number.isFinite(total) || total <= 0 || total > DECIMAL_10_2_MAX) {
       throw crearError('El total de la orden de compra supera el límite permitido', 400);
     }
+
+    const usuarioId = normalizarUsuarioId(data);
 
     const resultado = await repository.create({
       total,
@@ -590,11 +602,7 @@ export const actualizarOrdenCompra = async (id, data, archivos = []) => {
       }
     }
 
-    const usuarioIdRaw = data?.usuarioId ?? data?.usuario_id;
-    const usuarioId =
-      usuarioIdRaw !== undefined && usuarioIdRaw !== null && Number.isInteger(Number(usuarioIdRaw)) && Number(usuarioIdRaw) > 0
-        ? Number(usuarioIdRaw)
-        : null;
+    const usuarioId = normalizarUsuarioId(data);
 
     const datosActualizar = {
       total,

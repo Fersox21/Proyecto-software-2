@@ -102,7 +102,6 @@ const resolverProductoEnTransaccion = async (lote, client) => {
 };
 
 const insertarLoteEnTransaccion = async ({ lote, ordenId, prodId, origenExistente = 'INGRESO_LOTE', usuarioId = null, client }) => {
-  const { tieneHistorialPrecios } = await obtenerCapacidades(client);
   const fArribo = lote.fechaArribo ?? lote.fecha_arribo;
   const fVenci = lote.fechaVencimiento ?? lote.fecha_vencimiento ?? lote.fechaVenci;
 
@@ -124,17 +123,15 @@ const insertarLoteEnTransaccion = async ({ lote, ordenId, prodId, origenExistent
   const loteId = rows[0].id;
 
   if (lote.productoNuevo) {
-    if (tieneHistorialPrecios) {
-      await client.query(
-        `INSERT INTO historial_precios_producto (
-           producto_id, lote_id, orden_compra_id,
-           precio_costo_anterior, precio_costo_nuevo,
-           precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
-         )
-         VALUES ($1, $2, $3, NULL, $4, NULL, $5, 'ALTA_PRODUCTO', $6)`,
-        [prodId, loteId, ordenId, lote.productoNuevo.precioCosto, lote.productoNuevo.precioVenta, usuarioId]
-      );
-    }
+    await client.query(
+      `INSERT INTO historial_precios_producto (
+         producto_id, lote_id, orden_compra_id,
+         precio_costo_anterior, precio_costo_nuevo,
+         precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
+       )
+       VALUES ($1, $2, $3, NULL, $4, NULL, $5, 'ALTA_PRODUCTO', $6)`,
+      [prodId, loteId, ordenId, lote.productoNuevo.precioCosto, lote.productoNuevo.precioVenta, usuarioId]
+    );
   } else if (productoPrevio) {
     const precioCostoAnterior = Number(productoPrevio.precio_costo);
     const precioVentaAnterior = Number(productoPrevio.precio_venta);
@@ -167,27 +164,25 @@ const insertarLoteEnTransaccion = async ({ lote, ordenId, prodId, origenExistent
         [costoFinal, ventaFinal, prodId]
       );
 
-      if (tieneHistorialPrecios) {
-        await client.query(
-          `INSERT INTO historial_precios_producto (
-             producto_id, lote_id, orden_compra_id,
-             precio_costo_anterior, precio_costo_nuevo,
-             precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
-           )
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-          [
-            prodId,
-            loteId,
-            ordenId,
-            precioCostoAnterior,
-            costoFinal,
-            precioVentaAnterior,
-            ventaFinal,
-            origenExistente,
-            usuarioId
-          ]
-        );
-      }
+      await client.query(
+        `INSERT INTO historial_precios_producto (
+           producto_id, lote_id, orden_compra_id,
+           precio_costo_anterior, precio_costo_nuevo,
+           precio_venta_anterior, precio_venta_nuevo, origen, usuario_id
+         )
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          prodId,
+          loteId,
+          ordenId,
+          precioCostoAnterior,
+          costoFinal,
+          precioVentaAnterior,
+          ventaFinal,
+          origenExistente,
+          usuarioId
+        ]
+      );
     }
   }
 
