@@ -3,6 +3,8 @@ import * as repositoryOrdenCompra from '../ordenesCompra/ordenesCompra.repositor
 import * as repositoryProducto from '../productos/productos.repository.js';
 
 const FORMATO_FECHA = 'YYYY-MM-DD';
+const INT4_MAX = 2147483647;
+const DECIMAL_10_2_MAX = 99999999.99;
 
 const crearError = (mensaje, status) => {
   const error = new Error(mensaje);
@@ -12,7 +14,7 @@ const crearError = (mensaje, status) => {
 
 const validarId = (id) => {
   const numero = Number(id);
-  if (!Number.isInteger(numero) || numero <= 0) {
+  if (!Number.isInteger(numero) || numero <= 0 || numero > INT4_MAX) {
     throw crearError('El id del lote no es válido', 400);
   }
   return numero;
@@ -22,7 +24,7 @@ const validarCantidad = (cantidad) => {
   const mensaje = 'La cantidad del lote debe ser un entero mayor a 0';
 
   if (typeof cantidad === 'number') {
-    if (!Number.isInteger(cantidad) || cantidad <= 0) {
+    if (!Number.isInteger(cantidad) || cantidad <= 0 || cantidad > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return cantidad;
@@ -34,7 +36,7 @@ const validarCantidad = (cantidad) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isSafeInteger(numero) || numero <= 0) {
+    if (!Number.isSafeInteger(numero) || numero <= 0 || numero > INT4_MAX) {
       throw crearError(mensaje, 400);
     }
     return numero;
@@ -47,10 +49,11 @@ const validarTotal = (total) => {
   const mensaje = 'El total del lote debe ser un número mayor a 0';
 
   if (typeof total === 'number') {
-    if (!Number.isFinite(total) || total <= 0) {
+    const redondeado = Number(total.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return Number(total.toFixed(2));
+    return redondeado;
   }
 
   if (typeof total === 'string') {
@@ -59,10 +62,11 @@ const validarTotal = (total) => {
       throw crearError(mensaje, 400);
     }
     const numero = Number(limpio);
-    if (!Number.isFinite(numero) || numero <= 0) {
+    const redondeado = Number(numero.toFixed(2));
+    if (!Number.isFinite(redondeado) || redondeado <= 0 || redondeado > DECIMAL_10_2_MAX) {
       throw crearError(mensaje, 400);
     }
-    return Number(numero.toFixed(2));
+    return redondeado;
   }
 
   throw crearError(mensaje, 400);
@@ -111,13 +115,8 @@ const validarOrdenDeFechas = (fechaArribo, fechaVencimiento) => {
   }
 };
 
-const obtenerHoyLocalISO = () => {
-  const ahora = new Date();
-  const anio = ahora.getFullYear();
-  const mes = String(ahora.getMonth() + 1).padStart(2, '0');
-  const dia = String(ahora.getDate()).padStart(2, '0');
-  return `${anio}-${mes}-${dia}`;
-};
+const obtenerHoyLocalISO = () =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Argentina/Buenos_Aires' }).format(new Date());
 
 const validarNoVencido = (fechaVencimiento) => {
   if (fechaVencimiento && fechaVencimiento < obtenerHoyLocalISO()) {
@@ -158,11 +157,11 @@ export const crearLote = async (data) => {
   const ordenCompraId = Number(data.ordenCompra);
   const productoId = Number(data.producto);
 
-  if (!Number.isInteger(ordenCompraId) || ordenCompraId <= 0) {
+  if (!Number.isInteger(ordenCompraId) || ordenCompraId <= 0 || ordenCompraId > INT4_MAX) {
     throw crearError('La orden de compra indicada no es válida', 400);
   }
 
-  if (!Number.isInteger(productoId) || productoId <= 0) {
+  if (!Number.isInteger(productoId) || productoId <= 0 || productoId > INT4_MAX) {
     throw crearError('El producto indicado no es válido', 400);
   }
 
@@ -172,9 +171,15 @@ export const crearLote = async (data) => {
   if (!ordenCompraExistente) {
     throw crearError('La orden de compra indicada no existe', 400);
   }
+  if (ordenCompraExistente.activo === false) {
+    throw crearError('La orden de compra indicada está inactiva', 400);
+  }
 
   if (!productoExistente) {
     throw crearError('El producto indicado no existe', 400);
+  }
+  if (productoExistente.activo === false) {
+    throw crearError('El producto indicado está inactivo', 400);
   }
 
   const cantidad = validarCantidad(data.cantidad);
@@ -190,6 +195,9 @@ export const crearLote = async (data) => {
   validarNoVencido(fechaVencimiento);
 
   const total = Number((Number(productoExistente.precioCosto) * cantidad).toFixed(2));
+  if (!Number.isFinite(total) || total <= 0 || total > DECIMAL_10_2_MAX) {
+    throw crearError('El total calculado del lote supera el límite permitido', 400);
+  }
 
   return await repository.create({
     cantidad,

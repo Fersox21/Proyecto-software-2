@@ -4,6 +4,34 @@ import * as tiposPromocionRepo from '../tiposPromocion/tiposPromocion.repository
 import * as productosRepo from '../productos/productos.repository.js';
 import * as proveedoresRepo from '../proveedores/proveedores.repository.js';
 
+const resolverOCrearCatalogo = async (repo, nombre, client, savepoint) => {
+  let registro = await repo.findByNombreInsensitive(nombre, client);
+  if (registro) {
+    if (registro.activo === false && typeof repo.reactivar === 'function') {
+      registro = await repo.reactivar(registro.id, nombre, client);
+    }
+    return registro;
+  }
+
+  await client.query(`SAVEPOINT ${savepoint}`);
+  try {
+    registro = await repo.create(nombre, client);
+    await client.query(`RELEASE SAVEPOINT ${savepoint}`);
+    return registro;
+  } catch (err) {
+    if (err.code === '23505') {
+      await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`);
+      registro = await repo.findByNombreInsensitive(nombre, client);
+      if (registro?.activo === false && typeof repo.reactivar === 'function') {
+        registro = await repo.reactivar(registro.id, nombre, client);
+      }
+      return registro;
+    }
+    await client.query(`ROLLBACK TO SAVEPOINT ${savepoint}`);
+    throw err;
+  }
+};
+
 const resolverProductoEnTransaccion = async (lote, client) => {
   if (!lote.productoNuevo) {
     return lote.productoId ?? lote.producto;
@@ -13,10 +41,12 @@ const resolverProductoEnTransaccion = async (lote, client) => {
 
   let categoria = null;
   if (nuevo.categoriaNuevaNombre) {
-    categoria = await categoriasRepo.findByNombreInsensitive(nuevo.categoriaNuevaNombre, client);
-    if (!categoria) {
-      categoria = await categoriasRepo.create(nuevo.categoriaNuevaNombre, client);
-    }
+    categoria = await resolverOCrearCatalogo(
+      categoriasRepo,
+      nuevo.categoriaNuevaNombre,
+      client,
+      'sp_categoria_nueva'
+    );
   } else if (nuevo.categoriaId) {
     categoria = await categoriasRepo.findById(nuevo.categoriaId, client);
   }
@@ -33,10 +63,12 @@ const resolverProductoEnTransaccion = async (lote, client) => {
   let tipoPromocionId = null;
   if (enPromocion) {
     if (nuevo.tipoPromocionNuevaNombre) {
-      let tipo = await tiposPromocionRepo.findByNombreInsensitive(nuevo.tipoPromocionNuevaNombre, client);
-      if (!tipo) {
-        tipo = await tiposPromocionRepo.create(nuevo.tipoPromocionNuevaNombre, client);
-      }
+      const tipo = await resolverOCrearCatalogo(
+        tiposPromocionRepo,
+        nuevo.tipoPromocionNuevaNombre,
+        client,
+        'sp_tipo_promo_nuevo'
+      );
       tipoPromocionId = tipo.id;
     } else if (nuevo.tipoPromocionId != null) {
       tipoPromocionId = nuevo.tipoPromocionId;
@@ -309,13 +341,25 @@ export const remove = async (id) => {
   try {
     await client.query('BEGIN');
     const { rows: lotesActivos } = await client.query(
-      `SELECT producto_id, cantidad FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
+      `SELECT producto_id, cantidad, cantidad_inicial FROM lotes WHERE orden_compra_id = $1 AND activo = true FOR UPDATE`,
       [id]
     );
-    const { rowCount } = await client.query('UPDATE ordenes_compra SET activo = false WHERE id = $1', [id]);
-    await client.query('UPDATE lotes SET activo = false WHERE orden_compra_id = $1 AND activo = true', [id]);
-    for (const lote of lotesActivos) {
-      await productosRepo.recalcularStock(lote.producto_id, client);
+    const loteConsumido = lotesActivos.find((l) => Number(l.cantidad) < Number(l.cantidad_inicial));
+    if (loteConsumido) {
+      const error = new Error('No se puede dar de baja la orden de compra porque uno o más lotes ya registraron salidas o ventas');
+      error.status = 409;
+      throw error;
+    }
+
+    const { rowCount } = await client.query(
+      'UPDATE ordenes_compra SET activo = false WHERE id = $1 AND activo = true',
+      [id]
+    );
+    if (rowCount > 0) {
+      await client.query('UPDATE lotes SET activo = false WHERE orden_compra_id = $1 AND activo = true', [id]);
+      for (const lote of lotesActivos) {
+        await productosRepo.recalcularStock(lote.producto_id, client);
+      }
     }
     await client.query('COMMIT');
     return rowCount;

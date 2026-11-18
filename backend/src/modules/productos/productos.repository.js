@@ -8,11 +8,11 @@ const SQL_BASE = `
            FROM lotes l
            WHERE l.producto_id = p.id
              AND l.activo = true
-             AND l.fecha_vencimiento >= CURRENT_DATE
+             AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
          ), 0) AS stock_calculado,
          c.nombre AS categoria_nombre,
          tp.nombre AS tipo_promocion_nombre,
-         EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= CURRENT_DATE) AS tiene_lote_vigente
+         EXISTS (SELECT 1 FROM lotes l WHERE l.producto_id = p.id AND l.activo = true AND l.cantidad > 0 AND l.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date) AS tiene_lote_vigente
   FROM productos p
   LEFT JOIN categorias c ON c.id = p.categoria_id
   LEFT JOIN tipos_promocion tp ON tp.id = p.tipo_promocion_id
@@ -195,7 +195,7 @@ export const recalcularStock = async (id, client = pool) => {
        FROM lotes
        WHERE producto_id = $1
          AND activo = true
-         AND fecha_vencimiento >= CURRENT_DATE
+         AND fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
      ), 0)
      WHERE id = $1
      RETURNING id, stock`,

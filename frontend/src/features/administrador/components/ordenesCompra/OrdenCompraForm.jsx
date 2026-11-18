@@ -177,6 +177,18 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
     }
   }
 
+  function recalcularTotalLoteSiVacio(indice) {
+    setValores((prev) => ({
+      ...prev,
+      lotes: prev.lotes.map((lote, pos) => {
+        if (pos !== indice || lote.total !== '') return lote
+        const sugerido = calcularPrecioTotalLote(lote, productos)
+        if (sugerido === null) return lote
+        return { ...lote, totalManual: false, total: String(sugerido) }
+      }),
+    }))
+  }
+
   function cambiarProductoNuevo(indice, campo, valor) {
     setValores((prev) => ({
       ...prev,
@@ -285,12 +297,12 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
           const porcentajeNum = Number(prod.porcentajeDescuento)
           if (
             prod.porcentajeDescuento === '' ||
-            Number.isNaN(porcentajeNum) ||
-            porcentajeNum <= 0 ||
-            porcentajeNum >= 100
+            !Number.isInteger(porcentajeNum) ||
+            porcentajeNum < 1 ||
+            porcentajeNum > 99
           ) {
             nuevosErrores[`lote-${indice}-prod-porcentajeDescuento`] =
-              'El porcentaje debe ser mayor a 0 y menor a 100'
+              'El porcentaje debe ser un entero entre 1 y 99'
           }
           const precioPromoNum = Number(prod.precioPromo)
           if (
@@ -450,6 +462,15 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
   }
 
   const proveedoresActivos = proveedores.filter((p) => p?.activo !== false)
+  const proveedorActualInactivo =
+    editando &&
+    orden?.proveedor?.id != null &&
+    !proveedoresActivos.some((p) => String(p.id) === String(orden.proveedor.id))
+      ? orden.proveedor
+      : null
+  const proveedoresParaSelect = proveedorActualInactivo
+    ? [{ ...proveedorActualInactivo, _inactivo: true }, ...proveedoresActivos]
+    : proveedoresActivos
   const totalOrdenCalculado = calcularTotalOrden()
 
   return (
@@ -472,9 +493,9 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
             >
               <option value="">Elegí un proveedor</option>
               <option value="__nuevo__">+ Nuevo proveedor</option>
-              {proveedoresActivos.map((p) => (
+              {proveedoresParaSelect.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.nombre}
+                  {p.nombre}{p._inactivo || p.activo === false ? ' (Inactivo)' : ''}
                 </option>
               ))}
             </select>
@@ -552,6 +573,7 @@ function OrdenCompraForm({ orden, onGuardar, onCerrar }) {
                 deshabilitado={tieneLotesConsumidos}
                 fechaPedidoMinima={valores.fecha}
                 onCambiar={cambiarLote}
+                onRecalcularTotalSiVacio={recalcularTotalLoteSiVacio}
                 onCambiarProductoNuevo={cambiarProductoNuevo}
                 onCategoriaCreada={agregarCategoria}
                 onQuitar={quitarLote}

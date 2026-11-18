@@ -4,7 +4,16 @@ import { crearCategoria } from '../../services/ordenesCompraService'
 import {
   bloquearTeclasNoNumericas,
   sanitizarDecimalPositivo,
+  sanitizarEnteroPositivo,
 } from '../../../../shared/utils/validaciones'
+
+const TIPOS_IMAGEN_PERMITIDOS = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/avif',
+])
+const MAX_TAMANIO_IMAGEN_BYTES = 5 * 1024 * 1024
 
 function redondear2(valor) {
   return Math.round((valor + Number.EPSILON) * 100) / 100
@@ -20,6 +29,7 @@ function NuevoProductoInlineForm({
 }) {
   const [creandoCategoria, setCreandoCategoria] = useState(false)
   const [errorCategoriaRapida, setErrorCategoriaRapida] = useState(null)
+  const [errorImagenLocal, setErrorImagenLocal] = useState(null)
   const [vistaPrevia, setVistaPrevia] = useState('')
 
   useEffect(() => {
@@ -75,7 +85,7 @@ function NuevoProductoInlineForm({
   }
 
   function manejarCambioPorcentaje(valor) {
-    const limpio = sanitizarDecimalPositivo(valor)
+    const limpio = sanitizarEnteroPositivo(valor)
     onCambiarCampo(indice, 'porcentajeDescuento', limpio)
 
     if (limpio === '') {
@@ -103,8 +113,8 @@ function NuevoProductoInlineForm({
     const precioPromoNum = Number(limpio)
     const precioVentaNum = Number(producto.precioVenta)
     if (Number.isFinite(precioVentaNum) && precioVentaNum > 0 && Number.isFinite(precioPromoNum)) {
-      const calculado = redondear2(100 - ((precioPromoNum * 100) / precioVentaNum))
-      onCambiarCampo(indice, 'porcentajeDescuento', calculado >= 0 ? String(calculado) : '')
+      const calculado = Math.round(100 - ((precioPromoNum * 100) / precioVentaNum))
+      onCambiarCampo(indice, 'porcentajeDescuento', calculado >= 1 && calculado <= 99 ? String(calculado) : '')
     }
   }
 
@@ -279,13 +289,13 @@ function NuevoProductoInlineForm({
               <input
                 id={`orden-lote-${indice}-prod-porcentaje-promo`}
                 type="number"
-                min="0.01"
-                max="99.99"
-                step="0.01"
-                inputMode="decimal"
+                min="1"
+                max="99"
+                step="1"
+                inputMode="numeric"
                 placeholder="Ej. 15"
                 value={producto.porcentajeDescuento ?? ''}
-                onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
+                onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
                 onChange={(e) => manejarCambioPorcentaje(e.target.value)}
                 aria-invalid={Boolean(errorCampo('porcentajeDescuento'))}
               />
@@ -341,13 +351,31 @@ function NuevoProductoInlineForm({
           <input
             id={`orden-lote-${indice}-prod-imagen`}
             type="file"
-            accept="image/*"
+            accept=".jpg,.jpeg,.png,.webp,.avif,image/jpeg,image/png,image/webp,image/avif"
             className="orden-visually-hidden"
             onChange={(e) => {
               const archivo = e.target.files?.[0] || null
+              if (!archivo) {
+                setErrorImagenLocal(null)
+                onCambiarCampo(indice, 'imagenArchivo', null)
+                return
+              }
+              if (!TIPOS_IMAGEN_PERMITIDOS.has(archivo.type)) {
+                setErrorImagenLocal('Formato no válido. Usá JPG, PNG, WEBP o AVIF.')
+                e.target.value = ''
+                onCambiarCampo(indice, 'imagenArchivo', null)
+                return
+              }
+              if (archivo.size > MAX_TAMANIO_IMAGEN_BYTES) {
+                setErrorImagenLocal('La imagen no puede superar los 5 MB.')
+                e.target.value = ''
+                onCambiarCampo(indice, 'imagenArchivo', null)
+                return
+              }
+              setErrorImagenLocal(null)
               onCambiarCampo(indice, 'imagenArchivo', archivo)
             }}
-            aria-invalid={Boolean(errorCampo('imagenArchivo'))}
+            aria-invalid={Boolean(errorImagenLocal || errorCampo('imagenArchivo'))}
           />
           <label
             htmlFor={`orden-lote-${indice}-prod-imagen`}
@@ -374,8 +402,8 @@ function NuevoProductoInlineForm({
               />
             )}
           </label>
-          {errorCampo('imagenArchivo') && (
-            <p className="orden-campo-error">{errorCampo('imagenArchivo')}</p>
+          {(errorImagenLocal || errorCampo('imagenArchivo')) && (
+            <p className="orden-campo-error">{errorImagenLocal || errorCampo('imagenArchivo')}</p>
           )}
         </div>
 

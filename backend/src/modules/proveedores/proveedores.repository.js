@@ -10,6 +10,14 @@ export const findById = async (id) => {
   return rows[0];
 };
 
+export const findByNombreInsensitive = async (nombre, client = pool) => {
+  const { rows } = await client.query(
+    'SELECT * FROM proveedores WHERE LOWER(TRIM(nombre)) = LOWER(TRIM($1)) AND activo = true LIMIT 1',
+    [nombre]
+  );
+  return rows[0] || null;
+};
+
 export const create = async (data, client = pool) => {
   const { nombre, telefono } = data;
   const { rows } = await client.query(

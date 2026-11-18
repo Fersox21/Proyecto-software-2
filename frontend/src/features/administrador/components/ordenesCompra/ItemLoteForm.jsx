@@ -17,6 +17,7 @@ function ItemLoteForm({
   deshabilitado = false,
   fechaPedidoMinima,
   onCambiar,
+  onRecalcularTotalSiVacio,
   onCambiarProductoNuevo,
   onCategoriaCreada,
   onQuitar,
@@ -27,6 +28,10 @@ function ItemLoteForm({
   const productoSeleccionado = !esProductoNuevo && lote.productoId
     ? productos.find((p) => String(p.id) === String(lote.productoId))
     : null
+  const productosParaSelect =
+    productoSeleccionado && !productosActivos.some((p) => String(p.id) === String(productoSeleccionado.id))
+      ? [productoSeleccionado, ...productosActivos]
+      : productosActivos
 
   const precioCosto = esProductoNuevo
     ? Number(lote.productoNuevo?.precioCosto)
@@ -56,10 +61,11 @@ function ItemLoteForm({
           >
             <option value="">Elegí un producto</option>
             <option value="__nuevo__">+ Crear nuevo producto</option>
-            {productosActivos.map((producto) => (
+            {productosParaSelect.map((producto) => (
               <option key={producto.id} value={producto.id}>
                 {producto.nombre}
                 {producto.marca ? ` · ${producto.marca}` : ''}
+                {producto.activo === false ? ' (Inactivo)' : ''}
               </option>
             ))}
           </select>
@@ -155,6 +161,7 @@ function ItemLoteForm({
             disabled={deshabilitado}
             onKeyDown={(e) => bloquearTeclasNoNumericas(e, true)}
             onChange={(e) => onCambiar(indice, 'total', sanitizarDecimalPositivo(e.target.value))}
+            onBlur={() => onRecalcularTotalSiVacio?.(indice)}
             aria-invalid={Boolean(errores[`lote-${indice}-total`])}
           />
           {errores[`lote-${indice}-total`] && (

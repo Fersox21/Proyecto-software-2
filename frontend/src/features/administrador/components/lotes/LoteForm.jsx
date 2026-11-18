@@ -172,6 +172,10 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
 
   const productoActual = lote?.producto
   const ordenActual = lote?.ordenCompra
+  const tieneSalidas =
+    editando &&
+    lote?.cantidadInicial != null &&
+    Number(lote.cantidad) < Number(lote.cantidadInicial)
   const fechasInvalidas =
     Boolean(valores.fechaArribo) &&
     Boolean(valores.fechaVencimiento) &&
@@ -257,6 +261,8 @@ function LoteForm({ lote, onGuardar, onCerrar }) {
               value={valores.cantidad}
               onKeyDown={(e) => bloquearTeclasNoNumericas(e, false)}
               onChange={handleChange}
+              disabled={tieneSalidas}
+              title={tieneSalidas ? 'No se puede modificar porque el lote ya registró ventas o salidas.' : undefined}
               aria-invalid={Boolean(errores.cantidad)}
             />
           </CampoFormulario>

@@ -2,23 +2,31 @@ import * as service from './ordenesCompra.service.js';
 import { eliminarImagenFisica } from '../productos/productos.imagen.js';
 
 const parsearPayloadOrden = (req) => {
-  if (typeof req.body?.datos === 'string') {
-    let parsed;
+  const rawDatos = req.body?.datos;
+  if (Array.isArray(rawDatos)) {
+    const error = new Error('El campo datos no puede enviarse duplicado');
+    error.status = 400;
+    throw error;
+  }
+
+  let payload = req.body;
+  if (typeof rawDatos === 'string') {
     try {
-      parsed = JSON.parse(req.body.datos);
+      payload = JSON.parse(rawDatos);
     } catch {
       const error = new Error('El campo datos debe contener un JSON válido');
       error.status = 400;
       throw error;
     }
-    if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
-      const error = new Error('El campo datos debe ser un objeto JSON válido');
-      error.status = 400;
-      throw error;
-    }
-    return parsed;
   }
-  return req.body;
+
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    const error = new Error('El cuerpo de la petición debe ser un objeto JSON válido');
+    error.status = 400;
+    throw error;
+  }
+
+  return payload;
 };
 
 const limpiarImagenesSubidas = (archivos = []) => {

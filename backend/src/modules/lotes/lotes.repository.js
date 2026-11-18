@@ -6,7 +6,7 @@ import * as productosRepo from '../productos/productos.repository.js';
 // de esa orden. Evita que el frontend tenga que pedir una orden por cada lote.
 const SQL_DETALLE = `
   SELECT l.id, l.cantidad, l.cantidad_inicial, l.total, l.fecha_arribo, l.fecha_vencimiento, l.activo,
-         (l.fecha_vencimiento < CURRENT_DATE) AS esta_vencido,
+         (l.fecha_vencimiento < (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date) AS esta_vencido,
          (SELECT COUNT(*) FROM lotes l2 WHERE l2.orden_compra_id = l.orden_compra_id AND l2.activo = true)::int AS total_lotes_orden,
          p.id AS producto_id, p.nombre AS producto_nombre, p.marca AS producto_marca,
          p.activo AS producto_activo,
@@ -16,7 +16,7 @@ const SQL_DETALLE = `
            FROM lotes lv
            WHERE lv.producto_id = p.id
              AND lv.activo = true
-             AND lv.fecha_vencimiento >= CURRENT_DATE
+             AND lv.fecha_vencimiento >= (CURRENT_TIMESTAMP AT TIME ZONE 'America/Argentina/Buenos_Aires')::date
          ), 0)::int AS producto_stock,
          p.precio_costo AS producto_precio_costo, p.precio_venta AS producto_precio_venta,
          p.en_promocion AS producto_en_promocion, p.precio_promo AS producto_precio_promo,
@@ -182,8 +182,12 @@ export const update = async (id, data) => {
 
     await client.query(
       `UPDATE lotes
-      SET cantidad = $1, cantidad_inicial = $1, total = $2, fecha_arribo = $3, fecha_vencimiento = $4
-      WHERE id = $5`,
+      SET cantidad = $1,
+          cantidad_inicial = CASE WHEN cantidad = cantidad_inicial THEN $1 ELSE cantidad_inicial END,
+          total = $2,
+          fecha_arribo = $3,
+          fecha_vencimiento = $4
+      WHERE id = $5 AND activo = true`,
       [cantidad, total, fechaArribo, fechaVencimiento, id]
     );
 

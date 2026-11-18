@@ -74,6 +74,7 @@ function ProveedorForm({ proveedor, onGuardar, onCerrar }) {
           <input
             id="proveedor-nombre"
             type="text"
+            maxLength={100}
             placeholder="Ej. Distribuidora Central S.A."
             value={valores.nombre}
             onChange={(e) => actualizarCampo('nombre', e.target.value)}
